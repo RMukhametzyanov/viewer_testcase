@@ -1,0 +1,8 @@
+# Test Case Editor - Telegram Dark Theme
+# Редактор тест-кейсов в стиле Telegram Dark
+
+# PyQt5 версия
+PyQt5>=5.15.0
+
+# Flet версия (современная кроссплатформенная альтернатива)
+flet>=0.21.0
