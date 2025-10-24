@@ -512,8 +512,12 @@ class TestCaseEditor(QMainWindow):
         super().__init__()
         self.test_cases: List[Dict] = []
         self.current_test_case: Optional[Dict] = None
-        self.test_cases_dir = Path("testcases")
+        self.settings_file = Path("settings.json")
         self.has_unsaved_changes = False
+        
+        # Загружаем путь к папке из настроек
+        self.test_cases_dir = self.load_settings()
+        
         self.init_ui()
         self.apply_telegram_theme()
         self.load_test_cases()
@@ -575,7 +579,49 @@ class TestCaseEditor(QMainWindow):
         header_layout.addWidget(self.file_count_label)
         header_layout.addStretch()
         
+        # Кнопка выбора папки
+        self.select_folder_btn = QPushButton("📁")
+        self.select_folder_btn.setToolTip("Выбрать папку с тест-кейсами")
+        self.select_folder_btn.setMaximumWidth(35)
+        self.select_folder_btn.setMaximumHeight(30)
+        self.select_folder_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #2B5278;
+                border: 1px solid #3D6A98;
+                border-radius: 6px;
+                color: #FFFFFF;
+                font-size: 14pt;
+                padding: 2px;
+            }
+            QPushButton:hover {
+                background-color: #3D6A98;
+                border: 1px solid #5288C1;
+            }
+            QPushButton:pressed {
+                background-color: #1D3F5F;
+            }
+        """)
+        self.select_folder_btn.clicked.connect(self.select_test_cases_folder)
+        header_layout.addWidget(self.select_folder_btn)
+        
         layout.addWidget(header)
+        
+        # Отображение текущей папки
+        current_folder_frame = QFrame()
+        current_folder_frame.setMaximumHeight(30)
+        current_folder_layout = QHBoxLayout(current_folder_frame)
+        current_folder_layout.setContentsMargins(10, 0, 10, 5)
+        
+        folder_icon_label = QLabel("📂")
+        folder_icon_label.setStyleSheet("color: #5288C1; font-size: 10pt;")
+        current_folder_layout.addWidget(folder_icon_label)
+        
+        self.current_folder_label = QLabel("testcases")
+        self.current_folder_label.setStyleSheet("color: #8B9099; font-size: 9pt;")
+        self.current_folder_label.setWordWrap(False)
+        current_folder_layout.addWidget(self.current_folder_label, 1)
+        
+        layout.addWidget(current_folder_frame)
         
         # Поле поиска
         search_frame = QFrame()
@@ -1452,8 +1498,12 @@ class TestCaseEditor(QMainWindow):
         self.test_cases = []
         self.test_cases_tree.clear()
         
+        # Обновляем отображение текущей папки
+        self.current_folder_label.setText(str(self.test_cases_dir))
+        self.current_folder_label.setToolTip(str(self.test_cases_dir.absolute()))
+        
         if not self.test_cases_dir.exists():
-            self.statusBar().showMessage("Директория test_cases не найдена")
+            self.statusBar().showMessage(f"Директория {self.test_cases_dir} не найдена")
             return
             
         # Загружаем папки и файлы рекурсивно
@@ -2165,6 +2215,92 @@ class TestCaseEditor(QMainWindow):
                 visible_count += child_visible
         
         return visible_count
+    
+    def load_settings(self) -> Path:
+        """Загрузка настроек из файла"""
+        default_path = Path("testcases")
+        
+        if self.settings_file.exists():
+            try:
+                with open(self.settings_file, 'r', encoding='utf-8') as f:
+                    settings = json.load(f)
+                    test_cases_path = Path(settings.get('test_cases_dir', 'testcases'))
+                    
+                    # Проверяем, существует ли папка
+                    if test_cases_path.exists() and test_cases_path.is_dir():
+                        return test_cases_path
+                    else:
+                        # Если папка не существует, спрашиваем пользователя
+                        return self.prompt_select_folder()
+            except Exception as e:
+                print(f"Ошибка загрузки настроек: {e}")
+                return self.prompt_select_folder()
+        else:
+            # Если файл настроек не существует, но есть папка по умолчанию
+            if default_path.exists() and default_path.is_dir():
+                self.save_settings(default_path)
+                return default_path
+            else:
+                # Спрашиваем пользователя выбрать папку
+                return self.prompt_select_folder()
+    
+    def save_settings(self, test_cases_path: Path = None):
+        """Сохранение настроек в файл"""
+        if test_cases_path is None:
+            test_cases_path = self.test_cases_dir
+        
+        settings = {
+            'test_cases_dir': str(test_cases_path)
+        }
+        
+        try:
+            with open(self.settings_file, 'w', encoding='utf-8') as f:
+                json.dump(settings, f, ensure_ascii=False, indent=4)
+        except Exception as e:
+            print(f"Ошибка сохранения настроек: {e}")
+    
+    def prompt_select_folder(self) -> Path:
+        """Диалог выбора папки при первом запуске или если папка не найдена"""
+        msg_box = QMessageBox()
+        msg_box.setIcon(QMessageBox.Information)
+        msg_box.setWindowTitle("Выбор папки с тест-кейсами")
+        msg_box.setText("Папка с тест-кейсами не найдена.\n\nПожалуйста, выберите папку с тест-кейсами.")
+        msg_box.setStandardButtons(QMessageBox.Ok)
+        msg_box.exec_()
+        
+        # Открываем диалог выбора папки
+        folder = QFileDialog.getExistingDirectory(
+            None,
+            "Выберите папку с тест-кейсами",
+            str(Path.cwd()),
+            QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks
+        )
+        
+        if folder:
+            selected_path = Path(folder)
+            self.save_settings(selected_path)
+            return selected_path
+        else:
+            # Если пользователь отменил, используем текущую директорию
+            default = Path("testcases")
+            default.mkdir(exist_ok=True)
+            self.save_settings(default)
+            return default
+    
+    def select_test_cases_folder(self):
+        """Обработчик кнопки выбора папки"""
+        folder = QFileDialog.getExistingDirectory(
+            self,
+            "Выберите папку с тест-кейсами",
+            str(self.test_cases_dir),
+            QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks
+        )
+        
+        if folder:
+            self.test_cases_dir = Path(folder)
+            self.save_settings(self.test_cases_dir)
+            self.load_test_cases()
+            self.statusBar().showMessage(f"Выбрана папка: {self.test_cases_dir}")
                     
     def apply_telegram_theme(self):
         """Применение темы Telegram Dark"""
