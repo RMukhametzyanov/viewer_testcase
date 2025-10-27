@@ -99,17 +99,6 @@ class CustomTreeWidget(QTreeWidget):
             event.ignore()
             return
         
-        # Получаем данные перетаскиваемого элемента
-        source_data = source_item.data(0, Qt.UserRole)
-        if not source_data:
-            event.ignore()
-            return
-        
-        source_type = source_data.get('type')
-        if source_type not in ['file', 'folder']:
-            event.ignore()
-            return
-        
         # Получаем целевой элемент (куда перетаскиваем)
         target_item = self.itemAt(event.pos())
         if not target_item:
@@ -141,70 +130,152 @@ class CustomTreeWidget(QTreeWidget):
             event.ignore()
             return
         
-        # Перемещаем файл или папку
         import shutil
         
-        if source_type == 'file':
-            # Перемещение файла
-            test_case = source_data['test_case']
-            if '_filepath' in test_case:
-                old_path = Path(test_case['_filepath'])
-                new_path = target_folder / old_path.name
+        # Проверяем, включен ли режим массового редактирования и есть ли выбранные элементы
+        if self.parent_editor and self.parent_editor.edit_mode and self.parent_editor.selected_items:
+            # МАССОВОЕ ПЕРЕМЕЩЕНИЕ
+            moved_count = 0
+            errors = []
+            
+            for item_data in self.parent_editor.selected_items:
+                try:
+                    item_type = item_data.get('type')
+                    
+                    if item_type == 'file':
+                        # Перемещение файла
+                        test_case = item_data['test_case']
+                        if '_filepath' in test_case:
+                            old_path = Path(test_case['_filepath'])
+                            new_path = target_folder / old_path.name
+                            
+                            # Проверяем, не перемещаем ли в ту же папку
+                            if old_path.parent == new_path.parent:
+                                continue
+                            
+                            if new_path.exists():
+                                errors.append(f"Файл {old_path.name} уже существует в целевой папке")
+                                continue
+                            
+                            shutil.move(str(old_path), str(new_path))
+                            moved_count += 1
+                    
+                    elif item_type == 'folder':
+                        # Перемещение папки
+                        old_folder_path = item_data['path']
+                        new_folder_path = target_folder / old_folder_path.name
+                        
+                        # Проверяем, не перемещаем ли в ту же родительскую папку
+                        if old_folder_path.parent == target_folder:
+                            continue
+                        
+                        # Проверяем, не перемещаем ли папку саму в себя
+                        if target_folder == old_folder_path or str(target_folder).startswith(str(old_folder_path) + os.sep):
+                            errors.append(f"Нельзя переместить папку {old_folder_path.name} в саму себя")
+                            continue
+                        
+                        if new_folder_path.exists():
+                            errors.append(f"Папка {old_folder_path.name} уже существует в целевой папке")
+                            continue
+                        
+                        shutil.move(str(old_folder_path), str(new_folder_path))
+                        moved_count += 1
+                        
+                except Exception as e:
+                    errors.append(str(e))
+            
+            # Очищаем выбор и перезагружаем дерево
+            self.parent_editor.selected_items.clear()
+            self.parent_editor.load_test_cases()
+            self.parent_editor.update_selected_count()
+            
+            # Показываем результат
+            message = f"Перемещено элементов: {moved_count}"
+            if errors:
+                message += f"\n\nОшибки:\n" + "\n".join(errors[:5])
+                if len(errors) > 5:
+                    message += f"\n... и еще {len(errors) - 5} ошибок"
+            
+            if errors:
+                QMessageBox.warning(self.parent_editor, "Перемещение завершено с ошибками", message)
+            else:
+                self.parent_editor.statusBar().showMessage(message)
+            
+            event.accept()
+            
+        else:
+            # ОДИНОЧНОЕ ПЕРЕМЕЩЕНИЕ (обычный режим)
+            source_data = source_item.data(0, Qt.UserRole)
+            if not source_data:
+                event.ignore()
+                return
+            
+            source_type = source_data.get('type')
+            if source_type not in ['file', 'folder']:
+                event.ignore()
+                return
+            
+            if source_type == 'file':
+                # Перемещение файла
+                test_case = source_data['test_case']
+                if '_filepath' in test_case:
+                    old_path = Path(test_case['_filepath'])
+                    new_path = target_folder / old_path.name
+                    
+                    # Проверяем, не перемещаем ли в ту же папку
+                    if old_path.parent == new_path.parent:
+                        event.ignore()
+                        return
+                    
+                    try:
+                        shutil.move(str(old_path), str(new_path))
+                        if self.parent_editor:
+                            self.parent_editor.load_test_cases()
+                            self.parent_editor.statusBar().showMessage(f"Файл перемещен в {target_folder.name}")
+                        event.accept()
+                    except Exception as e:
+                        if self.parent_editor:
+                            QMessageBox.critical(self.parent_editor, "Ошибка", f"Не удалось переместить файл:\n{e}")
+                        event.ignore()
+                else:
+                    event.ignore()
+            
+            elif source_type == 'folder':
+                # Перемещение папки
+                old_folder_path = source_data['path']
+                new_folder_path = target_folder / old_folder_path.name
                 
-                # Проверяем, не перемещаем ли в ту же папку
-                if old_path.parent == new_path.parent:
+                # Проверяем, не перемещаем ли в ту же родительскую папку
+                if old_folder_path.parent == target_folder:
+                    event.ignore()
+                    return
+                
+                # Проверяем, не перемещаем ли папку саму в себя или в свою подпапку
+                if target_folder == old_folder_path or str(target_folder).startswith(str(old_folder_path) + os.sep):
+                    if self.parent_editor:
+                        self.parent_editor.statusBar().showMessage("Нельзя переместить папку в саму себя")
+                    event.ignore()
+                    return
+                
+                # Проверяем, не существует ли уже папка с таким именем
+                if new_folder_path.exists():
+                    if self.parent_editor:
+                        self.parent_editor.statusBar().showMessage(f"Папка {old_folder_path.name} уже существует в целевой директории")
                     event.ignore()
                     return
                 
                 try:
-                    shutil.move(str(old_path), str(new_path))
+                    shutil.move(str(old_folder_path), str(new_folder_path))
                     if self.parent_editor:
                         self.parent_editor.load_test_cases()
-                        self.parent_editor.statusBar().showMessage(f"Файл перемещен в {target_folder.name}")
+                        self.parent_editor.statusBar().showMessage(f"Папка '{old_folder_path.name}' перемещена в '{target_folder.name}'")
                     event.accept()
                 except Exception as e:
                     if self.parent_editor:
-                        QMessageBox.critical(self.parent_editor, "Ошибка", f"Не удалось переместить файл:\n{e}")
+                        QMessageBox.critical(self.parent_editor, "Ошибка", f"Не удалось переместить папку:\n{e}")
                     event.ignore()
             else:
                 event.ignore()
-        
-        elif source_type == 'folder':
-            # Перемещение папки
-            old_folder_path = source_data['path']
-            new_folder_path = target_folder / old_folder_path.name
-            
-            # Проверяем, не перемещаем ли в ту же родительскую папку
-            if old_folder_path.parent == target_folder:
-                event.ignore()
-                return
-            
-            # Проверяем, не перемещаем ли папку саму в себя или в свою подпапку
-            if target_folder == old_folder_path or str(target_folder).startswith(str(old_folder_path) + os.sep):
-                if self.parent_editor:
-                    self.parent_editor.statusBar().showMessage("Нельзя переместить папку в саму себя")
-                event.ignore()
-                return
-            
-            # Проверяем, не существует ли уже папка с таким именем
-            if new_folder_path.exists():
-                if self.parent_editor:
-                    self.parent_editor.statusBar().showMessage(f"Папка {old_folder_path.name} уже существует в целевой директории")
-                event.ignore()
-                return
-            
-            try:
-                shutil.move(str(old_folder_path), str(new_folder_path))
-                if self.parent_editor:
-                    self.parent_editor.load_test_cases()
-                    self.parent_editor.statusBar().showMessage(f"Папка '{old_folder_path.name}' перемещена в '{target_folder.name}'")
-                event.accept()
-            except Exception as e:
-                if self.parent_editor:
-                    QMessageBox.critical(self.parent_editor, "Ошибка", f"Не удалось переместить папку:\n{e}")
-                event.ignore()
-        else:
-            event.ignore()
 
 
 class TestCaseListItemWidget(QWidget):
@@ -515,6 +586,10 @@ class TestCaseEditor(QMainWindow):
         self.settings_file = Path("settings.json")
         self.has_unsaved_changes = False
         
+        # Режим массового редактирования
+        self.edit_mode = False
+        self.selected_items = []  # Список выбранных элементов для массовых операций
+        
         # Загружаем путь к папке из настроек
         self.test_cases_dir = self.load_settings()
         
@@ -543,9 +618,22 @@ class TestCaseEditor(QMainWindow):
         left_panel = self.create_left_panel()
         splitter.addWidget(left_panel)
         
-        # Правая панель - форма редактирования
+        # Правая панель - контейнер для формы и заглушки
+        right_panel = QWidget()
+        self.right_panel_layout = QVBoxLayout(right_panel)
+        self.right_panel_layout.setContentsMargins(0, 0, 0, 0)
+        self.right_panel_layout.setSpacing(0)
+        
+        # Создаем заглушку
+        self.placeholder_widget = self.create_placeholder_widget()
+        self.right_panel_layout.addWidget(self.placeholder_widget)
+        
+        # Создаем форму редактирования
         self.form_widget = self.create_form_widget()
-        splitter.addWidget(self.form_widget)
+        self.form_widget.setVisible(False)  # Скрыта по умолчанию
+        self.right_panel_layout.addWidget(self.form_widget)
+        
+        splitter.addWidget(right_panel)
         
         # Установка пропорций
         splitter.setStretchFactor(0, 1)
@@ -578,6 +666,36 @@ class TestCaseEditor(QMainWindow):
         self.file_count_label.setStyleSheet("color: #8B9099;")
         header_layout.addWidget(self.file_count_label)
         header_layout.addStretch()
+        
+        # Кнопка редактирования дерева (массовые операции)
+        self.edit_tree_btn = QPushButton("✏️")
+        self.edit_tree_btn.setToolTip("Редактировать дерево тест-кейсов")
+        self.edit_tree_btn.setMaximumWidth(35)
+        self.edit_tree_btn.setMaximumHeight(30)
+        self.edit_tree_btn.setCheckable(True)
+        self.edit_tree_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #2B5278;
+                border: 1px solid #3D6A98;
+                border-radius: 6px;
+                color: #FFFFFF;
+                font-size: 14pt;
+                padding: 2px;
+            }
+            QPushButton:hover {
+                background-color: #3D6A98;
+                border: 1px solid #5288C1;
+            }
+            QPushButton:pressed {
+                background-color: #1D3F5F;
+            }
+            QPushButton:checked {
+                background-color: #FFA931;
+                border: 1px solid #FFB84D;
+            }
+        """)
+        self.edit_tree_btn.clicked.connect(self.toggle_edit_mode)
+        header_layout.addWidget(self.edit_tree_btn)
         
         # Кнопка выбора папки
         self.select_folder_btn = QPushButton("📁")
@@ -637,9 +755,127 @@ class TestCaseEditor(QMainWindow):
         
         layout.addWidget(search_frame)
         
+        # Панель массовых операций (скрыта по умолчанию)
+        self.bulk_actions_panel = self.create_bulk_actions_panel()
+        self.bulk_actions_panel.setVisible(False)
+        layout.addWidget(self.bulk_actions_panel)
+        
         # Дерево тест-кейсов с папками
         self.test_cases_tree = self.create_test_cases_tree()
         layout.addWidget(self.test_cases_tree)
+        
+        return panel
+    
+    def create_placeholder_widget(self) -> QWidget:
+        """Создание заглушки для правой панели"""
+        placeholder = QWidget()
+        placeholder.setStyleSheet("background-color: #17212B;")
+        
+        layout = QVBoxLayout(placeholder)
+        layout.setAlignment(Qt.AlignCenter)
+        
+        # Иконка
+        icon_label = QLabel("📋")
+        icon_label.setFont(QFont("Segoe UI", 72))
+        icon_label.setAlignment(Qt.AlignCenter)
+        icon_label.setStyleSheet("color: #5288C1; background: transparent;")
+        layout.addWidget(icon_label)
+        
+        layout.addSpacing(20)
+        
+        # Основной текст
+        main_text = QLabel("Выберите тест-кейс для начала работы")
+        main_text.setFont(QFont("Segoe UI", 16, QFont.Bold))
+        main_text.setAlignment(Qt.AlignCenter)
+        main_text.setStyleSheet("color: #E1E3E6; background: transparent;")
+        main_text.setWordWrap(True)
+        layout.addWidget(main_text)
+        
+        layout.addSpacing(10)
+        
+        # Информация о количестве тест-кейсов
+        self.testcases_count_label = QLabel("Загрузка...")
+        self.testcases_count_label.setFont(QFont("Segoe UI", 12))
+        self.testcases_count_label.setAlignment(Qt.AlignCenter)
+        self.testcases_count_label.setStyleSheet("color: #8B9099; background: transparent;")
+        layout.addWidget(self.testcases_count_label)
+        
+        layout.addStretch()
+        
+        return placeholder
+    
+    def create_bulk_actions_panel(self) -> QWidget:
+        """Создание панели массовых операций"""
+        panel = QFrame()
+        panel.setStyleSheet("""
+            QFrame {
+                background-color: #1E2732;
+                border: 1px solid #FFA931;
+                border-radius: 6px;
+                padding: 5px;
+            }
+        """)
+        panel.setMaximumHeight(60)
+        
+        layout = QHBoxLayout(panel)
+        layout.setContentsMargins(8, 5, 8, 5)
+        layout.setSpacing(8)
+        
+        layout.addStretch()
+        
+        # Кнопка "Удалить"
+        self.bulk_delete_btn = QPushButton("🗑️ Удалить")
+        self.bulk_delete_btn.setMinimumHeight(35)
+        self.bulk_delete_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #F5555D;
+                border: 1px solid #F77078;
+                border-radius: 6px;
+                padding: 8px 15px;
+                color: #FFFFFF;
+                font-weight: 600;
+                font-size: 9pt;
+            }
+            QPushButton:hover {
+                background-color: #F77078;
+                border: 1px solid #F98B91;
+            }
+            QPushButton:pressed {
+                background-color: #D43F47;
+            }
+            QPushButton:disabled {
+                background-color: #17212B;
+                color: #6B7380;
+                border: 1px solid #2B3945;
+            }
+        """)
+        self.bulk_delete_btn.clicked.connect(self.bulk_delete_items)
+        self.bulk_delete_btn.setEnabled(False)
+        layout.addWidget(self.bulk_delete_btn)
+        
+        # Кнопка "Отменить выбор"
+        self.clear_selection_btn = QPushButton("✖ Сбросить")
+        self.clear_selection_btn.setMinimumHeight(35)
+        self.clear_selection_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #2B3945;
+                border: 1px solid #3D4B5C;
+                border-radius: 6px;
+                padding: 8px 15px;
+                color: #E1E3E6;
+                font-weight: 600;
+                font-size: 9pt;
+            }
+            QPushButton:hover {
+                background-color: #3D4B5C;
+                border: 1px solid #4E5D6E;
+            }
+            QPushButton:pressed {
+                background-color: #1E2732;
+            }
+        """)
+        self.clear_selection_btn.clicked.connect(self.clear_selection)
+        layout.addWidget(self.clear_selection_btn)
         
         return panel
         
@@ -729,6 +965,9 @@ class TestCaseEditor(QMainWindow):
         
         # Обработка кликов
         tree.itemClicked.connect(self.on_tree_item_clicked)
+        
+        # Обработка изменения состояния чекбоксов
+        tree.itemChanged.connect(self.on_item_check_state_changed)
         
         # Контекстное меню
         tree.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -951,11 +1190,40 @@ class TestCaseEditor(QMainWindow):
         static_title.setStyleSheet("color: #8B9099; border: none;")
         header_text_layout.addWidget(static_title)
         
+        # Контейнер для переключения между Label и LineEdit
+        self.title_container = QWidget()
+        self.title_container.setStyleSheet("background: transparent; border: none;")
+        title_container_layout = QVBoxLayout(self.title_container)
+        title_container_layout.setContentsMargins(0, 0, 0, 0)
+        title_container_layout.setSpacing(0)
+        
+        # Label для отображения названия (кликабельный)
         self.testcase_title_label = QLabel("Не выбран тест-кейс")
         self.testcase_title_label.setFont(QFont("Segoe UI", 14, QFont.Bold))
-        self.testcase_title_label.setStyleSheet("color: #5288C1; border: none;")
+        self.testcase_title_label.setStyleSheet("color: #5288C1; border: none; cursor: pointer;")
         self.testcase_title_label.setWordWrap(True)
-        header_text_layout.addWidget(self.testcase_title_label)
+        self.testcase_title_label.mousePressEvent = self.on_title_label_clicked
+        title_container_layout.addWidget(self.testcase_title_label)
+        
+        # LineEdit для редактирования (скрыт по умолчанию)
+        self.testcase_title_edit = QLineEdit()
+        self.testcase_title_edit.setFont(QFont("Segoe UI", 14, QFont.Bold))
+        self.testcase_title_edit.setStyleSheet("""
+            QLineEdit {
+                background-color: #1E2732;
+                border: 2px solid #5288C1;
+                border-radius: 6px;
+                padding: 5px;
+                color: #5288C1;
+                font-weight: bold;
+            }
+        """)
+        self.testcase_title_edit.setVisible(False)
+        self.testcase_title_edit.returnPressed.connect(self.on_title_edit_finished)
+        self.testcase_title_edit.editingFinished.connect(self.on_title_edit_finished)
+        title_container_layout.addWidget(self.testcase_title_edit)
+        
+        header_text_layout.addWidget(self.title_container)
         
         header_main_layout.addLayout(header_text_layout, 1)
         
@@ -1079,20 +1347,7 @@ class TestCaseEditor(QMainWindow):
         updated_container.addWidget(self.updated_at_input)
         row1.addLayout(updated_container)
         
-        # Название (растягивается)
-        title_container = QVBoxLayout()
-        title_container.setSpacing(5)
-        title_label = QLabel("Название:")
-        title_label.setFont(QFont("Segoe UI", 9, QFont.Bold))
-        title_container.addWidget(title_label)
-        
-        self.title_input = QLineEdit()
-        self.title_input.setPlaceholderText("Введите название тест-кейса")
-        self.title_input.setMinimumHeight(32)
-        self.title_input.textChanged.connect(self.update_title_label)
-        self.title_input.textChanged.connect(self.mark_as_changed)
-        title_container.addWidget(self.title_input)
-        row1.addLayout(title_container, 1)
+        row1.addStretch()
         
         main_layout.addLayout(row1)
         
@@ -1514,6 +1769,18 @@ class TestCaseEditor(QMainWindow):
         
         # Обновление счетчика файлов
         self.file_count_label.setText(f"({len(self.test_cases)})")
+        
+        # Обновление счетчика в заглушке
+        count = len(self.test_cases)
+        if count == 0:
+            self.testcases_count_label.setText("Нет тест-кейсов")
+        elif count == 1:
+            self.testcases_count_label.setText("1 тест-кейс")
+        elif 2 <= count <= 4:
+            self.testcases_count_label.setText(f"{count} тест-кейса")
+        else:
+            self.testcases_count_label.setText(f"{count} тест-кейсов")
+        
         self.statusBar().showMessage(f"Загружено тест-кейсов: {len(self.test_cases)}")
     
     def load_directory_recursive(self, directory: Path, parent_item):
@@ -1525,6 +1792,11 @@ class TestCaseEditor(QMainWindow):
             folder_item.setText(0, f"📁 {subdir.name}")
             folder_item.setData(0, Qt.UserRole, {'type': 'folder', 'path': subdir})
             folder_item.setFont(0, QFont("Segoe UI", 10, QFont.Bold))
+            
+            # Добавляем чекбокс в режиме редактирования
+            if self.edit_mode:
+                folder_item.setFlags(folder_item.flags() | Qt.ItemIsUserCheckable)
+                folder_item.setCheckState(0, Qt.Unchecked)
             
             # Рекурсивно загружаем содержимое папки
             self.load_directory_recursive(subdir, folder_item)
@@ -1550,6 +1822,11 @@ class TestCaseEditor(QMainWindow):
                     item.setData(0, Qt.UserRole, {'type': 'file', 'test_case': test_case})
                     item.setFont(0, QFont("Segoe UI", 10))
                     item.setForeground(0, QColor(status_color))
+                    
+                    # Добавляем чекбокс в режиме редактирования
+                    if self.edit_mode:
+                        item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
+                        item.setCheckState(0, Qt.Unchecked)
                         
             except Exception as e:
                 print(f"Ошибка загрузки {json_file}: {e}")
@@ -1588,11 +1865,38 @@ class TestCaseEditor(QMainWindow):
             if test_case:
                 self.current_test_case = test_case
                 self.load_test_case_to_form(test_case)
+                self.show_form()
     
     def on_test_case_clicked(self, test_case: Dict):
         """Обработка клика по тест-кейсу (для старого списка)"""
         self.current_test_case = test_case
         self.load_test_case_to_form(test_case)
+        self.show_form()
+    
+    def show_placeholder(self):
+        """Показать заглушку вместо формы"""
+        self.form_widget.setVisible(False)
+        self.placeholder_widget.setVisible(True)
+        self.current_test_case = None
+    
+    def show_form(self):
+        """Показать форму вместо заглушки"""
+        self.placeholder_widget.setVisible(False)
+        self.form_widget.setVisible(True)
+    
+    def format_datetime(self, datetime_str: str) -> str:
+        """Форматирование даты и времени в человекочитаемый формат"""
+        if not datetime_str:
+            return ""
+        
+        try:
+            # Парсим ISO формат (2024-10-27T14:30:45)
+            dt = datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S")
+            # Возвращаем в формате YYYY-mm-dd HH:MM
+            return dt.strftime("%Y-%m-%d %H:%M")
+        except ValueError:
+            # Если формат другой, возвращаем как есть
+            return datetime_str
     
     def mark_as_changed(self):
         """Пометить форму как измененную"""
@@ -1605,12 +1909,38 @@ class TestCaseEditor(QMainWindow):
         self.has_unsaved_changes = False
         self.save_button.setVisible(False)
     
-    def update_title_label(self):
-        """Обновление заголовка с названием тест-кейса при изменении"""
-        title = self.title_input.text().strip()
-        if not title:
-            title = "Без названия"
-        self.testcase_title_label.setText(title)
+    def on_title_label_clicked(self, event):
+        """Обработка клика по названию - переход в режим редактирования"""
+        if not self.current_test_case:
+            return
+        
+        # Скрываем label, показываем edit
+        self.testcase_title_label.setVisible(False)
+        self.testcase_title_edit.setVisible(True)
+        self.testcase_title_edit.setText(self.testcase_title_label.text())
+        self.testcase_title_edit.setFocus()
+        self.testcase_title_edit.selectAll()
+    
+    def on_title_edit_finished(self):
+        """Обработка завершения редактирования названия"""
+        if not self.testcase_title_edit.isVisible():
+            return
+        
+        # Получаем новое название
+        new_title = self.testcase_title_edit.text().strip()
+        if not new_title:
+            new_title = "Без названия"
+        
+        # Обновляем label
+        self.testcase_title_label.setText(new_title)
+        
+        # Переключаем обратно на label
+        self.testcase_title_edit.setVisible(False)
+        self.testcase_title_label.setVisible(True)
+        
+        # Помечаем как измененное
+        if self.current_test_case:
+            self.mark_as_changed()
     
     def load_test_case_to_form(self, test_case: Dict):
         """Загрузка тест-кейса в форму редактирования"""
@@ -1621,12 +1951,18 @@ class TestCaseEditor(QMainWindow):
         # Обновление заголовка с названием тест-кейса
         title = test_case.get('title', 'Без названия')
         self.testcase_title_label.setText(title)
+        self.testcase_title_label.setVisible(True)
+        self.testcase_title_edit.setVisible(False)
         
         # Основные поля
         self.id_input.setText(test_case.get('id', ''))
-        self.created_at_input.setText(test_case.get('created_at', ''))
-        self.updated_at_input.setText(test_case.get('updated_at', ''))
-        self.title_input.setText(test_case.get('title', ''))
+        
+        # Форматируем даты в человекочитаемый формат
+        created_at = self.format_datetime(test_case.get('created_at', ''))
+        updated_at = self.format_datetime(test_case.get('updated_at', ''))
+        
+        self.created_at_input.setText(created_at)
+        self.updated_at_input.setText(updated_at)
         self.author_input.setText(test_case.get('author', ''))
         
         # Status
@@ -1712,12 +2048,21 @@ class TestCaseEditor(QMainWindow):
         # Получаем текущее время в формате ISO
         current_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
         
-        # Получаем created_at из формы (если уже существует) или создаём новое
-        created_at = self.created_at_input.text() or current_time
+        # Получаем created_at из текущего тест-кейса (сохраняем оригинальное значение)
+        # Если тест-кейса нет, используем текущее время
+        if self.current_test_case and 'created_at' in self.current_test_case:
+            created_at = self.current_test_case['created_at']
+        else:
+            created_at = current_time
+        
+        # Получаем название из заголовка
+        title = self.testcase_title_label.text()
+        if title == "Не выбран тест-кейс":
+            title = "Без названия"
         
         return {
             'id': self.id_input.text(),
-            'title': self.title_input.text(),
+            'title': title,
             'author': self.author_input.text(),
             'description': self.description_input.toPlainText(),
             'tags': tags,
@@ -1801,6 +2146,7 @@ class TestCaseEditor(QMainWindow):
             self.load_test_cases()
             self.current_test_case = new_test_case
             self.load_test_case_to_form(new_test_case)
+            self.show_form()
             self.statusBar().showMessage(f"Создан новый тест-кейс: {filename}")
         except Exception as e:
             QMessageBox.critical(self, "Ошибка", f"Не удалось создать тест-кейс:\n{e}")
@@ -1820,8 +2166,8 @@ class TestCaseEditor(QMainWindow):
         if filepath:
             try:
                 Path(filepath).unlink()
-                self.current_test_case = None
                 self.load_test_cases()
+                self.show_placeholder()
                 self.statusBar().showMessage("Тест-кейс удален")
             except Exception as e:
                 QMessageBox.critical(self, "Ошибка", f"Не удалось удалить файл:\n{e}")
@@ -2301,6 +2647,131 @@ class TestCaseEditor(QMainWindow):
             self.save_settings(self.test_cases_dir)
             self.load_test_cases()
             self.statusBar().showMessage(f"Выбрана папка: {self.test_cases_dir}")
+    
+    def toggle_edit_mode(self):
+        """Переключение режима массового редактирования"""
+        self.edit_mode = not self.edit_mode
+        
+        # Показываем/скрываем панель массовых операций
+        self.bulk_actions_panel.setVisible(self.edit_mode)
+        
+        # Очищаем выбранные элементы при выходе из режима
+        if not self.edit_mode:
+            self.selected_items.clear()
+        
+        # Перезагружаем дерево для добавления/удаления чекбоксов
+        self.load_test_cases()
+        
+        if self.edit_mode:
+            self.statusBar().showMessage("Режим массового редактирования включен")
+        else:
+            self.statusBar().showMessage("Режим массового редактирования выключен")
+    
+    def update_selected_count(self):
+        """Обновление состояния кнопок в зависимости от выбранных элементов"""
+        count = len(self.selected_items)
+        
+        # Включаем/отключаем кнопки в зависимости от количества выбранных элементов
+        self.bulk_delete_btn.setEnabled(count > 0)
+    
+    def on_item_check_state_changed(self, item: QTreeWidgetItem, column: int):
+        """Обработка изменения состояния чекбокса"""
+        if not self.edit_mode:
+            return
+        
+        data = item.data(0, Qt.UserRole)
+        if not data:
+            return
+        
+        is_checked = item.checkState(0) == Qt.Checked
+        
+        # Добавляем или удаляем элемент из списка выбранных
+        if is_checked:
+            if data not in self.selected_items:
+                self.selected_items.append(data)
+        else:
+            if data in self.selected_items:
+                self.selected_items.remove(data)
+        
+        self.update_selected_count()
+    
+    def clear_selection(self):
+        """Очистка выбора"""
+        self.selected_items.clear()
+        
+        # Снимаем все чекбоксы в дереве
+        self.uncheck_all_items(self.test_cases_tree.invisibleRootItem())
+        
+        self.update_selected_count()
+        self.statusBar().showMessage("Выбор сброшен")
+    
+    def uncheck_all_items(self, parent_item):
+        """Рекурсивно снять все чекбоксы"""
+        for i in range(parent_item.childCount()):
+            child = parent_item.child(i)
+            child.setCheckState(0, Qt.Unchecked)
+            self.uncheck_all_items(child)
+    
+    def bulk_delete_items(self):
+        """Массовое удаление выбранных элементов"""
+        if not self.selected_items:
+            return
+        
+        # Подтверждение удаления
+        reply = QMessageBox.question(
+            self,
+            "Подтверждение удаления",
+            f"Вы уверены, что хотите удалить {len(self.selected_items)} элемент(ов)?\n\n"
+            "Это действие нельзя отменить!",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+        
+        if reply != QMessageBox.Yes:
+            return
+        
+        deleted_count = 0
+        errors = []
+        
+        import shutil
+        
+        for item_data in self.selected_items:
+            try:
+                item_type = item_data.get('type')
+                
+                if item_type == 'file':
+                    # Удаление файла
+                    test_case = item_data['test_case']
+                    if '_filepath' in test_case:
+                        filepath = Path(test_case['_filepath'])
+                        filepath.unlink()
+                        deleted_count += 1
+                
+                elif item_type == 'folder':
+                    # Удаление папки
+                    folder_path = item_data['path']
+                    shutil.rmtree(folder_path)
+                    deleted_count += 1
+                    
+            except Exception as e:
+                errors.append(str(e))
+        
+        # Очищаем выбор и перезагружаем дерево
+        self.selected_items.clear()
+        self.load_test_cases()
+        self.update_selected_count()
+        
+        # Показываем результат
+        message = f"Удалено элементов: {deleted_count}"
+        if errors:
+            message += f"\n\nОшибки:\n" + "\n".join(errors[:5])
+            if len(errors) > 5:
+                message += f"\n... и еще {len(errors) - 5} ошибок"
+        
+        if errors:
+            QMessageBox.warning(self, "Удаление завершено с ошибками", message)
+        else:
+            self.statusBar().showMessage(message)
                     
     def apply_telegram_theme(self):
         """Применение темы Telegram Dark"""
