@@ -1,0 +1,572 @@
+"""Главное окно приложения"""
+
+import json
+from pathlib import Path
+from typing import Optional
+
+from PyQt5.QtWidgets import (
+    QMainWindow,
+    QMessageBox,
+    QFileDialog,
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QSplitter,
+    QFrame,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QStackedLayout,
+    QInputDialog,
+)
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont
+
+from ..models.test_case import TestCase
+from ..services.test_case_service import TestCaseService
+from ..repositories.test_case_repository import TestCaseRepository
+from .widgets.placeholder_widget import PlaceholderWidget
+from .widgets.tree_widget import TestCaseTreeWidget
+from .widgets.form_widget import TestCaseFormWidget
+from .widgets.review_panel import ReviewPanel
+from .widgets.bulk_actions_panel import BulkActionsPanel
+from .styles.telegram_theme import TELEGRAM_DARK_THEME
+
+
+class MainWindow(QMainWindow):
+    """
+    Главное окно редактора тест-кейсов
+    
+    Соответствует принципам SOLID:
+    - Single Responsibility: отвечает только за координацию UI
+    - Dependency Inversion: использует абстракции (сервисы)
+    - Open/Closed: легко расширяется новыми функциями через сервисы
+    
+    ВАЖНО: Это упрощенная версия для демонстрации принципов SOLID.
+    Полная версия из test_case_editor_v1.py может быть постепенно портирована
+    по тому же принципу - разделение на отдельные виджеты и сервисы.
+    """
+    
+    def __init__(self):
+        super().__init__()
+        
+        # Внедрение зависимостей (Dependency Injection)
+        repository = TestCaseRepository()
+        self.service = TestCaseService(repository)
+        
+        # Настройки
+        self.settings_file = Path("settings.json")
+        self.settings = self.load_settings()
+        self.panel_sizes = dict(self.settings.get('panel_sizes', {'left': 350, 'form_area': 900, 'review': 0}))
+        self._last_review_width = self.panel_sizes.get('review', 0) or 360
+        self.test_cases_dir = Path(self.settings.get('test_cases_dir', 'testcases'))
+        if not self.test_cases_dir.exists():
+            self.test_cases_dir = self.prompt_select_folder()
+        self.default_prompt = self.settings.get('DEFAULT_PROMT', "Опиши задачу для ревью.")
+        
+        # Состояние
+        self.current_test_case: Optional[TestCase] = None
+        self.test_cases = []
+        
+        self.setup_ui()
+        self.apply_theme()
+        self.load_all_test_cases()
+    
+    def setup_ui(self):
+        """Настройка пользовательского интерфейса"""
+        self.setWindowTitle("✈️ Test Case Editor v2.0 (SOLID)")
+        self.setGeometry(100, 100, 1400, 900)
+        
+        # Создаем меню
+        self.create_menu()
+        
+        # Центральный виджет
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        
+        main_layout = QVBoxLayout(central_widget)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
+        
+        # Splitter для разделения
+        self.main_splitter = QSplitter(Qt.Horizontal)
+        self.main_splitter.setChildrenCollapsible(False)
+        self.main_splitter.splitterMoved.connect(self._on_main_splitter_moved)
+        
+        # Левая панель
+        left_panel = self._create_left_panel()
+        self.main_splitter.addWidget(left_panel)
+        
+        # Правая панель
+        right_panel = self._create_right_panel()
+        self.main_splitter.addWidget(right_panel)
+        
+        # Пропорции
+        self.main_splitter.setStretchFactor(0, 1)
+        self.main_splitter.setStretchFactor(1, 3)
+        
+        main_layout.addWidget(self.main_splitter)
+        
+        self._apply_initial_panel_sizes()
+        
+        self.statusBar().showMessage("Готов к работе")
+    
+    def _create_left_panel(self) -> QWidget:
+        """Создать левую панель с деревом"""
+        panel = QWidget()
+        layout = QVBoxLayout(panel)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(5)
+        
+        # Заголовок
+        header = QFrame()
+        header.setMaximumHeight(40)
+        header_layout = QHBoxLayout(header)
+        header_layout.setContentsMargins(10, 5, 10, 5)
+        
+        title_label = QLabel("📁 Файлы тест-кейсов")
+        title_label.setFont(QFont("Segoe UI", 10, QFont.Bold))
+        header_layout.addWidget(title_label)
+        
+        self.file_count_label = QLabel("(0)")
+        self.file_count_label.setStyleSheet("color: #8B9099;")
+        header_layout.addWidget(self.file_count_label)
+        header_layout.addStretch()
+
+        layout.addWidget(header)
+        
+        # Отображение текущей папки
+        current_folder_frame = QFrame()
+        current_folder_frame.setMaximumHeight(30)
+        folder_layout = QHBoxLayout(current_folder_frame)
+        folder_layout.setContentsMargins(10, 0, 10, 5)
+        
+        folder_icon = QLabel("📂")
+        folder_icon.setStyleSheet("color: #5288C1; font-size: 10pt;")
+        folder_layout.addWidget(folder_icon)
+        
+        self.current_folder_label = QLabel("testcases")
+        self.current_folder_label.setStyleSheet("color: #8B9099; font-size: 9pt;")
+        self.current_folder_label.setWordWrap(False)
+        folder_layout.addWidget(self.current_folder_label, 1)
+        
+        layout.addWidget(current_folder_frame)
+        
+        # Поиск
+        search_frame = QFrame()
+        search_frame.setMaximumHeight(40)
+        search_layout = QHBoxLayout(search_frame)
+        search_layout.setContentsMargins(10, 0, 10, 5)
+        
+        self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText("🔍 Поиск...")
+        self.search_input.setMinimumHeight(30)
+        self.search_input.textChanged.connect(self._filter_tree)
+        search_layout.addWidget(self.search_input)
+        
+        layout.addWidget(search_frame)
+        
+        # Дерево
+        self.tree_widget = TestCaseTreeWidget(self.service)
+        self.tree_widget.test_case_selected.connect(self._on_test_case_selected)
+        self.tree_widget.tree_updated.connect(self._on_tree_updated)
+        self.tree_widget.review_requested.connect(self._on_review_requested)
+        layout.addWidget(self.tree_widget, 1)
+        
+        return panel
+    
+    def _create_right_panel(self) -> QWidget:
+        """Создать правую панель с формой"""
+        panel = QWidget()
+        layout = QVBoxLayout(panel)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        
+        self.detail_splitter = QSplitter(Qt.Horizontal)
+        self.detail_splitter.setChildrenCollapsible(False)
+        self.detail_splitter.setCollapsible(1, True)
+        self.detail_splitter.splitterMoved.connect(self._on_detail_splitter_moved)
+
+        # Контейнер для placeholder / формы
+        self.detail_stack_container = QWidget()
+        self.detail_stack = QStackedLayout(self.detail_stack_container)
+        self.detail_stack.setContentsMargins(0, 0, 0, 0)
+
+        self.placeholder = PlaceholderWidget()
+        self.detail_stack.addWidget(self.placeholder)
+        
+        self.form_widget = TestCaseFormWidget(self.service)
+        self.form_widget.test_case_saved.connect(self._on_test_case_saved)
+        self.form_widget.unsaved_changes_state.connect(self._on_form_unsaved_state)
+        self.detail_stack.addWidget(self.form_widget)
+        self.detail_stack.setCurrentWidget(self.placeholder)
+
+        self.detail_splitter.addWidget(self.detail_stack_container)
+
+        # Панель ревью
+        self.review_panel = ReviewPanel()
+        self.review_panel.setVisible(False)
+        self.review_panel.prompt_saved.connect(self._on_prompt_saved)
+        self.review_panel.enter_clicked.connect(self._on_review_enter_clicked)
+        self.detail_splitter.addWidget(self.review_panel)
+
+        layout.addWidget(self.detail_splitter)
+        
+        return panel
+    
+    def create_menu(self):
+        """Создание меню приложения"""
+        menubar = self.menuBar()
+        
+        # Меню "Файл"
+        file_menu = menubar.addMenu('Файл')
+        
+        # Действие "Выбрать папку"
+        select_folder_action = file_menu.addAction('📁 Выбрать папку с тест-кейсами')
+        select_folder_action.triggered.connect(self.select_test_cases_folder)
+        select_folder_action.setShortcut('Ctrl+O')
+        
+        # Действие "Конвертировать из Azure DevOps"
+        convert_action = file_menu.addAction('Конвертировать')
+        convert_action.triggered.connect(self.convert_from_azure)
+
+        file_menu.addSeparator()
+        
+        # Действие "Выход"
+        exit_action = file_menu.addAction('Выход')
+        exit_action.triggered.connect(self.close)
+        exit_action.setShortcut('Ctrl+Q')
+
+        # Меню "Вид"
+        view_menu = menubar.addMenu('Вид')
+        width_action = view_menu.addAction('Настроить ширины панелей…')
+        width_action.triggered.connect(self._configure_panel_widths)
+    
+    def select_test_cases_folder(self):
+        """Обработчик выбора папки с тест-кейсами"""
+        folder = QFileDialog.getExistingDirectory(
+            self,
+            "Выберите папку с тест-кейсами",
+            str(self.test_cases_dir),
+            QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks
+        )
+        
+        if folder:
+            self.test_cases_dir = Path(folder)
+            self.settings['test_cases_dir'] = str(self.test_cases_dir)
+            self.save_settings(self.settings)
+            self.load_all_test_cases()
+            self.statusBar().showMessage(f"Выбрана папка: {self.test_cases_dir}")
+    
+    def apply_theme(self):
+        """Применение темы"""
+        self.setStyleSheet(TELEGRAM_DARK_THEME)
+    
+    def load_settings(self) -> dict:
+        """Загрузка настроек"""
+        defaults = {
+            'test_cases_dir': 'testcases',
+            'DEFAULT_PROMT': "Опиши, на что обратить внимание при ревью тест-кейсов.",
+            'panel_sizes': {'left': 350, 'form_area': 900, 'review': 0},
+        }
+        
+        if self.settings_file.exists():
+            try:
+                with open(self.settings_file, 'r', encoding='utf-8') as f:
+                    settings = json.load(f)
+                    for key, value in defaults.items():
+                        settings.setdefault(key, value)
+                    if isinstance(settings.get('panel_sizes'), dict):
+                        panel_defaults = defaults['panel_sizes']
+                        for key, value in panel_defaults.items():
+                            settings['panel_sizes'].setdefault(key, value)
+                    else:
+                        settings['panel_sizes'] = defaults['panel_sizes']
+                    self.save_settings(settings)
+                    return settings
+            except Exception as e:
+                print(f"Ошибка загрузки настроек: {e}")
+        
+        self.save_settings(defaults)
+        return defaults
+    
+    def save_settings(self, data: dict):
+        """Сохранение настроек"""
+        try:
+            with open(self.settings_file, 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=4)
+        except Exception as e:
+            print(f"Ошибка сохранения настроек: {e}")
+    
+    def prompt_select_folder(self) -> Path:
+        """Диалог выбора папки"""
+        msg_box = QMessageBox()
+        msg_box.setIcon(QMessageBox.Information)
+        msg_box.setWindowTitle("Выбор папки с тест-кейсами")
+        msg_box.setText("Папка с тест-кейсами не найдена.\n\nПожалуйста, выберите папку.")
+        msg_box.setStandardButtons(QMessageBox.Ok)
+        msg_box.exec_()
+        
+        folder = QFileDialog.getExistingDirectory(
+            None,
+            "Выберите папку с тест-кейсами",
+            str(Path.cwd()),
+            QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks
+        )
+        
+        if folder:
+            selected_path = Path(folder)
+            self.settings['test_cases_dir'] = str(selected_path)
+            self.save_settings(self.settings)
+            return selected_path
+        
+        # По умолчанию
+        default = Path("testcases")
+        default.mkdir(exist_ok=True)
+        self.settings['test_cases_dir'] = str(default)
+        self.save_settings(self.settings)
+        return default
+    
+    def load_all_test_cases(self):
+        """
+        Загрузка всех тест-кейсов через сервис
+        
+        Демонстрирует Dependency Inversion:
+        не работаем напрямую с файлами, используем сервис
+        """
+        self.test_cases = self.service.load_all_test_cases(self.test_cases_dir)
+        
+        # Обновляем дерево
+        self.tree_widget.load_tree(self.test_cases_dir, self.test_cases)
+        
+        # Обновляем счетчики
+        self.file_count_label.setText(f"({len(self.test_cases)})")
+        self.placeholder.update_count(len(self.test_cases))
+        self.current_folder_label.setText(str(self.test_cases_dir))
+        
+        self.statusBar().showMessage(f"Загружено тест-кейсов: {len(self.test_cases)}")
+
+    def _on_test_case_selected(self, test_case: TestCase):
+        """Обработка выбора тест-кейса"""
+        self.current_test_case = test_case
+        self.detail_stack.setCurrentWidget(self.form_widget)
+        self.form_widget.load_test_case(test_case)
+        self._hide_review_panel()
+        
+        # Показываем форму
+        
+        self.statusBar().showMessage(f"Открыт: {test_case.title}")
+    
+    def _on_form_unsaved_state(self, has_changes: bool):
+        """Обновление статуса при изменениях в форме"""
+        if has_changes:
+            self.statusBar().showMessage("Есть несохраненные изменения. Нажмите «Сохранить».")
+        else:
+            if self.current_test_case:
+                self.statusBar().showMessage(f"Изменения сохранены. Открыт: {self.current_test_case.title}")
+            else:
+                self.statusBar().showMessage("Готов к работе")
+    
+    def _on_tree_updated(self):
+        """Обработка обновления дерева"""
+        self.load_all_test_cases()
+        self.statusBar().showMessage("Дерево тест-кейсов обновлено.")
+    
+    def _on_test_case_saved(self):
+        """Обработка сохранения тест-кейса"""
+        self.load_all_test_cases()
+        self.statusBar().showMessage("Тест-кейс сохранен")
+    
+    def _filter_tree(self):
+        query = self.search_input.text()
+        self.tree_widget.filter_items(query)
+
+    def _on_review_requested(self, data):
+        """Показ панели ревью."""
+        if self.detail_stack.currentWidget() is not self.form_widget:
+            self.detail_stack.setCurrentWidget(self.form_widget)
+        self._show_review_panel()
+        self.review_panel.set_prompt_text(self.settings.get('DEFAULT_PROMT', self.default_prompt))
+        self.review_panel.clear_attachments()
+        self.statusBar().showMessage("Панель ревью открыта")
+
+    def _on_prompt_saved(self, text: str):
+        """Сохранение промта в настройках."""
+        self.settings['DEFAULT_PROMT'] = text
+        self.save_settings(self.settings)
+        self.default_prompt = text
+        self.statusBar().showMessage("Промт сохранен")
+
+    def _on_review_enter_clicked(self, text: str, files: list):
+        """Обработка нажатия кнопки Enter на панели ревью."""
+        self.statusBar().showMessage(
+            f"Отправлен промт длиной {len(text)} символов. Прикреплено файлов: {len(files)}"
+        )
+
+    # --- Работа с панелями и размерами -----------------------------------
+
+    def _show_placeholder(self):
+        self.detail_stack.setCurrentWidget(self.placeholder)
+        self._hide_review_panel()
+
+    def _hide_review_panel(self):
+        sizes = self.detail_splitter.sizes()
+        if len(sizes) == 2 and sizes[1] > 0:
+            self._last_review_width = sizes[1]
+            self.panel_sizes['review'] = self._last_review_width
+        total = sum(sizes) if sizes else self.panel_sizes.get('form_area', 900)
+        total = max(total, 200)
+        self.review_panel.setVisible(False)
+        self.detail_splitter.setSizes([total, 0])
+        self.panel_sizes['form_area'] = total
+        main_sizes = self.main_splitter.sizes()
+        if main_sizes and len(main_sizes) == 2:
+            self.main_splitter.setSizes([main_sizes[0], total])
+        self._save_panel_sizes()
+
+    def _show_review_panel(self):
+        review_width = max(self.panel_sizes.get('review', self._last_review_width or 300), 200)
+        right_sizes = self.main_splitter.sizes()
+        current_total = right_sizes[1] if right_sizes and len(right_sizes) > 1 else self.panel_sizes.get('form_area', 900)
+        total_area = max(current_total, review_width + 200)
+        self.panel_sizes['form_area'] = total_area
+        form_width = max(total_area - review_width, 200)
+        self.review_panel.setVisible(True)
+        self.detail_splitter.setSizes([form_width, review_width])
+        # Обновляем главные размеры
+        main_sizes = self.main_splitter.sizes()
+        if main_sizes and len(main_sizes) == 2:
+            right_total = max(sum(self.detail_splitter.sizes()), total_area)
+            self.main_splitter.setSizes([main_sizes[0], right_total])
+        self._save_panel_sizes()
+
+    def _apply_initial_panel_sizes(self):
+        left_width = max(self.panel_sizes.get('left', 350), 150)
+        total_area = max(self.panel_sizes.get('form_area', 900), 200)
+        review_width = max(self.panel_sizes.get('review', self._last_review_width or 300), 0)
+
+        self.main_splitter.setSizes([left_width, total_area])
+
+        if review_width > 0:
+            self.review_panel.setVisible(True)
+            form_width = max(total_area - review_width, 200)
+            self.detail_splitter.setSizes([form_width, review_width])
+        else:
+            self._hide_review_panel()
+
+    def _on_main_splitter_moved(self, _pos: int, _index: int):
+        sizes = self.main_splitter.sizes()
+        if sizes and len(sizes) >= 2:
+            self.panel_sizes['left'] = sizes[0]
+            self.panel_sizes['form_area'] = sizes[1]
+            self._save_panel_sizes()
+
+    def _on_detail_splitter_moved(self, _pos: int, _index: int):
+        sizes = self.detail_splitter.sizes()
+        if sizes and len(sizes) >= 2:
+            self.panel_sizes['form_area'] = sizes[0] + sizes[1]
+            if sizes[1] > 0:
+                self.panel_sizes['review'] = sizes[1]
+                self._last_review_width = sizes[1]
+        self._save_panel_sizes()
+
+    def _save_panel_sizes(self):
+        self.settings['panel_sizes'] = {
+            'left': self.panel_sizes.get('left', 350),
+            'form_area': self.panel_sizes.get('form_area', 900),
+            'review': self.panel_sizes.get('review', self._last_review_width),
+        }
+        self.save_settings(self.settings)
+
+    def _configure_panel_widths(self):
+        left_width, ok = QInputDialog.getInt(
+            self,
+            "Ширина панели",
+            "Панель дерева (px):",
+            int(self.panel_sizes.get('left', 350)),
+            150,
+            1200,
+        )
+        if not ok:
+            return
+
+        form_area, ok = QInputDialog.getInt(
+            self,
+            "Ширина панели",
+            "Панель редактирования (px):",
+            int(self.panel_sizes.get('form_area', 900)),
+            300,
+            2000,
+        )
+        if not ok:
+            return
+
+        review_width, ok = QInputDialog.getInt(
+            self,
+            "Ширина панели",
+            "Панель ревью (px):",
+            int(self.panel_sizes.get('review', max(self._last_review_width, 300))),
+            0,
+            1200,
+        )
+        if not ok:
+            return
+
+        self.panel_sizes['left'] = left_width
+        self.panel_sizes['form_area'] = max(form_area, 300)
+        self.panel_sizes['review'] = max(review_width, 0)
+        if review_width > 0:
+            self._last_review_width = review_width
+
+        self._save_panel_sizes()
+        self._apply_initial_panel_sizes()
+
+    def convert_from_azure(self):
+        """Импорт тест-кейсов из JSON Azure DevOps."""
+        files, _ = QFileDialog.getOpenFileNames(
+            self,
+            "Выберите JSON-файлы Azure DevOps",
+            str(self.test_cases_dir),
+            "JSON файлы (*.json)",
+        )
+
+        if not files:
+            return
+
+        total_created = 0
+        all_errors = []
+
+        for file_path in files:
+            created, errors = self.service.import_from_azure(Path(file_path), self.test_cases_dir)
+            total_created += created
+            all_errors.extend(errors)
+
+        self.load_all_test_cases()
+
+        if all_errors:
+            message = "\n".join(all_errors[:10])
+            if len(all_errors) > 10:
+                message += f"\n... и еще {len(all_errors) - 10} ошибок."
+            QMessageBox.warning(
+                self,
+                "Импорт завершен с ошибками",
+                f"Создано тест-кейсов: {total_created}\n\nОшибки:\n{message}",
+            )
+        else:
+            QMessageBox.information(
+                self,
+                "Импорт завершен",
+                f"Создано тест-кейсов: {total_created}",
+            )
+
+        self.statusBar().showMessage(f"Импортировано тест-кейсов: {total_created}")
+
+
+def create_main_window() -> MainWindow:
+    """
+    Фабричная функция для создания главного окна
+    
+    Использует паттерн Factory для централизованного создания окна
+    """
+    return MainWindow()
+

@@ -1,0 +1,9 @@
+{
+    "test_cases_dir": "C:\\test-cases-example\\testcases",
+    "DEFAULT_PROMT": "Опиши, на что обратить внимание при ревью тест-кейсов.",
+    "panel_sizes": {
+        "left": 342,
+        "form_area": 1585,
+        "review": 597
+    }
+}
