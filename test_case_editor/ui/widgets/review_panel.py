@@ -17,6 +17,8 @@ from PyQt5.QtWidgets import (
     QFileDialog,
     QSizePolicy,
     QScrollArea,
+    QTabWidget,
+    QFrame,
 )
 from PyQt5.QtCore import pyqtSignal, Qt, QEvent
 from PyQt5.QtGui import QTextCursor, QTextOption
@@ -185,30 +187,83 @@ class ReviewPanel(QWidget):
         response_label.setStyleSheet("color: #8B9099; font-weight: 600;")
         content_layout.addWidget(response_label)
 
-        self.response_view = QTextEdit()
-        self.response_view.setReadOnly(True)
-        self.response_view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.response_view.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self.response_view.setWordWrapMode(QTextOption.NoWrap)
-        response_policy = self.response_view.sizePolicy()
-        response_policy.setVerticalPolicy(QSizePolicy.Minimum)
-        self.response_view.setSizePolicy(response_policy)
-        self._response_min_height = 160
-        self.response_view.setMinimumHeight(self._response_min_height)
-        self.response_view.setStyleSheet(
+        self.response_tabs = QTabWidget()
+        self.response_tabs.setDocumentMode(True)
+        self.response_tabs.setStyleSheet(
+            """
+            QTabWidget::pane {
+                border: 1px solid #2B3945;
+                border-radius: 6px;
+            }
+            QTabBar::tab {
+                background-color: #1E2732;
+                color: #8B9099;
+                padding: 8px 16px;
+                border: 1px solid #2B3945;
+                border-bottom: none;
+            }
+            QTabBar::tab:selected {
+                background-color: #2B3945;
+                color: #E1E3E6;
+            }
+            """
+        )
+
+        self.response_text = QTextEdit()
+        self.response_text.setReadOnly(True)
+        self.response_text.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.response_text.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.response_text.setWordWrapMode(QTextOption.NoWrap)
+        text_policy = self.response_text.sizePolicy()
+        text_policy.setVerticalPolicy(QSizePolicy.Expanding)
+        self.response_text.setSizePolicy(text_policy)
+        self.response_text.setStyleSheet(
             """
             QTextEdit {
                 background-color: #101820;
-                border: 1px solid #2B3945;
-                border-radius: 8px;
+                border: none;
                 color: #E1E3E6;
                 padding: 10px;
                 font-size: 11pt;
             }
             """
         )
-        content_layout.addWidget(self.response_view, 1)
+
+        self.response_markdown = QTextEdit()
+        self.response_markdown.setReadOnly(True)
+        self.response_markdown.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.response_markdown.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.response_markdown.setWordWrapMode(QTextOption.WordWrap)
+        md_policy = self.response_markdown.sizePolicy()
+        md_policy.setVerticalPolicy(QSizePolicy.Expanding)
+        self.response_markdown.setSizePolicy(md_policy)
+        self.response_markdown.setMarkdown("")
+        self.response_markdown.setStyleSheet(
+            """
+            QTextEdit {
+                background-color: #101820;
+                border: none;
+                color: #E1E3E6;
+                padding: 10px;
+                font-size: 11pt;
+            }
+            """
+        )
+
+        tabs_container = QFrame()
+        tabs_container.setStyleSheet("QFrame { border: 1px solid #2B3945; border-radius: 6px; }")
+        tabs_layout = QVBoxLayout(tabs_container)
+        tabs_layout.setContentsMargins(0, 0, 0, 0)
+        tabs_layout.setSpacing(0)
+        tabs_layout.addWidget(self.response_tabs)
+
+        self.response_tabs.addTab(self.response_text, "Текст")
+        self.response_tabs.addTab(self.response_markdown, "Markdown")
+        content_layout.addWidget(tabs_container, 1)
         content_layout.addStretch(1)
+
+        self._response_min_height = 160
+        self._adjust_response_height()
 
     # --- Публичные методы -------------------------------------------------
 
@@ -222,14 +277,18 @@ class ReviewPanel(QWidget):
 
     def set_response_text(self, text: str):
         """Показать текст ответа LLM."""
-        self.response_view.setPlainText(text or "")
-        self.response_view.moveCursor(QTextCursor.Start)
+        displayed = text or ""
+        self.response_text.setPlainText(displayed)
+        self.response_text.moveCursor(QTextCursor.Start)
+        self.response_markdown.setMarkdown(displayed)
+        self.response_tabs.setCurrentIndex(0)
         self._adjust_response_height()
 
     def clear_response(self):
         """Очистить поле ответа."""
-        self.response_view.clear()
-        self.response_view.setMinimumHeight(self._response_min_height)
+        self.response_text.clear()
+        self.response_markdown.clear()
+        self._adjust_response_height()
 
     def set_loading_state(self, is_loading: bool):
         """Заблокировать элементы управления на время запроса."""
@@ -329,12 +388,23 @@ class ReviewPanel(QWidget):
 
     def _adjust_response_height(self):
         """Подстроить высоту области ответа под содержимое."""
-        doc = self.response_view.document()
-        doc_size = doc.size().toSize()
-        frame = self.response_view.frameWidth() * 2
-        margins = self.response_view.contentsMargins()
-        height = doc_size.height() + frame + margins.top() + margins.bottom()
-        height = max(height, self._response_min_height)
-        self.response_view.setMinimumHeight(height)
+        documents = [self.response_text.document(), self.response_markdown.document()]
+        max_height = 0
+        for edit, doc in (
+            (self.response_text, self.response_text.document()),
+            (self.response_markdown, self.response_markdown.document()),
+        ):
+            viewport_width = edit.viewport().width()
+            if viewport_width > 0:
+                doc.setTextWidth(viewport_width)
+            height = doc.size().height()
+            if height > max_height:
+                max_height = height
+
+        tab_bar_height = self.response_tabs.tabBar().sizeHint().height()
+        padding = 48  # запас под отступы
+        total_height = int(max_height + tab_bar_height + padding)
+        total_height = max(total_height, self._response_min_height)
+        self.response_tabs.setMinimumHeight(total_height)
 
 

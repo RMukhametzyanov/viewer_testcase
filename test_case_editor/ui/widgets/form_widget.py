@@ -19,6 +19,7 @@ from PyQt5.QtWidgets import (
     QSizePolicy,
     QStyledItemDelegate,
     QAbstractItemDelegate,
+    QAbstractItemView,
 )
 from PyQt5.QtCore import Qt, pyqtSignal, QEvent
 from PyQt5.QtGui import QFont
@@ -228,54 +229,90 @@ class TestCaseFormWidget(QWidget):
         """Создать заголовок"""
         header = QFrame()
         header.setStyleSheet("background-color: #1E2732; border-bottom: 2px solid #2B3945;")
-        header.setMaximumHeight(80)
-        
+        header.setMinimumHeight(90)
+
         layout = QHBoxLayout(header)
-        layout.setContentsMargins(15, 10, 15, 10)
-        
-        # Левая часть - заголовок
+        layout.setContentsMargins(20, 16, 20, 16)
+        layout.setSpacing(24)
+
         text_layout = QVBoxLayout()
-        text_layout.setSpacing(5)
-        
+        text_layout.setSpacing(6)
+
         static_title = QLabel("Редактирование тест-кейса")
         static_title.setFont(QFont("Segoe UI", 11, QFont.Normal))
         static_title.setStyleSheet("color: #8B9099; border: none;")
         text_layout.addWidget(static_title)
-        
-        # Контейнер для названия
+
+        row_layout = QHBoxLayout()
+        row_layout.setSpacing(12)
+
         self.title_container = QWidget()
         self.title_container.setStyleSheet("background: transparent; border: none;")
         title_layout = QVBoxLayout(self.title_container)
         title_layout.setContentsMargins(0, 0, 0, 0)
-        
-        # Label (кликабельный)
+        title_layout.setSpacing(0)
+
         self.title_label = QLabel("Не выбран тест-кейс")
         self.title_label.setFont(QFont("Segoe UI", 14, QFont.Bold))
         self.title_label.setStyleSheet("color: #5288C1; border: none;")
         self.title_label.setWordWrap(True)
         self.title_label.mousePressEvent = self._on_title_clicked
         title_layout.addWidget(self.title_label)
-        
-        # Edit (скрыт)
+
         self.title_edit = QLineEdit()
         self.title_edit.setFont(QFont("Segoe UI", 14, QFont.Bold))
-        self.title_edit.setStyleSheet("""
+        self.title_edit.setStyleSheet(
+            """
             QLineEdit {
                 background-color: #1E2732;
                 border: 2px solid #5288C1;
                 border-radius: 6px;
-                padding: 5px;
+                padding: 6px 8px;
                 color: #5288C1;
             }
-        """)
+            """
+        )
         self.title_edit.setVisible(False)
         self.title_edit.returnPressed.connect(self._on_title_edit_finished)
         self.title_edit.editingFinished.connect(self._on_title_edit_finished)
         title_layout.addWidget(self.title_edit)
-        
-        text_layout.addWidget(self.title_container)
-        layout.addLayout(text_layout, 1)
-        
+
+        row_layout.addWidget(self.title_container, stretch=1)
+
+        self.save_button = QPushButton("Сохранить")
+        self.save_button.setMinimumHeight(40)
+        self.save_button.setCursor(Qt.PointingHandCursor)
+        self.save_button.setEnabled(False)
+        self.save_button.clicked.connect(self._save)
+        self.save_button.setStyleSheet(
+            """
+            QPushButton {
+                background-color: #2B5278;
+                border: 1px solid #3D6A98;
+                border-radius: 8px;
+                color: #FFFFFF;
+                padding: 0 24px;
+                font-size: 12pt;
+                font-weight: 600;
+            }
+            QPushButton:disabled {
+                background-color: #1E2732;
+                border: 1px solid #2B3945;
+                color: #6B7380;
+            }
+            QPushButton:hover:!disabled {
+                background-color: #3D6A98;
+            }
+            QPushButton:pressed:!disabled {
+                background-color: #1D3F5F;
+            }
+            """
+        )
+        row_layout.addWidget(self.save_button, alignment=Qt.AlignRight)
+
+        text_layout.addLayout(row_layout)
+        layout.addLayout(text_layout, stretch=1)
+
         return header
     
     def _toggle_sections(self):
@@ -405,40 +442,6 @@ class TestCaseFormWidget(QWidget):
 
         controls_layout.addStretch()
 
-        self.save_button = QPushButton("💾 Сохранить")
-        self.save_button.setMinimumHeight(36)
-        self.save_button.setMinimumWidth(150)
-        self.save_button.setCursor(Qt.PointingHandCursor)
-        self.save_button.setStyleSheet(
-            """
-            QPushButton {
-                background-color: #3AAFA9;
-                border: 1px solid #62D0C5;
-                border-radius: 8px;
-                padding: 6px 18px;
-                color: #0B1C2D;
-                font-weight: 700;
-                font-size: 11pt;
-                letter-spacing: 0.3px;
-                text-transform: uppercase;
-            }
-            QPushButton:hover {
-                background-color: #62D0C5;
-            }
-            QPushButton:pressed {
-                background-color: #2B907F;
-            }
-            QPushButton:disabled {
-                background-color: #1F3A44;
-                color: #4C515A;
-                border: 1px solid #1F3A44;
-            }
-            """
-        )
-        self.save_button.clicked.connect(self._save)
-        self.save_button.setVisible(False)
-        controls_layout.addWidget(self.save_button)
-
         layout.addWidget(controls_panel)
 
         # Таблица шагов
@@ -452,8 +455,19 @@ class TestCaseFormWidget(QWidget):
         self.steps_table.setWordWrap(True)
         self.steps_table.setTextElideMode(Qt.ElideNone)
         self.steps_table.setMinimumHeight(250)
+        self.steps_table.setStyleSheet(
+            """
+            QTableWidget::item {
+                padding: 8px;
+            }
+            """
+        )
         self.steps_table.itemChanged.connect(self._on_step_item_changed)
         self.steps_table.itemSelectionChanged.connect(self._update_step_controls_state)
+        self.steps_table.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.steps_table.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.steps_table.verticalScrollBar().setSingleStep(20)
+        self.steps_table.horizontalScrollBar().setSingleStep(20)
         self.steps_delegate = self._StepsTableDelegate(self, self.steps_table)
         self.steps_table.setItemDelegate(self.steps_delegate)
         layout.addWidget(self.steps_table)
@@ -527,7 +541,7 @@ class TestCaseFormWidget(QWidget):
             self.precondition_input.clear()
             self.steps_table.setRowCount(0)
 
-        self.save_button.setVisible(False)
+        self.save_button.setEnabled(False)
         self._is_loading = False
         self.unsaved_changes_state.emit(False)
         self._update_step_controls_state()
@@ -593,8 +607,13 @@ class TestCaseFormWidget(QWidget):
 
         was_blocked = self.steps_table.signalsBlocked()
         self.steps_table.blockSignals(True)
-        self.steps_table.setItem(row, 0, QTableWidgetItem(step_text))
-        self.steps_table.setItem(row, 1, QTableWidgetItem(expected_text))
+        action_item = QTableWidgetItem(step_text)
+        action_item.setTextAlignment(Qt.AlignTop | Qt.AlignLeft)
+        self.steps_table.setItem(row, 0, action_item)
+
+        expected_item = QTableWidgetItem(expected_text)
+        expected_item.setTextAlignment(Qt.AlignTop | Qt.AlignLeft)
+        self.steps_table.setItem(row, 1, expected_item)
         self.steps_table.blockSignals(was_blocked)
         self._adjust_row_height(row)
         
@@ -707,10 +726,10 @@ class TestCaseFormWidget(QWidget):
         
         if not self.has_unsaved_changes:
             self.has_unsaved_changes = True
-            self.save_button.setVisible(True)
             self.unsaved_changes_state.emit(True)
         else:
             self.unsaved_changes_state.emit(True)
+        self.save_button.setEnabled(True)
     
     def _save(self):
         """Сохранить тест-кейс"""
@@ -748,7 +767,7 @@ class TestCaseFormWidget(QWidget):
         # Сохраняем через сервис
         if self.service.save_test_case(self.current_test_case):
             self.has_unsaved_changes = False
-            self.save_button.setVisible(False)
+            self.save_button.setEnabled(False)
             self.unsaved_changes_state.emit(False)
             self.test_case_saved.emit()
             

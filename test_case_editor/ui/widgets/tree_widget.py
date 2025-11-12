@@ -241,9 +241,11 @@ class TestCaseTreeWidget(QTreeWidget):
     # ------------------------------------------------------- actions
 
     def _create_test_case(self, target_folder):
+        expanded_paths = self._capture_expanded_state()
         test_case = self.service.create_new_test_case(target_folder)
         if test_case:
             self.tree_updated.emit()
+            self._restore_expanded_state(expanded_paths)
             self.test_case_selected.emit(test_case)
 
     def _create_folder(self, parent_dir):
@@ -257,6 +259,7 @@ class TestCaseTreeWidget(QTreeWidget):
                 QMessageBox.critical(self, "Ошибка", f"Не удалось создать папку:\n{e}")
 
     def _rename_folder(self, folder_path):
+        expanded_paths = self._capture_expanded_state()
         old_name = folder_path.name
         new_name, ok = QInputDialog.getText(self, 'Переименовать папку', 'Новое имя:', text=old_name)
         if ok and new_name and new_name != old_name:
@@ -264,18 +267,22 @@ class TestCaseTreeWidget(QTreeWidget):
             try:
                 folder_path.rename(new_path)
                 self.tree_updated.emit()
+                self._restore_expanded_state(expanded_paths)
             except Exception as e:
                 QMessageBox.critical(self, "Ошибка", f"Не удалось переименовать:\n{e}")
 
     def _delete_folder(self, folder_path):
+        expanded_paths = self._capture_expanded_state()
         try:
             import shutil
             shutil.rmtree(folder_path)
             self.tree_updated.emit()
+            self._restore_expanded_state(expanded_paths)
         except Exception as e:
             QMessageBox.critical(self, "Ошибка", f"Не удалось удалить папку:\n{e}")
 
     def _rename_file(self, test_case):
+        expanded_paths = self._capture_expanded_state()
         old_filename = test_case._filename
         new_filename, ok = QInputDialog.getText(self, 'Переименовать файл', 'Новое имя файла:', text=old_filename)
         if ok and new_filename and new_filename != old_filename:
@@ -288,6 +295,7 @@ class TestCaseTreeWidget(QTreeWidget):
             try:
                 old_path.rename(new_path)
                 self.tree_updated.emit()
+                self._restore_expanded_state(expanded_paths)
             except Exception as e:
                 QMessageBox.critical(self, "Ошибка", f"Не удалось переименовать:\n{e}")
 
@@ -367,8 +375,10 @@ class TestCaseTreeWidget(QTreeWidget):
         )
 
     def _delete_test_case(self, test_case):
+        expanded_paths = self._capture_expanded_state()
         if self.service.delete_test_case(test_case):
             self.tree_updated.emit()
+            self._restore_expanded_state(expanded_paths)
 
     # ---------------------------------------------------------------- style --
 

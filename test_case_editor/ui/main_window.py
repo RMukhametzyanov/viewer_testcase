@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import List, Optional
 
 from PyQt5.QtWidgets import (
+    QApplication,
     QMainWindow,
     QMessageBox,
     QFileDialog,
@@ -111,7 +112,7 @@ class MainWindow(QMainWindow):
     def setup_ui(self):
         """Настройка пользовательского интерфейса"""
         self.setWindowTitle("✈️ Test Case Editor v2.0 (SOLID)")
-        self.setGeometry(100, 100, 1400, 900)
+        self._apply_initial_geometry()
         
         # Создаем меню
         self.create_menu()
@@ -277,6 +278,8 @@ class MainWindow(QMainWindow):
         view_menu = menubar.addMenu('Вид')
         width_action = view_menu.addAction('Настроить ширины панелей…')
         width_action.triggered.connect(self._configure_panel_widths)
+        statistics_action = view_menu.addAction('Показать статистику')
+        statistics_action.triggered.connect(self._show_statistics_panel)
     
     def select_test_cases_folder(self):
         """Обработчик выбора папки с тест-кейсами"""
@@ -456,6 +459,12 @@ class MainWindow(QMainWindow):
                     attachments.append(path_obj)
 
         return attachments
+
+    def _show_statistics_panel(self):
+        """Показать дерево и статистику (placeholder)."""
+        self.detail_stack.setCurrentWidget(self.placeholder)
+        self._hide_review_panel()
+        self.statusBar().showMessage("Показана статистика тест-кейсов")
 
     def _find_chtz_attachment(self, attachments: List[Path]) -> Optional[Path]:
         for path in attachments:
@@ -672,6 +681,49 @@ class MainWindow(QMainWindow):
 
         self._save_panel_sizes()
         self._apply_initial_panel_sizes()
+
+    def _apply_initial_geometry(self):
+        geometry = self.settings.get('window_geometry')
+        screen = QApplication.primaryScreen()
+        screen_rect = screen.availableGeometry() if screen else None
+        default_width = min(1600, screen_rect.width() if screen_rect else 1920)
+        default_height = min(900, screen_rect.height() if screen_rect else 1080)
+        default_x = (screen_rect.width() - default_width) // 2 if screen_rect else 100
+        default_y = (screen_rect.height() - default_height) // 2 if screen_rect else 100
+
+        if geometry and isinstance(geometry, dict):
+            x = geometry.get('x', default_x)
+            y = geometry.get('y', default_y)
+            width = geometry.get('width', default_width)
+            height = geometry.get('height', default_height)
+            self.setGeometry(x, y, width, height)
+            if geometry.get('is_fullscreen'):
+                self.showMaximized()
+        else:
+            self.setGeometry(default_x, default_y, default_width, default_height)
+
+    def closeEvent(self, event):
+        if self.isMaximized():
+            geom = self.normalGeometry()
+            geometry_data = {
+                'x': geom.x(),
+                'y': geom.y(),
+                'width': geom.width(),
+                'height': geom.height(),
+                'is_fullscreen': True,
+            }
+        else:
+            geom = self.geometry()
+            geometry_data = {
+                'x': geom.x(),
+                'y': geom.y(),
+                'width': geom.width(),
+                'height': geom.height(),
+                'is_fullscreen': False,
+            }
+        self.settings['window_geometry'] = geometry_data
+        self.save_settings(self.settings)
+        super().closeEvent(event)
 
     def convert_from_azure(self):
         """Импорт тест-кейсов из JSON Azure DevOps."""

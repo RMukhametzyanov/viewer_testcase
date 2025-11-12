@@ -344,15 +344,17 @@ class TestCaseService:
             step_type = step.get("type", "")
             action = step.get("action", "").strip()
             expected = step.get("expected", "").strip()
+            action = action.replace("\\n", "\n")
+            expected = expected.replace("\\n", "\n")
 
             if not action and not expected:
                 continue
 
             prefix = ""
             if step_type == "ActionStep":
-                prefix = "Действие: "
+                prefix = ""
             elif step_type == "ValidateStep":
-                prefix = "Проверка: "
+                prefix = ""
             elif step_type:
                 prefix = f"{step_type}: "
 
