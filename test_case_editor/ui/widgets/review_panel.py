@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import List
+from typing import Iterable, List
 
 from PyQt5.QtWidgets import (
     QWidget,
@@ -15,8 +15,11 @@ from PyQt5.QtWidgets import (
     QListWidget,
     QListWidgetItem,
     QFileDialog,
+    QSizePolicy,
+    QScrollArea,
 )
-from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtCore import pyqtSignal, Qt, QEvent
+from PyQt5.QtGui import QTextCursor, QTextOption
 
 
 class ReviewPanel(QWidget):
@@ -31,9 +34,22 @@ class ReviewPanel(QWidget):
         self._setup_ui()
 
     def _setup_ui(self):
-        layout = QVBoxLayout(self)
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll_area.setFrameShape(QScrollArea.NoFrame)
+
+        content_widget = QWidget()
+        layout = QVBoxLayout(content_widget)
         layout.setContentsMargins(15, 15, 15, 15)
         layout.setSpacing(15)
+
+        scroll_area.setWidget(content_widget)
+        main_layout.addWidget(scroll_area)
 
         title = QLabel("Панель ревью")
         title.setStyleSheet("color: #E1E3E6; font-size: 16pt; font-weight: 600;")
@@ -116,7 +132,11 @@ class ReviewPanel(QWidget):
         layout.addLayout(prompt_layout)
 
         self.prompt_edit = QTextEdit()
-        self.prompt_edit.setMinimumHeight(160)
+        self.prompt_edit.setMinimumHeight(110)
+        self.prompt_edit.setMaximumHeight(150)
+        prompt_policy = self.prompt_edit.sizePolicy()
+        prompt_policy.setVerticalPolicy(QSizePolicy.Fixed)
+        self.prompt_edit.setSizePolicy(prompt_policy)
         self.prompt_edit.setStyleSheet(
             """
             QTextEdit {
@@ -129,6 +149,7 @@ class ReviewPanel(QWidget):
             }
             """
         )
+        self.prompt_edit.installEventFilter(self)
         layout.addWidget(self.prompt_edit)
 
         # Кнопка Enter
@@ -155,6 +176,36 @@ class ReviewPanel(QWidget):
         self.enter_button.clicked.connect(self._enter_clicked)
         layout.addWidget(self.enter_button, 0, Qt.AlignRight)
 
+        # Ответ LLM
+        response_label = QLabel("Ответ LLM")
+        response_label.setStyleSheet("color: #8B9099; font-weight: 600;")
+        layout.addWidget(response_label)
+
+        self.response_view = QTextEdit()
+        self.response_view.setReadOnly(True)
+        self.response_view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.response_view.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.response_view.setWordWrapMode(QTextOption.NoWrap)
+        response_policy = self.response_view.sizePolicy()
+        response_policy.setVerticalPolicy(QSizePolicy.Minimum)
+        self.response_view.setSizePolicy(response_policy)
+        self._response_min_height = 160
+        self.response_view.setMinimumHeight(self._response_min_height)
+        self.response_view.setStyleSheet(
+            """
+            QTextEdit {
+                background-color: #101820;
+                border: 1px solid #2B3945;
+                border-radius: 8px;
+                color: #E1E3E6;
+                padding: 10px;
+                font-size: 11pt;
+            }
+            """
+        )
+        layout.addWidget(self.response_view, 1)
+        layout.addStretch(1)
+
     # --- Публичные методы -------------------------------------------------
 
     def set_prompt_text(self, text: str):
@@ -165,10 +216,53 @@ class ReviewPanel(QWidget):
         """Получить текущий текст промта."""
         return self.prompt_edit.toPlainText().strip()
 
+    def set_response_text(self, text: str):
+        """Показать текст ответа LLM."""
+        self.response_view.setPlainText(text or "")
+        self.response_view.moveCursor(QTextCursor.Start)
+        self._adjust_response_height()
+
+    def clear_response(self):
+        """Очистить поле ответа."""
+        self.response_view.clear()
+        self.response_view.setMinimumHeight(self._response_min_height)
+
+    def set_loading_state(self, is_loading: bool):
+        """Заблокировать элементы управления на время запроса."""
+        self.enter_button.setEnabled(not is_loading)
+        self.prompt_edit.setEnabled(not is_loading)
+        if is_loading:
+            self.enter_button.setText("Отправка…")
+        else:
+            self.enter_button.setText("Enter")
+
     def clear_attachments(self):
         """Очистить список прикрепленных файлов."""
         self._attachments.clear()
         self.attachments_list.clear()
+        self._update_attachments_height()
+
+    def set_attachments(self, paths: Iterable[Path]):
+        """Заменить список прикрепленных файлов."""
+        self._attachments.clear()
+        self.attachments_list.clear()
+        self._update_attachments_height()
+        self.add_attachments(paths)
+
+    def add_attachments(self, paths: Iterable[Path]):
+        """Добавить новые файлы к списку прикрепленных."""
+        changed = False
+        for path in paths:
+            path_obj = Path(path)
+            if path_obj not in self._attachments:
+                self._attachments.append(path_obj)
+                changed = True
+        if changed:
+            self._refresh_attachments()
+
+    def get_attachments(self) -> List[Path]:
+        """Получить текущие прикрепленные файлы."""
+        return list(self._attachments)
 
     # --- Внутренние обработчики -------------------------------------------
 
@@ -183,11 +277,7 @@ class ReviewPanel(QWidget):
         if not files:
             return
 
-        self._attachments = [Path(path) for path in files]
-        self.attachments_list.clear()
-        for path in self._attachments:
-            QListWidgetItem(str(path), self.attachments_list)
-        self._update_attachments_height()
+        self.add_attachments(Path(path) for path in files)
 
     def _save_prompt_clicked(self):
         text = self.get_prompt_text()
@@ -206,4 +296,40 @@ class ReviewPanel(QWidget):
             metrics_height = self.attachments_list.fontMetrics().height() + 12
         new_height = frame + metrics_height * count
         self.attachments_list.setFixedHeight(new_height)
+        if self.attachments_list.count() == 0:
+            QListWidgetItem("Файлы не прикреплены", self.attachments_list)
+            self.attachments_list.item(0).setFlags(Qt.ItemIsEnabled)
+
+    def _refresh_attachments(self):
+        self.attachments_list.clear()
+        if not self._attachments:
+            self._update_attachments_height()
+            return
+        for path in self._attachments:
+            QListWidgetItem(str(path), self.attachments_list)
+        self._update_attachments_height()
+
+    # --- Qt события -------------------------------------------------------
+
+    def eventFilter(self, obj, event):
+        if obj is self.prompt_edit and event.type() == QEvent.KeyPress:
+            if event.key() in (Qt.Key_Return, Qt.Key_Enter) and not (
+                event.modifiers() & (Qt.ShiftModifier | Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier)
+            ):
+                self._enter_clicked()
+                return True
+        return super().eventFilter(obj, event)
+
+    # --- Вспомогательные методы -------------------------------------------
+
+    def _adjust_response_height(self):
+        """Подстроить высоту области ответа под содержимое."""
+        doc = self.response_view.document()
+        doc_size = doc.size().toSize()
+        frame = self.response_view.frameWidth() * 2
+        margins = self.response_view.contentsMargins()
+        height = doc_size.height() + frame + margins.top() + margins.bottom()
+        height = max(height, self._response_min_height)
+        self.response_view.setMinimumHeight(height)
+
 

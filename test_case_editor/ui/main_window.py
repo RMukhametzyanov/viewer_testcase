@@ -2,7 +2,7 @@
 
 import json
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 from PyQt5.QtWidgets import (
     QMainWindow,
@@ -19,7 +19,7 @@ from PyQt5.QtWidgets import (
     QStackedLayout,
     QInputDialog,
 )
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject
 from PyQt5.QtGui import QFont
 
 from ..models.test_case import TestCase
@@ -31,6 +31,31 @@ from .widgets.form_widget import TestCaseFormWidget
 from .widgets.review_panel import ReviewPanel
 from .widgets.bulk_actions_panel import BulkActionsPanel
 from .styles.telegram_theme import TELEGRAM_DARK_THEME
+from ..utils import llm
+from ..utils.prompt_builder import build_review_prompt
+
+
+class _LLMWorker(QObject):
+    finished = pyqtSignal(str)
+    error = pyqtSignal(str)
+
+    def __init__(self, message: str, model: Optional[str], host: Optional[str]):
+        super().__init__()
+        self.message = message
+        self.model = model
+        self.host = host
+
+    def run(self):
+        try:
+            response = llm.send_prompt(
+                self.message,
+                model=self.model,
+                host=self.host,
+            )
+        except Exception as exc:
+            self.error.emit(str(exc))
+        else:
+            self.finished.emit(response)
 
 
 class MainWindow(QMainWindow):
@@ -63,10 +88,20 @@ class MainWindow(QMainWindow):
         if not self.test_cases_dir.exists():
             self.test_cases_dir = self.prompt_select_folder()
         self.default_prompt = self.settings.get('DEFAULT_PROMT', "Опиши задачу для ревью.")
+        methodic_setting = self.settings.get('LLM_METHODIC_PATH')
+        if methodic_setting:
+            self.methodic_path = Path(methodic_setting).expanduser()
+        else:
+            self.methodic_path = self._default_methodic_path()
+        if not self.methodic_path.exists():
+            self.methodic_path = self._default_methodic_path()
         
         # Состояние
         self.current_test_case: Optional[TestCase] = None
         self.test_cases = []
+        self._llm_thread: Optional[QThread] = None
+        self._llm_worker: Optional[_LLMWorker] = None
+        self._current_test_case_path: Optional[Path] = None
         
         self.setup_ui()
         self.apply_theme()
@@ -267,6 +302,9 @@ class MainWindow(QMainWindow):
         defaults = {
             'test_cases_dir': 'testcases',
             'DEFAULT_PROMT': "Опиши, на что обратить внимание при ревью тест-кейсов.",
+            'LLM_MODEL': llm.DEFAULT_MODEL,
+            'LLM_HOST': llm.DEFAULT_HOST,
+            'LLM_METHODIC_PATH': str(self._default_methodic_path()),
             'panel_sizes': {'left': 350, 'form_area': 900, 'review': 0},
         }
         
@@ -386,8 +424,11 @@ class MainWindow(QMainWindow):
         if self.detail_stack.currentWidget() is not self.form_widget:
             self.detail_stack.setCurrentWidget(self.form_widget)
         self._show_review_panel()
-        self.review_panel.set_prompt_text(self.settings.get('DEFAULT_PROMT', self.default_prompt))
-        self.review_panel.clear_attachments()
+        attachments = self._collect_review_attachments(data)
+        self.review_panel.set_attachments(attachments)
+        base_prompt = self.settings.get('DEFAULT_PROMT', self.default_prompt)
+        self.review_panel.set_prompt_text(base_prompt)
+        self.review_panel.clear_response()
         self.statusBar().showMessage("Панель ревью открыта")
 
     def _on_prompt_saved(self, text: str):
@@ -397,11 +438,117 @@ class MainWindow(QMainWindow):
         self.default_prompt = text
         self.statusBar().showMessage("Промт сохранен")
 
+    def _collect_review_attachments(self, data) -> List[Path]:
+        attachments: List[Path] = []
+        self._current_test_case_path = None
+
+        if self.methodic_path and self.methodic_path not in attachments:
+            attachments.append(self.methodic_path)
+
+        if isinstance(data, dict) and data.get('type') == 'file':
+            test_case = data.get('test_case')
+            file_path = getattr(test_case, '_filepath', None)
+            if file_path:
+                path_obj = Path(file_path)
+                self._current_test_case_path = path_obj
+                if path_obj not in attachments:
+                    attachments.append(path_obj)
+
+        return attachments
+
+    def _find_chtz_attachment(self, attachments: List[Path]) -> Optional[Path]:
+        for path in attachments:
+            if self.methodic_path and path == self.methodic_path:
+                continue
+            name_lower = path.name.lower()
+            if "chtz" in name_lower or "чтз" in name_lower or ("тз" in name_lower and path.suffix.lower() in {".txt", ".md", ".docx", ".doc"}):
+                return path
+        return None
+
+    @staticmethod
+    def _default_methodic_path() -> Path:
+        return Path(__file__).resolve().parent.parent / "docs" / "test-cases-guidelines.md"
+
+    @staticmethod
+    def _find_test_case_attachment(attachments: List[Path]) -> Optional[Path]:
+        for path in attachments:
+            if path.suffix.lower() in {".json", ".txt", ".md"}:
+                return path
+        return None
+
     def _on_review_enter_clicked(self, text: str, files: list):
         """Обработка нажатия кнопки Enter на панели ревью."""
+        prompt = (text or "").strip()
+        if not prompt:
+            self.review_panel.set_response_text("Введите промт перед отправкой.")
+            self.statusBar().showMessage("Пустой промт — запрос не отправлен")
+            return
+
+        if self._llm_thread and self._llm_thread.isRunning():
+            self.statusBar().showMessage("Ожидайте завершения текущего запроса к LLM")
+            return
+
+        attachment_paths = [Path(p) for p in files]
+        self.review_panel.set_loading_state(True)
+        self.review_panel.set_response_text("Отправляю запрос в LLM…")
+
+        model = self.settings.get('LLM_MODEL') or None
+        host = self.settings.get('LLM_HOST') or None
+
+        chtz_path = self._find_chtz_attachment(attachment_paths)
+        test_case_path = self._current_test_case_path or self._find_test_case_attachment(attachment_paths)
+
+        try:
+            payload = build_review_prompt(
+                self.methodic_path,
+                prompt,
+                test_case_path=test_case_path,
+                chtz_path=chtz_path,
+            )
+        except Exception as exc:  # pylint: disable=broad-except
+            self.review_panel.set_loading_state(False)
+            self.review_panel.set_response_text(f"Не удалось подготовить промт: {exc}")
+            self.statusBar().showMessage("Ошибка подготовки промта для LLM")
+            return
+
+        worker = _LLMWorker(payload, model, host)
+        thread = QThread()
+        worker.moveToThread(thread)
+
+        worker.finished.connect(self._handle_llm_success)
+        worker.error.connect(self._handle_llm_error)
+        thread.started.connect(worker.run)
+
+        thread.start()
+
+        self._llm_worker = worker
+        self._llm_thread = thread
+
         self.statusBar().showMessage(
-            f"Отправлен промт длиной {len(text)} символов. Прикреплено файлов: {len(files)}"
+            f"Отправлен промт длиной {len(prompt)} символов. Прикреплено файлов: {len(files)}"
         )
+
+    def _handle_llm_success(self, response: str):
+        self.review_panel.set_response_text(response.strip())
+        self.review_panel.set_loading_state(False)
+        self.statusBar().showMessage("Ответ LLM получен")
+        self._cleanup_llm_worker()
+
+    def _handle_llm_error(self, error_message: str):
+        self.review_panel.set_response_text(f"Ошибка: {error_message}")
+        self.review_panel.set_loading_state(False)
+        self.statusBar().showMessage("Ошибка при обращении к LLM")
+        self._cleanup_llm_worker()
+
+    def _cleanup_llm_worker(self):
+        if self._llm_thread:
+            self._llm_thread.quit()
+            self._llm_thread.wait()
+            self._llm_thread.deleteLater()
+            self._llm_thread = None
+        if self._llm_worker:
+            self._llm_worker.deleteLater()
+            self._llm_worker = None
 
     # --- Работа с панелями и размерами -----------------------------------
 
