@@ -311,11 +311,16 @@ class TestCaseTreeWidget(QTreeWidget):
         if not target_path:
             QMessageBox.warning(self, "Открытие проводника", "Путь к элементу не найден.")
             return
-
-        if not target_path.exists():
-            QMessageBox.warning(self, "Открытие проводника", "Файл или папка не найдены.")
+        try:
+            normalized_path = Path(target_path).resolve(strict=False)
+        except Exception:
+            QMessageBox.warning(self, "Открытие проводника", "Не удалось определить путь к элементу.")
             return
 
+        if not normalized_path.exists():
+            QMessageBox.warning(self, "Открытие проводника", "Файл или папка не найдены.")
+            return
+        target_path = normalized_path
         try:
             if sys.platform.startswith("win"):
                 if select and target_path.is_file():

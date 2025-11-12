@@ -1,6 +1,7 @@
 """Главное окно приложения"""
 
 import json
+import subprocess
 from pathlib import Path
 from typing import List, Optional
 
@@ -19,6 +20,9 @@ from PyQt5.QtWidgets import (
     QPushButton,
     QStackedLayout,
     QInputDialog,
+    QDialog,
+    QTextEdit,
+    QDialogButtonBox,
 )
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject
 from PyQt5.QtGui import QFont
@@ -34,6 +38,44 @@ from .widgets.bulk_actions_panel import BulkActionsPanel
 from .styles.telegram_theme import TELEGRAM_DARK_THEME
 from ..utils import llm
 from ..utils.prompt_builder import build_review_prompt
+
+
+class GitCommitDialog(QDialog):
+    """Диалог для ввода комментария git-коммита."""
+
+    def __init__(self, parent: Optional[QWidget] = None):
+        super().__init__(parent)
+        self.setWindowTitle("Git commit")
+        self.setModal(True)
+        self.setMinimumWidth(400)
+
+        layout = QVBoxLayout(self)
+        label = QLabel("Введите комментарий к коммиту:")
+        label.setWordWrap(True)
+        layout.addWidget(label)
+
+        self.comment_edit = QTextEdit(self)
+        self.comment_edit.setPlaceholderText("Комментарий обязателен…")
+        self.comment_edit.textChanged.connect(self._on_text_changed)
+        layout.addWidget(self.comment_edit)
+
+        self.button_box = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
+            Qt.Horizontal,
+            self,
+        )
+        self.ok_button = self.button_box.button(QDialogButtonBox.Ok)
+        self.ok_button.setEnabled(False)
+        self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
+        layout.addWidget(self.button_box)
+
+    def _on_text_changed(self):
+        text = self.get_comment().strip()
+        self.ok_button.setEnabled(bool(text))
+
+    def get_comment(self) -> str:
+        return self.comment_edit.toPlainText()
 
 
 class _LLMWorker(QObject):
@@ -280,6 +322,115 @@ class MainWindow(QMainWindow):
         width_action.triggered.connect(self._configure_panel_widths)
         statistics_action = view_menu.addAction('Показать статистику')
         statistics_action.triggered.connect(self._show_statistics_panel)
+
+        # Меню "git"
+        git_menu = menubar.addMenu('git')
+        git_commit_action = git_menu.addAction('Выполнить commit и push…')
+        git_commit_action.triggered.connect(self._open_git_commit_dialog)
+    
+    def _open_git_commit_dialog(self):
+        """Открыть диалог с комментарием git-коммита."""
+        dialog = GitCommitDialog(self)
+        if dialog.exec_() == QDialog.Accepted:
+            comment = dialog.get_comment().strip()
+            if comment:
+                self._perform_git_commit_push(comment)
+
+    def _perform_git_commit_push(self, message: str):
+        """Выполнить git commit и push в директории тест-кейсов."""
+        repo_path = self.test_cases_dir
+
+        if not repo_path.exists():
+            QMessageBox.warning(
+                self,
+                "Git",
+                f"Папка с тест-кейсами не найдена:\n{repo_path}",
+            )
+            return
+
+        try:
+            status_proc = subprocess.run(
+                ["git", "status", "--porcelain"],
+                cwd=str(repo_path),
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+        except FileNotFoundError:
+            QMessageBox.critical(
+                self,
+                "Git",
+                "Команда git не найдена. Установите Git и убедитесь, что он доступен в PATH.",
+            )
+            return
+        except subprocess.CalledProcessError as exc:
+            error_message = exc.stderr or exc.stdout or str(exc)
+            QMessageBox.critical(
+                self,
+                "Git",
+                f"Не удалось получить статус репозитория:\n{error_message}",
+            )
+            return
+
+        if not status_proc.stdout.strip():
+            QMessageBox.information(
+                self,
+                "Git",
+                "Нет изменений для коммита.",
+            )
+            return
+
+        self.statusBar().showMessage("Git: подготовка изменений…")
+        commands = [
+            ("Git: подготовка файлов…", ["git", "add", "--all"]),
+            ("Git: создаю коммит…", ["git", "commit", "-m", message]),
+            ("Git: отправляю изменения…", ["git", "push"]),
+        ]
+
+        for status_text, cmd in commands:
+            self.statusBar().showMessage(status_text)
+            try:
+                result = subprocess.run(
+                    cmd,
+                    cwd=str(repo_path),
+                    capture_output=True,
+                    text=True,
+                )
+            except FileNotFoundError:
+                QMessageBox.critical(
+                    self,
+                    "Git",
+                    "Команда git не найдена. Установите Git и убедитесь, что он доступен в PATH.",
+                )
+                self.statusBar().showMessage("Git: ошибка выполнения")
+                return
+
+            if result.returncode != 0:
+                stderr = (result.stderr or "").strip()
+                stdout = (result.stdout or "").strip()
+                combined_output = stderr or stdout or "Неизвестная ошибка."
+                # Если git commit сообщает об отсутствии изменений
+                if "nothing to commit" in combined_output.lower():
+                    QMessageBox.information(
+                        self,
+                        "Git",
+                        "Нет изменений для коммита.",
+                    )
+                else:
+                    QMessageBox.critical(
+                        self,
+                        "Git",
+                        f"Команда {' '.join(cmd)} завершилась с ошибкой:\n{combined_output}",
+                    )
+                self.statusBar().showMessage("Git: ошибка выполнения")
+                return
+
+        QMessageBox.information(
+            self,
+            "Git",
+            "Изменения успешно отправлены в удалённый репозиторий.",
+        )
+        self.statusBar().showMessage("Git: изменения отправлены")
     
     def select_test_cases_folder(self):
         """Обработчик выбора папки с тест-кейсами"""

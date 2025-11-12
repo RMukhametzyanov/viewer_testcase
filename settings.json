@@ -3,8 +3,8 @@
     "DEFAULT_PROMT": "Проведи ревью этого тест-кейса с акцентом на аспекты указанные в методике. Выведи комментарии и список рекомендаций по улучшению и приведению в соответствие",
     "panel_sizes": {
         "left": 390,
-        "form_area": 1976,
-        "review": 1155
+        "form_area": 640,
+        "review": 374
     },
     "LLM_MODEL": "qwen2.5:32b-instruct",
     "LLM_HOST": "http://spb99-vkc-dhwgpu06.devzone.local:11434",
