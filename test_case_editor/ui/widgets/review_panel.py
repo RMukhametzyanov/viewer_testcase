@@ -44,16 +44,16 @@ class ReviewPanel(QWidget):
         scroll_area.setFrameShape(QScrollArea.NoFrame)
 
         content_widget = QWidget()
-        layout = QVBoxLayout(content_widget)
-        layout.setContentsMargins(15, 15, 15, 15)
-        layout.setSpacing(15)
+        content_layout = QVBoxLayout(content_widget)
+        content_layout.setContentsMargins(15, 15, 15, 15)
+        content_layout.setSpacing(15)
 
         scroll_area.setWidget(content_widget)
         main_layout.addWidget(scroll_area)
 
         title = QLabel("Панель ревью")
         title.setStyleSheet("color: #E1E3E6; font-size: 16pt; font-weight: 600;")
-        layout.addWidget(title)
+        content_layout.addWidget(title)
 
         # Блок прикрепленных файлов
         attachments_row = QHBoxLayout()
@@ -83,7 +83,7 @@ class ReviewPanel(QWidget):
         attachments_label.setStyleSheet("color: #8B9099; font-weight: 600;")
         attachments_row.addWidget(attachments_label, 0, Qt.AlignVCenter)
         attachments_row.addStretch(1)
-        layout.addLayout(attachments_row)
+        content_layout.addLayout(attachments_row)
 
         self.attachments_list = QListWidget()
         self.attachments_list.setStyleSheet(
@@ -99,7 +99,7 @@ class ReviewPanel(QWidget):
             }
             """
         )
-        layout.addWidget(self.attachments_list)
+        content_layout.addWidget(self.attachments_list)
         self._update_attachments_height()
 
         # Поле промта
@@ -129,7 +129,7 @@ class ReviewPanel(QWidget):
         self.save_prompt_button.clicked.connect(self._save_prompt_clicked)
         prompt_layout.addWidget(self.save_prompt_button, 0, Qt.AlignRight)
         prompt_layout.addStretch(1)
-        layout.addLayout(prompt_layout)
+        content_layout.addLayout(prompt_layout)
 
         self.prompt_edit = QTextEdit()
         self.prompt_edit.setMinimumHeight(110)
@@ -150,7 +150,7 @@ class ReviewPanel(QWidget):
             """
         )
         self.prompt_edit.installEventFilter(self)
-        layout.addWidget(self.prompt_edit)
+        content_layout.addWidget(self.prompt_edit)
 
         # Кнопка Enter
         self.enter_button = QPushButton("Enter")
@@ -174,12 +174,16 @@ class ReviewPanel(QWidget):
             """
         )
         self.enter_button.clicked.connect(self._enter_clicked)
-        layout.addWidget(self.enter_button, 0, Qt.AlignRight)
+
+        buttons_row = QHBoxLayout()
+        buttons_row.addStretch(1)
+        buttons_row.addWidget(self.enter_button)
+        content_layout.addLayout(buttons_row)
 
         # Ответ LLM
         response_label = QLabel("Ответ LLM")
         response_label.setStyleSheet("color: #8B9099; font-weight: 600;")
-        layout.addWidget(response_label)
+        content_layout.addWidget(response_label)
 
         self.response_view = QTextEdit()
         self.response_view.setReadOnly(True)
@@ -203,8 +207,8 @@ class ReviewPanel(QWidget):
             }
             """
         )
-        layout.addWidget(self.response_view, 1)
-        layout.addStretch(1)
+        content_layout.addWidget(self.response_view, 1)
+        content_layout.addStretch(1)
 
     # --- Публичные методы -------------------------------------------------
 
@@ -285,6 +289,7 @@ class ReviewPanel(QWidget):
 
     def _enter_clicked(self):
         self.enter_clicked.emit(self.get_prompt_text(), [str(p) for p in self._attachments])
+
 
     def _update_attachments_height(self):
         """Адаптировать высоту списка прикрепленных файлов."""

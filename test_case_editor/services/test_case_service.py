@@ -124,7 +124,7 @@ class TestCaseService:
             # Создаем глубокую копию
             new_test_case = copy.deepcopy(test_case)
             new_test_case.id = str(uuid.uuid4())
-            new_test_case.title = f"{new_test_case.title} (копия)"
+            new_test_case.title = f"(копия) {new_test_case.title}"
             
             # Генерируем новое имя файла
             original_path = test_case._filepath

@@ -1,5 +1,6 @@
 """Простой виджет дерева тест-кейсов."""
 
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -12,8 +13,9 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QMenu,
     QInputDialog,
+    QAbstractItemView,
 )
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal, QMimeData, QByteArray
 from PyQt5.QtGui import QFont, QColor
 
 from ...services.test_case_service import TestCaseService
@@ -22,6 +24,8 @@ from ...models.test_case import TestCase
 
 class TestCaseTreeWidget(QTreeWidget):
     """Минимальный QTreeWidget для отображения и управления деревом объектов."""
+
+    MIME_TYPE = "application/x-testcase-tree-item"
 
     test_case_selected = pyqtSignal(TestCase)
     tree_updated = pyqtSignal()
@@ -67,6 +71,11 @@ class TestCaseTreeWidget(QTreeWidget):
         self.itemClicked.connect(self._on_item_clicked)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self._show_context_menu)
+        self.setDragEnabled(True)
+        self.setAcceptDrops(True)
+        self.setDropIndicatorShown(True)
+        self.setDefaultDropAction(Qt.MoveAction)
+        self.setDragDropMode(QAbstractItemView.DragDrop)
 
     # ------------------------------------------------------------------ load
 
@@ -283,9 +292,12 @@ class TestCaseTreeWidget(QTreeWidget):
                 QMessageBox.critical(self, "Ошибка", f"Не удалось переименовать:\n{e}")
 
     def _duplicate_test_case(self, test_case):
+        expanded_paths = self._capture_expanded_state()
         new_test_case = self.service.duplicate_test_case(test_case)
         if new_test_case:
             self.tree_updated.emit()
+            self._restore_expanded_state(expanded_paths)
+            self.focus_on_test_case(new_test_case)
 
     def _open_in_explorer(self, target_path: Optional[Path], select: bool):
         if not target_path:
@@ -421,5 +433,189 @@ class TestCaseTreeWidget(QTreeWidget):
             return visible
 
         return matches
+
+    # ----------------------------------------------------------- DnD helpers
+
+    def mimeTypes(self):
+        return [self.MIME_TYPE]
+
+    def mimeData(self, items):
+        if not items:
+            return None
+        item = items[0]
+        data = item.data(0, Qt.UserRole)
+        if not data:
+            return None
+
+        payload = {"type": data.get("type")}
+        if payload["type"] == "file":
+            test_case = data.get("test_case")
+            if not test_case or not getattr(test_case, "_filepath", None):
+                return None
+            payload["path"] = str(test_case._filepath)
+        elif payload["type"] == "folder":
+            folder_path = data.get("path")
+            if not folder_path:
+                return None
+            payload["path"] = str(folder_path)
+        else:
+            return None
+
+        mime = QMimeData()
+        mime.setData(self.MIME_TYPE, QByteArray(json.dumps(payload).encode("utf-8")))
+        return mime
+
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasFormat(self.MIME_TYPE):
+            event.acceptProposedAction()
+        else:
+            event.ignore()
+
+    dragMoveEvent = dragEnterEvent
+
+    def dropEvent(self, event):
+        mime = event.mimeData()
+        if not mime.hasFormat(self.MIME_TYPE):
+            event.ignore()
+            return
+
+        if not self.test_cases_dir:
+            event.ignore()
+            return
+
+        try:
+            payload = json.loads(bytes(mime.data(self.MIME_TYPE)).decode("utf-8"))
+        except (ValueError, json.JSONDecodeError):
+            event.ignore()
+            return
+
+        source_type = payload.get("type")
+        source_path = payload.get("path")
+        if not source_type or not source_path:
+            event.ignore()
+            return
+
+        target_folder = self._resolve_drop_target(event.pos())
+        if target_folder is None:
+            event.ignore()
+            return
+        target_folder = Path(target_folder)
+
+        source_path_obj = Path(source_path)
+        if source_type == "file":
+            if source_path_obj.parent == target_folder:
+                event.ignore()
+                return
+            moved = self.service.move_item(source_path_obj, target_folder)
+        elif source_type == "folder":
+            if source_path_obj == target_folder or self._is_subpath(target_folder, source_path_obj):
+                event.ignore()
+                return
+            moved = self.service.move_item(source_path_obj, target_folder)
+        else:
+            event.ignore()
+            return
+
+        if moved:
+            event.acceptProposedAction()
+            expanded_paths = self._capture_expanded_state()
+            self.tree_updated.emit()
+            self._restore_expanded_state(expanded_paths)
+        else:
+            event.ignore()
+
+    def _resolve_drop_target(self, position):
+        item = self.itemAt(position)
+        if not item:
+            return self.test_cases_dir
+
+        data = item.data(0, Qt.UserRole)
+        if not data:
+            return None
+
+        if data.get("type") == "folder":
+            return data.get("path")
+
+        if data.get("type") == "file":
+            test_case = data.get("test_case")
+            if test_case and getattr(test_case, "_filepath", None):
+                return test_case._filepath.parent
+
+        return None
+
+    def _capture_expanded_state(self):
+        expanded = set()
+        stack = [self.invisibleRootItem()]
+        while stack:
+            node = stack.pop()
+            for i in range(node.childCount()):
+                child = node.child(i)
+                data = child.data(0, Qt.UserRole)
+                if child.isExpanded() and data and data.get("type") == "folder":
+                    path = data.get("path")
+                    if path:
+                        expanded.add(Path(path))
+                stack.append(child)
+        return expanded
+
+    def _restore_expanded_state(self, expanded_paths):
+        if not expanded_paths:
+            return
+        stack = [self.invisibleRootItem()]
+        while stack:
+            node = stack.pop()
+            for i in range(node.childCount()):
+                child = node.child(i)
+                data = child.data(0, Qt.UserRole)
+                if data and data.get("type") == "folder":
+                    path = data.get("path")
+                    if path and Path(path) in expanded_paths:
+                        child.setExpanded(True)
+                stack.append(child)
+
+    @staticmethod
+    def _is_subpath(path: Path, potential_parent: Path) -> bool:
+        try:
+            resolved_path = path.resolve()
+            resolved_parent = potential_parent.resolve()
+        except (OSError, RuntimeError):
+            return False
+
+        try:
+            resolved_path.relative_to(resolved_parent)
+            return True
+        except ValueError:
+            return False
+
+    # ----------------------------------------------------------- selection --
+
+    def focus_on_test_case(self, target: TestCase):
+        """Выделить тест-кейс в дереве и инициировать открытие."""
+        if not target:
+            return
+
+        filepath = getattr(target, "_filepath", None)
+        item = self._find_item(self.invisibleRootItem(), target, filepath)
+        if item:
+            self.setCurrentItem(item)
+            self.scrollToItem(item)
+            self.test_case_selected.emit(target)
+
+    def _find_item(self, parent: QTreeWidgetItem, target: TestCase, filepath: Optional[Path]):
+        for i in range(parent.childCount()):
+            child = parent.child(i)
+            data = child.data(0, Qt.UserRole)
+            if data and data.get("type") == "file":
+                test_case = data.get("test_case")
+                if test_case is target:
+                    return child
+                if filepath and getattr(test_case, "_filepath", None) == filepath:
+                    return child
+
+            found = self._find_item(child, target, filepath)
+            if found:
+                return found
+
+        return None
 
 

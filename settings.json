@@ -2,11 +2,11 @@
     "test_cases_dir": "C:\\test-cases-example\\testcases",
     "DEFAULT_PROMT": "Проведи ревью этого тест-кейса с акцентом на аспекты указанные в методике. Выведи комментарии и список рекомендаций по улучшению и приведению в соответствие",
     "panel_sizes": {
-        "left": 325,
-        "form_area": 1445,
-        "review": 770
+        "left": 367,
+        "form_area": 1082,
+        "review": 190
     },
-    "LLM_MODEL": "qwen3:latest",
+    "LLM_MODEL": "Qwen2.5-32B",
     "LLM_HOST": "http://spb99-vkc-dhwgpu06.devzone.local:11434",
     "LLM_METHODIC_PATH": "C:\\viewer_testcase\\test_case_editor\\docs\\test-cases-guidelines.md"
 }

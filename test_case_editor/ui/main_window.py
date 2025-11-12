@@ -106,6 +106,7 @@ class MainWindow(QMainWindow):
         self.setup_ui()
         self.apply_theme()
         self.load_all_test_cases()
+        self._show_placeholder()
     
     def setup_ui(self):
         """Настройка пользовательского интерфейса"""
@@ -476,6 +477,7 @@ class MainWindow(QMainWindow):
                 return path
         return None
 
+
     def _on_review_enter_clicked(self, text: str, files: list):
         """Обработка нажатия кнопки Enter на панели ревью."""
         prompt = (text or "").strip()
@@ -511,11 +513,18 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("Ошибка подготовки промта для LLM")
             return
 
+        self._start_llm_request(payload, model, host, self._handle_llm_success)
+
+        self.statusBar().showMessage(
+            f"Отправлен промт длиной {len(prompt)} символов. Прикреплено файлов: {len(files)}"
+        )
+
+    def _start_llm_request(self, payload: str, model: Optional[str], host: Optional[str], success_slot):
         worker = _LLMWorker(payload, model, host)
         thread = QThread()
         worker.moveToThread(thread)
 
-        worker.finished.connect(self._handle_llm_success)
+        worker.finished.connect(success_slot)
         worker.error.connect(self._handle_llm_error)
         thread.started.connect(worker.run)
 
@@ -523,10 +532,6 @@ class MainWindow(QMainWindow):
 
         self._llm_worker = worker
         self._llm_thread = thread
-
-        self.statusBar().showMessage(
-            f"Отправлен промт длиной {len(prompt)} символов. Прикреплено файлов: {len(files)}"
-        )
 
     def _handle_llm_success(self, response: str):
         self.review_panel.set_response_text(response.strip())
