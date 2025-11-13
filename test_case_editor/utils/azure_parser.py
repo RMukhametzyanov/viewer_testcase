@@ -12,10 +12,34 @@ _HTML_ENTITIES = {
     "&amp;": "&",
     "&quot;": '"',
     "&nbsp;": " ",
-    "&BR/&gt;": "\n",
-    "&BR/": "\n",
     "&amp;nbsp;": " ",
+    "&#160;": " ",
 }
+
+_BLOCK_BREAK_TAGS = (
+    "p",
+    "div",
+    "section",
+    "article",
+    "header",
+    "footer",
+    "blockquote",
+    "pre",
+    "table",
+    "thead",
+    "tbody",
+    "tfoot",
+    "tr",
+    "ul",
+    "ol",
+    "li",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+)
 
 
 def clean_azure_text(text: Optional[str]) -> str:
@@ -37,8 +61,22 @@ def clean_azure_text(text: Optional[str]) -> str:
     for entity, replacement in _HTML_ENTITIES.items():
         text = text.replace(entity, replacement)
 
-    # Удаляем HTML-теги
+    # Переводим HTML-переносы и блочные элементы в явные переносы строк
+    text = re.sub(r"(?i)<\s*br\s*/?\s*>", "\n", text)
+
+    for tag in _BLOCK_BREAK_TAGS:
+        # Закрывающий тег → перенос строки
+        text = re.sub(fr"(?i)</\s*{tag}\s*>", "\n", text)
+        # Маркируем элементы списка
+        if tag == "li":
+            text = re.sub(r"(?i)<\s*li[^>]*>", "- ", text)
+        else:
+            text = re.sub(fr"(?i)<\s*{tag}[^>]*>", "", text)
+    # Очищаем оставшиеся теги
     text = re.sub(r"<[^>]+>", "", text)
+
+    # Нормализуем переводы строк
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
 
     # Схлопываем множественные пробелы и пустые строки
     text = re.sub(r"\n\s*\n", "\n\n", text)
@@ -94,37 +132,69 @@ def parse_azure_test_cases(payload: Dict[str, Any]) -> List[Dict[str, Any]]:
     Returns:
         Список словарей с данными тест-кейсов.
     """
-    results: List[Dict[str, Any]] = []
+    if not payload:
+        return []
 
-    for entry in payload.get("value", []):
-        work_item = entry.get("workItem", {}) or {}
-        work_item_fields = work_item.get("workItemFields", []) or []
+    value = payload.get("value")
+    if isinstance(value, list):
+        results: List[Dict[str, Any]] = []
+        for entry in value:
+            parsed = _parse_collection_entry(entry)
+            if parsed:
+                results.append(parsed)
+        return results
 
-        # Извлекаем XML со шагами
-        steps_xml = None
-        additional_fields: Dict[str, Any] = {}
+    single_case = _parse_single_work_item(payload)
+    return [single_case] if single_case else []
 
-        for field in work_item_fields:
-            if "Microsoft.VSTS.TCM.Steps" in field:
-                steps_xml = field.get("Microsoft.VSTS.TCM.Steps")
-            else:
-                additional_fields.update(field)
 
-        steps = extract_azure_steps(steps_xml)
+def _parse_collection_entry(entry: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    work_item = entry.get("workItem", {}) or {}
+    work_item_fields = work_item.get("workItemFields", []) or []
 
-        results.append(
-            {
-                "id": work_item.get("id"),
-                "title": work_item.get("name") or "Без названия",
-                "steps": steps,
-                "plan": entry.get("testPlan", {}) or {},
-                "suite": entry.get("testSuite", {}) or {},
-                "project": entry.get("project", {}) or {},
-                "additional_fields": additional_fields,
-            }
-        )
+    steps_xml = None
+    additional_fields: Dict[str, Any] = {}
 
-    return results
+    for field in work_item_fields:
+        if not isinstance(field, dict):
+            continue
+        if "Microsoft.VSTS.TCM.Steps" in field:
+            steps_xml = field.get("Microsoft.VSTS.TCM.Steps")
+        else:
+            additional_fields.update(field)
+
+    return {
+        "id": work_item.get("id"),
+        "title": work_item.get("name")
+        or additional_fields.get("System.Title")
+        or "Без названия",
+        "steps": extract_azure_steps(steps_xml),
+        "plan": entry.get("testPlan", {}) or {},
+        "suite": entry.get("testSuite", {}) or {},
+        "project": entry.get("project", {}) or {},
+        "additional_fields": additional_fields,
+    }
+
+
+def _parse_single_work_item(payload: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    fields = payload.get("fields") or {}
+    if not isinstance(fields, dict):
+        return None
+
+    steps_xml = fields.get("Microsoft.VSTS.TCM.Steps")
+    additional_fields = {
+        key: value for key, value in fields.items() if key != "Microsoft.VSTS.TCM.Steps"
+    }
+
+    return {
+        "id": payload.get("id") or additional_fields.get("System.Id"),
+        "title": additional_fields.get("System.Title") or "Без названия",
+        "steps": extract_azure_steps(steps_xml),
+        "plan": payload.get("testPlan", {}) or {},
+        "suite": payload.get("testSuite", {}) or {},
+        "project": payload.get("project", {}) or {},
+        "additional_fields": additional_fields,
+    }
 
 
 __all__ = ["clean_azure_text", "extract_azure_steps", "parse_azure_test_cases"]

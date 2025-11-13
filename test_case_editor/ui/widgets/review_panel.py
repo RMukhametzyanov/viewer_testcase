@@ -29,6 +29,7 @@ class ReviewPanel(QWidget):
 
     prompt_saved = pyqtSignal(str)
     enter_clicked = pyqtSignal(str, list)
+    close_requested = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -58,8 +59,8 @@ class ReviewPanel(QWidget):
         content_layout.addWidget(title)
 
         # Блок прикрепленных файлов
-        attachments_row = QHBoxLayout()
-        attachments_row.setSpacing(10)
+        header_row = QHBoxLayout()
+        header_row.setSpacing(10)
 
         self.attach_button = QPushButton("📎")
         self.attach_button.setToolTip("Прикрепить файлы")
@@ -79,13 +80,38 @@ class ReviewPanel(QWidget):
             """
         )
         self.attach_button.clicked.connect(self._choose_files)
-        attachments_row.addWidget(self.attach_button, 0, Qt.AlignLeft)
+        header_row.addWidget(self.attach_button, 0, Qt.AlignLeft)
 
         attachments_label = QLabel("Прикрепленные файлы:")
         attachments_label.setStyleSheet("color: #8B9099; font-weight: 600;")
-        attachments_row.addWidget(attachments_label, 0, Qt.AlignVCenter)
-        attachments_row.addStretch(1)
-        content_layout.addLayout(attachments_row)
+        header_row.addWidget(attachments_label, 0, Qt.AlignVCenter)
+
+        header_row.addStretch(1)
+
+        self.close_button = QPushButton("✖")
+        self.close_button.setToolTip("Скрыть панель ревью")
+        self.close_button.setFixedSize(32, 32)
+        self.close_button.setStyleSheet(
+            """
+            QPushButton {
+                background-color: transparent;
+                border: 1px solid #3D6A98;
+                border-radius: 6px;
+                color: #E1E3E6;
+                font-size: 12pt;
+            }
+            QPushButton:hover {
+                background-color: #3D6A98;
+            }
+            QPushButton:pressed {
+                background-color: #1D3F5F;
+            }
+            """
+        )
+        self.close_button.clicked.connect(self.close_requested.emit)
+        header_row.addWidget(self.close_button, 0, Qt.AlignRight)
+
+        content_layout.addLayout(header_row)
 
         self.attachments_list = QListWidget()
         self.attachments_list.setStyleSheet(

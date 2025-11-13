@@ -1,6 +1,7 @@
 """Простой виджет дерева тест-кейсов."""
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -198,9 +199,6 @@ class TestCaseTreeWidget(QTreeWidget):
         action_open_explorer = menu.addAction("🪟 Открыть в проводнике")
         action_open_explorer.triggered.connect(lambda: self._open_in_explorer(folder_path, select=False))
 
-        action_review = menu.addAction("📝 Ревью")
-        action_review.triggered.connect(lambda: self.review_requested.emit(folder_data))
-
         menu.exec_(self.mapToGlobal(position))
 
     def _show_file_menu(self, position, file_data):
@@ -308,35 +306,70 @@ class TestCaseTreeWidget(QTreeWidget):
             self.focus_on_test_case(new_test_case)
 
     def _open_in_explorer(self, target_path: Optional[Path], select: bool):
-        if not target_path:
-            QMessageBox.warning(self, "Открытие проводника", "Путь к элементу не найден.")
-            return
-        try:
-            normalized_path = Path(target_path).resolve(strict=False)
-        except Exception:
-            QMessageBox.warning(self, "Открытие проводника", "Не удалось определить путь к элементу.")
+        resolved_path = self._resolve_target_path(target_path)
+        if not resolved_path:
             return
 
-        if not normalized_path.exists():
-            QMessageBox.warning(self, "Открытие проводника", "Файл или папка не найдены.")
-            return
-        target_path = normalized_path
         try:
             if sys.platform.startswith("win"):
-                if select and target_path.is_file():
-                    subprocess.run(["explorer", f"/select,{str(target_path)}"], check=False)
-                else:
-                    subprocess.run(["explorer", str(target_path)], check=False)
+                self._open_in_windows_explorer(resolved_path, select)
             elif sys.platform == "darwin":
-                if select and target_path.is_file():
-                    subprocess.run(["open", "-R", str(target_path)], check=False)
-                else:
-                    subprocess.run(["open", str(target_path)], check=False)
+                self._open_in_macos_finder(resolved_path, select)
             else:
-                path_to_open = target_path if not select or target_path.is_dir() else target_path.parent
-                subprocess.run(["xdg-open", str(path_to_open)], check=False)
+                self._open_in_unix_file_manager(resolved_path, select)
         except Exception as exc:
-            QMessageBox.critical(self, "Открытие проводника", f"Не удалось открыть проводник:\n{exc}")
+            QMessageBox.critical(
+                self,
+                "Открытие проводника",
+                f"Не удалось открыть проводник:\n{exc}",
+            )
+
+    def _resolve_target_path(self, target_path: Optional[Path]) -> Optional[Path]:
+        if not target_path:
+            QMessageBox.warning(self, "Открытие проводника", "Путь к элементу не найден.")
+            return None
+
+        try:
+            candidate_path = Path(target_path)
+        except TypeError:
+            QMessageBox.warning(self, "Открытие проводника", "Путь к элементу некорректен.")
+            return None
+
+        if not candidate_path.is_absolute():
+            base_dir = Path(self.test_cases_dir) if self.test_cases_dir else Path.cwd()
+            candidate_path = base_dir / candidate_path
+
+        try:
+            resolved_path = candidate_path.resolve(strict=False)
+        except Exception:
+            QMessageBox.warning(self, "Открытие проводника", "Не удалось определить путь к элементу.")
+            return None
+
+        if not resolved_path.exists():
+            QMessageBox.warning(self, "Открытие проводника", "Файл или папка не найдены.")
+            return None
+
+        return resolved_path
+
+    @staticmethod
+    def _open_in_windows_explorer(target_path: Path, select: bool):
+        normalized = os.path.normpath(str(target_path))
+        if select and target_path.is_file():
+            subprocess.run(["explorer", "/select,", normalized], check=False)
+        else:
+            subprocess.run(["explorer", normalized], check=False)
+
+    @staticmethod
+    def _open_in_macos_finder(target_path: Path, select: bool):
+        if select and target_path.is_file():
+            subprocess.run(["open", "-R", str(target_path)], check=False)
+        else:
+            subprocess.run(["open", str(target_path)], check=False)
+
+    @staticmethod
+    def _open_in_unix_file_manager(target_path: Path, select: bool):
+        path_to_open = target_path if not select or target_path.is_dir() else target_path.parent
+        subprocess.run(["xdg-open", str(path_to_open)], check=False)
 
     def _copy_test_case_info(self, test_case: TestCase):
         formatted = self._format_test_case_info(test_case)

@@ -311,7 +311,9 @@ class TestCaseService:
         steps = self._build_steps(case_data.get("steps", []))
 
         status = case_data.get("additional_fields", {}).get("System.State", "Draft")
-        author = case_data.get("additional_fields", {}).get("System.AssignedTo", "")
+        author_raw = case_data.get("additional_fields", {}).get("System.AssignedTo", "")
+        author = self._normalize_assigned_to(author_raw)
+        status = self._normalize_status(status)
 
         test_case = TestCase(
             id=case_id,
@@ -455,5 +457,55 @@ class TestCaseService:
             current = pattern.sub(r"\1", current)
 
         return current
+
+    @staticmethod
+    def _normalize_assigned_to(value: Any) -> str:
+        """
+        Преобразовать значение поля System.AssignedTo в строку.
+        """
+        if value is None:
+            return ""
+
+        if isinstance(value, dict):
+            for key in ("displayName", "name", "uniqueName", "descriptor"):
+                candidate = value.get(key)
+                if candidate:
+                    return str(candidate)
+            # на случай других структур попробуем превратить в JSON
+            try:
+                return json.dumps(value, ensure_ascii=False)
+            except (TypeError, ValueError):
+                return str(value)
+
+        return str(value)
+
+    @staticmethod
+    def _normalize_status(value: Any) -> str:
+        """
+        Преобразовать статус к одному из поддерживаемых значений.
+        """
+        allowed = {"Draft", "In Progress", "Done", "Blocked", "Deprecated"}
+        if value is None:
+            return "Draft"
+
+        candidate = str(value).strip()
+        if not candidate:
+            return "Draft"
+
+        mapping = {
+            "review": "In Progress",
+            "ревью": "In Progress",
+            "design": "In Progress",
+            "готов": "Done",
+            "done": "Done",
+            "blocked": "Blocked",
+            "deprecated": "Deprecated",
+            "draft": "Draft",
+        }
+
+        normalized = mapping.get(candidate.lower(), candidate)
+        if normalized not in allowed:
+            return "Draft"
+        return normalized
 
 

@@ -287,6 +287,7 @@ class MainWindow(QMainWindow):
         self.review_panel.setVisible(False)
         self.review_panel.prompt_saved.connect(self._on_prompt_saved)
         self.review_panel.enter_clicked.connect(self._on_review_enter_clicked)
+        self.review_panel.close_requested.connect(self._hide_review_panel)
         self.detail_splitter.addWidget(self.review_panel)
 
         layout.addWidget(self.detail_splitter)
@@ -723,33 +724,47 @@ class MainWindow(QMainWindow):
 
     def _hide_review_panel(self):
         sizes = self.detail_splitter.sizes()
-        if len(sizes) == 2 and sizes[1] > 0:
+        has_valid_geometry = bool(sizes) and len(sizes) == 2 and any(value > 0 for value in sizes)
+
+        if has_valid_geometry and sizes[1] > 0:
             self._last_review_width = sizes[1]
             self.panel_sizes['review'] = self._last_review_width
-        total = sum(sizes) if sizes else self.panel_sizes.get('form_area', 900)
-        total = max(total, 200)
+
+        if has_valid_geometry:
+            form_area = max(sizes[0] + sizes[1], 200)
+        else:
+            main_sizes = self.main_splitter.sizes()
+            right_width = main_sizes[1] if main_sizes and len(main_sizes) == 2 else self.panel_sizes.get('form_area', 900)
+            form_area = max(right_width, 200)
+
         self.review_panel.setVisible(False)
-        self.detail_splitter.setSizes([total, 0])
-        self.panel_sizes['form_area'] = total
-        main_sizes = self.main_splitter.sizes()
-        if main_sizes and len(main_sizes) == 2:
-            self.main_splitter.setSizes([main_sizes[0], total])
-        self._save_panel_sizes()
+        self.detail_splitter.setSizes([form_area, 0])
+
+        actual_sizes = self.detail_splitter.sizes()
+        if actual_sizes and len(actual_sizes) == 2:
+            self.panel_sizes['form_area'] = max(sum(actual_sizes), 200)
+            self._save_panel_sizes()
 
     def _show_review_panel(self):
+        main_sizes = self.main_splitter.sizes()
+        current_right = main_sizes[1] if main_sizes and len(main_sizes) == 2 else self.panel_sizes.get('form_area', 900)
+        current_right = max(current_right, 200)
+
         review_width = max(self.panel_sizes.get('review', self._last_review_width or 300), 200)
-        right_sizes = self.main_splitter.sizes()
-        current_total = right_sizes[1] if right_sizes and len(right_sizes) > 1 else self.panel_sizes.get('form_area', 900)
-        total_area = max(current_total, review_width + 200)
-        self.panel_sizes['form_area'] = total_area
+        total_area = max(current_right, review_width + 200)
         form_width = max(total_area - review_width, 200)
+
         self.review_panel.setVisible(True)
         self.detail_splitter.setSizes([form_width, review_width])
-        # Обновляем главные размеры
-        main_sizes = self.main_splitter.sizes()
-        if main_sizes and len(main_sizes) == 2:
-            right_total = max(sum(self.detail_splitter.sizes()), total_area)
-            self.main_splitter.setSizes([main_sizes[0], right_total])
+
+        actual_sizes = self.detail_splitter.sizes()
+        if actual_sizes and len(actual_sizes) == 2:
+            self.panel_sizes['form_area'] = max(sum(actual_sizes), 200)
+            self.panel_sizes['review'] = max(actual_sizes[1], 0)
+        else:
+            self.panel_sizes['form_area'] = total_area
+            self.panel_sizes['review'] = review_width
+
         self._save_panel_sizes()
 
     def _apply_initial_panel_sizes(self):
@@ -761,6 +776,8 @@ class MainWindow(QMainWindow):
 
         if review_width > 0:
             self.review_panel.setVisible(True)
+            total_area = max(total_area, review_width + 200)
+            self.panel_sizes['form_area'] = total_area
             form_width = max(total_area - review_width, 200)
             self.detail_splitter.setSizes([form_width, review_width])
         else:
