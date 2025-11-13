@@ -25,15 +25,16 @@ from PyQt5.QtGui import QTextCursor, QTextOption
 
 
 class ReviewPanel(QWidget):
-    """Правая панель для подготовки ревью."""
+    """Панель подготовки промта с возможностью прикрепления файлов."""
 
     prompt_saved = pyqtSignal(str)
     enter_clicked = pyqtSignal(str, list)
     close_requested = pyqtSignal()
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, *, title_text: str = "Панель ревью"):
         super().__init__(parent)
         self._attachments: List[Path] = []
+        self._title_text = title_text
         self._setup_ui()
 
     def _setup_ui(self):
@@ -54,9 +55,9 @@ class ReviewPanel(QWidget):
         scroll_area.setWidget(content_widget)
         main_layout.addWidget(scroll_area)
 
-        title = QLabel("Панель ревью")
-        title.setStyleSheet("color: #E1E3E6; font-size: 16pt; font-weight: 600;")
-        content_layout.addWidget(title)
+        self._title_label = QLabel(self._title_text)
+        self._title_label.setStyleSheet("color: #E1E3E6; font-size: 16pt; font-weight: 600;")
+        content_layout.addWidget(self._title_label)
 
         # Блок прикрепленных файлов
         header_row = QHBoxLayout()

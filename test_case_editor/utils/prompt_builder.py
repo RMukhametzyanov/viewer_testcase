@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import Iterable, Optional
 
 
 ENCODING = "utf-8"
@@ -88,7 +88,84 @@ def build_review_prompt(
         "Тест-кейс для анализа:\n\n"
         f"{test_case_block}\n\n"
         "Твоя задача:\n"
-        f"{task_block}"
+        f"{task_block}\n\n"
+        "Ответ предоставь на русском языке."
+    )
+
+
+def build_creation_prompt(
+    methodic_path: Optional[Path],
+    tech_task_paths: Iterable[Path],
+    task_text: str,
+) -> str:
+    """
+    Сформировать промт для генерации тест-кейсов.
+    """
+
+    methodic_block = (_read_text_file(methodic_path)).strip() or "[Методика не найдена]"
+
+    unique_paths: list[Path] = []
+    seen = set()
+    for raw_path in tech_task_paths:
+        path = Path(raw_path)
+        try:
+            key = path.resolve()
+        except OSError:
+            key = path
+        if key in seen:
+            continue
+        seen.add(key)
+        unique_paths.append(path)
+
+    tech_blocks: list[str] = []
+    for path in unique_paths:
+        content = _read_text_file(path).strip()
+        if not content:
+            continue
+        header = f"{path.name}\n" if len(unique_paths) > 1 else ""
+        tech_blocks.append(f"{header}{content}")
+
+    tech_task_block = "\n\n".join(tech_blocks).strip() or "[Постановка задачи не прикреплена]"
+    task_block = (task_text or "").strip() or "[Не задана задача создания тест-кейса]"
+
+    return (
+        "Твоя роль QA-инженер с многолетним опытом, который совершенствует корпоративные "
+        "тест-кейсы, приводит их в соответствие корпоративному стилю — результаты твоей работы "
+        "должны быть эталоном для команды.\n\n"
+        "Для создания тест-кейсов используй методику:\n\n"
+        f"<context>{methodic_block}</context>\n\n"
+        "При создании тест-кейсов используй постановку задачи:\n\n"
+        f"<context>{tech_task_block}</context>\n\n"
+        "Твоя задача:\n\n"
+        f"<task>{task_block}</task>\n\n"
+        "Верни результат строго в формате JSON без пояснений и лишнего текста. Структура ответа:\n"
+        "{\n"
+        '  "test_cases": [\n'
+        "    {\n"
+        '      "title": "string",\n'
+        '      "description": "string",\n'
+        '      "precondition": "string",\n'
+        '      "tags": ["string"],\n'
+        '      "status": "Draft | In Progress | Done | Blocked | Deprecated",\n'
+        '      "level": "smoke | critical | major | minor | trivial",\n'
+        '      "author": "string",\n'
+        '      "steps": [\n'
+        '        {\n'
+        '          "step": "string",\n'
+        '          "expected_res": "string"\n'
+        "        }\n"
+        "      ],\n"
+        '      "labels": [\n'
+        '        {\n'
+        '          "name": "string",\n'
+        '          "value": "string"\n'
+        "        }\n"
+        "      ]\n"
+        "    }\n"
+        "  ]\n"
+        "}\n"
+        "Если тест-кейсов несколько, перечисли их в массиве \"test_cases\". "
+        "Не добавляй текст вне JSON. Ответ предоставь на русском языке."
     )
 
 

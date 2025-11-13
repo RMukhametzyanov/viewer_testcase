@@ -418,6 +418,85 @@ class TestCaseService:
 
         return candidate
 
+    def create_test_case_from_dict(self, data: dict, target_folder: Path) -> TestCase:
+        """
+        Создать модель тест-кейса на основе словаря, полученного из LLM.
+        """
+        if not isinstance(data, dict):
+            raise ValueError("Ожидался словарь с данными тест-кейса.")
+
+        title = str(data.get("title") or "Тест-кейс без названия").strip()
+        description = str(data.get("description") or "").strip()
+        precondition = str(data.get("precondition") or "").strip()
+        author = str(data.get("author") or "").strip()
+
+        raw_tags = data.get("tags", [])
+        tags = []
+        if isinstance(raw_tags, list):
+            for tag in raw_tags:
+                tag_str = str(tag or "").strip()
+                if tag_str:
+                    tags.append(tag_str)
+
+        raw_steps = data.get("steps") or []
+        steps: List[TestCaseStep] = []
+        if isinstance(raw_steps, list):
+            for raw_step in raw_steps:
+                if not isinstance(raw_step, dict):
+                    continue
+                action = str(
+                    raw_step.get("step")
+                    or raw_step.get("action")
+                    or ""
+                ).strip()
+                expected = str(
+                    raw_step.get("expected_res")
+                    or raw_step.get("expected")
+                    or ""
+                ).strip()
+                steps.append(TestCaseStep(step=action, expected_res=expected))
+
+        if not steps:
+            steps.append(TestCaseStep(step="Шаг не задан", expected_res="Ожидаемый результат не задан"))
+
+        raw_labels = data.get("labels") or []
+        labels: List[TestCaseLabel] = []
+        if isinstance(raw_labels, list):
+            for raw_label in raw_labels:
+                if not isinstance(raw_label, dict):
+                    continue
+                name = str(raw_label.get("name") or "").strip()
+                value = str(raw_label.get("value") or "").strip()
+                if name or value:
+                    labels.append(TestCaseLabel(name=name, value=value))
+
+        level = str(data.get("level") or "minor").strip() or "minor"
+        status = self._normalize_status(data.get("status", "Draft"))
+
+        created = get_current_datetime()
+
+        test_case = TestCase(
+            id=str(uuid.uuid4()),
+            title=title,
+            author=author,
+            description=description,
+            tags=tags,
+            status=status,
+            use_case_id=str(data.get("use_case_id") or "").strip(),
+            folder_id=str(data.get("folder_id") or "").strip(),
+            level=level,
+            precondition=precondition,
+            steps=steps,
+            labels=labels,
+            created_at=created,
+            updated_at=created,
+        )
+
+        filename = self._generate_unique_filename(title, test_case.id, target_folder)
+        test_case._filename = filename
+        test_case._filepath = target_folder / filename
+        return test_case
+
     def _load_azure_payload(self, json_path: Path) -> dict:
         """
         Загрузить JSON Azure DevOps с попыткой исправить распространенные ошибки формата.

@@ -1,6 +1,7 @@
 """Главное окно приложения"""
 
 import json
+import re
 import subprocess
 from pathlib import Path
 from typing import List, Optional
@@ -33,11 +34,11 @@ from ..repositories.test_case_repository import TestCaseRepository
 from .widgets.placeholder_widget import PlaceholderWidget
 from .widgets.tree_widget import TestCaseTreeWidget
 from .widgets.form_widget import TestCaseFormWidget
-from .widgets.review_panel import ReviewPanel
+from .widgets.auxiliary_panel import AuxiliaryPanel
 from .widgets.bulk_actions_panel import BulkActionsPanel
 from .styles.telegram_theme import TELEGRAM_DARK_THEME
 from ..utils import llm
-from ..utils.prompt_builder import build_review_prompt
+from ..utils.prompt_builder import build_review_prompt, build_creation_prompt
 
 
 class GitCommitDialog(QDialog):
@@ -131,6 +132,7 @@ class MainWindow(QMainWindow):
         if not self.test_cases_dir.exists():
             self.test_cases_dir = self.prompt_select_folder()
         self.default_prompt = self.settings.get('DEFAULT_PROMT', "Опиши задачу для ревью.")
+        self.create_tc_prompt = self.settings.get('DEFAULT_PROMT_CREATE_TC', "Создай ТТ")
         methodic_setting = self.settings.get('LLM_METHODIC_PATH')
         if methodic_setting:
             self.methodic_path = Path(methodic_setting).expanduser()
@@ -263,7 +265,7 @@ class MainWindow(QMainWindow):
         
         self.detail_splitter = QSplitter(Qt.Horizontal)
         self.detail_splitter.setChildrenCollapsible(False)
-        self.detail_splitter.setCollapsible(1, True)
+        self.detail_splitter.setCollapsible(1, False)
         self.detail_splitter.splitterMoved.connect(self._on_detail_splitter_moved)
 
         # Контейнер для placeholder / формы
@@ -282,13 +284,17 @@ class MainWindow(QMainWindow):
 
         self.detail_splitter.addWidget(self.detail_stack_container)
 
-        # Панель ревью
-        self.review_panel = ReviewPanel()
-        self.review_panel.setVisible(False)
-        self.review_panel.prompt_saved.connect(self._on_prompt_saved)
-        self.review_panel.enter_clicked.connect(self._on_review_enter_clicked)
-        self.review_panel.close_requested.connect(self._hide_review_panel)
-        self.detail_splitter.addWidget(self.review_panel)
+        # Дополнительная панель
+        self.aux_panel = AuxiliaryPanel(
+            methodic_path=self.methodic_path,
+            default_review_prompt=self.default_prompt,
+            default_creation_prompt=self.create_tc_prompt,
+        )
+        self.aux_panel.review_prompt_saved.connect(self._on_prompt_saved)
+        self.aux_panel.review_enter_clicked.connect(self._on_review_enter_clicked)
+        self.aux_panel.creation_prompt_saved.connect(self._on_creation_prompt_saved)
+        self.aux_panel.creation_enter_clicked.connect(self._on_creation_enter_clicked)
+        self.detail_splitter.addWidget(self.aux_panel)
 
         layout.addWidget(self.detail_splitter)
         
@@ -458,6 +464,7 @@ class MainWindow(QMainWindow):
         defaults = {
             'test_cases_dir': 'testcases',
             'DEFAULT_PROMT': "Опиши, на что обратить внимание при ревью тест-кейсов.",
+            'DEFAULT_PROMT_CREATE_TC': "Создай ТТ",
             'LLM_MODEL': llm.DEFAULT_MODEL,
             'LLM_HOST': llm.DEFAULT_HOST,
             'LLM_METHODIC_PATH': str(self._default_methodic_path()),
@@ -545,7 +552,6 @@ class MainWindow(QMainWindow):
         self.current_test_case = test_case
         self.detail_stack.setCurrentWidget(self.form_widget)
         self.form_widget.load_test_case(test_case)
-        self._hide_review_panel()
         
         # Показываем форму
         
@@ -579,12 +585,12 @@ class MainWindow(QMainWindow):
         """Показ панели ревью."""
         if self.detail_stack.currentWidget() is not self.form_widget:
             self.detail_stack.setCurrentWidget(self.form_widget)
-        self._show_review_panel()
+        self.aux_panel.select_tab("review")
         attachments = self._collect_review_attachments(data)
-        self.review_panel.set_attachments(attachments)
+        self.aux_panel.set_review_attachments(attachments)
         base_prompt = self.settings.get('DEFAULT_PROMT', self.default_prompt)
-        self.review_panel.set_prompt_text(base_prompt)
-        self.review_panel.clear_response()
+        self.aux_panel.set_review_prompt_text(base_prompt)
+        self.aux_panel.clear_review_response()
         self.statusBar().showMessage("Панель ревью открыта")
 
     def _on_prompt_saved(self, text: str):
@@ -593,6 +599,14 @@ class MainWindow(QMainWindow):
         self.save_settings(self.settings)
         self.default_prompt = text
         self.statusBar().showMessage("Промт сохранен")
+
+    def _on_creation_prompt_saved(self, text: str):
+        """Сохранение промта для создания ТК."""
+        self.settings['DEFAULT_PROMT_CREATE_TC'] = text
+        self.save_settings(self.settings)
+        self.create_tc_prompt = text
+        self.aux_panel.set_creation_default_prompt(text)
+        self.statusBar().showMessage("Промт создания ТК сохранен")
 
     def _collect_review_attachments(self, data) -> List[Path]:
         attachments: List[Path] = []
@@ -615,7 +629,6 @@ class MainWindow(QMainWindow):
     def _show_statistics_panel(self):
         """Показать дерево и статистику (placeholder)."""
         self.detail_stack.setCurrentWidget(self.placeholder)
-        self._hide_review_panel()
         self.statusBar().showMessage("Показана статистика тест-кейсов")
 
     def _find_chtz_attachment(self, attachments: List[Path]) -> Optional[Path]:
@@ -641,25 +654,54 @@ class MainWindow(QMainWindow):
 
     def _on_review_enter_clicked(self, text: str, files: list):
         """Обработка нажатия кнопки Enter на панели ревью."""
-        prompt = (text or "").strip()
+        self.aux_panel.select_tab("review")
+        self._submit_prompt(
+            prompt_text=text,
+            files=files,
+            status_context="Ревью",
+            default_test_case_path=self._current_test_case_path,
+            set_loading=self.aux_panel.set_review_loading_state,
+            set_response=self.aux_panel.set_review_response_text,
+            success_handler=self._handle_review_success,
+            error_handler=self._handle_review_error,
+        )
+
+    def _on_creation_enter_clicked(self, text: str, files: list):
+        """Обработка Enter в панели создания ТК."""
+        self.aux_panel.select_tab("creation")
+        self._submit_creation_prompt(text=text, files=files)
+
+    def _submit_prompt(
+        self,
+        *,
+        prompt_text: str,
+        files: list,
+        status_context: str,
+        default_test_case_path: Optional[Path],
+        set_loading,
+        set_response,
+        success_handler,
+        error_handler,
+    ):
+        prompt = (prompt_text or "").strip()
         if not prompt:
-            self.review_panel.set_response_text("Введите промт перед отправкой.")
-            self.statusBar().showMessage("Пустой промт — запрос не отправлен")
+            set_response("Введите промт перед отправкой.")
+            self.statusBar().showMessage(f"{status_context}: пустой промт — запрос не отправлен")
             return
 
         if self._llm_thread and self._llm_thread.isRunning():
-            self.statusBar().showMessage("Ожидайте завершения текущего запроса к LLM")
+            self.statusBar().showMessage(f"{status_context}: ожидайте завершения текущего запроса к LLM")
             return
 
         attachment_paths = [Path(p) for p in files]
-        self.review_panel.set_loading_state(True)
-        self.review_panel.set_response_text("Отправляю запрос в LLM…")
+        set_loading(True)
+        set_response("Отправляю запрос в LLM…")
 
         model = self.settings.get('LLM_MODEL') or None
         host = self.settings.get('LLM_HOST') or None
 
         chtz_path = self._find_chtz_attachment(attachment_paths)
-        test_case_path = self._current_test_case_path or self._find_test_case_attachment(attachment_paths)
+        test_case_path = default_test_case_path or self._find_test_case_attachment(attachment_paths)
 
         try:
             payload = build_review_prompt(
@@ -669,24 +711,195 @@ class MainWindow(QMainWindow):
                 chtz_path=chtz_path,
             )
         except Exception as exc:  # pylint: disable=broad-except
-            self.review_panel.set_loading_state(False)
-            self.review_panel.set_response_text(f"Не удалось подготовить промт: {exc}")
-            self.statusBar().showMessage("Ошибка подготовки промта для LLM")
+            set_loading(False)
+            set_response(f"Не удалось подготовить промт: {exc}")
+            self.statusBar().showMessage(f"{status_context}: ошибка подготовки промта для LLM")
             return
 
-        self._start_llm_request(payload, model, host, self._handle_llm_success)
-
+        self._start_llm_request(payload, model, host, success_handler, error_handler)
         self.statusBar().showMessage(
-            f"Отправлен промт длиной {len(prompt)} символов. Прикреплено файлов: {len(files)}"
+            f"{status_context}: отправлен промт длиной {len(prompt)} символов. Прикреплено файлов: {len(files)}"
         )
 
-    def _start_llm_request(self, payload: str, model: Optional[str], host: Optional[str], success_slot):
+    def _submit_creation_prompt(self, *, text: str, files: list):
+        set_loading = self.aux_panel.set_creation_loading_state
+        set_response = self.aux_panel.set_creation_response_text
+
+        if self._llm_thread and self._llm_thread.isRunning():
+            self.statusBar().showMessage("Создание ТК: ожидайте завершения текущего запроса к LLM")
+            return
+
+        task_text = (text or "").strip() or (self.create_tc_prompt or "Создай ТТ")
+
+        set_loading(True)
+        set_response("Отправляю запрос в LLM…")
+
+        methodic_path = self.methodic_path
+
+        attachment_paths: list[Path] = []
+        for raw_path in files:
+            try:
+                attachment_paths.append(Path(raw_path))
+            except (TypeError, ValueError):
+                continue
+
+        methodic_resolved = None
+        if methodic_path:
+            try:
+                methodic_resolved = methodic_path.resolve()
+            except OSError:
+                methodic_resolved = methodic_path
+
+        tech_task_paths: list[Path] = []
+        seen = set()
+        for path in attachment_paths:
+            try:
+                resolved = path.resolve()
+            except OSError:
+                resolved = path
+            if methodic_resolved and resolved == methodic_resolved:
+                continue
+            if not path.exists():
+                continue
+            if resolved in seen:
+                continue
+            seen.add(resolved)
+            tech_task_paths.append(path)
+
+        try:
+            payload = build_creation_prompt(methodic_path, tech_task_paths, task_text)
+        except Exception as exc:  # noqa: BLE001
+            set_loading(False)
+            set_response(f"Не удалось подготовить промт: {exc}")
+            self.statusBar().showMessage("Создание ТК: ошибка подготовки промта для LLM")
+            return
+
+        model = self.settings.get('LLM_MODEL') or None
+        host = self.settings.get('LLM_HOST') or None
+
+        self._start_llm_request(
+            payload,
+            model,
+            host,
+            self._handle_creation_success,
+            self._handle_creation_error,
+        )
+        self.statusBar().showMessage(
+            f"Создание ТК: отправлен промт длиной {len(payload)} символов. Прикреплено файлов: {len(files)}"
+        )
+
+    @staticmethod
+    def _extract_json_from_llm(raw_text: str):
+        """Попытаться извлечь JSON из произвольного текста LLM."""
+        candidates = []
+        code_blocks = re.findall(r"```(?:json)?\s*(.*?)```", raw_text, re.DOTALL | re.IGNORECASE)
+        candidates.extend(code_blocks)
+        candidates.append(raw_text)
+
+        for candidate in candidates:
+            candidate = candidate.strip()
+            if not candidate:
+                continue
+            try:
+                return json.loads(candidate)
+            except json.JSONDecodeError:
+                continue
+        return None
+
+    def _materialize_generated_test_cases(self, raw_response: str):
+        """Создать файлы тест-кейсов на основе ответа LLM."""
+        parsed = self._extract_json_from_llm(raw_response)
+        if parsed is None:
+            self.statusBar().showMessage("Создание ТК: не удалось распознать JSON в ответе LLM")
+            return
+
+        if isinstance(parsed, dict):
+            if isinstance(parsed.get("test_cases"), list):
+                payloads = parsed.get("test_cases") or []
+            elif isinstance(parsed.get("cases"), list):
+                payloads = parsed.get("cases") or []
+            else:
+                payloads = [parsed]
+        elif isinstance(parsed, list):
+            payloads = parsed
+        else:
+            self.statusBar().showMessage("Создание ТК: ответ LLM имеет неподдерживаемый формат")
+            return
+
+        if not payloads:
+            self.statusBar().showMessage("Создание ТК: JSON не содержит тест-кейсов")
+            return
+
+        target_folder = self.test_cases_dir / "from LLM"
+        target_folder.mkdir(parents=True, exist_ok=True)
+
+        created_cases: List[TestCase] = []
+        errors: List[str] = []
+
+        for idx, payload in enumerate(payloads, start=1):
+            if not isinstance(payload, dict):
+                errors.append(f"{idx}: ожидался объект тест-кейса.")
+                continue
+            try:
+                test_case = self.service.create_test_case_from_dict(payload, target_folder)
+            except Exception as exc:  # noqa: BLE001
+                errors.append(f"{idx}: не удалось построить тест-кейс ({exc})")
+                continue
+
+            if self.service.save_test_case(test_case):
+                created_cases.append(test_case)
+                try:
+                    self.service._repository.save(test_case, test_case._filepath)
+                except Exception as exc:  # noqa: BLE001
+                    errors.append(f"{idx}: не удалось записать файл «{test_case.title}»: {exc}")
+            else:
+                errors.append(f"{idx}: не удалось сохранить файл тест-кейса «{test_case.title}».")
+
+        summary_lines: List[str] = []
+        if created_cases:
+            summary_lines.append(f"Создано тест-кейсов: {len(created_cases)}.")
+        if errors:
+            summary_lines.append("Ошибки:\n" + "\n".join(errors))
+
+        if summary_lines:
+            combined = raw_response.strip()
+            combined += "\n\n" + "\n".join(summary_lines)
+            self.aux_panel.set_creation_response_text(combined)
+
+        highlight_path = created_cases[0]._filepath if created_cases else None
+        if created_cases:
+            self.load_all_test_cases()
+            if highlight_path:
+                refreshed = next(
+                    (tc for tc in self.test_cases if getattr(tc, "_filepath", None) == highlight_path),
+                    None,
+                )
+                if refreshed:
+                    self.tree_widget.focus_on_test_case(refreshed)
+
+        if errors:
+            self.statusBar().showMessage(
+                f"Создание ТК: создано {len(created_cases)}, ошибок {len(errors)}."
+            )
+        elif created_cases:
+            self.statusBar().showMessage(
+                f"Создание ТК: создано тест-кейсов — {len(created_cases)}."
+            )
+
+    def _start_llm_request(
+        self,
+        payload: str,
+        model: Optional[str],
+        host: Optional[str],
+        success_slot,
+        error_slot,
+    ):
         worker = _LLMWorker(payload, model, host)
         thread = QThread()
         worker.moveToThread(thread)
 
         worker.finished.connect(success_slot)
-        worker.error.connect(self._handle_llm_error)
+        worker.error.connect(error_slot)
         thread.started.connect(worker.run)
 
         thread.start()
@@ -694,16 +907,30 @@ class MainWindow(QMainWindow):
         self._llm_worker = worker
         self._llm_thread = thread
 
-    def _handle_llm_success(self, response: str):
-        self.review_panel.set_response_text(response.strip())
-        self.review_panel.set_loading_state(False)
-        self.statusBar().showMessage("Ответ LLM получен")
+    def _handle_review_success(self, response: str):
+        self.aux_panel.set_review_response_text(response.strip())
+        self.aux_panel.set_review_loading_state(False)
+        self.statusBar().showMessage("Ревью: ответ LLM получен")
         self._cleanup_llm_worker()
 
-    def _handle_llm_error(self, error_message: str):
-        self.review_panel.set_response_text(f"Ошибка: {error_message}")
-        self.review_panel.set_loading_state(False)
-        self.statusBar().showMessage("Ошибка при обращении к LLM")
+    def _handle_review_error(self, error_message: str):
+        self.aux_panel.set_review_response_text(f"Ошибка: {error_message}")
+        self.aux_panel.set_review_loading_state(False)
+        self.statusBar().showMessage("Ревью: ошибка при обращении к LLM")
+        self._cleanup_llm_worker()
+
+    def _handle_creation_success(self, response: str):
+        cleaned = response.strip()
+        self.aux_panel.set_creation_response_text(cleaned)
+        self.aux_panel.set_creation_loading_state(False)
+        self.statusBar().showMessage("Создание ТК: ответ LLM получен")
+        self._cleanup_llm_worker()
+        self._materialize_generated_test_cases(cleaned)
+
+    def _handle_creation_error(self, error_message: str):
+        self.aux_panel.set_creation_response_text(f"Ошибка: {error_message}")
+        self.aux_panel.set_creation_loading_state(False)
+        self.statusBar().showMessage("Создание ТК: ошибка при обращении к LLM")
         self._cleanup_llm_worker()
 
     def _cleanup_llm_worker(self):
@@ -720,68 +947,21 @@ class MainWindow(QMainWindow):
 
     def _show_placeholder(self):
         self.detail_stack.setCurrentWidget(self.placeholder)
-        self._hide_review_panel()
-
-    def _hide_review_panel(self):
-        sizes = self.detail_splitter.sizes()
-        has_valid_geometry = bool(sizes) and len(sizes) == 2 and any(value > 0 for value in sizes)
-
-        if has_valid_geometry and sizes[1] > 0:
-            self._last_review_width = sizes[1]
-            self.panel_sizes['review'] = self._last_review_width
-
-        if has_valid_geometry:
-            form_area = max(sizes[0] + sizes[1], 200)
-        else:
-            main_sizes = self.main_splitter.sizes()
-            right_width = main_sizes[1] if main_sizes and len(main_sizes) == 2 else self.panel_sizes.get('form_area', 900)
-            form_area = max(right_width, 200)
-
-        self.review_panel.setVisible(False)
-        self.detail_splitter.setSizes([form_area, 0])
-
-        actual_sizes = self.detail_splitter.sizes()
-        if actual_sizes and len(actual_sizes) == 2:
-            self.panel_sizes['form_area'] = max(sum(actual_sizes), 200)
-            self._save_panel_sizes()
-
-    def _show_review_panel(self):
-        main_sizes = self.main_splitter.sizes()
-        current_right = main_sizes[1] if main_sizes and len(main_sizes) == 2 else self.panel_sizes.get('form_area', 900)
-        current_right = max(current_right, 200)
-
-        review_width = max(self.panel_sizes.get('review', self._last_review_width or 300), 200)
-        total_area = max(current_right, review_width + 200)
-        form_width = max(total_area - review_width, 200)
-
-        self.review_panel.setVisible(True)
-        self.detail_splitter.setSizes([form_width, review_width])
-
-        actual_sizes = self.detail_splitter.sizes()
-        if actual_sizes and len(actual_sizes) == 2:
-            self.panel_sizes['form_area'] = max(sum(actual_sizes), 200)
-            self.panel_sizes['review'] = max(actual_sizes[1], 0)
-        else:
-            self.panel_sizes['form_area'] = total_area
-            self.panel_sizes['review'] = review_width
-
-        self._save_panel_sizes()
 
     def _apply_initial_panel_sizes(self):
         left_width = max(self.panel_sizes.get('left', 350), 150)
-        total_area = max(self.panel_sizes.get('form_area', 900), 200)
-        review_width = max(self.panel_sizes.get('review', self._last_review_width or 300), 0)
+        total_area = max(self.panel_sizes.get('form_area', 900), 400)
+        aux_width = max(self.panel_sizes.get('review', self._last_review_width or 300), 220)
+        aux_width = min(aux_width, total_area - 200) if total_area > 200 else aux_width
+        aux_width = max(aux_width, 220)
+        form_width = max(total_area - aux_width, 200)
+        total_area = form_width + aux_width
+        self.panel_sizes['form_area'] = total_area
 
         self.main_splitter.setSizes([left_width, total_area])
-
-        if review_width > 0:
-            self.review_panel.setVisible(True)
-            total_area = max(total_area, review_width + 200)
-            self.panel_sizes['form_area'] = total_area
-            form_width = max(total_area - review_width, 200)
-            self.detail_splitter.setSizes([form_width, review_width])
-        else:
-            self._hide_review_panel()
+        self.detail_splitter.setSizes([form_width, aux_width])
+        self._last_review_width = aux_width
+        self.panel_sizes['review'] = aux_width
 
     def _on_main_splitter_moved(self, _pos: int, _index: int):
         sizes = self.main_splitter.sizes()
@@ -794,9 +974,8 @@ class MainWindow(QMainWindow):
         sizes = self.detail_splitter.sizes()
         if sizes and len(sizes) >= 2:
             self.panel_sizes['form_area'] = sizes[0] + sizes[1]
-            if sizes[1] > 0:
-                self.panel_sizes['review'] = sizes[1]
-                self._last_review_width = sizes[1]
+            self.panel_sizes['review'] = max(sizes[1], 200)
+            self._last_review_width = self.panel_sizes['review']
         self._save_panel_sizes()
 
     def _save_panel_sizes(self):
@@ -835,7 +1014,7 @@ class MainWindow(QMainWindow):
             "Ширина панели",
             "Панель ревью (px):",
             int(self.panel_sizes.get('review', max(self._last_review_width, 300))),
-            0,
+            200,
             1200,
         )
         if not ok:
