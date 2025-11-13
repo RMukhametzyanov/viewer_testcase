@@ -39,6 +39,7 @@ from .widgets.bulk_actions_panel import BulkActionsPanel
 from .styles.telegram_theme import TELEGRAM_DARK_THEME
 from ..utils import llm
 from ..utils.prompt_builder import build_review_prompt, build_creation_prompt
+from ..utils.list_models import fetch_models as fetch_llm_models
 
 
 class GitCommitDialog(QDialog):
@@ -133,6 +134,9 @@ class MainWindow(QMainWindow):
             self.test_cases_dir = self.prompt_select_folder()
         self.default_prompt = self.settings.get('DEFAULT_PROMT', "Опиши задачу для ревью.")
         self.create_tc_prompt = self.settings.get('DEFAULT_PROMT_CREATE_TC', "Создай ТТ")
+        self.llm_model = self.settings.get('LLM_MODEL', "").strip()
+        self.llm_host = self.settings.get('LLM_HOST', "").strip()
+        self.available_llm_models = self._fetch_available_llm_models()
         methodic_setting = self.settings.get('LLM_METHODIC_PATH')
         if methodic_setting:
             self.methodic_path = Path(methodic_setting).expanduser()
@@ -149,6 +153,7 @@ class MainWindow(QMainWindow):
         self._current_test_case_path: Optional[Path] = None
         
         self.setup_ui()
+        self._apply_model_options()
         self.apply_theme()
         self.load_all_test_cases()
         self._show_placeholder()
@@ -626,6 +631,33 @@ class MainWindow(QMainWindow):
 
         return attachments
 
+    def _fetch_available_llm_models(self) -> List[str]:
+        fallback = [self.llm_model] if self.llm_model else []
+        host = self.llm_host
+        if not host:
+            return fallback
+        try:
+            models = fetch_llm_models(host)
+        except Exception as exc:  # noqa: BLE001
+            print(f"[LLM] Не удалось получить список моделей с {host}: {exc}")
+            return fallback
+
+        cleaned = [str(model).strip() for model in (models or []) if str(model or "").strip()]
+        if self.llm_model and self.llm_model not in cleaned:
+            cleaned.insert(0, self.llm_model)
+        return cleaned or fallback
+
+    def _apply_model_options(self):
+        models = self.available_llm_models or ([self.llm_model] if self.llm_model else [])
+        default = self.llm_model or (models[0] if models else "")
+        self.aux_panel.set_model_options(models, default)
+        if not models:
+            warning = (
+                "Не удалось получить список моделей LLM. Проверьте настройки LLM_HOST/LLM_MODEL "
+                "и повторите попытку."
+            )
+            self.statusBar().showMessage(warning)
+
     def _show_statistics_panel(self):
         """Показать дерево и статистику (placeholder)."""
         self.detail_stack.setCurrentWidget(self.placeholder)
@@ -657,6 +689,7 @@ class MainWindow(QMainWindow):
         self.aux_panel.select_tab("review")
         self._submit_prompt(
             prompt_text=text,
+            model=self.aux_panel.get_selected_review_model(),
             files=files,
             status_context="Ревью",
             default_test_case_path=self._current_test_case_path,
@@ -675,6 +708,7 @@ class MainWindow(QMainWindow):
         self,
         *,
         prompt_text: str,
+        model: str,
         files: list,
         status_context: str,
         default_test_case_path: Optional[Path],
@@ -697,8 +731,10 @@ class MainWindow(QMainWindow):
         set_loading(True)
         set_response("Отправляю запрос в LLM…")
 
-        model = self.settings.get('LLM_MODEL') or None
-        host = self.settings.get('LLM_HOST') or None
+        model_used = (model or self.llm_model or "").strip()
+        host = self.llm_host or None
+        if not model_used and self.available_llm_models:
+            model_used = self.available_llm_models[0]
 
         chtz_path = self._find_chtz_attachment(attachment_paths)
         test_case_path = default_test_case_path or self._find_test_case_attachment(attachment_paths)
@@ -716,9 +752,10 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage(f"{status_context}: ошибка подготовки промта для LLM")
             return
 
-        self._start_llm_request(payload, model, host, success_handler, error_handler)
+        self._start_llm_request(payload, model_used or None, host, success_handler, error_handler)
         self.statusBar().showMessage(
-            f"{status_context}: отправлен промт длиной {len(prompt)} символов. Прикреплено файлов: {len(files)}"
+            f"{status_context}: отправлен промт (модель {model_used or 'не указана'}) длиной {len(prompt)} символов. "
+            f"Прикреплено файлов: {len(files)}"
         )
 
     def _submit_creation_prompt(self, *, text: str, files: list):
@@ -774,18 +811,21 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("Создание ТК: ошибка подготовки промта для LLM")
             return
 
-        model = self.settings.get('LLM_MODEL') or None
-        host = self.settings.get('LLM_HOST') or None
+        model_used = (self.aux_panel.get_selected_creation_model() or self.llm_model or "").strip()
+        if not model_used and self.available_llm_models:
+            model_used = self.available_llm_models[0]
+        host = self.llm_host or None
 
         self._start_llm_request(
             payload,
-            model,
+            model_used or None,
             host,
             self._handle_creation_success,
             self._handle_creation_error,
         )
         self.statusBar().showMessage(
-            f"Создание ТК: отправлен промт длиной {len(payload)} символов. Прикреплено файлов: {len(files)}"
+            f"Создание ТК: отправлен промт (модель {model_used or 'не указана'}) длиной {len(payload)} символов. "
+            f"Прикреплено файлов: {len(files)}"
         )
 
     @staticmethod
@@ -804,6 +844,17 @@ class MainWindow(QMainWindow):
                 return json.loads(candidate)
             except json.JSONDecodeError:
                 continue
+
+        decoder = json.JSONDecoder()
+        for match in re.finditer(r"[\[{]", raw_text):
+            start_index = match.start()
+            try:
+                obj, _ = decoder.raw_decode(raw_text[start_index:].strip())
+            except json.JSONDecodeError:
+                continue
+            else:
+                return obj
+
         return None
 
     def _materialize_generated_test_cases(self, raw_response: str):

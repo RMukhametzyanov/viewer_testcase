@@ -2,10 +2,11 @@
 
 import json
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 from PyQt5.QtWidgets import (
     QApplication,
@@ -27,6 +28,22 @@ class TestCaseTreeWidget(QTreeWidget):
     """Минимальный QTreeWidget для отображения и управления деревом объектов."""
 
     MIME_TYPE = "application/x-testcase-tree-item"
+    _PYTEST_TEMPLATE_PATH = Path(__file__).resolve().parents[2] / "utils" / "pytest_tamplete.json"
+    _PYTEST_TEMPLATE_CACHE: Optional[str] = None
+    _PYTEST_TEMPLATE_FALLBACK = (
+        "import os\n"
+        "import allure\n"
+        "from gpn_qa_utils.api.auth import Auth\n\n"
+        "@allure.epic(\"{epic}\")\n"
+        "@allure.feature(\"{feature}\")\n"
+        "@allure.story(\"{story}\")\n"
+        "class Test{class_name}:\n"
+        "    client = Auth.get_client(base_url=os.getenv(\"AUTOTEST_BASE_URL\"), timeout=20.0)\n\n"
+        "    @allure.testcase(\"{testcase_id}\", \"{testcase_id}\")\n"
+        "    @allure.title(\"{title}\")\n"
+        "    def test_{method_name}(self):\n"
+        "{steps}\n"
+    )
 
     test_case_selected = pyqtSignal(TestCase)
     tree_updated = pyqtSignal()
@@ -218,6 +235,9 @@ class TestCaseTreeWidget(QTreeWidget):
         action_copy_info = menu.addAction("📋 Копировать информацию")
         action_copy_info.triggered.connect(lambda: self._copy_test_case_info(test_case))
 
+        action_generate_api = menu.addAction("🧪 Сгенерировать каркас АТ API")
+        action_generate_api.triggered.connect(lambda: self._copy_pytest_skeleton(test_case))
+
         action_rename = menu.addAction("✏️ Переименовать файл")
         action_rename.triggered.connect(lambda: self._rename_file(test_case))
 
@@ -377,46 +397,150 @@ class TestCaseTreeWidget(QTreeWidget):
         clipboard.setText(formatted)
         QMessageBox.information(self, "Скопировано", "Информация по тест-кейсу скопирована в буфер обмена.")
 
+    def _copy_pytest_skeleton(self, test_case: TestCase):
+        skeleton = self._build_pytest_skeleton(test_case)
+        skeleton = self._normalize_line_endings(skeleton)
+        if not skeleton:
+            QMessageBox.warning(self, "Каркас автотеста", "Не удалось сформировать каркас автотеста.")
+            return
+        clipboard = QApplication.clipboard()
+        clipboard.setText(skeleton)
+        QMessageBox.information(self, "Готово", "Каркас автотеста на pytest скопирован в буфер обмена.")
+
+    @classmethod
+    def _load_pytest_template(cls) -> str:
+        if cls._PYTEST_TEMPLATE_CACHE is not None:
+            return cls._PYTEST_TEMPLATE_CACHE
+        try:
+            with open(cls._PYTEST_TEMPLATE_PATH, "r", encoding="utf-8") as handler:
+                payload = json.load(handler)
+            template = str(payload.get("template", ""))
+            if not template.strip():
+                template = cls._PYTEST_TEMPLATE_FALLBACK
+        except (FileNotFoundError, json.JSONDecodeError, OSError):
+            template = cls._PYTEST_TEMPLATE_FALLBACK
+        cls._PYTEST_TEMPLATE_CACHE = template
+        return template
+
+    def _build_pytest_skeleton(self, test_case: TestCase) -> str:
+        template = self._load_pytest_template()
+
+        epic = self._find_label_value(test_case, "epic") or "Название EPIC"
+        feature = self._find_label_value(test_case, "feature") or "Название FEATURE"
+        story = self._find_label_value(test_case, "story") or "Название STORY"
+
+        class_name = self._sanitize_class_name(test_case.title)
+        method_name = self._sanitize_method_name(test_case.title)
+        testcase_id = (test_case.id or "tc.id").strip() or "tc.id"
+        title = self._escape_quotes(test_case.title or "Без названия")
+
+        steps_fragment = self._render_pytest_steps(test_case)
+
+        try:
+            rendered = template.format(
+                epic=self._escape_braces(epic),
+                feature=self._escape_braces(feature),
+                story=self._escape_braces(story),
+                class_name=class_name,
+                testcase_id=self._escape_braces(testcase_id),
+                title=self._escape_braces(title),
+                method_name=method_name,
+                steps=self._escape_braces(steps_fragment),
+            )
+        except KeyError:
+            rendered = self._PYTEST_TEMPLATE_FALLBACK.format(
+                epic=self._escape_braces(epic),
+                feature=self._escape_braces(feature),
+                story=self._escape_braces(story),
+                class_name=class_name,
+                testcase_id=self._escape_braces(testcase_id),
+                title=self._escape_braces(title),
+                method_name=method_name,
+                steps=self._escape_braces(steps_fragment),
+            )
+        return rendered
+
     @staticmethod
-    def _format_test_case_info(test_case: TestCase) -> str:
-        tags = ", ".join(test_case.tags) if test_case.tags else "-"
-        steps_lines = []
-        for idx, step in enumerate(test_case.steps, start=1):
-            action = step.step.strip() or "-"
-            expected = step.expected_res.strip() or "-"
-            steps_lines.append(f"{idx}. Действие:\n    {action}\n   Ожидаемый результат:\n    {expected}")
-        steps_text = "\n\n".join(steps_lines) if steps_lines else "Шаги не заданы."
+    def _render_pytest_steps(test_case: TestCase) -> str:
+        steps = getattr(test_case, "steps", None) or []
+        if not steps:
+            return (
+                '\t\twith allure.step("Шаг1"):\n'
+                '\t\t\t"""\n'
+                '\t\t\tДействие: -\n'
+                '\t\t\tОжидаемый результат: -\n'
+                '\t\t\t"""\n'
+                '\t\t\tpass'
+            )
 
-        labels_lines = []
-        for label in test_case.labels:
-            labels_lines.append(f"- {label.name}: {label.value}")
-        labels_text = "\n".join(labels_lines) if labels_lines else "-"
+        blocks: List[str] = []
+        for idx, step in enumerate(steps, start=1):
+            action_text = TestCaseTreeWidget._prepare_docstring_content(step.step)
+            expected_text = TestCaseTreeWidget._prepare_docstring_content(step.expected_res)
 
-        description = test_case.description.strip() or "-"
-        precondition = test_case.precondition.strip() or "-"
-        created = test_case.created_at or "-"
-        updated = test_case.updated_at or "-"
+            block = (
+                f'\t\twith allure.step("Шаг{idx}"):\n'
+                f'\t\t\t"""\n'
+                f'\t\t\tДействие: {action_text}\n'
+                f'\t\t\tОжидаемый результат: {expected_text}\n'
+                f'\t\t\t"""\n'
+                f'\t\t\tpass'
+            )
+            blocks.append(block)
 
-        return (
-            f"Тест-кейс: {test_case.title}\n"
-            f"ID: {test_case.id or '-'}\n"
-            f"Статус: {test_case.status}\n"
-            f"Уровень: {test_case.level}\n"
-            f"Автор: {test_case.author or '-'}\n"
-            f"Теги: {tags}\n"
-            f"Создан: {created}\n"
-            f"Обновлён: {updated}\n"
-            f"Предусловия:\n{precondition}\n\n"
-            f"Описание:\n{description}\n\n"
-            f"Метки:\n{labels_text}\n\n"
-            f"Шаги:\n{steps_text}\n"
-        )
+        return "\n\n".join(blocks)
 
-    def _delete_test_case(self, test_case):
-        expanded_paths = self._capture_expanded_state()
-        if self.service.delete_test_case(test_case):
-            self.tree_updated.emit()
-            self._restore_expanded_state(expanded_paths)
+    @staticmethod
+    def _prepare_docstring_content(value: Optional[str]) -> str:
+        text = (value or "-").strip() or "-"
+        text = text.replace('"""', '\\"\\"\\"')
+        text = text.replace("\r\n", "\n").replace("\r", "\n")
+        return text.replace("\n", "\n\t\t\t")
+
+    @staticmethod
+    def _escape_quotes(value: str) -> str:
+        return value.replace("\"", "\\\"")
+
+    @staticmethod
+    def _escape_braces(value: str) -> str:
+        return value.replace("{", "{{").replace("}", "}}")
+
+    @staticmethod
+    def _normalize_line_endings(value: str) -> str:
+        normalized = value.replace("\r\n", "\n").replace("\r", "\n")
+        return normalized.replace("\n", "\r\n")
+
+    @staticmethod
+    def _find_label_value(test_case: TestCase, target_name: str) -> str:
+        labels = getattr(test_case, "labels", None) or []
+        lower_target = target_name.lower()
+        for label in labels:
+            name = (getattr(label, "name", "") or "").strip().lower()
+            value = (getattr(label, "value", "") or "").strip()
+            if name == lower_target and value:
+                return value
+        return ""
+
+    @staticmethod
+    def _sanitize_class_name(title: str) -> str:
+        source = (title or "Generated").strip()
+        parts = re.findall(r"[A-Za-z0-9]+", source.title())
+        class_name = "".join(parts)
+        if not class_name:
+            class_name = "Generated"
+        if class_name[0].isdigit():
+            class_name = f"Generated{class_name}"
+        return class_name
+
+    @staticmethod
+    def _sanitize_method_name(title: str) -> str:
+        source = (title or "generated").lower()
+        slug = re.sub(r"[^0-9a-z]+", "_", source).strip("_")
+        if not slug:
+            slug = "generated"
+        if slug[0].isdigit():
+            slug = f"tc_{slug}"
+        return slug
 
     # ---------------------------------------------------------------- style --
 
