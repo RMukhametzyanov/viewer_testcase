@@ -24,7 +24,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, pyqtSignal, QEvent
 from PyQt5.QtGui import QFont
 
-from ...models.test_case import TestCase, TestCaseStep, TestCaseLabel
+from ...models.test_case import TestCase, TestCaseStep
 from ...services.test_case_service import TestCaseService
 from ...utils.datetime_utils import format_datetime, get_current_datetime
 
@@ -206,6 +206,11 @@ class TestCaseFormWidget(QWidget):
         form_layout.addWidget(self.tags_group)
         self.sections_widgets.append(self.tags_group)
 
+        # Контекст
+        self.domain_group = self._create_domain_group()
+        form_layout.addWidget(self.domain_group)
+        self.sections_widgets.append(self.domain_group)
+
         # Описание
         self.description_group = self._create_description_group()
         form_layout.addWidget(self.description_group)
@@ -214,6 +219,11 @@ class TestCaseFormWidget(QWidget):
         # Предусловия
         precond_group = self._create_precondition_group()
         form_layout.addWidget(precond_group)
+
+        # Общий ожидаемый результат
+        expected_group = self._create_expected_result_group()
+        form_layout.addWidget(expected_group)
+        self.sections_widgets.append(expected_group)
 
         # Шаги тестирования
         steps_group = self._create_steps_group()
@@ -337,31 +347,73 @@ class TestCaseFormWidget(QWidget):
             info_line.addStretch(1)
         layout.addLayout(info_line)
 
-        author_layout = QVBoxLayout()
-        author_layout.addWidget(QLabel("Автор:"))
-        self.author_input = QLineEdit()
-        self.author_input.textChanged.connect(self._mark_changed)
-        author_layout.addWidget(self.author_input)
-        layout.addLayout(author_layout)
+        people_row = QHBoxLayout()
+        people_row.setSpacing(12)
+        self.author_input = self._create_line_edit()
+        self._add_labeled_widget(people_row, "Автор:", self.author_input)
 
-        status_level_layout = QHBoxLayout()
-        status_container = QVBoxLayout()
-        status_container.addWidget(QLabel("Статус:"))
+        self.owner_input = self._create_line_edit()
+        self._add_labeled_widget(people_row, "Владелец:", self.owner_input)
+
+        self.reviewer_input = self._create_line_edit()
+        self._add_labeled_widget(people_row, "Ревьюер:", self.reviewer_input)
+        layout.addLayout(people_row)
+
+        status_row = QHBoxLayout()
+        status_row.setSpacing(12)
         self.status_input = QComboBox()
         self.status_input.addItems(["Draft", "In Progress", "Done", "Blocked", "Deprecated"])
         self.status_input.currentTextChanged.connect(self._mark_changed)
-        status_container.addWidget(self.status_input)
-        status_level_layout.addLayout(status_container)
+        self._add_labeled_widget(status_row, "Статус:", self.status_input)
 
-        level_container = QVBoxLayout()
-        level_container.addWidget(QLabel("Уровень:"))
-        self.level_input = QComboBox()
-        self.level_input.addItems(["smoke", "critical", "major", "minor", "trivial"])
-        self.level_input.currentTextChanged.connect(self._mark_changed)
-        level_container.addWidget(self.level_input)
-        status_level_layout.addLayout(level_container)
-        status_level_layout.addStretch()
-        layout.addLayout(status_level_layout)
+        self.test_layer_input = QComboBox()
+        self.test_layer_input.addItems(["Unit", "Component", "API", "UI", "E2E", "Integration"])
+        self.test_layer_input.setEditable(True)
+        self.test_layer_input.currentTextChanged.connect(self._mark_changed)
+        self._add_labeled_widget(status_row, "Test Layer:", self.test_layer_input)
+
+        self.test_type_input = QComboBox()
+        self.test_type_input.addItems(["manual", "automated", "hybrid"])
+        self.test_type_input.setEditable(True)
+        self.test_type_input.currentTextChanged.connect(self._mark_changed)
+        self._add_labeled_widget(status_row, "Тип теста:", self.test_type_input)
+        layout.addLayout(status_row)
+
+        quality_row = QHBoxLayout()
+        quality_row.setSpacing(12)
+        self.severity_input = QComboBox()
+        self.severity_input.addItems(["BLOCKER", "CRITICAL", "MAJOR", "NORMAL", "MINOR"])
+        self.severity_input.setEditable(True)
+        self.severity_input.currentTextChanged.connect(self._mark_changed)
+        self._add_labeled_widget(quality_row, "Severity:", self.severity_input)
+
+        self.priority_input = QComboBox()
+        self.priority_input.addItems(["HIGHEST", "HIGH", "MEDIUM", "LOW", "LOWEST"])
+        self.priority_input.setEditable(True)
+        self.priority_input.currentTextChanged.connect(self._mark_changed)
+        self._add_labeled_widget(quality_row, "Priority:", self.priority_input)
+        layout.addLayout(quality_row)
+
+        environment_row = QHBoxLayout()
+        environment_row.setSpacing(12)
+        self.environment_input = self._create_line_edit()
+        self._add_labeled_widget(environment_row, "Окружение:", self.environment_input)
+
+        self.browser_input = self._create_line_edit()
+        self._add_labeled_widget(environment_row, "Браузер:", self.browser_input)
+        layout.addLayout(environment_row)
+
+        links_row = QHBoxLayout()
+        links_row.setSpacing(12)
+        self.test_case_id_input = self._create_line_edit()
+        self._add_labeled_widget(links_row, "Test Case ID:", self.test_case_id_input)
+
+        self.issue_links_input = self._create_line_edit()
+        self._add_labeled_widget(links_row, "Issue Links:", self.issue_links_input)
+
+        self.test_case_links_input = self._create_line_edit()
+        self._add_labeled_widget(links_row, "TC Links:", self.test_case_links_input)
+        layout.addLayout(links_row)
 
         return group
 
@@ -390,6 +442,29 @@ class TestCaseFormWidget(QWidget):
         self.description_input.textChanged.connect(self._mark_changed)
         layout.addWidget(self.description_input)
         return group
+
+    def _create_domain_group(self) -> QGroupBox:
+        group = QGroupBox("Контекст (epic / feature / story / component)")
+        layout = QHBoxLayout(group)
+        layout.setSpacing(12)
+
+        self.epic_input = self._create_line_edit()
+        self.epic_input.setPlaceholderText("Epic")
+        self._add_labeled_widget(layout, "Epic:", self.epic_input)
+
+        self.feature_input = self._create_line_edit()
+        self.feature_input.setPlaceholderText("Feature")
+        self._add_labeled_widget(layout, "Feature:", self.feature_input)
+
+        self.story_input = self._create_line_edit()
+        self.story_input.setPlaceholderText("Story")
+        self._add_labeled_widget(layout, "Story:", self.story_input)
+
+        self.component_input = self._create_line_edit()
+        self.component_input.setPlaceholderText("Component")
+        self._add_labeled_widget(layout, "Component:", self.component_input)
+
+        return group
     
     def _create_precondition_group(self) -> QGroupBox:
         """Группа предусловий"""
@@ -405,6 +480,46 @@ class TestCaseFormWidget(QWidget):
         
         group.setLayout(layout)
         return group
+
+    def _create_expected_result_group(self) -> QGroupBox:
+        group = QGroupBox("Общий ожидаемый результат")
+        layout = QVBoxLayout()
+
+        self.expected_result_input = QTextEdit()
+        self.expected_result_input.setPlaceholderText("Что должно получиться по завершении кейса")
+        self.expected_result_input.setMinimumHeight(60)
+        self.expected_result_input.setMaximumHeight(120)
+        self.expected_result_input.textChanged.connect(self._mark_changed)
+        layout.addWidget(self.expected_result_input)
+
+        group.setLayout(layout)
+        return group
+
+    def _create_line_edit(self) -> QLineEdit:
+        edit = QLineEdit()
+        edit.textChanged.connect(self._mark_changed)
+        return edit
+
+    def _add_labeled_widget(self, parent_layout: QHBoxLayout, label_text: str, widget):
+        container = QVBoxLayout()
+        label = QLabel(label_text)
+        label.setStyleSheet("color: #8B9099;")
+        container.addWidget(label)
+        container.addWidget(widget)
+        parent_layout.addLayout(container)
+        return widget
+
+    def _set_combo_value(self, combo: QComboBox, value: str):
+        combo.blockSignals(True)
+        if value:
+            idx = combo.findText(value)
+            if idx == -1:
+                combo.addItem(value)
+                idx = combo.findText(value)
+            combo.setCurrentIndex(idx)
+        else:
+            combo.setCurrentIndex(0)
+        combo.blockSignals(False)
     
     def _create_steps_group(self) -> QGroupBox:
         """Группа шагов тестирования"""
@@ -482,7 +597,7 @@ class TestCaseFormWidget(QWidget):
         self.has_unsaved_changes = False
 
         if test_case:
-            self.title_label.setText(test_case.title)
+            self.title_label.setText(test_case.name)
             self.title_label.setVisible(True)
             self.title_edit.setVisible(False)
 
@@ -496,17 +611,19 @@ class TestCaseFormWidget(QWidget):
             self.author_input.setText(test_case.author)
             self.author_input.blockSignals(False)
 
-            self.status_input.blockSignals(True)
-            idx = self.status_input.findText(test_case.status)
-            if idx >= 0:
-                self.status_input.setCurrentIndex(idx)
-            self.status_input.blockSignals(False)
+            self.owner_input.blockSignals(True)
+            self.owner_input.setText(test_case.owner)
+            self.owner_input.blockSignals(False)
 
-            self.level_input.blockSignals(True)
-            idx = self.level_input.findText(test_case.level)
-            if idx >= 0:
-                self.level_input.setCurrentIndex(idx)
-            self.level_input.blockSignals(False)
+            self.reviewer_input.blockSignals(True)
+            self.reviewer_input.setText(test_case.reviewer)
+            self.reviewer_input.blockSignals(False)
+
+            self._set_combo_value(self.status_input, test_case.status)
+            self._set_combo_value(self.test_layer_input, test_case.test_layer)
+            self._set_combo_value(self.test_type_input, test_case.test_type)
+            self._set_combo_value(self.severity_input, test_case.severity)
+            self._set_combo_value(self.priority_input, test_case.priority)
 
             self.tags_input.blockSignals(True)
             self.tags_input.setText('\n'.join(test_case.tags))
@@ -517,13 +634,53 @@ class TestCaseFormWidget(QWidget):
             self.description_input.blockSignals(False)
 
             self.precondition_input.blockSignals(True)
-            self.precondition_input.setText(test_case.precondition)
+            self.precondition_input.setText(test_case.preconditions)
             self.precondition_input.blockSignals(False)
+
+            self.expected_result_input.blockSignals(True)
+            self.expected_result_input.setText(test_case.expected_result)
+            self.expected_result_input.blockSignals(False)
+
+            self.environment_input.blockSignals(True)
+            self.environment_input.setText(test_case.environment)
+            self.environment_input.blockSignals(False)
+
+            self.browser_input.blockSignals(True)
+            self.browser_input.setText(test_case.browser)
+            self.browser_input.blockSignals(False)
+
+            self.test_case_id_input.blockSignals(True)
+            self.test_case_id_input.setText(test_case.test_case_id)
+            self.test_case_id_input.blockSignals(False)
+
+            self.issue_links_input.blockSignals(True)
+            self.issue_links_input.setText(test_case.issue_links)
+            self.issue_links_input.blockSignals(False)
+
+            self.test_case_links_input.blockSignals(True)
+            self.test_case_links_input.setText(test_case.test_case_links)
+            self.test_case_links_input.blockSignals(False)
+
+            self.epic_input.blockSignals(True)
+            self.epic_input.setText(test_case.epic)
+            self.epic_input.blockSignals(False)
+
+            self.feature_input.blockSignals(True)
+            self.feature_input.setText(test_case.feature)
+            self.feature_input.blockSignals(False)
+
+            self.story_input.blockSignals(True)
+            self.story_input.setText(test_case.story)
+            self.story_input.blockSignals(False)
+
+            self.component_input.blockSignals(True)
+            self.component_input.setText(test_case.component)
+            self.component_input.blockSignals(False)
 
             self.steps_table.blockSignals(True)
             self.steps_table.setRowCount(0)
             for step in test_case.steps:
-                self._add_step(step.step, step.expected_res)
+                self._add_step(step.description, step.expected_result)
             self.steps_table.blockSignals(False)
             self.steps_table.clearSelection()
         else:
@@ -534,11 +691,26 @@ class TestCaseFormWidget(QWidget):
             self.created_label.setText("Создан: -")
             self.updated_label.setText("Обновлён: -")
             self.author_input.clear()
+            self.owner_input.clear()
+            self.reviewer_input.clear()
             self.status_input.setCurrentIndex(0)
-            self.level_input.setCurrentIndex(0)
+            self.test_layer_input.setCurrentIndex(0)
+            self.test_type_input.setCurrentIndex(0)
+            self.severity_input.setCurrentIndex(0)
+            self.priority_input.setCurrentIndex(0)
+            self.environment_input.clear()
+            self.browser_input.clear()
+            self.test_case_id_input.clear()
+            self.issue_links_input.clear()
+            self.test_case_links_input.clear()
+            self.epic_input.clear()
+            self.feature_input.clear()
+            self.story_input.clear()
+            self.component_input.clear()
             self.tags_input.clear()
             self.description_input.clear()
             self.precondition_input.clear()
+            self.expected_result_input.clear()
             self.steps_table.setRowCount(0)
 
         self.save_button.setEnabled(False)
@@ -737,12 +909,27 @@ class TestCaseFormWidget(QWidget):
             return
         
         # Собираем данные
-        self.current_test_case.title = self.title_label.text()
+        self.current_test_case.name = self.title_label.text()
         self.current_test_case.author = self.author_input.text()
+        self.current_test_case.owner = self.owner_input.text()
+        self.current_test_case.reviewer = self.reviewer_input.text()
         self.current_test_case.status = self.status_input.currentText()
-        self.current_test_case.level = self.level_input.currentText()
+        self.current_test_case.test_layer = self.test_layer_input.currentText()
+        self.current_test_case.test_type = self.test_type_input.currentText()
+        self.current_test_case.severity = self.severity_input.currentText()
+        self.current_test_case.priority = self.priority_input.currentText()
         self.current_test_case.description = self.description_input.toPlainText()
-        self.current_test_case.precondition = self.precondition_input.toPlainText()
+        self.current_test_case.preconditions = self.precondition_input.toPlainText()
+        self.current_test_case.expected_result = self.expected_result_input.toPlainText()
+        self.current_test_case.environment = self.environment_input.text()
+        self.current_test_case.browser = self.browser_input.text()
+        self.current_test_case.test_case_id = self.test_case_id_input.text()
+        self.current_test_case.issue_links = self.issue_links_input.text()
+        self.current_test_case.test_case_links = self.test_case_links_input.text()
+        self.current_test_case.epic = self.epic_input.text()
+        self.current_test_case.feature = self.feature_input.text()
+        self.current_test_case.story = self.story_input.text()
+        self.current_test_case.component = self.component_input.text()
         
         # Теги
         tags_text = self.tags_input.toPlainText().strip()
@@ -757,7 +944,14 @@ class TestCaseFormWidget(QWidget):
             step_text = step_item.text() if step_item else ""
             expected_text = expected_item.text() if expected_item else ""
             
-            steps.append(TestCaseStep(step=step_text, expected_res=expected_text))
+            steps.append(
+                TestCaseStep(
+                    name=f"Шаг {row + 1}",
+                    description=step_text,
+                    expected_result=expected_text,
+                    status="pending",
+                )
+            )
         
         self.current_test_case.steps = steps
         

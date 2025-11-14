@@ -1,35 +1,84 @@
-"""Утилиты для работы с датой и временем"""
+"""Утилиты для работы с датой и временем."""
+
+from __future__ import annotations
 
 from datetime import datetime
+from typing import Union
+
+TimestampInput = Union[str, int, float, None]
 
 
-def format_datetime(datetime_str: str) -> str:
+def _try_parse_iso_datetime(value: str) -> int:
+    """Преобразовать ISO-строку в timestamp (мс)."""
+    formats = (
+        "%Y-%m-%dT%H:%M:%S",
+        "%Y-%m-%d %H:%M:%S",
+        "%Y-%m-%d %H:%M",
+        "%Y-%m-%d",
+    )
+    for fmt in formats:
+        try:
+            dt = datetime.strptime(value, fmt)
+            return int(dt.timestamp() * 1000)
+        except ValueError:
+            continue
+    raise ValueError(f"Unsupported datetime format: {value}")
+
+
+def ensure_timestamp_ms(value: TimestampInput) -> int:
     """
-    Форматирование даты и времени в человекочитаемый формат
-    
-    Args:
-        datetime_str: Строка с датой в ISO формате (YYYY-MM-DDTHH:MM:SS)
-    
-    Returns:
-        Отформатированная строка (YYYY-MM-DD HH:MM) или исходная строка при ошибке
+    Привести произвольное значение даты/времени к timestamp в миллисекундах.
+    Возвращает 0, если определить значение не удалось.
     """
-    if not datetime_str:
-        return ""
-    
+    if value is None:
+        return 0
+
+    if isinstance(value, (int, float)):
+        return int(value)
+
+    text = str(value).strip()
+    if not text:
+        return 0
+
     try:
-        dt = datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S")
-        return dt.strftime("%Y-%m-%d %H:%M")
+        return int(float(text))
     except ValueError:
-        return datetime_str
+        pass
+
+    try:
+        return _try_parse_iso_datetime(text)
+    except ValueError:
+        return 0
 
 
-def get_current_datetime() -> str:
+def format_datetime(value: TimestampInput) -> str:
     """
-    Получить текущую дату и время в ISO формате
-    
+    Форматирование даты и времени в человекочитаемый формат.
+
+    Args:
+        value: timestamp (мс) либо строковое представление
+
     Returns:
-        Строка с текущей датой и временем (YYYY-MM-DDTHH:MM:SS)
+        Строка вида YYYY-MM-DD HH:MM либо исходное значение при ошибке.
     """
-    return datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+    if value is None or value == "":
+        return ""
+
+    timestamp = ensure_timestamp_ms(value)
+    if timestamp == 0:
+        return str(value)
+
+    try:
+        dt = datetime.fromtimestamp(timestamp / 1000)
+        return dt.strftime("%Y-%m-%d %H:%M")
+    except (OverflowError, OSError, ValueError):
+        return str(value)
+
+
+def get_current_datetime() -> int:
+    """
+    Получить текущую дату и время в виде timestamp (мс).
+    """
+    return ensure_timestamp_ms(datetime.now().timestamp() * 1000)
 
 

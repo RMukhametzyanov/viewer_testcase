@@ -142,25 +142,43 @@ def build_creation_prompt(
         "{\n"
         '  "test_cases": [\n'
         "    {\n"
-        '      "title": "string",\n'
+        '      "id": "uuid",\n'
+        '      "name": "string",\n'
         '      "description": "string",\n'
-        '      "precondition": "string",\n'
-        '      "tags": ["string"],\n'
-        '      "status": "Draft | In Progress | Done | Blocked | Deprecated",\n'
-        '      "level": "smoke | critical | major | minor | trivial",\n'
+        '      "preconditions": "string",\n'
+        '      "expectedResult": "string",\n'
+        '      "epic": "string",\n'
+        '      "feature": "string",\n'
+        '      "story": "string",\n'
+        '      "component": "string",\n'
+        '      "testLayer": "Unit | API | UI | E2E | Integration",\n'
+        '      "severity": "BLOCKER | CRITICAL | MAJOR | NORMAL | MINOR",\n'
+        '      "priority": "HIGHEST | HIGH | MEDIUM | LOW | LOWEST",\n'
+        '      "environment": "string",\n'
+        '      "browser": "string",\n'
+        '      "owner": "string",\n'
         '      "author": "string",\n'
+        '      "reviewer": "string",\n'
+        '      "testCaseId": "string",\n'
+        '      "issueLinks": "string",\n'
+        '      "testCaseLinks": "string",\n'
+        '      "tags": "tag1, tag2",\n'
+        '      "status": "Draft | In Progress | Done | Blocked | Deprecated",\n'
+        '      "testType": "manual | automated | hybrid",\n'
         '      "steps": [\n'
-        '        {\n'
-        '          "step": "string",\n'
-        '          "expected_res": "string"\n'
+        "        {\n"
+        '          "id": "uuid",\n'
+        '          "name": "string",\n'
+        '          "description": "string",\n'
+        '          "expectedResult": "string",\n'
+        '          "status": "pending | passed | failed",\n'
+        '          "bugLink": "string",\n'
+        '          "skipReason": "string",\n'
+        '          "attachments": "comma separated ids"\n'
         "        }\n"
         "      ],\n"
-        '      "labels": [\n'
-        '        {\n'
-        '          "name": "string",\n'
-        '          "value": "string"\n'
-        "        }\n"
-        "      ]\n"
+        '      "createdAt": 1700000000000,\n'
+        '      "updatedAt": 1700000000000\n'
         "    }\n"
         "  ]\n"
         "}\n"

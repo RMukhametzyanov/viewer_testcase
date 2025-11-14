@@ -127,7 +127,9 @@ class MainWindow(QMainWindow):
         # Настройки
         self.settings_file = Path("settings.json")
         self.settings = self.load_settings()
-        self.panel_sizes = dict(self.settings.get('panel_sizes', {'left': 350, 'form_area': 900, 'review': 0}))
+        default_sizes = {'left': 350, 'form_area': 900, 'review': 360}
+        self.panel_sizes = dict(default_sizes)
+        self.panel_sizes.update(self.settings.get('panel_sizes', {}))
         self._last_review_width = self.panel_sizes.get('review', 0) or 360
         self.test_cases_dir = Path(self.settings.get('test_cases_dir', 'testcases'))
         if not self.test_cases_dir.exists():
@@ -270,7 +272,6 @@ class MainWindow(QMainWindow):
         
         self.detail_splitter = QSplitter(Qt.Horizontal)
         self.detail_splitter.setChildrenCollapsible(False)
-        self.detail_splitter.setCollapsible(1, False)
         self.detail_splitter.splitterMoved.connect(self._on_detail_splitter_moved)
 
         # Контейнер для placeholder / формы
@@ -301,6 +302,8 @@ class MainWindow(QMainWindow):
         self.aux_panel.creation_enter_clicked.connect(self._on_creation_enter_clicked)
         self.detail_splitter.addWidget(self.aux_panel)
 
+        self.detail_splitter.setCollapsible(0, False)
+        self.detail_splitter.setCollapsible(1, False)
         layout.addWidget(self.detail_splitter)
         
         return panel
@@ -551,16 +554,19 @@ class MainWindow(QMainWindow):
         self.current_folder_label.setText(str(self.test_cases_dir))
         
         self.statusBar().showMessage(f"Загружено тест-кейсов: {len(self.test_cases)}")
+        self._update_json_preview()
 
     def _on_test_case_selected(self, test_case: TestCase):
         """Обработка выбора тест-кейса"""
         self.current_test_case = test_case
         self.detail_stack.setCurrentWidget(self.form_widget)
         self.form_widget.load_test_case(test_case)
+        self._update_json_preview()
+        self._update_json_preview()
         
         # Показываем форму
         
-        self.statusBar().showMessage(f"Открыт: {test_case.title}")
+        self.statusBar().showMessage(f"Открыт: {test_case.name}")
     
     def _on_form_unsaved_state(self, has_changes: bool):
         """Обновление статуса при изменениях в форме"""
@@ -568,7 +574,7 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("Есть несохраненные изменения. Нажмите «Сохранить».")
         else:
             if self.current_test_case:
-                self.statusBar().showMessage(f"Изменения сохранены. Открыт: {self.current_test_case.title}")
+                self.statusBar().showMessage(f"Изменения сохранены. Открыт: {self.current_test_case.name}")
             else:
                 self.statusBar().showMessage("Готов к работе")
     
@@ -580,6 +586,7 @@ class MainWindow(QMainWindow):
     def _on_test_case_saved(self):
         """Обработка сохранения тест-кейса"""
         self.load_all_test_cases()
+        self._update_json_preview()
         self.statusBar().showMessage("Тест-кейс сохранен")
     
     def _filter_tree(self):
@@ -902,9 +909,9 @@ class MainWindow(QMainWindow):
                 try:
                     self.service._repository.save(test_case, test_case._filepath)
                 except Exception as exc:  # noqa: BLE001
-                    errors.append(f"{idx}: не удалось записать файл «{test_case.title}»: {exc}")
-            else:
-                errors.append(f"{idx}: не удалось сохранить файл тест-кейса «{test_case.title}».")
+                    errors.append(f"{idx}: не удалось записать файл «{test_case.name}»: {exc}")
+                else:
+                    errors.append(f"{idx}: не удалось сохранить файл тест-кейса «{test_case.name}».")
 
         summary_lines: List[str] = []
         if created_cases:
@@ -999,20 +1006,25 @@ class MainWindow(QMainWindow):
     def _show_placeholder(self):
         self.detail_stack.setCurrentWidget(self.placeholder)
 
+    def _update_json_preview(self):
+        if not hasattr(self, "aux_panel"):
+            return
+        self.aux_panel.set_json_test_case(self.current_test_case)
+
     def _apply_initial_panel_sizes(self):
         left_width = max(self.panel_sizes.get('left', 350), 150)
         total_area = max(self.panel_sizes.get('form_area', 900), 400)
         aux_width = max(self.panel_sizes.get('review', self._last_review_width or 300), 220)
-        aux_width = min(aux_width, total_area - 200) if total_area > 200 else aux_width
+        aux_width = min(aux_width, total_area - 300) if total_area > 300 else aux_width
         aux_width = max(aux_width, 220)
-        form_width = max(total_area - aux_width, 200)
+        form_width = max(total_area - aux_width, 300)
         total_area = form_width + aux_width
         self.panel_sizes['form_area'] = total_area
+        self.panel_sizes['review'] = aux_width
 
         self.main_splitter.setSizes([left_width, total_area])
         self.detail_splitter.setSizes([form_width, aux_width])
         self._last_review_width = aux_width
-        self.panel_sizes['review'] = aux_width
 
     def _on_main_splitter_moved(self, _pos: int, _index: int):
         sizes = self.main_splitter.sizes()

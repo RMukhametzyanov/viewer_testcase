@@ -116,9 +116,11 @@ class TestCaseRepository(ITestCaseRepository):
         
         test_case = TestCase(
             id=new_id,
-            title='Новый тест-кейс',
+            name='Новый тест-кейс',
             created_at=current_time,
             updated_at=current_time,
+            status="Draft",
+            test_type="manual",
             _filename=filename,
             _filepath=target_folder / filename
         )

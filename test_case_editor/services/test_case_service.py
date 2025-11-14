@@ -7,7 +7,7 @@ import uuid
 from pathlib import Path
 from typing import Any, List, Optional, Tuple
 
-from ..models import TestCase, TestCaseLabel, TestCaseStep
+from ..models import TestCase, TestCaseStep
 from ..repositories import ITestCaseRepository
 from ..utils import get_current_datetime
 from ..utils.azure_parser import parse_azure_test_cases
@@ -51,7 +51,7 @@ class TestCaseService:
         Returns:
             True при успехе, False при ошибке
         """
-        if not test_case.title:
+        if not test_case.name:
             return False
         
         filepath = test_case._filepath
@@ -124,7 +124,7 @@ class TestCaseService:
             # Создаем глубокую копию
             new_test_case = copy.deepcopy(test_case)
             new_test_case.id = str(uuid.uuid4())
-            new_test_case.title = f"(копия) {new_test_case.title}"
+            new_test_case.name = f"(копия) {new_test_case.name}"
             
             # Генерируем новое имя файла
             original_path = test_case._filepath
@@ -310,24 +310,40 @@ class TestCaseService:
         now = get_current_datetime()
         steps = self._build_steps(case_data.get("steps", []))
 
-        status = case_data.get("additional_fields", {}).get("System.State", "Draft")
-        author_raw = case_data.get("additional_fields", {}).get("System.AssignedTo", "")
+        additional = case_data.get("additional_fields", {}) or {}
+        status = additional.get("System.State", "Draft")
+        author_raw = additional.get("System.AssignedTo", "")
         author = self._normalize_assigned_to(author_raw)
         status = self._normalize_status(status)
+        priority = additional.get("Microsoft.VSTS.Common.Priority")
+        tags_field = additional.get("System.Tags") or ""
+        tags = [tag.strip() for tag in str(tags_field).split(";") if tag.strip()]
 
         test_case = TestCase(
             id=case_id,
-            title=title,
+            name=title,
             author=author,
+            owner=author,
             description=description,
             status=status or "Draft",
-            tags=[],
-            use_case_id="",
-            folder_id="",
-            level="minor",
-            precondition="",
+            tags=tags,
+            preconditions="",
+            expected_result="",
+            epic="",
+            feature="",
+            story="",
+            component="",
+            test_layer="E2E",
+            severity="NORMAL",
+            priority=str(priority) if priority is not None else "MEDIUM",
+            environment="",
+            browser="",
+            reviewer="",
+            test_case_id=case_id,
+            issue_links="",
+            test_case_links="",
+            test_type="manual",
             steps=steps,
-            labels=[],
             created_at=now,
             updated_at=now,
         )
@@ -342,10 +358,10 @@ class TestCaseService:
         """Построить список шагов тест-кейса на основе данных Azure DevOps."""
         steps: List[TestCaseStep] = []
 
-        for step in steps_data:
+        for index, step in enumerate(steps_data, start=1):
             step_type = step.get("type", "")
-            action = step.get("action", "").strip()
-            expected = step.get("expected", "").strip()
+            action = (step.get("action") or "").strip()
+            expected = (step.get("expected") or "").strip()
             action = action.replace("\\n", "\n")
             expected = expected.replace("\\n", "\n")
 
@@ -353,21 +369,22 @@ class TestCaseService:
                 continue
 
             prefix = ""
-            if step_type == "ActionStep":
-                prefix = ""
-            elif step_type == "ValidateStep":
-                prefix = ""
-            elif step_type:
+            if step_type and step_type not in {"ActionStep", "ValidateStep"}:
                 prefix = f"{step_type}: "
 
-            step_text = action or expected
-            if prefix and not step_text.startswith(prefix):
-                step_text = f"{prefix}{step_text}"
+            description = action or expected
+            if prefix and not description.startswith(prefix):
+                description = f"{prefix}{description}"
+
+            name = step.get("name") or f"Шаг {index}"
 
             steps.append(
                 TestCaseStep(
-                    step=step_text.strip(),
-                    expected_res=expected,
+                    id=str(step.get("id") or uuid.uuid4()),
+                    name=str(name).strip() or f"Шаг {index}",
+                    description=description.strip(),
+                    expected_result=expected,
+                    status="pending",
                 )
             )
 
@@ -404,10 +421,10 @@ class TestCaseService:
         description = "\n".join(parts).strip()
         return description
 
-    def _generate_unique_filename(self, title: str, case_id: str, target_folder: Path) -> str:
+    def _generate_unique_filename(self, name: str, case_id: str, target_folder: Path) -> str:
         """Сгенерировать уникальное имя файла для тест-кейса."""
-        sanitized_title = re.sub(r"[^A-Za-zА-Яа-я0-9_-]+", "_", title).strip("_")
-        base = sanitized_title or f"test_case_{case_id}"
+        sanitized_name = re.sub(r"[^A-Za-zА-Яа-я0-9_-]+", "_", name).strip("_")
+        base = sanitized_name or f"test_case_{case_id}"
         base = base[:80]  # ограничим длину имени файла
 
         candidate = f"{base}.json"
@@ -425,18 +442,36 @@ class TestCaseService:
         if not isinstance(data, dict):
             raise ValueError("Ожидался словарь с данными тест-кейса.")
 
-        title = str(data.get("title") or "Тест-кейс без названия").strip()
+        name = str(data.get("name") or "Тест-кейс без названия").strip()
         description = str(data.get("description") or "").strip()
-        precondition = str(data.get("precondition") or "").strip()
+        preconditions = str(data.get("preconditions") or "").strip()
+        expected_result = str(data.get("expectedResult") or "").strip()
         author = str(data.get("author") or "").strip()
+        owner = str(data.get("owner") or author).strip()
+        reviewer = str(data.get("reviewer") or "").strip()
+        epic = str(data.get("epic") or "").strip()
+        feature = str(data.get("feature") or "").strip()
+        story = str(data.get("story") or "").strip()
+        component = str(data.get("component") or "").strip()
+        test_layer = str(data.get("testLayer") or "E2E").strip()
+        severity = str(data.get("severity") or "NORMAL").strip()
+        priority = str(data.get("priority") or "MEDIUM").strip()
+        environment = str(data.get("environment") or "").strip()
+        browser = str(data.get("browser") or "").strip()
+        test_case_id = str(data.get("testCaseId") or "").strip()
+        issue_links = str(data.get("issueLinks") or "").strip()
+        test_case_links = str(data.get("testCaseLinks") or "").strip()
+        test_type = str(data.get("testType") or "manual").strip()
 
-        raw_tags = data.get("tags", [])
-        tags = []
+        raw_tags = data.get("tags")
+        tags: List[str] = []
         if isinstance(raw_tags, list):
             for tag in raw_tags:
                 tag_str = str(tag or "").strip()
                 if tag_str:
                     tags.append(tag_str)
+        elif isinstance(raw_tags, str):
+            tags = [tag.strip() for tag in raw_tags.split(",") if tag.strip()]
 
         raw_steps = data.get("steps") or []
         steps: List[TestCaseStep] = []
@@ -444,55 +479,52 @@ class TestCaseService:
             for raw_step in raw_steps:
                 if not isinstance(raw_step, dict):
                     continue
-                action = str(
-                    raw_step.get("step")
-                    or raw_step.get("action")
-                    or ""
-                ).strip()
-                expected = str(
-                    raw_step.get("expected_res")
-                    or raw_step.get("expected")
-                    or ""
-                ).strip()
-                steps.append(TestCaseStep(step=action, expected_res=expected))
+                steps.append(TestCaseStep.from_dict(raw_step))
 
         if not steps:
-            steps.append(TestCaseStep(step="Шаг не задан", expected_res="Ожидаемый результат не задан"))
+            steps.append(
+                TestCaseStep(
+                    name="Шаг 1",
+                    description="Шаг не задан",
+                    expected_result="Ожидаемый результат не задан",
+                    status="pending",
+                )
+            )
 
-        raw_labels = data.get("labels") or []
-        labels: List[TestCaseLabel] = []
-        if isinstance(raw_labels, list):
-            for raw_label in raw_labels:
-                if not isinstance(raw_label, dict):
-                    continue
-                name = str(raw_label.get("name") or "").strip()
-                value = str(raw_label.get("value") or "").strip()
-                if name or value:
-                    labels.append(TestCaseLabel(name=name, value=value))
-
-        level = str(data.get("level") or "minor").strip() or "minor"
         status = self._normalize_status(data.get("status", "Draft"))
 
         created = get_current_datetime()
 
         test_case = TestCase(
             id=str(uuid.uuid4()),
-            title=title,
+            name=name,
             author=author,
+            owner=owner,
+            reviewer=reviewer,
             description=description,
+            preconditions=preconditions,
+            expected_result=expected_result,
+            epic=epic,
+            feature=feature,
+            story=story,
+            component=component,
+            test_layer=test_layer or "E2E",
+            severity=severity or "NORMAL",
+            priority=priority or "MEDIUM",
+            environment=environment,
+            browser=browser,
             tags=tags,
             status=status,
-            use_case_id=str(data.get("use_case_id") or "").strip(),
-            folder_id=str(data.get("folder_id") or "").strip(),
-            level=level,
-            precondition=precondition,
             steps=steps,
-            labels=labels,
+            test_case_id=test_case_id,
+            issue_links=issue_links,
+            test_case_links=test_case_links,
+            test_type=test_type or "manual",
             created_at=created,
             updated_at=created,
         )
 
-        filename = self._generate_unique_filename(title, test_case.id, target_folder)
+        filename = self._generate_unique_filename(name, test_case.id, target_folder)
         test_case._filename = filename
         test_case._filepath = target_folder / filename
         return test_case

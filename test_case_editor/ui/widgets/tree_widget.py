@@ -121,7 +121,7 @@ class TestCaseTreeWidget(QTreeWidget):
                 color = self._status_color(test_case.status)
 
                 item = QTreeWidgetItem(parent_item)
-                item.setText(0, f"{icon} {test_case.title}")
+                item.setText(0, f"{icon} {test_case.name}")
                 item.setData(0, Qt.UserRole, {'type': 'file', 'test_case': test_case})
                 item.setFont(0, QFont("Segoe UI", 10))
                 item.setForeground(0, QColor(color))
@@ -299,6 +299,35 @@ class TestCaseTreeWidget(QTreeWidget):
         except Exception as e:
             QMessageBox.critical(self, "Ошибка", f"Не удалось удалить папку:\n{e}")
 
+    def _delete_test_case(self, test_case: TestCase):
+        if not test_case:
+            return
+
+        name = getattr(test_case, "name", None) or getattr(test_case, "title", "тест-кейс")
+        reply = QMessageBox.question(
+            self,
+            "Удаление тест-кейса",
+            f"Удалить «{name}»?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+        if reply != QMessageBox.Yes:
+            return
+
+        expanded_paths = self._capture_expanded_state()
+        try:
+            success = self.service.delete_test_case(test_case)
+        except Exception as exc:  # noqa: BLE001
+            QMessageBox.critical(self, "Ошибка", f"Не удалось удалить тест-кейс:\n{exc}")
+            return
+
+        if not success:
+            QMessageBox.warning(self, "Удаление", "Не удалось удалить тест-кейс.")
+            return
+
+        self.tree_updated.emit()
+        self._restore_expanded_state(expanded_paths)
+
     def _rename_file(self, test_case):
         expanded_paths = self._capture_expanded_state()
         old_filename = test_case._filename
@@ -407,6 +436,44 @@ class TestCaseTreeWidget(QTreeWidget):
         clipboard.setText(skeleton)
         QMessageBox.information(self, "Готово", "Каркас автотеста на pytest скопирован в буфер обмена.")
 
+    @staticmethod
+    def _format_test_case_info(test_case: TestCase) -> str:
+        tags = ", ".join(getattr(test_case, "tags", []) or []) or "-"
+        steps = getattr(test_case, "steps", []) or []
+        steps_lines = []
+        for idx, step in enumerate(steps, start=1):
+            action = getattr(step, "description", getattr(step, "step", "")) or "-"
+            expected = getattr(step, "expected_result", getattr(step, "expected_res", "")) or "-"
+            steps_lines.append(f"{idx}. {action} → {expected}")
+        steps_block = "\n".join(steps_lines) if steps_lines else "-"
+
+        return (
+            f"Название: {getattr(test_case, 'name', '') or '-'}\n"
+            f"ID: {test_case.id or '-'}\n"
+            f"Статус: {test_case.status}\n"
+            f"Test Layer: {getattr(test_case, 'test_layer', '-')}\n"
+            f"Тип теста: {getattr(test_case, 'test_type', '-')}\n"
+            f"Severity/Priority: {getattr(test_case, 'severity', '-')}/{getattr(test_case, 'priority', '-')}\n"
+            f"Epic/Feature/Story/Component: "
+            f"{getattr(test_case, 'epic', '-')}/"
+            f"{getattr(test_case, 'feature', '-')}/"
+            f"{getattr(test_case, 'story', '-')}/"
+            f"{getattr(test_case, 'component', '-')}\n"
+            f"Окружение/Браузер: {getattr(test_case, 'environment', '-')}/"
+            f"{getattr(test_case, 'browser', '-')}\n"
+            f"Автор/Владелец/Ревьюер: {test_case.author or '-'} / "
+            f"{getattr(test_case, 'owner', '-') or '-'} / "
+            f"{getattr(test_case, 'reviewer', '-') or '-'}\n"
+            f"TestCaseId: {getattr(test_case, 'test_case_id', '-')}\n"
+            f"Issue Links: {getattr(test_case, 'issue_links', '-')}\n"
+            f"Test Case Links: {getattr(test_case, 'test_case_links', '-')}\n"
+            f"Теги: {tags}\n"
+            f"Описание:\n{getattr(test_case, 'description', '') or '-'}\n"
+            f"Предусловия:\n{test_case.preconditions or '-'}\n"
+            f"Ожидаемый результат:\n{getattr(test_case, 'expected_result', '-') or '-'}\n"
+            f"Шаги:\n{steps_block}"
+        )
+
     @classmethod
     def _load_pytest_template(cls) -> str:
         if cls._PYTEST_TEMPLATE_CACHE is not None:
@@ -425,14 +492,14 @@ class TestCaseTreeWidget(QTreeWidget):
     def _build_pytest_skeleton(self, test_case: TestCase) -> str:
         template = self._load_pytest_template()
 
-        epic = self._find_label_value(test_case, "epic") or "Название EPIC"
-        feature = self._find_label_value(test_case, "feature") or "Название FEATURE"
-        story = self._find_label_value(test_case, "story") or "Название STORY"
+        epic = getattr(test_case, "epic", "") or "Название EPIC"
+        feature = getattr(test_case, "feature", "") or "Название FEATURE"
+        story = getattr(test_case, "story", "") or "Название STORY"
 
-        class_name = self._sanitize_class_name(test_case.title)
-        method_name = self._sanitize_method_name(test_case.title)
-        testcase_id = (test_case.id or "tc.id").strip() or "tc.id"
-        title = self._escape_quotes(test_case.title or "Без названия")
+        class_name = self._sanitize_class_name(test_case.name)
+        method_name = self._sanitize_method_name(test_case.name)
+        testcase_id = (getattr(test_case, "test_case_id", "") or test_case.id or "tc.id").strip() or "tc.id"
+        title = self._escape_quotes(test_case.name or "Без названия")
 
         steps_fragment = self._render_pytest_steps(test_case)
 
@@ -475,8 +542,8 @@ class TestCaseTreeWidget(QTreeWidget):
 
         blocks: List[str] = []
         for idx, step in enumerate(steps, start=1):
-            action_text = TestCaseTreeWidget._prepare_docstring_content(step.step)
-            expected_text = TestCaseTreeWidget._prepare_docstring_content(step.expected_res)
+            action_text = TestCaseTreeWidget._prepare_docstring_content(getattr(step, "description", getattr(step, "step", "")))
+            expected_text = TestCaseTreeWidget._prepare_docstring_content(getattr(step, "expected_result", getattr(step, "expected_res", "")))
 
             block = (
                 f'\t\twith allure.step("Шаг{idx}"):\n'
@@ -509,17 +576,6 @@ class TestCaseTreeWidget(QTreeWidget):
     def _normalize_line_endings(value: str) -> str:
         normalized = value.replace("\r\n", "\n").replace("\r", "\n")
         return normalized.replace("\n", "\r\n")
-
-    @staticmethod
-    def _find_label_value(test_case: TestCase, target_name: str) -> str:
-        labels = getattr(test_case, "labels", None) or []
-        lower_target = target_name.lower()
-        for label in labels:
-            name = (getattr(label, "name", "") or "").strip().lower()
-            value = (getattr(label, "value", "") or "").strip()
-            if name == lower_target and value:
-                return value
-        return ""
 
     @staticmethod
     def _sanitize_class_name(title: str) -> str:
