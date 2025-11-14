@@ -24,6 +24,10 @@ from PyQt5.QtWidgets import (
     QDialog,
     QTextEdit,
     QDialogButtonBox,
+    QAction,
+    QActionGroup,
+    QMenu,
+    QToolButton,
 )
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject
 from PyQt5.QtGui import QFont
@@ -153,20 +157,20 @@ class MainWindow(QMainWindow):
         self._llm_thread: Optional[QThread] = None
         self._llm_worker: Optional[_LLMWorker] = None
         self._current_test_case_path: Optional[Path] = None
+        self._current_mode: str = "edit"
         
         self.setup_ui()
         self._apply_model_options()
         self.apply_theme()
         self.load_all_test_cases()
         self._show_placeholder()
+        self._apply_mode_state()
     
     def setup_ui(self):
         """Настройка пользовательского интерфейса"""
         self.setWindowTitle("✈️ Test Case Editor v2.0 (SOLID)")
         self._apply_initial_geometry()
-        
-        # Создаем меню
-        self.create_menu()
+        self._init_menus()
         
         # Центральный виджет
         central_widget = QWidget()
@@ -175,6 +179,9 @@ class MainWindow(QMainWindow):
         main_layout = QVBoxLayout(central_widget)
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
+
+        header = self._create_mode_header()
+        main_layout.addWidget(header)
         
         # Splitter для разделения
         self.main_splitter = QSplitter(Qt.Horizontal)
@@ -262,6 +269,53 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.tree_widget, 1)
         
         return panel
+
+    def _create_mode_header(self) -> QWidget:
+        header = QFrame()
+        header.setStyleSheet("background-color: #131A23; border-bottom: 1px solid #1F2A36;")
+        header.setMaximumHeight(48)
+        layout = QHBoxLayout(header)
+        layout.setContentsMargins(16, 8, 16, 8)
+
+        menu_row = QHBoxLayout()
+        menu_row.setSpacing(6)
+        for menu in (self.file_menu, self.view_menu, self.git_menu):
+            btn = QToolButton()
+            btn.setText(menu.title())
+            btn.setPopupMode(QToolButton.InstantPopup)
+            btn.setMenu(menu)
+            btn.setCursor(Qt.PointingHandCursor)
+            btn.setStyleSheet(
+                """
+                QToolButton {
+                    background-color: #1E2732;
+                    border: 1px solid #2B3945;
+                    border-radius: 6px;
+                    color: #E1E3E6;
+                    padding: 4px 12px;
+                }
+                QToolButton:hover {
+                    background-color: #2B3945;
+                }
+                """
+            )
+            menu_row.addWidget(btn)
+
+        layout.addLayout(menu_row)
+
+        title = QLabel("✈️ Test Case Editor")
+        title.setFont(QFont("Segoe UI", 12, QFont.Bold))
+        title.setStyleSheet("color: #E1E3E6;")
+        layout.addWidget(title, 1, Qt.AlignLeft)
+
+        layout.addStretch(1)
+
+        self.mode_label = QLabel()
+        self.mode_label.setStyleSheet("color: #8B9099; font-size: 10pt;")
+        layout.addWidget(self.mode_label, alignment=Qt.AlignRight)
+        self._update_mode_label()
+
+        return header
     
     def _create_right_panel(self) -> QWidget:
         """Создать правую панель с формой"""
@@ -308,39 +362,44 @@ class MainWindow(QMainWindow):
         
         return panel
     
-    def create_menu(self):
-        """Создание меню приложения"""
-        menubar = self.menuBar()
-        
-        # Меню "Файл"
-        file_menu = menubar.addMenu('Файл')
-        
-        # Действие "Выбрать папку"
-        select_folder_action = file_menu.addAction('📁 Выбрать папку с тест-кейсами')
+    def _init_menus(self):
+        self.file_menu = QMenu('Файл', self)
+        select_folder_action = self.file_menu.addAction('📁 Выбрать папку с тест-кейсами')
         select_folder_action.triggered.connect(self.select_test_cases_folder)
         select_folder_action.setShortcut('Ctrl+O')
-        
-        # Действие "Конвертировать из Azure DevOps"
-        convert_action = file_menu.addAction('Конвертировать')
-        convert_action.triggered.connect(self.convert_from_azure)
 
-        file_menu.addSeparator()
-        
-        # Действие "Выход"
-        exit_action = file_menu.addAction('Выход')
+        convert_action = self.file_menu.addAction('Конвертировать')
+        convert_action.triggered.connect(self.convert_from_azure)
+        self.file_menu.addSeparator()
+
+        exit_action = self.file_menu.addAction('Выход')
         exit_action.triggered.connect(self.close)
         exit_action.setShortcut('Ctrl+Q')
 
-        # Меню "Вид"
-        view_menu = menubar.addMenu('Вид')
-        width_action = view_menu.addAction('Настроить ширины панелей…')
+        self.view_menu = QMenu('Вид', self)
+        width_action = self.view_menu.addAction('Настроить ширины панелей…')
         width_action.triggered.connect(self._configure_panel_widths)
-        statistics_action = view_menu.addAction('Показать статистику')
+        statistics_action = self.view_menu.addAction('Показать статистику')
         statistics_action.triggered.connect(self._show_statistics_panel)
 
-        # Меню "git"
-        git_menu = menubar.addMenu('git')
-        git_commit_action = git_menu.addAction('Выполнить commit и push…')
+        mode_menu = self.view_menu.addMenu('Режим')
+        self._mode_action_group = QActionGroup(self)
+        self._mode_action_group.setExclusive(True)
+        self._mode_actions = {}
+        edit_action = QAction("Редактирование", self, checkable=True)
+        run_action = QAction("Запуск", self, checkable=True)
+        self._mode_actions["edit"] = edit_action
+        self._mode_actions["run"] = run_action
+        self._mode_action_group.addAction(edit_action)
+        self._mode_action_group.addAction(run_action)
+        mode_menu.addAction(edit_action)
+        mode_menu.addAction(run_action)
+        edit_action.triggered.connect(lambda checked: checked and self._set_mode("edit"))
+        run_action.triggered.connect(lambda checked: checked and self._set_mode("run"))
+        edit_action.setChecked(True)
+
+        self.git_menu = QMenu('git', self)
+        git_commit_action = self.git_menu.addAction('Выполнить commit и push…')
         git_commit_action.triggered.connect(self._open_git_commit_dialog)
     
     def _open_git_commit_dialog(self):
@@ -555,6 +614,8 @@ class MainWindow(QMainWindow):
         
         self.statusBar().showMessage(f"Загружено тест-кейсов: {len(self.test_cases)}")
         self._update_json_preview()
+        if hasattr(self, "aux_panel"):
+            self.aux_panel.update_statistics(self.test_cases)
 
     def _on_test_case_selected(self, test_case: TestCase):
         """Обработка выбора тест-кейса"""
@@ -577,6 +638,7 @@ class MainWindow(QMainWindow):
                 self.statusBar().showMessage(f"Изменения сохранены. Открыт: {self.current_test_case.name}")
             else:
                 self.statusBar().showMessage("Готов к работе")
+        self._update_mode_label()
     
     def _on_tree_updated(self):
         """Обработка обновления дерева"""
@@ -1010,6 +1072,37 @@ class MainWindow(QMainWindow):
         if not hasattr(self, "aux_panel"):
             return
         self.aux_panel.set_json_test_case(self.current_test_case)
+
+    def _set_mode(self, mode: str):
+        if mode not in ("edit", "run"):
+            return
+        if self._current_mode == mode:
+            return
+        self._current_mode = mode
+        action = self._mode_actions.get(mode)
+        if action and not action.isChecked():
+            action.setChecked(True)
+        self._update_mode_label()
+        self._apply_mode_state()
+        label = "Редактирование" if mode == "edit" else "Запуск тестов"
+        self.statusBar().showMessage(f"Режим изменён: {label}")
+
+    def _update_mode_label(self):
+        mode_text = "Редактирование" if self._current_mode == "edit" else "Запуск тестов"
+        if hasattr(self, "mode_label"):
+            self.mode_label.setText(f"Режим: {mode_text}")
+
+    def _apply_mode_state(self):
+        is_edit = self._current_mode == "edit"
+        if hasattr(self, "form_widget"):
+            self.form_widget.set_edit_mode(is_edit)
+            self.form_widget.set_run_mode(not is_edit)
+        if hasattr(self, "aux_panel"):
+            self.aux_panel.set_panels_enabled(is_edit, is_edit)
+            if is_edit:
+                self.aux_panel.restore_last_tab()
+            else:
+                self.aux_panel.show_stats_tab()
 
     def _apply_initial_panel_sizes(self):
         left_width = max(self.panel_sizes.get('left', 350), 150)

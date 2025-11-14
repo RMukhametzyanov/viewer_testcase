@@ -1,0 +1,38 @@
+{
+    "id": "06991b19-0195-43c7-9948-225dd07ae716",
+    "name": "Название",
+    "description": "Описание",
+    "preconditions": "Предусловия",
+    "expectedResult": "ОР",
+    "epic": "Хуепик",
+    "feature": "Хуича",
+    "story": "стори",
+    "component": "",
+    "testLayer": "E2E",
+    "severity": "NORMAL",
+    "priority": "HIGHEST",
+    "environment": "dev",
+    "browser": "хроме",
+    "owner": "овнер",
+    "author": "аутор",
+    "reviewer": "ревьювер",
+    "testCaseId": "123",
+    "issueLinks": "1",
+    "testCaseLinks": "1,2",
+    "tags": "tagggg",
+    "testType": "manual",
+    "steps": [
+      {
+        "id": "a9c932ae-583d-4780-b105-89b793b9a2dd",
+        "name": "шаг 1",
+        "description": "123",
+        "expectedResult": "ОР 1",
+        "status": "passed",
+        "bugLink": "",
+        "skipReason": "",
+        "attachments": "1"
+      }
+    ],
+    "createdAt": 1763095605996,
+    "updatedAt": 1763095605996
+  }
