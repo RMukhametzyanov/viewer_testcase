@@ -19,8 +19,6 @@ class PlaceholderWidget(QWidget):
     
     def setup_ui(self):
         """Настройка интерфейса"""
-        self.setStyleSheet("background-color: #17212B;")
-        
         layout = QVBoxLayout(self)
         layout.setAlignment(Qt.AlignCenter)
         
@@ -28,7 +26,6 @@ class PlaceholderWidget(QWidget):
         icon_label = QLabel("📋")
         icon_label.setFont(QFont("Segoe UI", 72))
         icon_label.setAlignment(Qt.AlignCenter)
-        icon_label.setStyleSheet("color: #5288C1; background: transparent;")
         layout.addWidget(icon_label)
         
         layout.addSpacing(20)
@@ -37,7 +34,6 @@ class PlaceholderWidget(QWidget):
         main_text = QLabel("Выберите тест-кейс для начала работы")
         main_text.setFont(QFont("Segoe UI", 16, QFont.Bold))
         main_text.setAlignment(Qt.AlignCenter)
-        main_text.setStyleSheet("color: #E1E3E6; background: transparent;")
         main_text.setWordWrap(True)
         layout.addWidget(main_text)
         
@@ -47,7 +43,6 @@ class PlaceholderWidget(QWidget):
         self.count_label = QLabel("Загрузка...")
         self.count_label.setFont(QFont("Segoe UI", 12))
         self.count_label.setAlignment(Qt.AlignCenter)
-        self.count_label.setStyleSheet("color: #8B9099; background: transparent;")
         layout.addWidget(self.count_label)
         
         layout.addStretch()

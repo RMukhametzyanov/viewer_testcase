@@ -14,7 +14,6 @@ def main():
     компоненты получают их через injection
     """
     app = QApplication(sys.argv)
-    app.setStyle('Fusion')
     
     # Создаем и показываем главное окно через фабрику
     window = create_main_window()

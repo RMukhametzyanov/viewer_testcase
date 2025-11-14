@@ -59,32 +59,6 @@ class TestCaseTreeWidget(QTreeWidget):
         self.setHeaderHidden(True)
         self.setIndentation(20)
         self.setAnimated(True)
-        self.setStyleSheet(
-            """
-            QTreeWidget {
-                background-color: #17212B;
-                border: none;
-                border-radius: 8px;
-                outline: 0;
-                padding: 5px;
-            }
-            QTreeWidget::item {
-                background-color: transparent;
-                border: none;
-                padding: 6px 8px;
-                margin: 2px 0px;
-                border-radius: 4px;
-                color: #E1E3E6;
-            }
-            QTreeWidget::item:selected {
-                background-color: #2B5278;
-                color: #FFFFFF;
-            }
-            QTreeWidget::item:hover {
-                background-color: #1E2732;
-            }
-            """
-        )
 
         self.itemClicked.connect(self._on_item_clicked)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -174,7 +148,6 @@ class TestCaseTreeWidget(QTreeWidget):
 
     def _show_root_menu(self, position):
         menu = QMenu(self)
-        menu.setStyleSheet(self._menu_style())
 
         action_new_tc = menu.addAction("➕ Создать тест-кейс")
         action_new_tc.triggered.connect(lambda: self._create_test_case(self.test_cases_dir))
@@ -193,7 +166,6 @@ class TestCaseTreeWidget(QTreeWidget):
 
     def _show_folder_menu(self, position, folder_data):
         menu = QMenu(self)
-        menu.setStyleSheet(self._menu_style())
 
         folder_path = folder_data['path']
 
@@ -220,7 +192,6 @@ class TestCaseTreeWidget(QTreeWidget):
 
     def _show_file_menu(self, position, file_data):
         menu = QMenu(self)
-        menu.setStyleSheet(self._menu_style())
 
         test_case = file_data['test_case']
 
@@ -598,45 +569,6 @@ class TestCaseTreeWidget(QTreeWidget):
             slug = f"tc_{slug}"
         return slug
 
-    # ---------------------------------------------------------------- style --
-
-    @staticmethod
-    def _menu_style() -> str:
-        return (
-            """
-            QMenu {
-                background-color: #1E2732;
-                border: 1px solid #2B3945;
-                border-radius: 8px;
-                padding: 5px;
-            }
-            QMenu::item {
-                padding: 8px 30px 8px 20px;
-                border-radius: 4px;
-                color: #E1E3E6;
-                transition: background 120ms ease;
-            }
-            QMenu::item:hover {
-                background-color: #3D6A98;
-                color: #FFFFFF;
-            }
-            QMenu::item:selected {
-                background-color: #2B5278;
-                color: #FFFFFF;
-                border: 1px solid #5E9BE3;
-                padding-left: 24px;
-            }
-            QMenu::item:pressed {
-                background-color: #1D3F5F;
-            }
-            QMenu::separator {
-                height: 1px;
-                background-color: #2B3945;
-                margin: 5px 10px;
-            }
-            """
-        )
-
     def filter_items(self, query: str):
         pattern = (query or "").strip().lower()
         self._apply_filter(self.invisibleRootItem(), pattern)
@@ -800,6 +732,14 @@ class TestCaseTreeWidget(QTreeWidget):
                     if path and Path(path) in expanded_paths:
                         child.setExpanded(True)
                 stack.append(child)
+
+    # Public helpers for external callers
+
+    def capture_expanded_state(self):
+        return self._capture_expanded_state()
+
+    def restore_expanded_state(self, expanded_paths):
+        self._restore_expanded_state(expanded_paths)
 
     @staticmethod
     def _is_subpath(path: Path, potential_parent: Path) -> bool:

@@ -1,17 +1,17 @@
 {
     "test_cases_dir": "C:\\test-cases-example\\testcases",
-    "DEFAULT_PROMT": "Проведи ревью этого тест-кейса с акцентом на аспекты указанные в методике. Выведи комментарии и список рекомендаций по улучшению и приведению в соответствие",
+    "DEFAULT_PROMT": "",
     "panel_sizes": {
-        "left": 410,
-        "form_area": 1445,
-        "review": 625
+        "left": 346,
+        "form_area": 1463,
+        "review": 607
     },
-    "LLM_MODEL": "qwen3:latest",
+    "LLM_MODEL": "deepseek-v3.1:latest",
     "LLM_HOST": "http://spb99-vkc-dhwgpu06.devzone.local:11434",
     "LLM_METHODIC_PATH": "C:\\viewer_testcase\\test_case_editor\\docs\\test-cases-guidelines.md",
     "window_geometry": {
-        "x": 268,
-        "y": 87,
+        "x": 286,
+        "y": 72,
         "width": 1839,
         "height": 900,
         "is_fullscreen": false

@@ -1,7 +1,6 @@
 """Панель массовых операций"""
 
 from PyQt5.QtWidgets import QFrame, QHBoxLayout, QPushButton, QMessageBox
-from PyQt5.QtGui import QFont
 from PyQt5.QtCore import pyqtSignal
 
 from ...services.test_case_service import TestCaseService
@@ -28,14 +27,6 @@ class BulkActionsPanel(QFrame):
     
     def setup_ui(self):
         """Настройка UI"""
-        self.setStyleSheet("""
-            QFrame {
-                background-color: #1E2732;
-                border: 1px solid #FFA931;
-                border-radius: 6px;
-                padding: 5px;
-            }
-        """)
         self.setMaximumHeight(60)
         
         layout = QHBoxLayout(self)
@@ -47,29 +38,6 @@ class BulkActionsPanel(QFrame):
         # Кнопка "Удалить"
         self.delete_btn = QPushButton("🗑️ Удалить")
         self.delete_btn.setMinimumHeight(35)
-        self.delete_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #F5555D;
-                border: 1px solid #F77078;
-                border-radius: 6px;
-                padding: 8px 15px;
-                color: #FFFFFF;
-                font-weight: 600;
-                font-size: 9pt;
-            }
-            QPushButton:hover {
-                background-color: #F77078;
-                border: 1px solid #F98B91;
-            }
-            QPushButton:pressed {
-                background-color: #D43F47;
-            }
-            QPushButton:disabled {
-                background-color: #17212B;
-                color: #6B7380;
-                border: 1px solid #2B3945;
-            }
-        """)
         self.delete_btn.clicked.connect(self._bulk_delete)
         self.delete_btn.setEnabled(False)
         layout.addWidget(self.delete_btn)
@@ -77,24 +45,6 @@ class BulkActionsPanel(QFrame):
         # Кнопка "Сбросить"
         self.clear_btn = QPushButton("✖ Сбросить")
         self.clear_btn.setMinimumHeight(35)
-        self.clear_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #2B3945;
-                border: 1px solid #3D4B5C;
-                border-radius: 6px;
-                padding: 8px 15px;
-                color: #E1E3E6;
-                font-weight: 600;
-                font-size: 9pt;
-            }
-            QPushButton:hover {
-                background-color: #3D4B5C;
-                border: 1px solid #4E5D6E;
-            }
-            QPushButton:pressed {
-                background-color: #1E2732;
-            }
-        """)
         self.clear_btn.clicked.connect(self._clear_selection)
         layout.addWidget(self.clear_btn)
     

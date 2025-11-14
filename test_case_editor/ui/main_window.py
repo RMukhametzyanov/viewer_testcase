@@ -3,6 +3,7 @@
 import json
 import re
 import subprocess
+import webbrowser
 from pathlib import Path
 from typing import List, Optional
 
@@ -28,8 +29,9 @@ from PyQt5.QtWidgets import (
     QActionGroup,
     QMenu,
     QToolButton,
+    QComboBox,
 )
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject, QStringListModel, QSortFilterProxyModel, QRegularExpression, QEvent
 from PyQt5.QtGui import QFont
 
 from ..models.test_case import TestCase
@@ -40,10 +42,12 @@ from .widgets.tree_widget import TestCaseTreeWidget
 from .widgets.form_widget import TestCaseFormWidget
 from .widgets.auxiliary_panel import AuxiliaryPanel
 from .widgets.bulk_actions_panel import BulkActionsPanel
-from .styles.telegram_theme import TELEGRAM_DARK_THEME
+from .widgets.toggle_switch import ToggleSwitch
 from ..utils import llm
 from ..utils.prompt_builder import build_review_prompt, build_creation_prompt
 from ..utils.list_models import fetch_models as fetch_llm_models
+from .styles.ui_metrics import UI_METRICS
+from .styles.app_theme import build_app_style_sheet
 
 
 class GitCommitDialog(QDialog):
@@ -142,7 +146,15 @@ class MainWindow(QMainWindow):
         self.create_tc_prompt = self.settings.get('DEFAULT_PROMT_CREATE_TC', "Создай ТТ")
         self.llm_model = self.settings.get('LLM_MODEL', "").strip()
         self.llm_host = self.settings.get('LLM_HOST', "").strip()
+        self._model_list_model = QStringListModel(self)
+        self._model_proxy_model = QSortFilterProxyModel(self)
+        self._model_proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        self._model_proxy_model.setFilterKeyColumn(0)
+        self._model_proxy_model.setSourceModel(self._model_list_model)
+        self._model_options: List[str] = []
+        self._suppress_model_change = False
         self.available_llm_models = self._fetch_available_llm_models()
+        self.selected_llm_model = self.llm_model
         methodic_setting = self.settings.get('LLM_METHODIC_PATH')
         if methodic_setting:
             self.methodic_path = Path(methodic_setting).expanduser()
@@ -158,18 +170,23 @@ class MainWindow(QMainWindow):
         self._llm_worker: Optional[_LLMWorker] = None
         self._current_test_case_path: Optional[Path] = None
         self._current_mode: str = "edit"
+        self._geometry_initialized = False
+        self._header_clicks = 0
+        self._header_easter_egg_url = "https://i.ytimg.com/vi/g62kAljkjYA/maxres2.jpg?sqp=-oaymwEoCIAKENAF8quKqQMcGADwAQH4AbYIgAKwC4oCDAgAEAEYZSBjKFcwDw==&rs=AOn4CLD2KEljBBwxwtUb_QIUwe_j-FK6cg"
         
         self.setup_ui()
         self._apply_model_options()
-        self.apply_theme()
         self.load_all_test_cases()
         self._show_placeholder()
         self._apply_mode_state()
     
     def setup_ui(self):
         """Настройка пользовательского интерфейса"""
+        self.menuBar().clear()
         self.setWindowTitle("✈️ Test Case Editor v2.0 (SOLID)")
-        self._apply_initial_geometry()
+        if not self._geometry_initialized:
+            self._apply_initial_geometry()
+            self._geometry_initialized = True
         self._init_menus()
         
         # Центральный виджет
@@ -177,8 +194,13 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central_widget)
         
         main_layout = QVBoxLayout(central_widget)
-        main_layout.setContentsMargins(0, 0, 0, 0)
-        main_layout.setSpacing(0)
+        main_layout.setContentsMargins(
+            UI_METRICS.window_margin,
+            UI_METRICS.window_margin,
+            UI_METRICS.window_margin,
+            UI_METRICS.window_margin,
+        )
+        main_layout.setSpacing(UI_METRICS.base_spacing)
 
         header = self._create_mode_header()
         main_layout.addWidget(header)
@@ -210,48 +232,24 @@ class MainWindow(QMainWindow):
         """Создать левую панель с деревом"""
         panel = QWidget()
         layout = QVBoxLayout(panel)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(5)
-        
-        # Заголовок
-        header = QFrame()
-        header.setMaximumHeight(40)
-        header_layout = QHBoxLayout(header)
-        header_layout.setContentsMargins(10, 5, 10, 5)
-        
-        title_label = QLabel("📁 Файлы тест-кейсов")
-        title_label.setFont(QFont("Segoe UI", 10, QFont.Bold))
-        header_layout.addWidget(title_label)
-        
-        self.file_count_label = QLabel("(0)")
-        self.file_count_label.setStyleSheet("color: #8B9099;")
-        header_layout.addWidget(self.file_count_label)
-        header_layout.addStretch()
-
-        layout.addWidget(header)
-        
-        # Отображение текущей папки
-        current_folder_frame = QFrame()
-        current_folder_frame.setMaximumHeight(30)
-        folder_layout = QHBoxLayout(current_folder_frame)
-        folder_layout.setContentsMargins(10, 0, 10, 5)
-        
-        folder_icon = QLabel("📂")
-        folder_icon.setStyleSheet("color: #5288C1; font-size: 10pt;")
-        folder_layout.addWidget(folder_icon)
-        
-        self.current_folder_label = QLabel("testcases")
-        self.current_folder_label.setStyleSheet("color: #8B9099; font-size: 9pt;")
-        self.current_folder_label.setWordWrap(False)
-        folder_layout.addWidget(self.current_folder_label, 1)
-        
-        layout.addWidget(current_folder_frame)
+        layout.setContentsMargins(
+            UI_METRICS.container_padding,
+            UI_METRICS.container_padding,
+            UI_METRICS.container_padding,
+            UI_METRICS.container_padding,
+        )
+        layout.setSpacing(UI_METRICS.section_spacing)
         
         # Поиск
         search_frame = QFrame()
-        search_frame.setMaximumHeight(40)
+        search_frame.setMaximumHeight(48)
         search_layout = QHBoxLayout(search_frame)
-        search_layout.setContentsMargins(10, 0, 10, 5)
+        search_layout.setContentsMargins(
+            UI_METRICS.base_spacing,
+            0,
+            UI_METRICS.base_spacing,
+            UI_METRICS.base_spacing // 2,
+        )
         
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("🔍 Поиск...")
@@ -272,57 +270,84 @@ class MainWindow(QMainWindow):
 
     def _create_mode_header(self) -> QWidget:
         header = QFrame()
-        header.setStyleSheet("background-color: #131A23; border-bottom: 1px solid #1F2A36;")
-        header.setMaximumHeight(48)
+        header.setMaximumHeight(64)
         layout = QHBoxLayout(header)
-        layout.setContentsMargins(16, 8, 16, 8)
+        layout.setContentsMargins(
+            UI_METRICS.header_padding,
+            UI_METRICS.header_padding,
+            UI_METRICS.header_padding,
+            UI_METRICS.header_padding,
+        )
+        layout.setSpacing(UI_METRICS.base_spacing)
 
         menu_row = QHBoxLayout()
-        menu_row.setSpacing(6)
+        menu_row.setSpacing(UI_METRICS.base_spacing)
         for menu in (self.file_menu, self.view_menu, self.git_menu):
             btn = QToolButton()
             btn.setText(menu.title())
             btn.setPopupMode(QToolButton.InstantPopup)
             btn.setMenu(menu)
             btn.setCursor(Qt.PointingHandCursor)
-            btn.setStyleSheet(
-                """
-                QToolButton {
-                    background-color: #1E2732;
-                    border: 1px solid #2B3945;
-                    border-radius: 6px;
-                    color: #E1E3E6;
-                    padding: 4px 12px;
-                }
-                QToolButton:hover {
-                    background-color: #2B3945;
-                }
-                """
-            )
+            btn.setMinimumHeight(UI_METRICS.control_min_height)
+            btn.setMinimumWidth(UI_METRICS.control_min_width * 2)
             menu_row.addWidget(btn)
 
         layout.addLayout(menu_row)
 
         title = QLabel("✈️ Test Case Editor")
         title.setFont(QFont("Segoe UI", 12, QFont.Bold))
-        title.setStyleSheet("color: #E1E3E6;")
         layout.addWidget(title, 1, Qt.AlignLeft)
 
         layout.addStretch(1)
 
-        self.mode_label = QLabel()
-        self.mode_label.setStyleSheet("color: #8B9099; font-size: 10pt;")
-        layout.addWidget(self.mode_label, alignment=Qt.AlignRight)
-        self._update_mode_label()
+        model_layout = QHBoxLayout()
+        model_layout.setSpacing(UI_METRICS.base_spacing // 2)
+        model_label = QLabel("LLM:")
+        self.model_selector = QComboBox()
+        self.model_selector.setModel(self._model_proxy_model)
+        self.model_selector.setEditable(True)
+        self.model_selector.setInsertPolicy(QComboBox.NoInsert)
+        self.model_selector.setMinimumWidth(200)
+        self.model_selector.currentTextChanged.connect(self._on_model_selector_changed)
+        line_edit = self.model_selector.lineEdit()
+        if line_edit:
+            line_edit.setPlaceholderText("Выберите модель…")
+            line_edit.textEdited.connect(self._on_model_selector_text_edited)
+            line_edit.editingFinished.connect(self._on_model_editing_finished)
+        model_layout.addWidget(model_label)
+        model_layout.addWidget(self.model_selector)
+        layout.addLayout(model_layout)
 
+        switch_row = QHBoxLayout()
+        switch_row.setSpacing(UI_METRICS.base_spacing // 2)
+        self.mode_edit_label = QLabel("Редактирование")
+        self.mode_run_label = QLabel("Запуск тестов")
+        self.mode_switch = ToggleSwitch()
+        self.mode_switch.toggled.connect(self._on_mode_switch_changed)
+        switch_row.addWidget(self.mode_edit_label)
+        switch_row.addWidget(self.mode_switch)
+        switch_row.addWidget(self.mode_run_label)
+        layout.addLayout(switch_row)
+        self._update_mode_indicator()
+
+        self._header_widget = header
+        header.installEventFilter(self)
         return header
+
+    def eventFilter(self, obj, event):
+        if obj is getattr(self, "_header_widget", None) and event.type() == QEvent.MouseButtonPress:
+            self._header_clicks += 1
+            if self._header_clicks >= 5:
+                self._header_clicks = 0
+                webbrowser.open(self._header_easter_egg_url)
+        return super().eventFilter(obj, event)
     
     def _create_right_panel(self) -> QWidget:
         """Создать правую панель с формой"""
         panel = QWidget()
         layout = QVBoxLayout(panel)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
+        layout.setSpacing(UI_METRICS.base_spacing)
         
         self.detail_splitter = QSplitter(Qt.Horizontal)
         self.detail_splitter.setChildrenCollapsible(False)
@@ -354,6 +379,10 @@ class MainWindow(QMainWindow):
         self.aux_panel.review_enter_clicked.connect(self._on_review_enter_clicked)
         self.aux_panel.creation_prompt_saved.connect(self._on_creation_prompt_saved)
         self.aux_panel.creation_enter_clicked.connect(self._on_creation_enter_clicked)
+        self.aux_panel.stats_panel.reset_all_statuses.connect(self._reset_all_step_statuses)
+        self.aux_panel.stats_panel.mark_current_passed.connect(self._mark_current_case_passed)
+        self.aux_panel.stats_panel.reset_current_case.connect(self._reset_current_case_statuses)
+        self.aux_panel.stats_panel.generate_allure.connect(lambda: self.statusBar().showMessage("Generate Allure (todo)"))
         self.detail_splitter.addWidget(self.aux_panel)
 
         self.detail_splitter.setCollapsible(0, False)
@@ -522,9 +551,6 @@ class MainWindow(QMainWindow):
             self.load_all_test_cases()
             self.statusBar().showMessage(f"Выбрана папка: {self.test_cases_dir}")
     
-    def apply_theme(self):
-        """Применение темы"""
-        self.setStyleSheet(TELEGRAM_DARK_THEME)
     
     def load_settings(self) -> dict:
         """Загрузка настроек"""
@@ -602,18 +628,25 @@ class MainWindow(QMainWindow):
         Демонстрирует Dependency Inversion:
         не работаем напрямую с файлами, используем сервис
         """
+        expanded_state = set()
+        if hasattr(self, "tree_widget"):
+            expanded_state = self.tree_widget.capture_expanded_state()
+
         self.test_cases = self.service.load_all_test_cases(self.test_cases_dir)
         
         # Обновляем дерево
         self.tree_widget.load_tree(self.test_cases_dir, self.test_cases)
+        self.tree_widget.restore_expanded_state(expanded_state)
         
         # Обновляем счетчики
-        self.file_count_label.setText(f"({len(self.test_cases)})")
         self.placeholder.update_count(len(self.test_cases))
-        self.current_folder_label.setText(str(self.test_cases_dir))
         
         self.statusBar().showMessage(f"Загружено тест-кейсов: {len(self.test_cases)}")
         self._update_json_preview()
+        if hasattr(self, "aux_panel"):
+            self.aux_panel.update_statistics(self.test_cases)
+
+    def _update_statistics_panel(self):
         if hasattr(self, "aux_panel"):
             self.aux_panel.update_statistics(self.test_cases)
 
@@ -638,7 +671,7 @@ class MainWindow(QMainWindow):
                 self.statusBar().showMessage(f"Изменения сохранены. Открыт: {self.current_test_case.name}")
             else:
                 self.statusBar().showMessage("Готов к работе")
-        self._update_mode_label()
+        self._update_mode_indicator()
     
     def _on_tree_updated(self):
         """Обработка обновления дерева"""
@@ -718,14 +751,149 @@ class MainWindow(QMainWindow):
 
     def _apply_model_options(self):
         models = self.available_llm_models or ([self.llm_model] if self.llm_model else [])
-        default = self.llm_model or (models[0] if models else "")
-        self.aux_panel.set_model_options(models, default)
+        default = self.selected_llm_model or self.llm_model or (models[0] if models else "")
+        self._configure_model_selector(models, default)
         if not models:
             warning = (
                 "Не удалось получить список моделей LLM. Проверьте настройки LLM_HOST/LLM_MODEL "
                 "и повторите попытку."
             )
             self.statusBar().showMessage(warning)
+
+    def _configure_model_selector(self, models: List[str], default: str):
+        if not hasattr(self, "model_selector"):
+            return
+        combo = self.model_selector
+        cleaned = [str(m).strip() for m in models if str(m or "").strip()]
+        self._model_options = cleaned
+        self._model_list_model.setStringList(cleaned)
+        target = (default or (cleaned[0] if cleaned else "")).strip()
+        self._reset_model_filter()
+        self._suppress_model_change = True
+        if target and target in cleaned:
+            source_index = self._model_list_model.index(cleaned.index(target), 0)
+            proxy_index = self._model_proxy_model.mapFromSource(source_index)
+            if proxy_index.isValid():
+                combo.setCurrentIndex(proxy_index.row())
+        else:
+            combo.setCurrentIndex(-1)
+        combo.setEditText(target)
+        self._suppress_model_change = False
+        line_edit = combo.lineEdit()
+        if line_edit:
+            line_edit.setPlaceholderText("Выберите модель…")
+        self.selected_llm_model = target
+        if target:
+            self.llm_model = target
+
+    def _on_model_selector_changed(self, text: str):
+        if self._suppress_model_change:
+            return
+        value = (text or "").strip()
+        self.selected_llm_model = value
+        if value:
+            self._apply_model_selection(value)
+
+    def _apply_model_selection(self, value: str):
+        value = (value or "").strip()
+        if not value:
+            return
+        self.selected_llm_model = value
+        self.llm_model = value
+        self.settings['LLM_MODEL'] = value
+        self.save_settings(self.settings)
+
+    def _current_llm_model(self) -> str:
+        value = (self.selected_llm_model or "").strip()
+        if value:
+            return value
+        if hasattr(self, "model_selector"):
+            return self.model_selector.currentText().strip()
+        return self.llm_model or ""
+
+    def _on_model_selector_text_edited(self, text: str):
+        if not hasattr(self, "_model_proxy_model"):
+            return
+        if text:
+            pattern = f".*{QRegularExpression.escape(text)}.*"
+            regex = QRegularExpression(pattern, QRegularExpression.CaseInsensitiveOption)
+        else:
+            regex = QRegularExpression(".*", QRegularExpression.CaseInsensitiveOption)
+        self._model_proxy_model.setFilterRegularExpression(regex)
+        self.model_selector.showPopup()
+        line_edit = self.model_selector.lineEdit()
+        if line_edit:
+            line_edit.setFocus()
+            line_edit.setCursorPosition(len(text))
+
+    def _on_model_editing_finished(self):
+        if not hasattr(self, "model_selector"):
+            return
+        line_edit = self.model_selector.lineEdit()
+        if not line_edit:
+            return
+        value = line_edit.text().strip()
+        if not value:
+            self._reset_model_filter()
+            return
+        if value not in self._model_options:
+            self._model_options.append(value)
+            self._model_list_model.setStringList(self._model_options)
+        self._reset_model_filter()
+        source_index = self._model_list_model.index(self._model_options.index(value), 0)
+        proxy_index = self._model_proxy_model.mapFromSource(source_index)
+        self._suppress_model_change = True
+        if proxy_index.isValid():
+            self.model_selector.setCurrentIndex(proxy_index.row())
+        else:
+            self.model_selector.setCurrentIndex(-1)
+        self.model_selector.setEditText(value)
+        self._suppress_model_change = False
+        self._apply_model_selection(value)
+
+    def _reset_model_filter(self):
+        if hasattr(self, "_model_proxy_model"):
+            self._model_proxy_model.setFilterRegularExpression(
+                QRegularExpression(".*", QRegularExpression.CaseInsensitiveOption)
+            )
+
+    def _reset_all_step_statuses(self):
+        if not self.test_cases:
+            return
+        count = 0
+        for case in self.test_cases:
+            if not case.steps:
+                continue
+            for step in case.steps:
+                step.status = ""
+            self.service.save_test_case(case)
+            count += 1
+        self.load_all_test_cases()
+        if self.current_test_case:
+            self.form_widget.load_test_case(self.current_test_case)
+        self.statusBar().showMessage(f"Статусы шагов сброшены: {count} тест-кейсов")
+
+    def _mark_current_case_passed(self):
+        if not self.current_test_case or not self.current_test_case.steps:
+            return
+        for step in self.current_test_case.steps:
+            step.status = "passed"
+        self.service.save_test_case(self.current_test_case)
+        self.form_widget.load_test_case(self.current_test_case)
+        self.load_all_test_cases()
+        self.statusBar().showMessage("Все шаги текущего тест-кейса помечены как passed")
+        self._update_statistics_panel()
+
+    def _reset_current_case_statuses(self):
+        if not self.current_test_case or not self.current_test_case.steps:
+            return
+        for step in self.current_test_case.steps:
+            step.status = ""
+        self.service.save_test_case(self.current_test_case)
+        self.form_widget.load_test_case(self.current_test_case)
+        self.load_all_test_cases()
+        self.statusBar().showMessage("Статусы текущего тест-кейса сброшены")
+        self._update_statistics_panel()
 
     def _show_statistics_panel(self):
         """Показать дерево и статистику (placeholder)."""
@@ -758,7 +926,7 @@ class MainWindow(QMainWindow):
         self.aux_panel.select_tab("review")
         self._submit_prompt(
             prompt_text=text,
-            model=self.aux_panel.get_selected_review_model(),
+            model=self._current_llm_model(),
             files=files,
             status_context="Ревью",
             default_test_case_path=self._current_test_case_path,
@@ -880,7 +1048,7 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("Создание ТК: ошибка подготовки промта для LLM")
             return
 
-        model_used = (self.aux_panel.get_selected_creation_model() or self.llm_model or "").strip()
+        model_used = self._current_llm_model() or self.llm_model
         if not model_used and self.available_llm_models:
             model_used = self.available_llm_models[0]
         host = self.llm_host or None
@@ -1082,15 +1250,25 @@ class MainWindow(QMainWindow):
         action = self._mode_actions.get(mode)
         if action and not action.isChecked():
             action.setChecked(True)
-        self._update_mode_label()
+        self._update_mode_indicator()
         self._apply_mode_state()
         label = "Редактирование" if mode == "edit" else "Запуск тестов"
         self.statusBar().showMessage(f"Режим изменён: {label}")
 
-    def _update_mode_label(self):
-        mode_text = "Редактирование" if self._current_mode == "edit" else "Запуск тестов"
-        if hasattr(self, "mode_label"):
-            self.mode_label.setText(f"Режим: {mode_text}")
+    def _update_mode_indicator(self):
+        is_run = self._current_mode == "run"
+        if hasattr(self, "mode_switch"):
+            self.mode_switch.blockSignals(True)
+            self.mode_switch.setChecked(is_run)
+            self.mode_switch.blockSignals(False)
+        if hasattr(self, "mode_edit_label"):
+            self.mode_edit_label.setStyleSheet(
+                "color: #ffffff;" if not is_run else "color: #777777;"
+            )
+        if hasattr(self, "mode_run_label"):
+            self.mode_run_label.setStyleSheet(
+                "color: #ffffff;" if is_run else "color: #777777;"
+            )
 
     def _apply_mode_state(self):
         is_edit = self._current_mode == "edit"
@@ -1267,6 +1445,11 @@ class MainWindow(QMainWindow):
             )
 
         self.statusBar().showMessage(f"Импортировано тест-кейсов: {total_created}")
+
+    # ----------------------- UI Metrics ---------------------------------
+
+    def _on_mode_switch_changed(self, checked: bool):
+        self._set_mode("run" if checked else "edit")
 
 
 def create_main_window() -> MainWindow:

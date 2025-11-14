@@ -1,5 +1,7 @@
 """Виджет формы редактирования тест-кейса"""
 
+from typing import List
+
 from PyQt5.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -17,13 +19,26 @@ from PyQt5.QtWidgets import (
     QToolButton,
     QSizePolicy,
     QAbstractItemView,
+    QMenu,
 )
-from PyQt5.QtCore import Qt, pyqtSignal, QEvent, QSize
-from PyQt5.QtGui import QFont
+from PyQt5.QtCore import Qt, pyqtSignal, QEvent, QSize, QTimer
+from PyQt5.QtGui import QFont, QTextOption, QIcon, QPixmap, QPainter, QColor
 
 from ...models.test_case import TestCase, TestCaseStep
 from ...services.test_case_service import TestCaseService
 from ...utils.datetime_utils import format_datetime, get_current_datetime
+from ..styles.ui_metrics import UI_METRICS
+
+
+class _NoWheelComboBox(QComboBox):
+    """Комбо-бокс без изменения значения колесом мыши, пока меню закрыто."""
+
+    def wheelEvent(self, event):
+        popup = self.view()
+        if popup and popup.isVisible():
+            super().wheelEvent(event)
+        else:
+            event.ignore()
 
 
 class TestCaseFormWidget(QWidget):
@@ -43,48 +58,30 @@ class TestCaseFormWidget(QWidget):
             self._status = "pending"
             self._index = 1
             self.setObjectName("StepCard")
-            self.setStyleSheet(
-                """
-                QFrame#StepCard {
-                    background-color: #111821;
-                    border: 1px solid #1F2A36;
-                    border-radius: 10px;
-                }
-                QTextEdit {
-                    background: transparent;
-                    border: 1px solid #2B3945;
-                    border-radius: 6px;
-                    color: #E1E3E6;
-                    padding: 6px;
-                    font-size: 11pt;
-                }
-                QTextEdit:read-only {
-                    border: 1px solid #1B2530;
-                    color: #94A0AE;
-                }
-                """
-            )
-
             layout = QVBoxLayout(self)
-            layout.setContentsMargins(12, 12, 12, 12)
-            layout.setSpacing(10)
+            layout.setContentsMargins(
+                UI_METRICS.container_padding,
+                UI_METRICS.container_padding,
+                UI_METRICS.container_padding,
+                UI_METRICS.container_padding,
+            )
+            layout.setSpacing(UI_METRICS.base_spacing)
 
             header = QHBoxLayout()
-            header.setSpacing(6)
+            header.setSpacing(UI_METRICS.base_spacing // 2)
             self.index_label = QLabel("Шаг 1")
-            self.index_label.setStyleSheet("color: #8B9099; font-weight: 600;")
             header.addWidget(self.index_label)
             header.addStretch(1)
 
             self.status_widget = QWidget()
             status_layout = QHBoxLayout(self.status_widget)
             status_layout.setContentsMargins(0, 0, 0, 0)
-            status_layout.setSpacing(4)
+            status_layout.setSpacing(UI_METRICS.base_spacing // 2)
             self.status_buttons = []
             spec = [
-                ("passed", "✓", "#4CAF50"),
-                ("failed", "✕", "#F44336"),
-                ("skipped", "S", "#B0BEC5"),
+                ("passed", "✓", "#2ecc71"),
+                ("failed", "✕", "#e74c3c"),
+                ("skipped", "S", "#95a5a6"),
             ]
             for value, text, color in spec:
                 btn = QToolButton()
@@ -131,7 +128,7 @@ class TestCaseFormWidget(QWidget):
             self._status = status or "pending"
             for btn in self.status_buttons:
                 value = btn.property("status_value")
-                color = btn.property("status_color")
+                color = btn.property("status_color") or "#4CAF50"
                 is_active = value == self._status
                 btn.setChecked(is_active)
                 if is_active:
@@ -139,10 +136,10 @@ class TestCaseFormWidget(QWidget):
                         f"""
                         QToolButton {{
                             background-color: {color};
-                            border-radius: 4px;
-                            color: #0F1520;
-                            font-weight: 600;
-                            padding: 2px 6px;
+                            color: #0f1117;
+                            border-radius: 9px;
+                            font-weight: 700;
+                            padding: 2px 10px;
                         }}
                         """
                     )
@@ -150,14 +147,13 @@ class TestCaseFormWidget(QWidget):
                     btn.setStyleSheet(
                         f"""
                         QToolButton {{
-                            border: none;
+                            border: 1px solid {color};
                             color: {color};
-                            font-weight: 600;
-                            padding: 2px 6px;
+                            border-radius: 9px;
+                            padding: 2px 10px;
                         }}
-                        QToolButton::hover {{
-                            background-color: rgba(255,255,255,0.08);
-                            border-radius: 4px;
+                        QToolButton:hover {{
+                            background-color: {color}33;
                         }}
                         """
                     )
@@ -179,19 +175,17 @@ class TestCaseFormWidget(QWidget):
                 btn.setEnabled(enabled)
 
         def sizeHint(self):
-            def _doc_height(edit: QTextEdit) -> float:
-                doc = edit.document()
-                width = edit.viewport().width()
-                if width <= 0:
-                    width = 320
-                doc.setTextWidth(width - 4)
-                return doc.size().height()
+            header_height = self.index_label.sizeHint().height() + 16
+            line_height = self.action_edit.fontMetrics().lineSpacing()
+            min_content_height = line_height * 7
 
-            header_height = self.index_label.sizeHint().height() + 32
-            action_height = _doc_height(self.action_edit) + 24
-            expected_height = _doc_height(self.expected_edit) + 24
-            total_height = int(header_height + action_height + expected_height)
-            return QSize(self.width() or 400, max(140, total_height))
+            hints = [
+                max(self.action_edit.document().size().height(), min_content_height / 2),
+                max(self.expected_edit.document().size().height(), min_content_height / 2),
+            ]
+            total_height = header_height + sum(hints) + 32
+            min_total = header_height + min_content_height + 32
+            return QSize(self.width() or 400, int(max(min_total, total_height)))
 
         def _on_status_clicked(self, status: str):
             if status == self._status:
@@ -216,12 +210,45 @@ class TestCaseFormWidget(QWidget):
         self.step_statuses: List[str] = []
 
         self.setup_ui()
+
+    def _init_auto_resizing_text_edit(self, text_edit: QTextEdit, *, min_lines: int = 3, max_lines: int = 12):
+        """Настроить QTextEdit так, чтобы он подстраивал высоту под содержимое."""
+        text_edit.setWordWrapMode(QTextOption.WordWrap)
+        text_edit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        text_edit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        min_height = self._calculate_text_edit_height(text_edit, min_lines)
+        max_height = self._calculate_text_edit_height(text_edit, max_lines)
+        text_edit.setMinimumHeight(min_height)
+        text_edit.setMaximumHeight(max_height)
+
+        def _resize():
+            self._auto_resize_text_edit(text_edit, min_height, max_height)
+
+        text_edit.textChanged.connect(_resize)
+        QTimer.singleShot(0, _resize)
+
+    @staticmethod
+    def _calculate_text_edit_height(text_edit: QTextEdit, lines: int) -> int:
+        metrics = text_edit.fontMetrics()
+        line_height = metrics.lineSpacing()
+        margins = text_edit.contentsMargins()
+        doc_margin = text_edit.document().documentMargin()
+        return int(lines * line_height + doc_margin * 2 + margins.top() + margins.bottom() + 8)
+
+    @staticmethod
+    def _auto_resize_text_edit(text_edit: QTextEdit, min_height: int, max_height: int):
+        doc = text_edit.document()
+        margins = text_edit.contentsMargins()
+        doc_height = doc.size().height() + doc.documentMargin() * 2 + margins.top() + margins.bottom() + 6
+        new_height = max(min_height, min(max_height, int(doc_height)))
+        if text_edit.height() != new_height:
+            text_edit.setFixedHeight(new_height)
     
     def setup_ui(self):
         """Настройка UI"""
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
+        layout.setSpacing(UI_METRICS.base_spacing)
         
         # Заголовок
         header = self._create_header()
@@ -234,8 +261,13 @@ class TestCaseFormWidget(QWidget):
         
         form_widget = QWidget()
         form_layout = QVBoxLayout(form_widget)
-        form_layout.setSpacing(15)
-        form_layout.setContentsMargins(15, 15, 15, 15)
+        form_layout.setSpacing(UI_METRICS.section_spacing)
+        form_layout.setContentsMargins(
+            UI_METRICS.container_padding,
+            UI_METRICS.container_padding,
+            UI_METRICS.container_padding,
+            UI_METRICS.container_padding,
+        )
         
         # Кнопка сворачивания секций
         self.sections_toggle_btn = QToolButton()
@@ -243,19 +275,8 @@ class TestCaseFormWidget(QWidget):
         self.sections_toggle_btn.setToolButtonStyle(Qt.ToolButtonIconOnly)
         self.sections_toggle_btn.setCheckable(True)
         self.sections_toggle_btn.setChecked(True)
-        self.sections_toggle_btn.setFixedSize(24, 24)
-        self.sections_toggle_btn.setStyleSheet(
-            """
-            QToolButton {
-                background: transparent;
-                border: none;
-                color: #E1E3E6;
-            }
-            QToolButton:hover {
-                color: #3D6A98;
-            }
-            """
-        )
+        self.sections_toggle_btn.setMinimumHeight(max(28, UI_METRICS.control_min_height // 2))
+        self.sections_toggle_btn.setMinimumWidth(UI_METRICS.control_min_width)
         self.sections_toggle_btn.clicked.connect(self._toggle_sections)
         form_layout.addWidget(self.sections_toggle_btn, alignment=Qt.AlignLeft)
 
@@ -303,86 +324,34 @@ class TestCaseFormWidget(QWidget):
     def _create_header(self) -> QWidget:
         """Создать заголовок"""
         header = QFrame()
-        header.setStyleSheet("background-color: #1E2732; border-bottom: 2px solid #2B3945;")
         header.setMinimumHeight(90)
 
         layout = QHBoxLayout(header)
-        layout.setContentsMargins(20, 16, 20, 16)
-        layout.setSpacing(24)
+        layout.setContentsMargins(
+            UI_METRICS.container_padding,
+            UI_METRICS.section_spacing,
+            UI_METRICS.container_padding,
+            UI_METRICS.section_spacing,
+        )
+        layout.setSpacing(UI_METRICS.section_spacing)
 
         text_layout = QVBoxLayout()
-        text_layout.setSpacing(6)
-
-        static_title = QLabel("Редактирование тест-кейса")
-        static_title.setFont(QFont("Segoe UI", 11, QFont.Normal))
-        static_title.setStyleSheet("color: #8B9099; border: none;")
-        text_layout.addWidget(static_title)
+        text_layout.setSpacing(UI_METRICS.base_spacing // 2)
 
         row_layout = QHBoxLayout()
-        row_layout.setSpacing(12)
-
-        self.title_container = QWidget()
-        self.title_container.setStyleSheet("background: transparent; border: none;")
-        title_layout = QVBoxLayout(self.title_container)
-        title_layout.setContentsMargins(0, 0, 0, 0)
-        title_layout.setSpacing(0)
-
-        self.title_label = QLabel("Не выбран тест-кейс")
-        self.title_label.setFont(QFont("Segoe UI", 14, QFont.Bold))
-        self.title_label.setStyleSheet("color: #5288C1; border: none;")
-        self.title_label.setWordWrap(True)
-        self.title_label.mousePressEvent = self._on_title_clicked
-        title_layout.addWidget(self.title_label)
+        row_layout.setSpacing(UI_METRICS.base_spacing)
 
         self.title_edit = QLineEdit()
         self.title_edit.setFont(QFont("Segoe UI", 14, QFont.Bold))
-        self.title_edit.setStyleSheet(
-            """
-            QLineEdit {
-                background-color: #1E2732;
-                border: 2px solid #5288C1;
-                border-radius: 6px;
-                padding: 6px 8px;
-                color: #5288C1;
-            }
-            """
-        )
-        self.title_edit.setVisible(False)
-        self.title_edit.returnPressed.connect(self._on_title_edit_finished)
-        self.title_edit.editingFinished.connect(self._on_title_edit_finished)
-        title_layout.addWidget(self.title_edit)
-
-        row_layout.addWidget(self.title_container, stretch=1)
+        self.title_edit.setPlaceholderText("Название тест-кейса")
+        self.title_edit.textChanged.connect(self._mark_changed)
+        row_layout.addWidget(self.title_edit, stretch=1)
 
         self.save_button = QPushButton("Сохранить")
-        self.save_button.setMinimumHeight(40)
+        self.save_button.setMinimumHeight(UI_METRICS.control_min_height)
         self.save_button.setCursor(Qt.PointingHandCursor)
         self.save_button.setEnabled(False)
         self.save_button.clicked.connect(self._save)
-        self.save_button.setStyleSheet(
-            """
-            QPushButton {
-                background-color: #2B5278;
-                border: 1px solid #3D6A98;
-                border-radius: 8px;
-                color: #FFFFFF;
-                padding: 0 24px;
-                font-size: 12pt;
-                font-weight: 600;
-            }
-            QPushButton:disabled {
-                background-color: #1E2732;
-                border: 1px solid #2B3945;
-                color: #6B7380;
-            }
-            QPushButton:hover:!disabled {
-                background-color: #3D6A98;
-            }
-            QPushButton:pressed:!disabled {
-                background-color: #1D3F5F;
-            }
-            """
-        )
         row_layout.addWidget(self.save_button, alignment=Qt.AlignRight)
 
         text_layout.addLayout(row_layout)
@@ -399,21 +368,25 @@ class TestCaseFormWidget(QWidget):
     def _create_main_info_group(self) -> QGroupBox:
         group = QGroupBox("Основная информация")
         layout = QVBoxLayout(group)
-        layout.setSpacing(8)
-        layout.setContentsMargins(10, 8, 10, 8)
+        layout.setSpacing(UI_METRICS.base_spacing)
+        layout.setContentsMargins(
+            UI_METRICS.container_padding,
+            UI_METRICS.base_spacing,
+            UI_METRICS.container_padding,
+            UI_METRICS.base_spacing,
+        )
 
         info_line = QHBoxLayout()
         self.id_label = QLabel("ID: -")
         self.created_label = QLabel("Создан: -")
         self.updated_label = QLabel("Обновлён: -")
         for widget in (self.id_label, self.created_label, self.updated_label):
-            widget.setStyleSheet("color: #E1E3E6;")
             info_line.addWidget(widget)
             info_line.addStretch(1)
         layout.addLayout(info_line)
 
         people_row = QHBoxLayout()
-        people_row.setSpacing(12)
+        people_row.setSpacing(UI_METRICS.base_spacing)
         self.author_input = self._create_line_edit()
         self._add_labeled_widget(people_row, "Автор:", self.author_input)
 
@@ -425,19 +398,20 @@ class TestCaseFormWidget(QWidget):
         layout.addLayout(people_row)
 
         status_row = QHBoxLayout()
-        status_row.setSpacing(12)
-        self.status_input = QComboBox()
+        status_row.setSpacing(UI_METRICS.base_spacing)
+        self.status_input = _NoWheelComboBox()
         self.status_input.addItems(["Draft", "In Progress", "Done", "Blocked", "Deprecated"])
+        self.status_input.setEditable(True)
         self.status_input.currentTextChanged.connect(self._mark_changed)
         self._add_labeled_widget(status_row, "Статус:", self.status_input)
 
-        self.test_layer_input = QComboBox()
+        self.test_layer_input = _NoWheelComboBox()
         self.test_layer_input.addItems(["Unit", "Component", "API", "UI", "E2E", "Integration"])
         self.test_layer_input.setEditable(True)
         self.test_layer_input.currentTextChanged.connect(self._mark_changed)
         self._add_labeled_widget(status_row, "Test Layer:", self.test_layer_input)
 
-        self.test_type_input = QComboBox()
+        self.test_type_input = _NoWheelComboBox()
         self.test_type_input.addItems(["manual", "automated", "hybrid"])
         self.test_type_input.setEditable(True)
         self.test_type_input.currentTextChanged.connect(self._mark_changed)
@@ -445,14 +419,14 @@ class TestCaseFormWidget(QWidget):
         layout.addLayout(status_row)
 
         quality_row = QHBoxLayout()
-        quality_row.setSpacing(12)
-        self.severity_input = QComboBox()
+        quality_row.setSpacing(UI_METRICS.base_spacing)
+        self.severity_input = _NoWheelComboBox()
         self.severity_input.addItems(["BLOCKER", "CRITICAL", "MAJOR", "NORMAL", "MINOR"])
         self.severity_input.setEditable(True)
         self.severity_input.currentTextChanged.connect(self._mark_changed)
         self._add_labeled_widget(quality_row, "Severity:", self.severity_input)
 
-        self.priority_input = QComboBox()
+        self.priority_input = _NoWheelComboBox()
         self.priority_input.addItems(["HIGHEST", "HIGH", "MEDIUM", "LOW", "LOWEST"])
         self.priority_input.setEditable(True)
         self.priority_input.currentTextChanged.connect(self._mark_changed)
@@ -460,7 +434,7 @@ class TestCaseFormWidget(QWidget):
         layout.addLayout(quality_row)
 
         environment_row = QHBoxLayout()
-        environment_row.setSpacing(12)
+        environment_row.setSpacing(UI_METRICS.base_spacing)
         self.environment_input = self._create_line_edit()
         self._add_labeled_widget(environment_row, "Окружение:", self.environment_input)
 
@@ -469,7 +443,7 @@ class TestCaseFormWidget(QWidget):
         layout.addLayout(environment_row)
 
         links_row = QHBoxLayout()
-        links_row.setSpacing(12)
+        links_row.setSpacing(UI_METRICS.base_spacing)
         self.test_case_id_input = self._create_line_edit()
         self._add_labeled_widget(links_row, "Test Case ID:", self.test_case_id_input)
 
@@ -490,8 +464,8 @@ class TestCaseFormWidget(QWidget):
 
         self.tags_input = QTextEdit()
         self.tags_input.setPlaceholderText("Введите теги, каждый с новой строки")
-        self.tags_input.setMaximumHeight(100)
         self.tags_input.textChanged.connect(self._mark_changed)
+        self._init_auto_resizing_text_edit(self.tags_input, min_lines=2, max_lines=10)
         layout.addWidget(self.tags_input)
         return group
 
@@ -503,8 +477,8 @@ class TestCaseFormWidget(QWidget):
 
         self.description_input = QTextEdit()
         self.description_input.setPlaceholderText("Подробное описание тест-кейса")
-        self.description_input.setMaximumHeight(100)
         self.description_input.textChanged.connect(self._mark_changed)
+        self._init_auto_resizing_text_edit(self.description_input, min_lines=4, max_lines=12)
         layout.addWidget(self.description_input)
         return group
 
@@ -538,9 +512,8 @@ class TestCaseFormWidget(QWidget):
         
         self.precondition_input = QTextEdit()
         self.precondition_input.setPlaceholderText("Предусловия для выполнения тест-кейса")
-        self.precondition_input.setMinimumHeight(80)
-        self.precondition_input.setMaximumHeight(120)
         self.precondition_input.textChanged.connect(self._mark_changed)
+        self._init_auto_resizing_text_edit(self.precondition_input, min_lines=3, max_lines=10)
         layout.addWidget(self.precondition_input)
         
         group.setLayout(layout)
@@ -552,9 +525,8 @@ class TestCaseFormWidget(QWidget):
 
         self.expected_result_input = QTextEdit()
         self.expected_result_input.setPlaceholderText("Что должно получиться по завершении кейса")
-        self.expected_result_input.setMinimumHeight(60)
-        self.expected_result_input.setMaximumHeight(120)
         self.expected_result_input.textChanged.connect(self._mark_changed)
+        self._init_auto_resizing_text_edit(self.expected_result_input, min_lines=3, max_lines=10)
         layout.addWidget(self.expected_result_input)
 
         group.setLayout(layout)
@@ -568,11 +540,11 @@ class TestCaseFormWidget(QWidget):
     def _add_labeled_widget(self, parent_layout: QHBoxLayout, label_text: str, widget):
         container = QVBoxLayout()
         label = QLabel(label_text)
-        label.setStyleSheet("color: #8B9099;")
         container.addWidget(label)
         container.addWidget(widget)
         parent_layout.addLayout(container)
         return widget
+
 
     def _set_combo_value(self, combo: QComboBox, value: str):
         combo.blockSignals(True)
@@ -590,43 +562,19 @@ class TestCaseFormWidget(QWidget):
         """Группа шагов тестирования"""
         group = QGroupBox("Шаги тестирования")
         layout = QVBoxLayout()
-        
-        controls_panel = QFrame()
-        controls_layout = QHBoxLayout(controls_panel)
-        controls_layout.setContentsMargins(0, 0, 0, 0)
-        controls_layout.setSpacing(6)
+        layout.setContentsMargins(
+            UI_METRICS.container_padding,
+            UI_METRICS.base_spacing,
+            UI_METRICS.container_padding,
+            UI_METRICS.base_spacing,
+        )
+        layout.setSpacing(UI_METRICS.base_spacing)
 
-        self.step_add_end_btn = self._create_step_control_button("＋", "Добавить шаг в конец")
-        self.step_add_end_btn.clicked.connect(self._add_step_to_end)
-        controls_layout.addWidget(self.step_add_end_btn)
-
-        self.step_insert_above_btn = self._create_step_control_button("＋↑", "Вставить шаг выше выбранного")
-        self.step_insert_above_btn.clicked.connect(self._insert_step_above)
-        controls_layout.addWidget(self.step_insert_above_btn)
-
-        self.step_insert_below_btn = self._create_step_control_button("＋↓", "Вставить шаг ниже выбранного")
-        self.step_insert_below_btn.clicked.connect(self._insert_step_below)
-        controls_layout.addWidget(self.step_insert_below_btn)
-
-        self.step_move_up_btn = self._create_step_control_button("↑", "Переместить шаг выше")
-        self.step_move_up_btn.clicked.connect(self._move_step_up)
-        controls_layout.addWidget(self.step_move_up_btn)
-
-        self.step_move_down_btn = self._create_step_control_button("↓", "Переместить шаг ниже")
-        self.step_move_down_btn.clicked.connect(self._move_step_down)
-        controls_layout.addWidget(self.step_move_down_btn)
-
-        self.step_remove_btn = self._create_step_control_button("✕", "Удалить выбранный шаг")
-        self.step_remove_btn.clicked.connect(self._remove_step)
-        controls_layout.addWidget(self.step_remove_btn)
-
-        controls_layout.addStretch()
-
-        layout.addWidget(controls_panel)
-
-        # Список шагов
         self.steps_list = QListWidget()
         self.steps_list.setSpacing(6)
+        self.steps_list.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.steps_list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.steps_list.setFrameShape(QFrame.NoFrame)
         self.steps_list.setStyleSheet(
             """
             QListWidget {
@@ -634,16 +582,13 @@ class TestCaseFormWidget(QWidget):
                 border: none;
             }
             QListWidget::item {
-                margin-bottom: 8px;
-            }
-            QListWidget::item:selected {
-                background: transparent;
+                margin: 0;
             }
             """
         )
-        self.steps_list.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
-        self.steps_list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.steps_list.itemSelectionChanged.connect(self._update_step_controls_state)
+        self.steps_list.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.steps_list.customContextMenuRequested.connect(self._show_steps_context_menu)
         layout.addWidget(self.steps_list)
         
         group.setLayout(layout)
@@ -656,9 +601,9 @@ class TestCaseFormWidget(QWidget):
         self.has_unsaved_changes = False
 
         if test_case:
-            self.title_label.setText(test_case.name)
-            self.title_label.setVisible(True)
-            self.title_edit.setVisible(False)
+            self.title_edit.blockSignals(True)
+            self.title_edit.setText(test_case.name)
+            self.title_edit.blockSignals(False)
 
             self.id_label.setText(f"ID: {test_case.id or '-'}")
             created_text = format_datetime(test_case.created_at) if test_case.created_at else "-"
@@ -746,9 +691,9 @@ class TestCaseFormWidget(QWidget):
             self._refresh_step_indices()
             self._update_steps_list_height()
         else:
-            self.title_label.setText("Не выбран тест-кейс")
-            self.title_label.setVisible(True)
-            self.title_edit.setVisible(False)
+            self.title_edit.blockSignals(True)
+            self.title_edit.setText("Не выбран тест-кейс")
+            self.title_edit.blockSignals(False)
             self.id_label.setText("ID: -")
             self.created_label.setText("Создан: -")
             self.updated_label.setText("Обновлён: -")
@@ -782,27 +727,10 @@ class TestCaseFormWidget(QWidget):
         self.unsaved_changes_state.emit(False)
         self._update_step_controls_state()
     
-    def _on_title_clicked(self, event):
-        """Клик по названию"""
-        if not self.current_test_case:
-            return
-        
-        self.title_label.setVisible(False)
-        self.title_edit.setVisible(True)
-        self.title_edit.setText(self.title_label.text())
-        self.title_edit.setFocus()
-        self.title_edit.selectAll()
-    
     def _on_title_edit_finished(self):
         """Завершение редактирования названия"""
-        if not self.title_edit.isVisible():
-            return
-        
         new_title = self.title_edit.text().strip() or "Без названия"
-        self.title_label.setText(new_title)
-        self.title_edit.setVisible(False)
-        self.title_label.setVisible(True)
-        
+        self.title_edit.setText(new_title)
         if self.current_test_case:
             self._mark_changed()
     
@@ -813,27 +741,50 @@ class TestCaseFormWidget(QWidget):
         btn.setToolTip(tooltip)
         btn.setCursor(Qt.PointingHandCursor)
         btn.setAutoRaise(True)
-        btn.setFixedSize(28, 28)
-        btn.setStyleSheet(
-            """
-            QToolButton {
-                background-color: #1E2732;
-                border: 1px solid #2B3945;
-                border-radius: 6px;
-                color: #E1E3E6;
-                font-size: 14px;
-                font-weight: 600;
-            }
-            QToolButton:hover {
-                background-color: #2B3945;
-            }
-            QToolButton:disabled {
-                color: #4C515A;
-                background-color: #151E27;
-            }
-            """
-        )
+        btn.setMinimumHeight(max(32, UI_METRICS.control_min_height - 6))
+        btn.setMinimumWidth(max(32, UI_METRICS.control_min_width))
         return btn
+
+    def _show_steps_context_menu(self, pos):
+        if not self._edit_mode_enabled:
+            return
+        row = self.steps_list.indexAt(pos).row()
+        if row != -1:
+            self.steps_list.setCurrentRow(row)
+
+        menu = QMenu(self)
+        actions = {
+            "add_new": menu.addAction("➕ Добавить новый шаг"),
+            "insert_above": menu.addAction("⬆️ Вставить шаг выше"),
+            "insert_below": menu.addAction("⬇️ Вставить шаг ниже"),
+            "move_up": menu.addAction("⇡ Переместить наверх"),
+            "move_down": menu.addAction("⇣ Переместить вниз"),
+            "remove": menu.addAction("✕ Удалить"),
+        }
+
+        if row == -1:
+            for key in ("insert_above", "insert_below", "move_up", "move_down", "remove"):
+                actions[key].setEnabled(False)
+        else:
+            actions["move_up"].setEnabled(row > 0)
+            actions["move_down"].setEnabled(row < self.steps_list.count() - 1)
+
+        action = menu.exec_(self.steps_list.mapToGlobal(pos))
+        if not action:
+            return
+
+        if action == actions["add_new"]:
+            self._add_step_to_end()
+        elif action == actions["insert_above"]:
+            self._insert_step_above()
+        elif action == actions["insert_below"]:
+            self._insert_step_below()
+        elif action == actions["move_up"]:
+            self._move_step_up()
+        elif action == actions["move_down"]:
+            self._move_step_down()
+        elif action == actions["remove"]:
+            self._remove_step()
 
     def _add_step(self, step_text="", expected_text="", status="pending", row=None):
         widget = self._StepCard(self)
@@ -937,16 +888,8 @@ class TestCaseFormWidget(QWidget):
         self._update_step_controls_state()
 
     def _update_step_controls_state(self):
-        """Обновить доступность кнопок управления шагами."""
-        row_count = self.steps_list.count()
-        current_row = self.steps_list.currentRow()
-        has_selection = 0 <= current_row < row_count
-
-        self.step_remove_btn.setEnabled(has_selection)
-        self.step_insert_above_btn.setEnabled(has_selection)
-        self.step_insert_below_btn.setEnabled(has_selection)
-        self.step_move_up_btn.setEnabled(has_selection and current_row > 0)
-        self.step_move_down_btn.setEnabled(has_selection and current_row < row_count - 1)
+        """Поддерживаем совместимость — пока достаточно ничего не делать."""
+        return
     def _mark_changed(self):
         """Пометить как измененное"""
         if self._is_loading:
@@ -965,7 +908,7 @@ class TestCaseFormWidget(QWidget):
             return
         
         # Собираем данные
-        self.current_test_case.name = self.title_label.text()
+        self.current_test_case.name = self.title_edit.text()
         self.current_test_case.author = self.author_input.text()
         self.current_test_case.owner = self.owner_input.text()
         self.current_test_case.reviewer = self.reviewer_input.text()
@@ -1052,13 +995,6 @@ class TestCaseFormWidget(QWidget):
         ]
         for widget in widgets_to_toggle:
             widget.setEnabled(enabled)
-        self.title_label.setEnabled(enabled)
-        self.step_add_end_btn.setEnabled(enabled)
-        self.step_insert_above_btn.setEnabled(enabled)
-        self.step_insert_below_btn.setEnabled(enabled)
-        self.step_move_up_btn.setEnabled(enabled)
-        self.step_move_down_btn.setEnabled(enabled)
-        self.step_remove_btn.setEnabled(enabled)
         self.sections_toggle_btn.setEnabled(True)
 
         for row in range(self.steps_list.count()):

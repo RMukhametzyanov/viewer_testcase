@@ -11,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from PyQt5.QtWidgets import QApplication
 from test_case_editor.ui import MainWindow
+from test_case_editor.ui.styles.app_theme import APP_STYLE_SHEET
 
 
 def main():
@@ -55,6 +56,7 @@ def main():
     """
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
+    app.setStyleSheet(APP_STYLE_SHEET)
     
     # Создаем главное окно
     window = MainWindow()
