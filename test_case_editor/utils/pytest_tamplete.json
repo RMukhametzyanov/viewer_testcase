@@ -1,0 +1,4 @@
+{
+    "template": "import os\nimport allure\nfrom gpn_qa_utils.api.auth import Auth\n\n\n@allure.epic(\"{epic}\")\n@allure.feature(\"{feature}\")\n@allure.story(\"{story}\")\nclass Test{class_name}:\n\n\tclient = Auth.get_client(base_url=os.getenv(\"AUTOTEST_BASE_URL\"), timeout=20.0)\n\n\t@allure.testcase(\"{testcase_id}\", \"{testcase_id}\")\n\t@allure.title(\"{title}\")\n\tdef test_{method_name}(self):\n{steps}\n"
+}
+
