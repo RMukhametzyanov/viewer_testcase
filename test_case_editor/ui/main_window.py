@@ -3,7 +3,6 @@
 import json
 import re
 import subprocess
-import webbrowser
 from pathlib import Path
 from typing import List, Optional
 
@@ -31,7 +30,7 @@ from PyQt5.QtWidgets import (
     QToolButton,
     QComboBox,
 )
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject, QStringListModel, QSortFilterProxyModel, QRegularExpression, QEvent
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject, QStringListModel, QSortFilterProxyModel, QRegularExpression
 from PyQt5.QtGui import QFont
 
 from ..models.test_case import TestCase
@@ -41,11 +40,11 @@ from .widgets.placeholder_widget import PlaceholderWidget
 from .widgets.tree_widget import TestCaseTreeWidget
 from .widgets.form_widget import TestCaseFormWidget
 from .widgets.auxiliary_panel import AuxiliaryPanel
-from .widgets.bulk_actions_panel import BulkActionsPanel
 from .widgets.toggle_switch import ToggleSwitch
 from ..utils import llm
 from ..utils.prompt_builder import build_review_prompt, build_creation_prompt
 from ..utils.list_models import fetch_models as fetch_llm_models
+from ..utils.allure_generator import generate_allure_report
 from .styles.ui_metrics import UI_METRICS
 from .styles.app_theme import build_app_style_sheet
 
@@ -171,8 +170,6 @@ class MainWindow(QMainWindow):
         self._current_test_case_path: Optional[Path] = None
         self._current_mode: str = "edit"
         self._geometry_initialized = False
-        self._header_clicks = 0
-        self._header_easter_egg_url = "https://i.ytimg.com/vi/g62kAljkjYA/maxres2.jpg?sqp=-oaymwEoCIAKENAF8quKqQMcGADwAQH4AbYIgAKwC4oCDAgAEAEYZSBjKFcwDw==&rs=AOn4CLD2KEljBBwxwtUb_QIUwe_j-FK6cg"
         
         self.setup_ui()
         self._apply_model_options()
@@ -183,7 +180,7 @@ class MainWindow(QMainWindow):
     def setup_ui(self):
         """Настройка пользовательского интерфейса"""
         self.menuBar().clear()
-        self.setWindowTitle("✈️ Test Case Editor v2.0 (SOLID)")
+        self.setWindowTitle("Test Case Editor")
         if not self._geometry_initialized:
             self._apply_initial_geometry()
             self._geometry_initialized = True
@@ -294,7 +291,7 @@ class MainWindow(QMainWindow):
 
         layout.addLayout(menu_row)
 
-        title = QLabel("✈️ Test Case Editor")
+        title = QLabel("Test Case Editor")
         title.setFont(QFont("Segoe UI", 12, QFont.Bold))
         layout.addWidget(title, 1, Qt.AlignLeft)
 
@@ -330,17 +327,7 @@ class MainWindow(QMainWindow):
         layout.addLayout(switch_row)
         self._update_mode_indicator()
 
-        self._header_widget = header
-        header.installEventFilter(self)
         return header
-
-    def eventFilter(self, obj, event):
-        if obj is getattr(self, "_header_widget", None) and event.type() == QEvent.MouseButtonPress:
-            self._header_clicks += 1
-            if self._header_clicks >= 5:
-                self._header_clicks = 0
-                webbrowser.open(self._header_easter_egg_url)
-        return super().eventFilter(obj, event)
     
     def _create_right_panel(self) -> QWidget:
         """Создать правую панель с формой"""
@@ -382,7 +369,7 @@ class MainWindow(QMainWindow):
         self.aux_panel.stats_panel.reset_all_statuses.connect(self._reset_all_step_statuses)
         self.aux_panel.stats_panel.mark_current_passed.connect(self._mark_current_case_passed)
         self.aux_panel.stats_panel.reset_current_case.connect(self._reset_current_case_statuses)
-        self.aux_panel.stats_panel.generate_allure.connect(lambda: self.statusBar().showMessage("Generate Allure (todo)"))
+        self.aux_panel.stats_panel.generate_allure.connect(self._generate_allure_report)
         self.detail_splitter.addWidget(self.aux_panel)
 
         self.detail_splitter.setCollapsible(0, False)
@@ -397,7 +384,7 @@ class MainWindow(QMainWindow):
         select_folder_action.triggered.connect(self.select_test_cases_folder)
         select_folder_action.setShortcut('Ctrl+O')
 
-        convert_action = self.file_menu.addAction('Конвертировать')
+        convert_action = self.file_menu.addAction('Импорт из ALM')
         convert_action.triggered.connect(self.convert_from_azure)
         self.file_menu.addSeparator()
 
@@ -1450,6 +1437,34 @@ class MainWindow(QMainWindow):
 
     def _on_mode_switch_changed(self, checked: bool):
         self._set_mode("run" if checked else "edit")
+
+    def _generate_allure_report(self):
+        """Генерация Allure отчета из JSON файлов тест-кейсов"""
+        try:
+            # Определяем папку приложения (где находится run_app_v2.py)
+            # main_window.py находится в ui/, поднимаемся на 2 уровня вверх
+            app_dir = Path(__file__).resolve().parent.parent.parent
+            
+            # Генерируем отчет
+            report_dir = generate_allure_report(
+                test_cases_dir=self.test_cases_dir,
+                app_dir=app_dir,
+            )
+            
+            if report_dir:
+                self.statusBar().showMessage(
+                    f"Allure отчет сгенерирован: {report_dir.name}. "
+                    f"Папка открыта в проводнике."
+                )
+            else:
+                self.statusBar().showMessage("Ошибка при генерации Allure отчета")
+        except Exception as e:
+            QMessageBox.critical(
+                self,
+                "Ошибка генерации Allure отчета",
+                f"Не удалось сгенерировать Allure отчет:\n{e}",
+            )
+            self.statusBar().showMessage(f"Ошибка: {e}")
 
 
 def create_main_window() -> MainWindow:

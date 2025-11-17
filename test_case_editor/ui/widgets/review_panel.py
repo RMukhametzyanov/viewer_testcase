@@ -33,7 +33,6 @@ class ReviewPanel(QWidget):
 
     prompt_saved = pyqtSignal(str)
     enter_clicked = pyqtSignal(str, list)
-    close_requested = pyqtSignal()
 
     def __init__(self, parent=None, *, title_text: str = "Панель ревью"):
         super().__init__(parent)
@@ -76,12 +75,6 @@ class ReviewPanel(QWidget):
         header_row.addWidget(attachments_label, 0, Qt.AlignVCenter)
 
         header_row.addStretch(1)
-
-        self.close_button = QPushButton("✖")
-        self.close_button.setToolTip("Скрыть панель ревью")
-        self.close_button.setFixedSize(32, 32)
-        self.close_button.clicked.connect(self.close_requested.emit)
-        header_row.addWidget(self.close_button, 0, Qt.AlignRight)
 
         content_layout.addLayout(header_row)
 

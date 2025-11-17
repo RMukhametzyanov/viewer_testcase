@@ -110,9 +110,19 @@ class TestCaseRepository(ITestCaseRepository):
         Returns:
             Новый тест-кейс
         """
+        from ..models.test_case import TestCaseStep
+        
         new_id = str(uuid.uuid4())
         filename = f'tc_new_{uuid.uuid4().hex[:8]}.json'
         current_time = get_current_datetime()
+        
+        # Создаем первый пустой шаг
+        first_step = TestCaseStep(
+            name="Шаг 1",
+            description="",
+            expected_result="",
+            status="pending",
+        )
         
         test_case = TestCase(
             id=new_id,
@@ -121,6 +131,7 @@ class TestCaseRepository(ITestCaseRepository):
             updated_at=current_time,
             status="Draft",
             test_type="manual",
+            steps=[first_step],
             _filename=filename,
             _filepath=target_folder / filename
         )

@@ -320,6 +320,7 @@ class TestCaseFormWidget(QWidget):
 
         scroll.setWidget(form_widget)
         layout.addWidget(scroll)
+        self.scroll_area = scroll  # Сохраняем ссылку для прокрутки
     
     def _create_header(self) -> QWidget:
         """Создать заголовок"""
@@ -812,6 +813,7 @@ class TestCaseFormWidget(QWidget):
         """Добавить шаг в конец."""
         new_row = self._add_step()
         self.steps_list.setCurrentRow(new_row)
+        self._scroll_to_step_and_focus(new_row)
 
     def _insert_step_above(self):
         """Добавить шаг выше выбранного."""
@@ -821,6 +823,7 @@ class TestCaseFormWidget(QWidget):
             return
         new_row = self._add_step(row=row)
         self.steps_list.setCurrentRow(new_row)
+        self._scroll_to_step_and_focus(new_row)
 
     def _insert_step_below(self):
         """Добавить шаг ниже выбранного."""
@@ -828,6 +831,7 @@ class TestCaseFormWidget(QWidget):
         insert_row = row + 1 if row >= 0 else self.steps_list.count()
         new_row = self._add_step(row=insert_row)
         self.steps_list.setCurrentRow(new_row)
+        self._scroll_to_step_and_focus(new_row)
 
     def _move_step_up(self):
         """Переместить выбранный шаг выше."""
@@ -869,6 +873,54 @@ class TestCaseFormWidget(QWidget):
                 self.step_statuses[row_a],
             )
         self._refresh_step_indices()
+    
+    def _scroll_to_step_and_focus(self, row: int):
+        """Прокрутить к шагу и установить фокус на поле 'Действия'"""
+        if row < 0 or row >= self.steps_list.count():
+            return
+        
+        # Получаем виджет шага
+        step_widget = self._get_step_widget(row)
+        if not step_widget:
+            return
+        
+        # Прокручиваем QScrollArea к блоку шагов
+        # Находим группу шагов
+        steps_group = None
+        for widget in self.findChildren(QGroupBox):
+            if widget.title() == "Шаги тестирования":
+                steps_group = widget
+                break
+        
+        if steps_group and hasattr(self, 'scroll_area'):
+            # Прокручиваем к группе шагов
+            self._scroll_to_widget(steps_group)
+        
+        # Прокручиваем QListWidget к нужному элементу с небольшой задержкой
+        item = self.steps_list.item(row)
+        if item:
+            QTimer.singleShot(50, lambda: self.steps_list.scrollToItem(item, QAbstractItemView.PositionAtCenter))
+        
+        # Устанавливаем фокус на поле "Действия" с задержкой
+        # чтобы прокрутка успела завершиться
+        QTimer.singleShot(150, lambda: step_widget.action_edit.setFocus())
+    
+    def _scroll_to_widget(self, widget: QWidget):
+        """Прокрутить QScrollArea к указанному виджету"""
+        if not hasattr(self, 'scroll_area') or not self.scroll_area:
+            return
+        
+        # Получаем координаты виджета относительно виджета внутри scroll_area
+        scroll_widget = self.scroll_area.widget()
+        if not scroll_widget:
+            return
+        
+        # Получаем координаты виджета относительно scroll_widget
+        widget_pos = widget.mapTo(scroll_widget, widget.rect().topLeft())
+        
+        # Прокручиваем с небольшим отступом сверху
+        scroll_y = max(0, widget_pos.y() - 20)
+        self.scroll_area.verticalScrollBar().setValue(scroll_y)
     
     def _remove_step(self):
         """Удалить шаг"""
