@@ -1,0 +1,23 @@
+{
+    "test_cases_dir": "C:\\test-cases-example\\testcases",
+    "DEFAULT_PROMT": "",
+    "panel_sizes": {
+        "left": 301,
+        "form_area": 1490,
+        "review": 523
+    },
+    "LLM_MODEL": "deepseek-v3.1:latest",
+    "LLM_HOST": "http://spb99-vkc-dhwgpu06.devzone.local:11434",
+    "LLM_METHODIC_PATH": "C:\\viewer_testcase\\test_case_editor\\docs\\test-cases-guidelines.md",
+    "window_geometry": {
+        "x": 187,
+        "y": 52,
+        "width": 1839,
+        "height": 955,
+        "is_fullscreen": false
+    },
+    "DEFAULT_PROMT_CREATE_TC": "Создай тест-кейсы с акцентом на аспекты указанные в методике и ЧТЗ. Поверхностное описание шагов не приемлемо. Необходимы детальные шаги.",
+    "theme": "light",
+    "font_family": "Segoe UI Semilight",
+    "font_size": 11
+}
