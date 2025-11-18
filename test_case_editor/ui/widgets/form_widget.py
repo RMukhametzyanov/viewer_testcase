@@ -52,11 +52,17 @@ class TestCaseFormWidget(QWidget):
     class _StepCard(QFrame):
         content_changed = pyqtSignal()
         status_changed = pyqtSignal(str)
+        add_above_requested = pyqtSignal()
+        add_below_requested = pyqtSignal()
+        move_up_requested = pyqtSignal()
+        move_down_requested = pyqtSignal()
+        remove_requested = pyqtSignal()
 
         def __init__(self, parent=None):
             super().__init__(parent)
             self._status = "pending"
             self._index = 1
+            self._edit_mode = False
             self.setObjectName("StepCard")
             layout = QVBoxLayout(self)
             layout.setContentsMargins(
@@ -71,6 +77,61 @@ class TestCaseFormWidget(QWidget):
             header.setSpacing(UI_METRICS.base_spacing // 2)
             self.index_label = QLabel("Шаг 1")
             header.addWidget(self.index_label)
+            
+            # Панель кнопок управления (видна только в режиме редактирования)
+            self.control_buttons_widget = QWidget()
+            control_layout = QHBoxLayout(self.control_buttons_widget)
+            control_layout.setContentsMargins(0, 0, 0, 0)
+            control_layout.setSpacing(UI_METRICS.base_spacing // 2)
+            
+            self.add_above_btn = QToolButton()
+            self.add_above_btn.setText("+↑")
+            self.add_above_btn.setToolTip("Добавить шаг выше")
+            self.add_above_btn.setCursor(Qt.PointingHandCursor)
+            self.add_above_btn.setAutoRaise(True)
+            self.add_above_btn.setMinimumSize(32, 24)
+            self.add_above_btn.clicked.connect(self.add_above_requested.emit)
+            control_layout.addWidget(self.add_above_btn)
+            
+            self.add_below_btn = QToolButton()
+            self.add_below_btn.setText("+↓")
+            self.add_below_btn.setToolTip("Добавить шаг ниже")
+            self.add_below_btn.setCursor(Qt.PointingHandCursor)
+            self.add_below_btn.setAutoRaise(True)
+            self.add_below_btn.setMinimumSize(32, 24)
+            self.add_below_btn.clicked.connect(self.add_below_requested.emit)
+            control_layout.addWidget(self.add_below_btn)
+            
+            self.move_up_btn = QToolButton()
+            self.move_up_btn.setText("↑")
+            self.move_up_btn.setToolTip("Переместить вверх")
+            self.move_up_btn.setCursor(Qt.PointingHandCursor)
+            self.move_up_btn.setAutoRaise(True)
+            self.move_up_btn.setMinimumSize(24, 24)
+            self.move_up_btn.clicked.connect(self.move_up_requested.emit)
+            control_layout.addWidget(self.move_up_btn)
+            
+            self.move_down_btn = QToolButton()
+            self.move_down_btn.setText("↓")
+            self.move_down_btn.setToolTip("Переместить вниз")
+            self.move_down_btn.setCursor(Qt.PointingHandCursor)
+            self.move_down_btn.setAutoRaise(True)
+            self.move_down_btn.setMinimumSize(24, 24)
+            self.move_down_btn.clicked.connect(self.move_down_requested.emit)
+            control_layout.addWidget(self.move_down_btn)
+            
+            self.remove_btn = QToolButton()
+            self.remove_btn.setText("×")
+            self.remove_btn.setToolTip("Удалить шаг")
+            self.remove_btn.setCursor(Qt.PointingHandCursor)
+            self.remove_btn.setAutoRaise(True)
+            self.remove_btn.setMinimumSize(24, 24)
+            self.remove_btn.clicked.connect(self.remove_requested.emit)
+            control_layout.addWidget(self.remove_btn)
+            
+            self.control_buttons_widget.setVisible(False)
+            header.addWidget(self.control_buttons_widget)
+            
             header.addStretch(1)
 
             self.status_widget = QWidget()
@@ -166,8 +227,10 @@ class TestCaseFormWidget(QWidget):
             self.index_label.setText(f"Шаг {index}")
 
         def set_edit_mode(self, enabled: bool):
+            self._edit_mode = enabled
             self.action_edit.setReadOnly(not enabled)
             self.expected_edit.setReadOnly(not enabled)
+            self.control_buttons_widget.setVisible(enabled)
 
         def set_run_mode(self, enabled: bool):
             self.status_widget.setVisible(enabled)
@@ -794,6 +857,13 @@ class TestCaseFormWidget(QWidget):
         widget.set_run_mode(self._run_mode_enabled)
         widget.content_changed.connect(self._on_step_card_content_changed)
         widget.status_changed.connect(lambda value, w=widget: self._on_step_status_changed(w, value))
+        
+        # Подключаем сигналы кнопок управления
+        widget.add_above_requested.connect(lambda: self._on_step_add_above(widget))
+        widget.add_below_requested.connect(lambda: self._on_step_add_below(widget))
+        widget.move_up_requested.connect(lambda: self._on_step_move_up(widget))
+        widget.move_down_requested.connect(lambda: self._on_step_move_down(widget))
+        widget.remove_requested.connect(lambda: self._on_step_remove(widget))
 
         item = QListWidgetItem()
         if row is None or row >= self.steps_list.count():
@@ -940,8 +1010,68 @@ class TestCaseFormWidget(QWidget):
         self._update_step_controls_state()
 
     def _update_step_controls_state(self):
-        """Поддерживаем совместимость — пока достаточно ничего не делать."""
-        return
+        """Обновить состояние кнопок управления шагами."""
+        if not self._edit_mode_enabled:
+            return
+        
+        for row in range(self.steps_list.count()):
+            widget = self._get_step_widget(row)
+            if widget:
+                # Кнопка "вверх" активна только если не первый шаг
+                widget.move_up_btn.setEnabled(row > 0)
+                # Кнопка "вниз" активна только если не последний шаг
+                widget.move_down_btn.setEnabled(row < self.steps_list.count() - 1)
+    
+    def _on_step_add_above(self, step_card):
+        """Обработчик кнопки добавления шага выше."""
+        row = self._find_widget_row(step_card)
+        if row >= 0:
+            new_row = self._add_step(row=row)
+            self.steps_list.setCurrentRow(new_row)
+            self._scroll_to_step_and_focus(new_row)
+    
+    def _on_step_add_below(self, step_card):
+        """Обработчик кнопки добавления шага ниже."""
+        row = self._find_widget_row(step_card)
+        insert_row = row + 1 if row >= 0 else self.steps_list.count()
+        new_row = self._add_step(row=insert_row)
+        self.steps_list.setCurrentRow(new_row)
+        self._scroll_to_step_and_focus(new_row)
+    
+    def _on_step_move_up(self, step_card):
+        """Обработчик кнопки перемещения шага вверх."""
+        row = self._find_widget_row(step_card)
+        if row > 0:
+            self._swap_step_rows(row, row - 1)
+            self.steps_list.setCurrentRow(row - 1)
+            self._mark_changed()
+            self._update_step_controls_state()
+    
+    def _on_step_move_down(self, step_card):
+        """Обработчик кнопки перемещения шага вниз."""
+        row = self._find_widget_row(step_card)
+        if row >= 0 and row < self.steps_list.count() - 1:
+            self._swap_step_rows(row, row + 1)
+            self.steps_list.setCurrentRow(row + 1)
+            self._mark_changed()
+            self._update_step_controls_state()
+    
+    def _on_step_remove(self, step_card):
+        """Обработчик кнопки удаления шага."""
+        row = self._find_widget_row(step_card)
+        if row >= 0:
+            item = self.steps_list.takeItem(row)
+            if item:
+                widget = self.steps_list.itemWidget(item)
+                if widget:
+                    widget.deleteLater()
+                del item
+            if row < len(self.step_statuses):
+                self.step_statuses.pop(row)
+            self._refresh_step_indices()
+            if not self._is_loading:
+                self._mark_changed()
+            self._update_step_controls_state()
     def _mark_changed(self):
         """Пометить как измененное"""
         if self._is_loading:
@@ -1053,6 +1183,8 @@ class TestCaseFormWidget(QWidget):
             widget = self._get_step_widget(row)
             if widget:
                 widget.set_edit_mode(enabled)
+        
+        self._update_step_controls_state()
 
         if not enabled:
             self.save_button.setEnabled(False)
