@@ -28,6 +28,36 @@ from PyQt5.QtCore import (
 from PyQt5.QtGui import QTextCursor, QTextOption
 
 
+class AttachmentItemWidget(QWidget):
+    """Виджет элемента списка прикрепленных файлов с кнопкой удаления."""
+
+    def __init__(self, file_path: Path, parent=None):
+        super().__init__(parent)
+        self.file_path = file_path
+        self._setup_ui()
+
+    def _setup_ui(self):
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(5, 2, 5, 2)
+        layout.setSpacing(5)
+
+        file_label = QLabel(self.file_path.name)
+        file_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        layout.addWidget(file_label)
+
+        delete_button = QPushButton("✕")
+        delete_button.setToolTip("Удалить файл")
+        delete_button.setFixedSize(24, 24)
+        delete_button.setCursor(Qt.PointingHandCursor)
+        delete_button.clicked.connect(self._on_delete_clicked)
+        layout.addWidget(delete_button, 0, Qt.AlignRight)
+
+    def _on_delete_clicked(self):
+        self.delete_requested.emit(self.file_path)
+
+    delete_requested = pyqtSignal(Path)
+
+
 class ReviewPanel(QWidget):
     """Панель подготовки промта с возможностью прикрепления файлов."""
 
@@ -260,8 +290,19 @@ class ReviewPanel(QWidget):
             self._update_attachments_height()
             return
         for path in self._attachments:
-            QListWidgetItem(str(path), self.attachments_list)
+            item_widget = AttachmentItemWidget(path)
+            item_widget.delete_requested.connect(self._remove_attachment)
+            item = QListWidgetItem()
+            item.setSizeHint(item_widget.sizeHint())
+            self.attachments_list.addItem(item)
+            self.attachments_list.setItemWidget(item, item_widget)
         self._update_attachments_height()
+
+    def _remove_attachment(self, path: Path):
+        """Удалить файл из списка прикрепленных."""
+        if path in self._attachments:
+            self._attachments.remove(path)
+            self._refresh_attachments()
 
     # --- Qt события -------------------------------------------------------
 
