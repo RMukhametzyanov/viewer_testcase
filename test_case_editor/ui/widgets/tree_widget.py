@@ -177,7 +177,7 @@ class TestCaseTreeWidget(QTreeWidget):
 
         menu.addSeparator()
 
-        action_rename = menu.addAction("✏️ Переименовать")
+        action_rename = menu.addAction("✎ Переименовать")
         action_rename.triggered.connect(lambda: self._rename_folder(folder_path))
 
         action_delete = menu.addAction("🗑️ Удалить папку")
@@ -209,7 +209,7 @@ class TestCaseTreeWidget(QTreeWidget):
         action_generate_api = menu.addAction("🧪 Сгенерировать каркас АТ API")
         action_generate_api.triggered.connect(lambda: self._copy_pytest_skeleton(test_case))
 
-        action_rename = menu.addAction("✏️ Переименовать файл")
+        action_rename = menu.addAction("✎ Переименовать файл")
         action_rename.triggered.connect(lambda: self._rename_file(test_case))
 
         action_duplicate = menu.addAction("📋 Дублировать")

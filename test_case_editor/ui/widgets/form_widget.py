@@ -819,8 +819,8 @@ class TestCaseFormWidget(QWidget):
         menu = QMenu(self)
         actions = {
             "add_new": menu.addAction("➕ Добавить новый шаг"),
-            "insert_above": menu.addAction("⬆️ Вставить шаг выше"),
-            "insert_below": menu.addAction("⬇️ Вставить шаг ниже"),
+            "insert_above": menu.addAction("↑ Вставить шаг выше"),
+            "insert_below": menu.addAction("↓ Вставить шаг ниже"),
             "move_up": menu.addAction("⇡ Переместить наверх"),
             "move_down": menu.addAction("⇣ Переместить вниз"),
             "remove": menu.addAction("✕ Удалить"),
