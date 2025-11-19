@@ -527,6 +527,9 @@ class MainWindow(QMainWindow):
         self.create_tc_prompt = self.settings.get('DEFAULT_PROMT_CREATE_TC', "Создай ТТ")
         self.llm_model = self.settings.get('LLM_MODEL', "").strip()
         self.llm_host = self.settings.get('LLM_HOST', "").strip()
+        
+        # Применяем настройки шрифта к UI_METRICS
+        self._apply_font_settings()
         self._model_list_model = QStringListModel(self)
         self._model_proxy_model = QSortFilterProxyModel(self)
         self._model_proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
@@ -1946,11 +1949,14 @@ class MainWindow(QMainWindow):
             if methodic_path:
                 self.settings['LLM_METHODIC_PATH'] = methodic_path
         
-        # Внешний вид (тема, шрифт) - может потребовать перезапуска
-        # Но можно попробовать применить сразу
+        # Внешний вид (тема, шрифт) - применяем сразу
         if 'theme' in new_settings or 'font_family' in new_settings or 'font_size' in new_settings:
-            # Обновление темы и шрифта может потребовать перезапуска приложения
-            pass
+            self._apply_font_settings()
+            # Переприменяем стили к приложению
+            app = QApplication.instance()
+            if app:
+                new_style_sheet = build_app_style_sheet(UI_METRICS)
+                app.setStyleSheet(new_style_sheet)
     
     def closeEvent(self, event):
         if self.isMaximized():
@@ -2016,6 +2022,13 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage(f"Импортировано тест-кейсов: {total_created}")
 
     # ----------------------- UI Metrics ---------------------------------
+
+    def _apply_font_settings(self):
+        """Применить настройки шрифта из settings к UI_METRICS"""
+        if 'font_family' in self.settings:
+            UI_METRICS.font_family = self.settings['font_family']
+        if 'font_size' in self.settings:
+            UI_METRICS.base_font_size = self.settings['font_size']
 
     def _on_mode_switch_changed(self, checked: bool):
         self._set_mode("run" if checked else "edit")

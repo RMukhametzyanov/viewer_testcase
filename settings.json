@@ -1,5 +1,5 @@
 {
-    "test_cases_dir": "C:\\test-cases-example\\testcases",
+    "test_cases_dir": "/Users/utb404/work/projects/viewer_testcase/testcases",
     "DEFAULT_PROMT": "",
     "panel_sizes": {
         "left": 398,
@@ -10,14 +10,14 @@
     "LLM_HOST": "http://spb99-vkc-dhwgpu06.devzone.local:11434",
     "LLM_METHODIC_PATH": "C:\\viewer_testcase\\test_case_editor\\docs\\test-cases-guidelines.md",
     "window_geometry": {
-        "x": 211,
-        "y": 69,
-        "width": 2001,
-        "height": 956,
+        "x": 513,
+        "y": 181,
+        "width": 1845,
+        "height": 1078,
         "is_fullscreen": false
     },
     "DEFAULT_PROMT_CREATE_TC": "Создай тест-кейсы с акцентом на аспекты указанные в методике и ЧТЗ. Поверхностное описание шагов не приемлемо. Необходимы детальные шаги.",
     "theme": "light",
     "font_family": "Segoe UI Semilight",
-    "font_size": 24
+    "font_size": 12
 }

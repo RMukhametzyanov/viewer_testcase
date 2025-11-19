@@ -4,6 +4,7 @@
 """
 
 import sys
+import json
 from pathlib import Path
 
 # Добавляем путь к модулю
@@ -11,7 +12,8 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from PyQt5.QtWidgets import QApplication
 from test_case_editor.ui import MainWindow
-from test_case_editor.ui.styles.app_theme import APP_STYLE_SHEET
+from test_case_editor.ui.styles.app_theme import build_app_style_sheet
+from test_case_editor.ui.styles.ui_metrics import UI_METRICS
 
 
 def main():
@@ -56,7 +58,24 @@ def main():
     """
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
-    app.setStyleSheet(APP_STYLE_SHEET)
+    
+    # Загружаем настройки и применяем к UI_METRICS перед созданием окна
+    settings_file = Path("settings.json")
+    if settings_file.exists():
+        try:
+            with settings_file.open("r", encoding="utf-8") as f:
+                settings = json.load(f)
+                if 'font_family' in settings:
+                    UI_METRICS.font_family = settings['font_family']
+                if 'font_size' in settings:
+                    UI_METRICS.base_font_size = settings['font_size']
+        except Exception:
+            # Если не удалось загрузить настройки, используем значения по умолчанию
+            pass
+    
+    # Применяем стили с учетом настроек
+    style_sheet = build_app_style_sheet(UI_METRICS)
+    app.setStyleSheet(style_sheet)
     
     # Создаем главное окно
     window = MainWindow()
