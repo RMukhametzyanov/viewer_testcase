@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QHBoxLayout,
+    QGridLayout,
     QLabel,
     QLineEdit,
     QTextEdit,
@@ -159,19 +160,33 @@ class TestCaseFormWidget(QWidget):
             header.addWidget(self.status_widget)
             layout.addLayout(header)
 
+            # Таблица для действия и ожидаемого результата
+            self.body_grid = QGridLayout()
+            self.body_grid.setSpacing(10)
+            self.body_grid.setContentsMargins(0, 0, 0, 0)
+            
+            # Текстовые поля
             self.action_edit = QTextEdit()
-            self.action_edit.setPlaceholderText("Действие")
-            self.action_edit.textChanged.connect(self.content_changed.emit)
-
+            self.action_edit.setPlaceholderText("Действие...")
+            self._init_auto_resizing_text_edit_for_step(self.action_edit)
+            self.action_edit.textChanged.connect(self._on_text_changed)
+            
             self.expected_edit = QTextEdit()
-            self.expected_edit.setPlaceholderText("Ожидаемый результат")
-            self.expected_edit.textChanged.connect(self.content_changed.emit)
-
-            body = QHBoxLayout()
-            body.setSpacing(10)
-            body.addWidget(self.action_edit)
-            body.addWidget(self.expected_edit)
-            layout.addLayout(body)
+            self.expected_edit.setPlaceholderText("Ожидаемый результат...")
+            self._init_auto_resizing_text_edit_for_step(self.expected_edit)
+            self.expected_edit.textChanged.connect(self._on_text_changed)
+            
+            self.body_grid.addWidget(self.action_edit, 0, 0)
+            self.body_grid.addWidget(self.expected_edit, 0, 1)
+            
+            # Устанавливаем одинаковую ширину колонок
+            self.body_grid.setColumnStretch(0, 1)
+            self.body_grid.setColumnStretch(1, 1)
+            
+            layout.addLayout(self.body_grid)
+            
+            # Синхронизируем высоту полей после инициализации
+            QTimer.singleShot(100, self._sync_text_edits_height)
 
         def set_contents(self, action: str, expected: str, status: str):
             self.action_edit.blockSignals(True)
@@ -181,6 +196,9 @@ class TestCaseFormWidget(QWidget):
             self.action_edit.blockSignals(False)
             self.expected_edit.blockSignals(False)
             self.set_status(status or "pending")
+            # Синхронизируем высоту полей после установки содержимого
+            # Используем небольшую задержку, чтобы документы успели обновиться
+            QTimer.singleShot(50, self._sync_text_edits_height)
 
         def get_contents(self) -> tuple[str, str]:
             return self.action_edit.toPlainText(), self.expected_edit.toPlainText()
@@ -237,18 +255,150 @@ class TestCaseFormWidget(QWidget):
             for btn in self.status_buttons:
                 btn.setEnabled(enabled)
 
-        def sizeHint(self):
-            header_height = self.index_label.sizeHint().height() + 16
-            line_height = self.action_edit.fontMetrics().lineSpacing()
-            min_content_height = line_height * 7
+        def _init_auto_resizing_text_edit_for_step(self, text_edit: QTextEdit, *, min_lines: int = 2):
+            """Настроить QTextEdit в шаге так, чтобы он подстраивал высоту под содержимое.
+            
+            Текст всегда отображается целиком (без ограничения максимальной высоты).
+            """
+            text_edit.setWordWrapMode(QTextOption.WordWrap)
+            text_edit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            text_edit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            line_height = text_edit.fontMetrics().lineSpacing()
+            margins = text_edit.contentsMargins()
+            doc_margin = text_edit.document().documentMargin()
+            min_height = int(line_height * min_lines + doc_margin * 2 + margins.top() + margins.bottom() + 6)
+            text_edit.setMinimumHeight(min_height)
+            # Убираем максимальную высоту, чтобы текст всегда отображался целиком
+            text_edit.setMaximumHeight(16777215)  # Максимальное значение QSize
 
-            hints = [
-                max(self.action_edit.document().size().height(), min_content_height / 2),
-                max(self.expected_edit.document().size().height(), min_content_height / 2),
-            ]
-            total_height = header_height + sum(hints) + 32
-            min_total = header_height + min_content_height + 32
-            return QSize(self.width() or 400, int(max(min_total, total_height)))
+            def _resize():
+                doc = text_edit.document()
+                margins = text_edit.contentsMargins()
+                doc_height = doc.size().height() + doc.documentMargin() * 2 + margins.top() + margins.bottom() + 6
+                new_height = max(min_height, int(doc_height))
+                if text_edit.height() != new_height:
+                    text_edit.setFixedHeight(new_height)
+                    # Синхронизируем высоту обоих полей и обновляем размер шага
+                    QTimer.singleShot(0, self._sync_text_edits_height)
+
+            text_edit.textChanged.connect(_resize)
+            QTimer.singleShot(0, _resize)
+        
+        def _sync_text_edits_height(self):
+            """Синхронизировать высоту полей действия и ожидаемого результата.
+            
+            Оба поля должны иметь одинаковую высоту, равную максимальной из них.
+            Высота вычисляется на основе реального содержимого документов.
+            """
+            def _calculate_text_edit_height(text_edit: QTextEdit) -> int:
+                """Вычислить необходимую высоту текстового поля на основе содержимого."""
+                doc = text_edit.document()
+                margins = text_edit.contentsMargins()
+                doc_margin = doc.documentMargin()
+                line_height = text_edit.fontMetrics().lineSpacing()
+                min_height = int(line_height * 2 + doc_margin * 2 + margins.top() + margins.bottom() + 6)
+                
+                # Вычисляем высоту на основе содержимого документа
+                # Убеждаемся, что документ имеет правильную ширину для расчета высоты
+                viewport_width = text_edit.viewport().width()
+                if viewport_width > 0:
+                    doc.setTextWidth(viewport_width)
+                
+                doc_height = doc.size().height() + doc_margin * 2 + margins.top() + margins.bottom() + 6
+                return max(min_height, int(doc_height))
+            
+            # Вычисляем необходимую высоту для каждого поля на основе содержимого
+            action_needed_height = _calculate_text_edit_height(self.action_edit)
+            expected_needed_height = _calculate_text_edit_height(self.expected_edit)
+            
+            # Используем максимальную высоту для обоих полей
+            target_height = max(action_needed_height, expected_needed_height)
+            
+            # Обновляем высоту обоих полей
+            if self.action_edit.height() != target_height:
+                self.action_edit.setFixedHeight(target_height)
+            if self.expected_edit.height() != target_height:
+                self.expected_edit.setFixedHeight(target_height)
+            
+            # Принудительно обновляем геометрию карточки
+            self.updateGeometry()
+            
+            # Обновляем размер шага после синхронизации
+            QTimer.singleShot(0, self._update_step_size)
+
+        def _on_text_changed(self):
+            """Обработчик изменения текста в полях действия или ожидаемого результата."""
+            # Высота будет синхронизирована через _sync_text_edits_height
+            # который вызывается из _resize в _init_auto_resizing_text_edit_for_step
+            self.content_changed.emit()
+
+        def _update_step_size(self):
+            """Обновить размер шага на основе содержимого."""
+            # Находим родительский виджет формы для обновления размера элемента в списке
+            # Идем вверх по иерархии виджетов до тех пор, пока не найдем виджет с steps_list
+            parent_form = self.parent()
+            while parent_form:
+                if hasattr(parent_form, 'steps_list') and hasattr(parent_form, '_find_widget_row'):
+                    row = parent_form._find_widget_row(self)
+                    if row >= 0:
+                        item = parent_form.steps_list.item(row)
+                        if item:
+                            item.setSizeHint(self.sizeHint())
+                            parent_form._update_steps_list_height()
+                    break
+                parent_form = parent_form.parent()
+
+        def sizeHint(self):
+            """Вычислить размер шага на основе реального содержимого."""
+            # Получаем реальные отступы и spacing из layout'ов
+            main_layout = self.layout()
+            margins = self.contentsMargins()
+            main_spacing = main_layout.spacing() if main_layout else UI_METRICS.base_spacing
+            grid_spacing = self.body_grid.spacing() if hasattr(self, 'body_grid') else 10
+            
+            # Высота header (индекс + кнопки + статус)
+            # Используем реальную высоту header layout, если он уже отрисован
+            header_height = self.index_label.sizeHint().height()
+            # Добавляем отступ для header (учитываем padding и spacing)
+            header_total = header_height + 8
+            
+            # Получаем высоту текстовых полей (они всегда синхронизированы и имеют одинаковую высоту)
+            # Используем реальную высоту, если виджет уже отрисован, иначе sizeHint
+            if self.action_edit.height() > 0:
+                content_height = self.action_edit.height()
+            else:
+                # Если виджет еще не отрисован, вычисляем высоту на основе документа
+                doc = self.action_edit.document()
+                doc_margin = doc.documentMargin()
+                margins_edit = self.action_edit.contentsMargins()
+                line_height = self.action_edit.fontMetrics().lineSpacing()
+                min_height = int(line_height * 2 + doc_margin * 2 + margins_edit.top() + margins_edit.bottom() + 6)
+                doc_height = doc.size().height() + doc_margin * 2 + margins_edit.top() + margins_edit.bottom() + 6
+                content_height = max(min_height, int(doc_height))
+            
+            # Вычисляем общую высоту с учетом всех отступов и spacing
+            total_height = (
+                margins.top() +                    # Верхний отступ карточки
+                header_total +                     # Высота header
+                main_spacing +                     # Spacing между header и grid
+                content_height +                   # Высота текстовых полей
+                margins.bottom()                   # Нижний отступ карточки
+            )
+            
+            # Минимальная высота для пустого шага
+            line_height = self.action_edit.fontMetrics().lineSpacing()
+            min_content_height = line_height * 2
+            min_total = (
+                margins.top() + 
+                header_total + 
+                main_spacing + 
+                min_content_height + 
+                margins.bottom()
+            )
+            
+            # Возвращаем максимальное значение между минимумом и реальной высотой
+            # Добавляем запас (8px) для предотвращения обрезки из-за округлений и границ
+            return QSize(self.width() or 400, int(max(min_total, total_height) + 8))
 
         def _on_status_clicked(self, status: str):
             if status == self._status:
@@ -636,7 +786,7 @@ class TestCaseFormWidget(QWidget):
 
         self.steps_list = QListWidget()
         self.steps_list.setSpacing(6)
-        self.steps_list.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.steps_list.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.steps_list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.steps_list.setFrameShape(QFrame.NoFrame)
         self.steps_list.setStyleSheet(
@@ -1227,6 +1377,7 @@ class TestCaseFormWidget(QWidget):
                 item = self.steps_list.item(row)
                 if item:
                     item.setSizeHint(widget.sizeHint())
+                    self._update_steps_list_height()
         self._mark_changed()
 
     def _on_step_status_changed(self, widget: "TestCaseFormWidget._StepCard", status: str):
@@ -1266,13 +1417,16 @@ class TestCaseFormWidget(QWidget):
         self._update_steps_list_height()
 
     def _update_steps_list_height(self):
+        """Обновить высоту списка шагов на основе реального содержимого."""
         total = 0
         spacing = self.steps_list.spacing()
         for i in range(self.steps_list.count()):
             total += self.steps_list.sizeHintForRow(i) + spacing
         total += 12
         self.steps_list.setMinimumHeight(total)
-        self.steps_list.setMaximumHeight(total)
+        # Убираем максимальную высоту, чтобы список мог расширяться естественным образом
+        # и последний элемент не растягивался
+        self.steps_list.setMaximumHeight(16777215)  # Максимальное значение QSize
 
     def _auto_save_status_change(self):
         if not self.current_test_case:
