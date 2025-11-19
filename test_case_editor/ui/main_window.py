@@ -29,8 +29,12 @@ from PyQt5.QtWidgets import (
     QMenu,
     QToolButton,
     QComboBox,
+    QSpinBox,
+    QGroupBox,
+    QScrollArea,
+    QTabWidget,
 )
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject, QStringListModel, QSortFilterProxyModel, QRegularExpression
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject, QStringListModel, QSortFilterProxyModel, QRegularExpression, QTimer, QEvent
 from PyQt5.QtGui import QFont
 
 from ..models.test_case import TestCase
@@ -85,6 +89,384 @@ class GitCommitDialog(QDialog):
 
     def get_comment(self) -> str:
         return self.comment_edit.toPlainText()
+
+
+class SettingsDialog(QDialog):
+    """Диалог настроек приложения."""
+
+    def __init__(self, settings: dict, parent: Optional[QWidget] = None):
+        super().__init__(parent)
+        self.settings = settings.copy()
+        self.setWindowTitle("Настройки")
+        self.setModal(True)
+        self.setMinimumSize(700, 600)
+        
+        self._setup_ui()
+        self._load_settings()
+
+    def _setup_ui(self):
+        layout = QVBoxLayout(self)
+        layout.setSpacing(UI_METRICS.base_spacing)
+        layout.setContentsMargins(
+            UI_METRICS.container_padding,
+            UI_METRICS.container_padding,
+            UI_METRICS.container_padding,
+            UI_METRICS.container_padding,
+        )
+
+        # Используем вкладки для группировки настроек
+        tabs = QTabWidget()
+        
+        # Вкладка "Общие"
+        general_tab = self._create_general_tab()
+        tabs.addTab(general_tab, "Общие")
+        
+        # Вкладка "LLM"
+        llm_tab = self._create_llm_tab()
+        tabs.addTab(llm_tab, "LLM")
+        
+        # Вкладка "Промпты"
+        prompts_tab = self._create_prompts_tab()
+        tabs.addTab(prompts_tab, "Промпты")
+        
+        # Вкладка "Панели"
+        panels_tab = self._create_panels_tab()
+        tabs.addTab(panels_tab, "Панели")
+        
+        # Вкладка "Внешний вид"
+        appearance_tab = self._create_appearance_tab()
+        tabs.addTab(appearance_tab, "Внешний вид")
+
+        layout.addWidget(tabs)
+
+        # Кнопки
+        button_box = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
+            Qt.Horizontal,
+            self,
+        )
+        button_box.accepted.connect(self._save_and_accept)
+        button_box.rejected.connect(self.reject)
+        layout.addWidget(button_box)
+
+    def _create_general_tab(self) -> QWidget:
+        """Создать вкладку общих настроек"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        layout.setSpacing(UI_METRICS.base_spacing)
+        
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.NoFrame)
+        
+        content = QWidget()
+        content_layout = QVBoxLayout(content)
+        content_layout.setSpacing(UI_METRICS.section_spacing)
+        
+        # Папка с тест-кейсами
+        test_cases_group = QGroupBox("Папка с тест-кейсами")
+        test_cases_layout = QHBoxLayout()
+        self.test_cases_dir_edit = QLineEdit()
+        self.test_cases_dir_edit.setPlaceholderText("Путь к папке с тест-кейсами")
+        test_cases_dir_btn = QPushButton("Обзор...")
+        test_cases_dir_btn.clicked.connect(self._browse_test_cases_dir)
+        test_cases_layout.addWidget(self.test_cases_dir_edit)
+        test_cases_layout.addWidget(test_cases_dir_btn)
+        test_cases_group.setLayout(test_cases_layout)
+        content_layout.addWidget(test_cases_group)
+        
+        # Путь к методике
+        methodic_group = QGroupBox("Путь к методике")
+        methodic_layout = QHBoxLayout()
+        self.methodic_path_edit = QLineEdit()
+        self.methodic_path_edit.setPlaceholderText("Путь к файлу методики")
+        methodic_path_btn = QPushButton("Обзор...")
+        methodic_path_btn.clicked.connect(self._browse_methodic_path)
+        methodic_layout.addWidget(self.methodic_path_edit)
+        methodic_layout.addWidget(methodic_path_btn)
+        methodic_group.setLayout(methodic_layout)
+        content_layout.addWidget(methodic_group)
+        
+        content_layout.addStretch()
+        scroll.setWidget(content)
+        layout.addWidget(scroll)
+        
+        return widget
+
+    def _create_llm_tab(self) -> QWidget:
+        """Создать вкладку настроек LLM"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        layout.setSpacing(UI_METRICS.base_spacing)
+        
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.NoFrame)
+        
+        content = QWidget()
+        content_layout = QVBoxLayout(content)
+        content_layout.setSpacing(UI_METRICS.section_spacing)
+        
+        # LLM Host
+        host_group = QGroupBox("LLM Host")
+        host_layout = QVBoxLayout()
+        self.llm_host_edit = QLineEdit()
+        self.llm_host_edit.setPlaceholderText("http://localhost:11434")
+        host_layout.addWidget(self.llm_host_edit)
+        host_group.setLayout(host_layout)
+        content_layout.addWidget(host_group)
+        
+        # LLM Model
+        model_group = QGroupBox("LLM Model")
+        model_layout = QVBoxLayout()
+        self.llm_model_edit = QLineEdit()
+        self.llm_model_edit.setPlaceholderText("deepseek-v3.1:latest")
+        model_layout.addWidget(self.llm_model_edit)
+        model_group.setLayout(model_layout)
+        content_layout.addWidget(model_group)
+        
+        content_layout.addStretch()
+        scroll.setWidget(content)
+        layout.addWidget(scroll)
+        
+        return widget
+
+    def _create_prompts_tab(self) -> QWidget:
+        """Создать вкладку настроек промптов"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        layout.setSpacing(UI_METRICS.base_spacing)
+        
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.NoFrame)
+        
+        content = QWidget()
+        content_layout = QVBoxLayout(content)
+        content_layout.setSpacing(UI_METRICS.section_spacing)
+        
+        # Промпт для ревью
+        review_group = QGroupBox("Промпт для ревью")
+        review_layout = QVBoxLayout()
+        self.review_prompt_edit = QTextEdit()
+        self.review_prompt_edit.setPlaceholderText("Опиши, на что обратить внимание при ревью тест-кейсов.")
+        self.review_prompt_edit.setMinimumHeight(100)
+        review_layout.addWidget(self.review_prompt_edit)
+        review_group.setLayout(review_layout)
+        content_layout.addWidget(review_group)
+        
+        # Промпт для создания ТК
+        create_group = QGroupBox("Промпт для создания тест-кейсов")
+        create_layout = QVBoxLayout()
+        self.create_prompt_edit = QTextEdit()
+        self.create_prompt_edit.setPlaceholderText("Создай тест-кейсы...")
+        self.create_prompt_edit.setMinimumHeight(100)
+        create_layout.addWidget(self.create_prompt_edit)
+        create_group.setLayout(create_layout)
+        content_layout.addWidget(create_group)
+        
+        content_layout.addStretch()
+        scroll.setWidget(content)
+        layout.addWidget(scroll)
+        
+        return widget
+
+    def _create_panels_tab(self) -> QWidget:
+        """Создать вкладку настроек панелей"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        layout.setSpacing(UI_METRICS.base_spacing)
+        
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.NoFrame)
+        
+        content = QWidget()
+        content_layout = QVBoxLayout(content)
+        content_layout.setSpacing(UI_METRICS.section_spacing)
+        
+        # Размеры панелей
+        panels_group = QGroupBox("Размеры панелей (в пикселях)")
+        panels_layout = QVBoxLayout()
+        panels_layout.setSpacing(UI_METRICS.base_spacing)
+        
+        # Левая панель
+        left_layout = QHBoxLayout()
+        left_layout.addWidget(QLabel("Левая панель (дерево):"))
+        self.left_panel_spin = QSpinBox()
+        self.left_panel_spin.setMinimum(150)
+        self.left_panel_spin.setMaximum(2000)
+        self.left_panel_spin.setSuffix(" px")
+        left_layout.addWidget(self.left_panel_spin)
+        left_layout.addStretch()
+        panels_layout.addLayout(left_layout)
+        
+        # Панель редактирования
+        form_layout = QHBoxLayout()
+        form_layout.addWidget(QLabel("Панель редактирования:"))
+        self.form_area_spin = QSpinBox()
+        self.form_area_spin.setMinimum(300)
+        self.form_area_spin.setMaximum(5000)
+        self.form_area_spin.setSuffix(" px")
+        form_layout.addWidget(self.form_area_spin)
+        form_layout.addStretch()
+        panels_layout.addLayout(form_layout)
+        
+        # Панель ревью
+        review_layout = QHBoxLayout()
+        review_layout.addWidget(QLabel("Панель ревью:"))
+        self.review_panel_spin = QSpinBox()
+        self.review_panel_spin.setMinimum(200)
+        self.review_panel_spin.setMaximum(2000)
+        self.review_panel_spin.setSuffix(" px")
+        review_layout.addWidget(self.review_panel_spin)
+        review_layout.addStretch()
+        panels_layout.addLayout(review_layout)
+        
+        panels_group.setLayout(panels_layout)
+        content_layout.addWidget(panels_group)
+        
+        content_layout.addStretch()
+        scroll.setWidget(content)
+        layout.addWidget(scroll)
+        
+        return widget
+
+    def _create_appearance_tab(self) -> QWidget:
+        """Создать вкладку настроек внешнего вида"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        layout.setSpacing(UI_METRICS.base_spacing)
+        
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.NoFrame)
+        
+        content = QWidget()
+        content_layout = QVBoxLayout(content)
+        content_layout.setSpacing(UI_METRICS.section_spacing)
+        
+        # Тема
+        theme_group = QGroupBox("Тема")
+        theme_layout = QVBoxLayout()
+        self.theme_combo = QComboBox()
+        self.theme_combo.setEditable(True)
+        self.theme_combo.addItems(["light", "dark"])
+        theme_layout.addWidget(self.theme_combo)
+        theme_group.setLayout(theme_layout)
+        content_layout.addWidget(theme_group)
+        
+        # Шрифт
+        font_group = QGroupBox("Шрифт")
+        font_layout = QVBoxLayout()
+        font_layout.setSpacing(UI_METRICS.base_spacing)
+        
+        font_family_layout = QHBoxLayout()
+        font_family_layout.addWidget(QLabel("Семейство шрифтов:"))
+        self.font_family_edit = QLineEdit()
+        self.font_family_edit.setPlaceholderText("Segoe UI")
+        font_family_layout.addWidget(self.font_family_edit)
+        font_layout.addLayout(font_family_layout)
+        
+        font_size_layout = QHBoxLayout()
+        font_size_layout.addWidget(QLabel("Размер шрифта:"))
+        self.font_size_spin = QSpinBox()
+        self.font_size_spin.setMinimum(8)
+        self.font_size_spin.setMaximum(24)
+        self.font_size_spin.setSuffix(" pt")
+        font_size_layout.addWidget(self.font_size_spin)
+        font_size_layout.addStretch()
+        font_layout.addLayout(font_size_layout)
+        
+        font_group.setLayout(font_layout)
+        content_layout.addWidget(font_group)
+        
+        content_layout.addStretch()
+        scroll.setWidget(content)
+        layout.addWidget(scroll)
+        
+        return widget
+
+    def _browse_test_cases_dir(self):
+        """Выбрать папку с тест-кейсами"""
+        current_path = self.test_cases_dir_edit.text() or str(Path.cwd())
+        folder = QFileDialog.getExistingDirectory(
+            self,
+            "Выберите папку с тест-кейсами",
+            current_path,
+            QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks
+        )
+        if folder:
+            self.test_cases_dir_edit.setText(folder)
+
+    def _browse_methodic_path(self):
+        """Выбрать файл методики"""
+        current_path = self.methodic_path_edit.text() or str(Path.cwd())
+        file_path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Выберите файл методики",
+            current_path,
+            "Markdown файлы (*.md);;Текстовые файлы (*.txt);;Все файлы (*.*)"
+        )
+        if file_path:
+            self.methodic_path_edit.setText(file_path)
+
+    def _load_settings(self):
+        """Загрузить настройки в поля формы"""
+        # Общие
+        self.test_cases_dir_edit.setText(self.settings.get('test_cases_dir', ''))
+        self.methodic_path_edit.setText(self.settings.get('LLM_METHODIC_PATH', ''))
+        
+        # LLM
+        self.llm_host_edit.setText(self.settings.get('LLM_HOST', ''))
+        self.llm_model_edit.setText(self.settings.get('LLM_MODEL', ''))
+        
+        # Промпты
+        self.review_prompt_edit.setPlainText(self.settings.get('DEFAULT_PROMT', ''))
+        self.create_prompt_edit.setPlainText(self.settings.get('DEFAULT_PROMT_CREATE_TC', ''))
+        
+        # Панели
+        panel_sizes = self.settings.get('panel_sizes', {})
+        self.left_panel_spin.setValue(panel_sizes.get('left', 350))
+        self.form_area_spin.setValue(panel_sizes.get('form_area', 900))
+        self.review_panel_spin.setValue(panel_sizes.get('review', 360))
+        
+        # Внешний вид
+        self.theme_combo.setCurrentText(self.settings.get('theme', 'light'))
+        self.font_family_edit.setText(self.settings.get('font_family', 'Segoe UI'))
+        self.font_size_spin.setValue(self.settings.get('font_size', 11))
+
+    def _save_and_accept(self):
+        """Сохранить настройки и закрыть диалог"""
+        # Общие
+        self.settings['test_cases_dir'] = self.test_cases_dir_edit.text().strip()
+        self.settings['LLM_METHODIC_PATH'] = self.methodic_path_edit.text().strip()
+        
+        # LLM
+        self.settings['LLM_HOST'] = self.llm_host_edit.text().strip()
+        self.settings['LLM_MODEL'] = self.llm_model_edit.text().strip()
+        
+        # Промпты
+        self.settings['DEFAULT_PROMT'] = self.review_prompt_edit.toPlainText().strip()
+        self.settings['DEFAULT_PROMT_CREATE_TC'] = self.create_prompt_edit.toPlainText().strip()
+        
+        # Панели
+        if 'panel_sizes' not in self.settings:
+            self.settings['panel_sizes'] = {}
+        self.settings['panel_sizes']['left'] = self.left_panel_spin.value()
+        self.settings['panel_sizes']['form_area'] = self.form_area_spin.value()
+        self.settings['panel_sizes']['review'] = self.review_panel_spin.value()
+        
+        # Внешний вид
+        self.settings['theme'] = self.theme_combo.currentText().strip()
+        self.settings['font_family'] = self.font_family_edit.text().strip()
+        self.settings['font_size'] = self.font_size_spin.value()
+        
+        self.accept()
+
+    def get_settings(self) -> dict:
+        """Получить сохраненные настройки"""
+        return self.settings
 
 
 class _LLMWorker(QObject):
@@ -326,6 +708,14 @@ class MainWindow(QMainWindow):
         switch_row.addWidget(self.mode_run_label)
         layout.addLayout(switch_row)
         self._update_mode_indicator()
+
+        # Кнопка настроек
+        self.settings_button = QPushButton("Настройки")
+        self.settings_button.setCursor(Qt.PointingHandCursor)
+        self.settings_button.setMinimumHeight(UI_METRICS.control_min_height)
+        self.settings_button.setMinimumWidth(UI_METRICS.control_min_width)
+        self.settings_button.clicked.connect(self._open_settings_dialog)
+        layout.addWidget(self.settings_button)
 
         return header
     
@@ -616,14 +1006,29 @@ class MainWindow(QMainWindow):
         не работаем напрямую с файлами, используем сервис
         """
         expanded_state = set()
+        selected_filepath = None
+        # Сохраняем размеры панелей перед обновлением
+        saved_detail_sizes = None
+        if hasattr(self, "detail_splitter"):
+            saved_detail_sizes = self.detail_splitter.sizes()
+        
         if hasattr(self, "tree_widget"):
             expanded_state = self.tree_widget.capture_expanded_state()
+            # Сохраняем путь к выбранному элементу для восстановления фокуса
+            selected_filepath = self.tree_widget.capture_selected_item()
 
         self.test_cases = self.service.load_all_test_cases(self.test_cases_dir)
         
         # Обновляем дерево
         self.tree_widget.load_tree(self.test_cases_dir, self.test_cases)
         self.tree_widget.restore_expanded_state(expanded_state)
+        # Восстанавливаем выбранный элемент
+        if selected_filepath:
+            self.tree_widget.restore_selected_item(selected_filepath)
+        
+        # Восстанавливаем размеры панелей после обновления
+        if saved_detail_sizes and hasattr(self, "detail_splitter"):
+            self.detail_splitter.setSizes(saved_detail_sizes)
         
         # Обновляем счетчики
         self.placeholder.update_count(len(self.test_cases))
@@ -1264,6 +1669,10 @@ class MainWindow(QMainWindow):
             self.form_widget.set_run_mode(not is_edit)
         if hasattr(self, "aux_panel"):
             self.aux_panel.set_panels_enabled(is_edit, is_edit)
+            # Блокируем/разблокируем кнопки в панели управления раннером
+            if hasattr(self.aux_panel, "stats_panel"):
+                # В режиме редактирования блокируем, в режиме запуска - разблокируем
+                self.aux_panel.stats_panel.set_buttons_enabled(not is_edit)
             if is_edit:
                 self.aux_panel.restore_last_tab()
             else:
@@ -1370,6 +1779,179 @@ class MainWindow(QMainWindow):
         else:
             self.setGeometry(default_x, default_y, default_width, default_height)
 
+    def changeEvent(self, event):
+        """Обработка изменения состояния окна (maximize/restore и т.д.)"""
+        if event.type() == QEvent.WindowStateChange:
+            # При изменении состояния окна (maximize/restore) обновляем панели
+            QTimer.singleShot(100, self._update_panels_after_resize)
+        super().changeEvent(event)
+    
+    def resizeEvent(self, event):
+        """Обработка изменения размера окна"""
+        # При изменении размера окна обновляем панели
+        QTimer.singleShot(100, self._update_panels_after_resize)
+        super().resizeEvent(event)
+    
+    def _update_panels_after_resize(self):
+        """Обновить панели после изменения размера окна"""
+        if not hasattr(self, "detail_splitter") or not hasattr(self, "form_widget"):
+            return
+        
+        # Сохраняем текущие размеры splitter'ов перед обновлением
+        current_detail_sizes = self.detail_splitter.sizes()
+        current_main_sizes = self.main_splitter.sizes() if hasattr(self, "main_splitter") else None
+        
+        # Обновляем геометрию формы для корректного пересчета размеров
+        self.form_widget.updateGeometry()
+        
+        # Если есть сохраненные размеры, применяем их пропорционально
+        if hasattr(self, "panel_sizes") and current_main_sizes and len(current_main_sizes) > 1:
+            # Вычисляем пропорции на основе сохраненных размеров
+            total_saved = self.panel_sizes.get('form_area', 900)
+            if total_saved > 0:
+                # Текущая доступная ширина для правой панели
+                current_total = current_main_sizes[1]
+                
+                # Вычисляем пропорции для detail_splitter
+                saved_review = self.panel_sizes.get('review', 360)
+                saved_form = total_saved - saved_review
+                
+                if saved_form > 0 and saved_review > 0:
+                    # Сохраняем пропорции
+                    form_ratio = saved_form / total_saved
+                    review_ratio = saved_review / total_saved
+                    
+                    # Применяем пропорции к текущему размеру
+                    new_form_width = int(current_total * form_ratio)
+                    new_review_width = int(current_total * review_ratio)
+                    
+                    # Убеждаемся, что размеры не слишком малы
+                    new_form_width = max(new_form_width, 300)
+                    new_review_width = max(new_review_width, 220)
+                    
+                    # Если сумма превышает доступное пространство, корректируем
+                    if new_form_width + new_review_width > current_total:
+                        total_needed = new_form_width + new_review_width
+                        new_form_width = int(new_form_width * current_total / total_needed)
+                        new_review_width = current_total - new_form_width
+                    
+                    self.detail_splitter.setSizes([new_form_width, new_review_width])
+                else:
+                    # Если пропорции не определены, используем текущие размеры
+                    if len(current_detail_sizes) >= 2:
+                        self.detail_splitter.setSizes(current_detail_sizes)
+            else:
+                # Если сохраненных размеров нет, используем текущие
+                if len(current_detail_sizes) >= 2:
+                    self.detail_splitter.setSizes(current_detail_sizes)
+        else:
+            # Если нет сохраненных размеров, используем текущие
+            if len(current_detail_sizes) >= 2:
+                self.detail_splitter.setSizes(current_detail_sizes)
+        
+        # Принудительно обновляем форму для пересчета размеров шагов
+        QTimer.singleShot(50, self._refresh_form_layout)
+    
+    def _refresh_form_layout(self):
+        """Обновить layout формы для корректного отображения после изменения размера"""
+        if not hasattr(self, "form_widget"):
+            return
+        
+        # Обновляем геометрию формы
+        self.form_widget.updateGeometry()
+        
+        # Обновляем размеры шагов, если они есть
+        if hasattr(self.form_widget, "steps_list"):
+            # Обновляем размеры всех шагов для корректного переноса текста
+            for row in range(self.form_widget.steps_list.count()):
+                widget = self.form_widget._get_step_widget(row)
+                if widget:
+                    # Обновляем ширину текста в документах для правильного переноса
+                    if hasattr(widget, "action_edit"):
+                        viewport_width = widget.action_edit.viewport().width()
+                        if viewport_width > 0:
+                            widget.action_edit.document().setTextWidth(viewport_width)
+                    if hasattr(widget, "expected_edit"):
+                        viewport_width = widget.expected_edit.viewport().width()
+                        if viewport_width > 0:
+                            widget.expected_edit.document().setTextWidth(viewport_width)
+                    # Синхронизируем высоту полей после обновления ширины
+                    widget._sync_text_edits_height()
+            
+            # Обновляем общую высоту списка шагов
+            self.form_widget._update_steps_list_height()
+    
+    def _open_settings_dialog(self):
+        """Открыть диалог настроек"""
+        dialog = SettingsDialog(self.settings, self)
+        if dialog.exec_() == QDialog.Accepted:
+            new_settings = dialog.get_settings()
+            
+            # Сохраняем существующие настройки, которые не редактируются в диалоге
+            # (например, window_geometry)
+            for key, value in self.settings.items():
+                if key not in new_settings:
+                    new_settings[key] = value
+            
+            # Сохраняем настройки
+            self.save_settings(new_settings)
+            self.settings = new_settings
+            
+            # Применяем изменения
+            self._apply_settings_changes(new_settings)
+            
+            QMessageBox.information(
+                self,
+                "Настройки сохранены",
+                "Настройки успешно сохранены. Некоторые изменения могут потребовать перезапуска приложения."
+            )
+    
+    def _apply_settings_changes(self, new_settings: dict):
+        """Применить изменения настроек к приложению"""
+        # Обновляем пути
+        if 'test_cases_dir' in new_settings:
+            old_dir = self.test_cases_dir
+            self.test_cases_dir = Path(new_settings['test_cases_dir'])
+            if old_dir != self.test_cases_dir:
+                # Перезагружаем дерево тест-кейсов, если изменилась папка
+                self.load_all_test_cases()
+        
+        # Обновляем LLM настройки
+        if 'LLM_HOST' in new_settings:
+            self.llm_host = new_settings['LLM_HOST'].strip()
+        if 'LLM_MODEL' in new_settings:
+            self.llm_model = new_settings['LLM_MODEL'].strip()
+            # Обновляем модель в селекторе
+            if hasattr(self, 'model_selector'):
+                current_text = self.model_selector.currentText()
+                if current_text != self.llm_model:
+                    self.model_selector.setCurrentText(self.llm_model)
+        
+        # Обновляем промпты
+        if 'DEFAULT_PROMT' in new_settings:
+            self.default_prompt = new_settings['DEFAULT_PROMT']
+        if 'DEFAULT_PROMT_CREATE_TC' in new_settings:
+            self.create_tc_prompt = new_settings['DEFAULT_PROMT_CREATE_TC']
+        
+        # Обновляем размеры панелей
+        if 'panel_sizes' in new_settings:
+            self.panel_sizes.update(new_settings['panel_sizes'])
+            # Применяем новые размеры
+            if hasattr(self, 'main_splitter') and hasattr(self, 'detail_splitter'):
+                self._apply_initial_panel_sizes()
+        
+        # Обновляем путь к методике
+        if 'LLM_METHODIC_PATH' in new_settings:
+            methodic_path = new_settings['LLM_METHODIC_PATH']
+            if methodic_path:
+                self.settings['LLM_METHODIC_PATH'] = methodic_path
+        
+        # Внешний вид (тема, шрифт) - может потребовать перезапуска
+        # Но можно попробовать применить сразу
+        if 'theme' in new_settings or 'font_family' in new_settings or 'font_size' in new_settings:
+            # Обновление темы и шрифта может потребовать перезапуска приложения
+            pass
+    
     def closeEvent(self, event):
         if self.isMaximized():
             geom = self.normalGeometry()

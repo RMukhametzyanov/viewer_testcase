@@ -757,6 +757,46 @@ class TestCaseTreeWidget(QTreeWidget):
 
     # ----------------------------------------------------------- selection --
 
+    def capture_selected_item(self) -> Optional[Path]:
+        """Сохранить путь к выбранному тест-кейсу для восстановления после перезагрузки."""
+        current = self.currentItem()
+        if not current:
+            return None
+        
+        data = current.data(0, Qt.UserRole)
+        if data and data.get("type") == "file":
+            test_case = data.get("test_case")
+            if test_case:
+                return getattr(test_case, "_filepath", None)
+        return None
+
+    def restore_selected_item(self, filepath: Optional[Path]):
+        """Восстановить выбранный элемент по пути к файлу."""
+        if not filepath:
+            return
+        
+        item = self._find_item_by_filepath(self.invisibleRootItem(), filepath)
+        if item:
+            self.setCurrentItem(item)
+            self.scrollToItem(item)
+            # Не вызываем test_case_selected.emit, чтобы не перезагружать форму
+
+    def _find_item_by_filepath(self, parent: QTreeWidgetItem, filepath: Path) -> Optional[QTreeWidgetItem]:
+        """Найти элемент дерева по пути к файлу тест-кейса."""
+        for i in range(parent.childCount()):
+            child = parent.child(i)
+            data = child.data(0, Qt.UserRole)
+            if data and data.get("type") == "file":
+                test_case = data.get("test_case")
+                if test_case and getattr(test_case, "_filepath", None) == filepath:
+                    return child
+
+            found = self._find_item_by_filepath(child, filepath)
+            if found:
+                return found
+
+        return None
+
     def focus_on_test_case(self, target: TestCase):
         """Выделить тест-кейс в дереве и инициировать открытие."""
         if not target:

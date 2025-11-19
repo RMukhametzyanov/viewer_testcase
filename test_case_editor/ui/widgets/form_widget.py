@@ -136,6 +136,9 @@ class TestCaseFormWidget(QWidget):
             header.addStretch(1)
 
             self.status_widget = QWidget()
+            # Устанавливаем фиксированную минимальную ширину для виджета статусов,
+            # чтобы все кнопки всегда были видны
+            self.status_widget.setMinimumWidth(120)
             status_layout = QHBoxLayout(self.status_widget)
             status_layout.setContentsMargins(0, 0, 0, 0)
             status_layout.setSpacing(UI_METRICS.base_spacing // 2)
@@ -151,6 +154,8 @@ class TestCaseFormWidget(QWidget):
                 btn.setCheckable(True)
                 btn.setCursor(Qt.PointingHandCursor)
                 btn.setAutoRaise(True)
+                # Устанавливаем фиксированный размер для кнопок статусов
+                btn.setFixedSize(32, 24)
                 btn.setProperty("status_value", value)
                 btn.setProperty("status_color", color)
                 btn.clicked.connect(lambda _checked, val=value: self._on_status_clicked(val))
@@ -210,6 +215,8 @@ class TestCaseFormWidget(QWidget):
                 color = btn.property("status_color") or "#4CAF50"
                 is_active = value == self._status
                 btn.setChecked(is_active)
+                # Убеждаемся, что размер кнопки остается фиксированным
+                btn.setFixedSize(32, 24)
                 if is_active:
                     btn.setStyleSheet(
                         f"""
@@ -218,7 +225,9 @@ class TestCaseFormWidget(QWidget):
                             color: #0f1117;
                             border-radius: 9px;
                             font-weight: 700;
-                            padding: 2px 10px;
+                            padding: 2px 6px;
+                            min-width: 32px;
+                            max-width: 32px;
                         }}
                         """
                     )
@@ -229,7 +238,9 @@ class TestCaseFormWidget(QWidget):
                             border: 1px solid {color};
                             color: {color};
                             border-radius: 9px;
-                            padding: 2px 10px;
+                            padding: 2px 6px;
+                            min-width: 32px;
+                            max-width: 32px;
                         }}
                         QToolButton:hover {{
                             background-color: {color}33;

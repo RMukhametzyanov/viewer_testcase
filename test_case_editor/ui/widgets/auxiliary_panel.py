@@ -115,7 +115,7 @@ class AuxiliaryPanel(QWidget):
             ("review", "Ревью", "Панель ревью"),
             ("creation", "Создать ТК", "Создать ТК"),
             ("json", "JSON", "JSON превью"),
-            ("stats", "Статистика", "Статистика"),
+            ("stats", "Панель управления раннером", "Панель управления раннером"),
         ]
 
         for index, (tab_id, text, tooltip) in enumerate(tabs):
