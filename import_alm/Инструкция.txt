@@ -1,0 +1,27 @@
+Инструкция:
+1) В КСПД выполняем запрос через Postman
+GET https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites
+
+авторизация basic (сгенерировать токен через настройки профиля в ALM, как для ALMReporter
+
+Результат запроса сохраняем в файл (справа снизу будет save response)
+
+Результат:
+json файл.
+
+2) В Девзоне настроить файл const.py в папке import_alm и выполнить скрипт build_suite_hierarchy.py
+Результат: 
+Появится маппинг структуры сьютов  - файл suite_hierarchy_map.json
+
+3) В КСПД перенести файлы const.py, suite_hierarchy_map.json, fetch_test_cases.py
+
+Положить их в одну папку и выполнить скрипт fetch_test_cases.py
+
+
+Результат: В той папке, где будет лежать скрипт сгенерируется много файлов json формата 12345.json
+
+4) Через почту перекинуть сгенгерированные файлы формата 12345.json и закинуть в папку test_suites\from_alm 
+В эту же папку поместить suite_hierarchy_map.json
+
+5) Запустить вьювер. И нажать Файл / Импорт из ALM
+

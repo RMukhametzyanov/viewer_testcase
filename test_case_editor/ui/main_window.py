@@ -1982,24 +1982,77 @@ class MainWindow(QMainWindow):
         super().closeEvent(event)
 
     def convert_from_azure(self):
-        """Импорт тест-кейсов из JSON Azure DevOps."""
-        files, _ = QFileDialog.getOpenFileNames(
-            self,
-            "Выберите JSON-файлы Azure DevOps",
-            str(self.test_cases_dir),
-            "JSON файлы (*.json)",
-        )
+        """Импорт тест-кейсов из ALM с созданием структуры папок согласно иерархии."""
+        # Определяем пути к папкам - сначала пробуем относительно корня проекта
+        # (где находится run_app.py), затем относительно test_cases_dir
+        app_dir = Path(__file__).resolve().parent.parent.parent
+        test_suites_dir = None
+        from_alm_dir = None
+        hierarchy_map_path = None
 
-        if not files:
+        # Пробуем найти относительно корня проекта
+        candidate_dir = app_dir / "test_suites"
+        if candidate_dir.exists():
+            test_suites_dir = candidate_dir
+        else:
+            # Пробуем относительно test_cases_dir
+            candidate_dir = self.test_cases_dir / "test_suites"
+            if candidate_dir.exists():
+                test_suites_dir = candidate_dir
+
+        if test_suites_dir:
+            from_alm_dir = test_suites_dir / "from_alm"
+            hierarchy_map_path = test_suites_dir / "suite_hierarchy_map.json"
+        else:
+            # Если не нашли test_suites, пробуем прямо в test_cases_dir
+            from_alm_dir = self.test_cases_dir / "test_suites" / "from_alm"
+            hierarchy_map_path = self.test_cases_dir / "test_suites" / "suite_hierarchy_map.json"
+
+        # Проверяем наличие необходимых папок и файлов
+        if not from_alm_dir.exists():
+            QMessageBox.warning(
+                self,
+                "Папка не найдена",
+                f"Папка с suite файлами не найдена:\n{from_alm_dir}\n\n"
+                "Убедитесь, что папка test_suites/from_alm существует и содержит JSON файлы.\n\n"
+                f"Искали в:\n- {app_dir / 'test_suites'}\n- {self.test_cases_dir / 'test_suites'}",
+            )
             return
 
-        total_created = 0
-        all_errors = []
+        if not hierarchy_map_path.exists():
+            QMessageBox.warning(
+                self,
+                "Файл не найден",
+                f"Файл карты иерархии не найден:\n{hierarchy_map_path}\n\n"
+                "Убедитесь, что файл test_suites/suite_hierarchy_map.json существует.\n\n"
+                f"Искали в:\n- {app_dir / 'test_suites' / 'suite_hierarchy_map.json'}\n"
+                f"- {self.test_cases_dir / 'test_suites' / 'suite_hierarchy_map.json'}",
+            )
+            return
 
-        for file_path in files:
-            created, errors = self.service.import_from_azure(Path(file_path), self.test_cases_dir)
-            total_created += created
-            all_errors.extend(errors)
+        # Подтверждение импорта
+        reply = QMessageBox.question(
+            self,
+            "Импорт из ALM",
+            f"Будет обработано всех suite из папки:\n{from_alm_dir}\n\n"
+            f"Структура папок будет создана согласно:\n{hierarchy_map_path}\n\n"
+            "Продолжить?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.Yes,
+        )
+
+        if reply != QMessageBox.Yes:
+            return
+
+        # Выполняем импорт
+        self.statusBar().showMessage("Импорт из ALM: обработка файлов...")
+        QApplication.processEvents()  # Обновляем UI
+
+        total_created, all_errors = self.service.import_from_alm_with_hierarchy(
+            from_alm_dir=from_alm_dir,
+            hierarchy_map_path=hierarchy_map_path,
+            target_root=self.test_cases_dir,
+        )
 
         self.load_all_test_cases()
 
@@ -2016,7 +2069,8 @@ class MainWindow(QMainWindow):
             QMessageBox.information(
                 self,
                 "Импорт завершен",
-                f"Создано тест-кейсов: {total_created}",
+                f"Создано тест-кейсов: {total_created}\n\n"
+                f"Структура папок создана согласно иерархии из:\n{hierarchy_map_path.name}",
             )
 
         self.statusBar().showMessage(f"Импортировано тест-кейсов: {total_created}")
