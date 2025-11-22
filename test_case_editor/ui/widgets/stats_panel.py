@@ -71,6 +71,21 @@ class StatsPanel(QWidget):
         layout.addWidget(container, 1)
         layout.addStretch(1)
         self.update_statistics([])
+        
+        # По умолчанию кнопки заблокированы (режим редактирования)
+        self.set_buttons_enabled(False)
+
+    def set_buttons_enabled(self, enabled: bool):
+        """Блокировать или разблокировать все кнопки в панели.
+        
+        Args:
+            enabled: True для разблокировки (режим запуска тестов),
+                    False для блокировки (режим редактирования)
+        """
+        self.reset_button.setEnabled(enabled)
+        self.generate_button.setEnabled(enabled)
+        self.pass_button.setEnabled(enabled)
+        self.reset_current_button.setEnabled(enabled)
 
     def update_statistics(self, test_cases: Iterable[TestCase]) -> None:
         cases = list(test_cases or [])

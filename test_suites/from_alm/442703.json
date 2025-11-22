@@ -1,0 +1,287 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442703,
+        "name": "Вкладка Ошибки"
+      },
+      "workItem": {
+        "id": 367962,
+        "name": "ДОБ. ТР20. Переопределить поле вывода ошибки от ТР20 (логи)",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"8\"><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Выполнить предусловие &lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Проект пересчитан&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">Перейти на вкладку Ошибки\n \nОтфильтровать реестр по типу ГТМ ОПТ\n\nВыбрать скважину\n \nКлик на иконку в колонке Тип ошибки </parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В окне расшифровки ошибок нет записей с технической информацией, все расшифровки ошибок на русском&lt;BR/&gt;&lt;BR/&gt;Пример:&lt;BR/&gt;&lt;SPAN style=\"font-size: 14px;background-color: rgb(255, 255, 0)\"&gt;Ошибка внутреннего расчета PythonError&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Получить well_id скважины с типом ГТМ ОПТ&lt;BR/&gt;&amp;nbsp; &lt;BR/&gt;Перейти в БД таблица spektr.expertise_errors&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Выполнить запрос &lt;BR/&gt;&lt;/P&gt;&lt;DIV style=\"background-color:#ffffff;padding:0px 0px 0px 2px\"&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-family: Consolas;font-size: 10pt\"&gt;&lt;P&gt;&lt;SPAN style=\"color:#800000;font-weight:bold\"&gt;SELECT&lt;/SPAN&gt; * &lt;SPAN style=\"color:#800000;font-weight:bold\"&gt;FROM&lt;/SPAN&gt; spektr.expertise_errors&lt;/P&gt;&lt;P&gt;&lt;SPAN style=\"color:#800000;font-weight:bold\"&gt;where&lt;/SPAN&gt; well_id = &lt;SPAN style=\"color:#808080\"&gt;--id скважины&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;&lt;P&gt;&lt;BR/&gt;Из поля &lt;SPAN style=\"color: rgb(0, 0, 0);font-size: 14px;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;error_data &lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;получить значение атрибута &lt;/SPAN&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgb(255, 255, 255);font-size: 14px\"&gt;userLog&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Пример:&lt;BR/&gt;&lt;/P&gt;&lt;P&gt;&lt;SPAN style=\"font-size: 14px;background-color: rgb(255, 255, 255)\"&gt;&amp;nbsp;&lt;/SPAN&gt;&lt;SPAN style=\"font-size: 14px;background-color: rgb(255, 255, 255)\"&gt;{&lt;BR/&gt;&lt;/SPAN&gt;&lt;/P&gt;&lt;DIV style=\"font-size: 14px;background-color: rgb(255, 255, 255)\"&gt;\"fullErrorLog\":&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV style=\"font-size: 14px;background-color: rgb(255, 255, 255)\"&gt;&amp;nbsp;{&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV style=\"font-size: 14px;background-color: rgb(255, 255, 255)\"&gt;&amp;nbsp; &amp;nbsp; \"status\": \"5003\",&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV style=\"font-size: 14px;background-color: rgb(255, 255, 255)\"&gt;&amp;nbsp; &amp;nbsp; \"calcLog\": [\"PythonError: list indices must be integers or slices, not str\"],&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV style=\"font-size: 14px;background-color: rgb(255, 255, 255)\"&gt;&amp;nbsp; &amp;nbsp; \"userLog\": [&lt;SPAN style=\"background-color: rgb(255, 255, 0)\"&gt;\"Ошибка внутреннего расчета PythonError\"&lt;/SPAN&gt;]&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV style=\"font-size: 14px;background-color: rgb(255, 255, 255)\"&gt;}&lt;BR/&gt;&lt;/DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;P&gt;&lt;SPAN style=\"font-size: 14px;background-color: rgb(255, 255, 255)\"&gt;}&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;В гриде ошибок в колонке тип ошибки &lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Значение в колонке тип ошибки == значению в &lt;SPAN style=\"background-color: rgb(255, 255, 255);font-size: 14px;color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;\"userLog\"&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt; &lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-04-01T14:17:58.12Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-05-23T08:07:30.123Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 9
+          }
+        ]
+      },
+      "pointAssignments": [
+        {
+          "id": 39843,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Лобанов Сергей Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+              }
+            },
+            "id": "cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "uniqueName": "GAZPROM-NEFT\\Lobanov.SI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442703/TestPoint/39843"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442703/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442703"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442703,
+        "name": "Вкладка Ошибки"
+      },
+      "workItem": {
+        "id": 92624,
+        "name": "[ДОБ] Ошибки",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"10\"><step id=\"7\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ПРЕДУСЛОВИЕ&lt;BR/&gt;&lt;BR/&gt;&lt;SPAN&gt;https://spektr-u210001901.apps.test.gazprom-neft.local/home&lt;/SPAN&gt;&lt;BR/&gt;&lt;SPAN&gt;Открыть меню / Добывающий фонд&lt;/SPAN&gt;&lt;BR/&gt;&lt;SPAN&gt;Развернуть самый верхний месяц&lt;/SPAN&gt;&lt;BR/&gt;&lt;SPAN&gt;Выбрать любое ДО&lt;/SPAN&gt;&lt;BR/&gt;&lt;SPAN&gt;Открыть&lt;/SPAN&gt;&lt;BR/&gt;&lt;SPAN&gt;Перейти на страницу Ошибки&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать скважину&lt;BR/&gt;Открыть панели\n&lt;BR/&gt; - Статус экспертизы\n - Информация о скважине&lt;BR/&gt; - Информация о ремонтах&lt;BR/&gt; - История корректировок&lt;BR/&gt; - Графики (Дебиты, Давления, Кпрод)&lt;BR/&gt;&amp;nbsp;- Карты&lt;BR/&gt; - Системный и Узловой анализ (&lt;B&gt;для ГТМ группы ОПТ&lt;/B&gt;)&lt;BR/&gt; - Данные РИГИС&lt;BR/&gt;&lt;IMG src=\"data:image/png;base64,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\" alt=\"\"/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Все панели открываются. Отображают информацию&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;В колонке Тип ошибки нажать фильтр&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Отображаются возможные варианты типов ошибок:&lt;BR/&gt; - Расчет невозможен&lt;BR/&gt; - Расчет некорректный&lt;BR/&gt; - Нефизичные данные&lt;BR/&gt;&lt;BR/&gt;Пустого типа ошибки быть не может&lt;BR/&gt;(Допускается пустой тип ошибки на ЗБС, т.к. функционал не доделан 19.09.2025)&lt;/P&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Выбрать скважину&lt;BR/&gt;В столбце \"Тип ошибки\" нажать на красную иконку&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;В колонке Тип ошибки всегда есть красный квадратик, хотя бы один. &lt;BR/&gt;&lt;BR/&gt;При клике на красный квадратик открывается окно с видом ошибки (вкладки) и самим текстом ошибки&lt;/P&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать скважину с типом ГТМ: ОПТ&lt;BR/&gt;В столбце \"Тип ошибки\" нажать на красную иконку&lt;BR/&gt;&lt;BR/&gt;*проверить несколько типов ошибок&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В окне расшифровки ошибок нет записей с технической информацией, все расшифровки ошибок на русском языке.&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Скачать Excel&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Поставить фильтр и выбрать \"Пусто\" одновременно для столбцов:&lt;BR/&gt;&amp;nbsp;- Отсутсвующие параметры ТР (H)&lt;BR/&gt; - Отсутсвующие параметры ТР (I)&lt;BR/&gt; - Ошибки (J)&lt;BR/&gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;В колонках с ошибками (H, I, J) все расшифровки на русском языке без технической информации.&lt;BR/&gt;&lt;BR/&gt;После выставления фильтров нет отображающихся записей (Допускается записи ЗБС, т.к. функционал не доработан 19.09.2025)\n\n&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-12-07T18:41:52.503Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-09-05T09:40:50.027Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 35
+          }
+        ]
+      },
+      "order": 1,
+      "pointAssignments": [
+        {
+          "id": 39939,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442703/TestPoint/39939"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442703/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442703"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442703,
+        "name": "Вкладка Ошибки"
+      },
+      "workItem": {
+        "id": 178329,
+        "name": "[ДОБ] Ошибки. Отнесение многопластовых скважин в ошибки при отсутствии совокупного техрежима",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"8\"><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;ПРЕДУСЛОВИЕ:&lt;BR/&gt;&lt;BR/&gt;Через средство просмотра БД (прим.: DBeaver, Data Grip, PGadmin) открыть консоль и выполнить запрос:&lt;BR/&gt;select *&lt;BR/&gt;from data_store.\"TechModes\"&lt;BR/&gt;where \"LayerIdName\" = 'PL0000'&lt;BR/&gt;and \"OrganizationId\" = 2&lt;BR/&gt;and \"ReportingMonth\" = 'ПЕРВОЕ ЧИСЛО МЕСЯЦА ПРОЕКТА, В КОТОРОМ БУДЕМ ПРОВОДИТЬ ДЕЙСТВИЯ'&lt;BR/&gt;&lt;BR/&gt;ПКМ на записи: Генерация INSERT / копировать&lt;BR/&gt;Сохранить сгенерированный INSERT в блокнот(Это будет бекапом)&lt;BR/&gt;&lt;BR/&gt;Удалить выбранную запись из БД / Сохранить&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Из списка многопластовых скваждин взята одна скважина и по ней сформирован бекап.&lt;BR/&gt;&lt;BR/&gt;Запись удалена из БД.&lt;BR/&gt;&amp;nbsp;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меню / ДОБ / Выбрать последний месяц для ДО Восток (т.к. по нему удаляли запись)&lt;BR/&gt;Настройки / Выбрать баблики ВБД, ОПТ, ОПТ с заглублением, МЕХ, ОПЗ, ДЕМЕХ&lt;BR/&gt;Сохранить и пересчитать&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Статус на ВБД, ОПТ, МЕХ, ДЕМЕХ поменялся на в процессе.&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Дождаться результатов расчета&lt;BR/&gt;Открыть вкладку Ошибки&lt;BR/&gt;Найти скважину, по которой удаляли запись&lt;BR/&gt;Нажать на красную иконку напротив такой записи&lt;BR/&gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Отображается текст ошибки: Отсутствует техрежим на совокупный пласт\"&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ПОСТУСЛОВИЕ&lt;BR/&gt;Выполнить ранее сгенерированный INSERT в БД, чтобы вернуть запись&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Запись восстановлена в БД&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Огилько Виктория Михайловна <GAZPROM-NEFT\\Ogilko.VM>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-11-22T06:13:45.633Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-09-19T08:36:29.22Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 18
+          }
+        ]
+      },
+      "order": 2,
+      "pointAssignments": [
+        {
+          "id": 40202,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Огилько Виктория Михайловна",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/0a7f5a8a-d508-4c27-b674-a3fa98901418",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTU1MjA"
+              }
+            },
+            "id": "0a7f5a8a-d508-4c27-b674-a3fa98901418",
+            "uniqueName": "GAZPROM-NEFT\\Ogilko.VM",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTU1MjA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTU1MjA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442703/TestPoint/40202"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442703/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442703"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 3
+}

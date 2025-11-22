@@ -1,0 +1,288 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442741,
+        "name": "Вкладка Анализ ВБД"
+      },
+      "workItem": {
+        "id": 144857,
+        "name": "[Мониторинг] Анализ ВБД. Проверка значений на графиках",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"9\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Мониторинг&lt;BR/&gt;Перейти на вкладку Анализ ВБД&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображаются графики:&lt;BR/&gt;Суммарный прирост\nРаспределение потенциала из БД фонда&lt;BR/&gt;График ВБД (шт)&lt;BR/&gt;&lt;BR/&gt;Отображается таблица \"Выполнение графика ВБД\"&lt;BR/&gt;&lt;BR/&gt;Дизайн соответствует макету: https://www.figma.com/file/pza27W6eHdj8sGjKulEBxW/SPekTR.review?type=design&amp;amp;node-id=57291-245627&amp;amp;mode=design&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Изменить выбранное ДО в верхнем фильтре&lt;BR/&gt;Изменить выбранный период &lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Таблицы и графики перестраиваются&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Проверка графика \"&lt;/B&gt;&lt;SPAN style=\"font-weight: bold;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Суммарный прирост&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;&lt;B&gt;\"&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&lt;/B&gt;&lt;B&gt;Выбрать в фильтре 1 месяц и 1 ДО&lt;BR/&gt;(проверить и Qн, и Qж)&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&lt;/B&gt;Перейти на вкладку \"Мониторинг\"&lt;BR/&gt;Отфильтровать по:&lt;BR/&gt;&lt;/SPAN&gt;- Дата запуска = не пусто&lt;BR/&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;- Вид ВБД = \"Возврат базы\"&lt;BR/&gt;Получить сумму столбца \"Остановочный Qн\" (выделив столбец)&lt;BR/&gt;&lt;BR/&gt;Отфильтровать по:&lt;BR/&gt;&lt;/SPAN&gt;- \"Дата запуска\" = не пусто&lt;BR/&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;- Вид ВБД = все, кроме пустых и \"Возврат базы\"&lt;BR/&gt;&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;&amp;nbsp;Получить сумму столбца \"Запускной Qн\"&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Вернуться на вкладку ВБД&lt;BR/&gt;&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Сумма остановочных Qн по возврату базы + сумма столбца Запускных Qн = значению \"нефть\" в столбце \"факт\" на графике \"Суммарный прирост\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Проверка графика График ВБД (шт)&lt;/B&gt;&lt;BR/&gt;&lt;B&gt;&lt;BR/&gt;&lt;/B&gt;Нажать на стрелку у названия графика&lt;B&gt;&amp;nbsp;&lt;/B&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображается выпадающий список:&lt;BR/&gt;График ВБД (шт)\nГрафик ВБД (Qж, м3/сут)\nГрафик ВБД (Qн, т/сут)&lt;BR/&gt;&lt;BR/&gt;При выборе другого графика значения перестраиваются &lt;BR/&gt;&lt;BR/&gt;По оси X - отображаются месяцы за выбранный период&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Перейти на вкладку Мониторинг&lt;BR/&gt;Отфильтровать по 1 из месяцев текущего года&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;Проверить ожидаемый результат для каждого сценария:&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;- В столбце \"Тек года/ пр лет\" отфильтровать по Не пусто&lt;BR/&gt;- В столбце &lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;\"Тек года/ пр лет\" отфильтровать по \"Тек года\"&lt;/SPAN&gt;&lt;BR/&gt;&amp;nbsp;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Количество &lt;/SPAN&gt;строк = ВБД общий на графике ВБД (шт) = значению в центре круговой диаграммы \"Количество\" графика  \"Распределение потенциала из БД фонда\"&lt;BR/&gt;&lt;BR/&gt;Сумма значений столбца \"Qн остановочный\" (для Возврата Базы) + Сумма значений столбца \"Запускной прирост от остановочных / Дельта Qн \" (для остальных \"видов ВБД\") = ВБД общий на графике ВБД (Qн) =  значению в центре круговой диаграммы \"Qн\" графика  \"Распределение потенциала из БД фонда\"&lt;BR/&gt;&lt;BR/&gt;(Аналогично - для Qж)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В столбце \"Тек года/ пр лет\" отфильтровать по \"Тек Года\"&lt;BR/&gt;&lt;BR/&gt;&lt;B&gt;(проверить и по ДО, и при выбранном в верхнем фильтре месторождении)&lt;/B&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Количество строк = ВБД тек года на графике ВБД (шт)&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;В столбце \"Тек года/ пр лет\" отфильтровать по \"Пр лет\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Количество &lt;/SPAN&gt;строк = ВБД пр лет на графике ВБД (шт)&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Проверка графика \"&lt;/B&gt;&lt;SPAN style=\"font-weight: bold;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Распределение потенциала из БД фонда&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;&lt;B&gt;\"&lt;BR/&gt;&lt;/B&gt;&lt;B&gt;&lt;BR/&gt;&lt;/B&gt;Перейти в Мониторинг&lt;BR/&gt;&lt;BR/&gt;Отфильтровать по 1 из видов ВБД&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Количество &lt;/SPAN&gt;строк = значению по данному виду ВБД на диаграмме \"Количество\"&lt;BR/&gt;&lt;BR/&gt;Сумма столбца \"Запускной Qн\" = &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;значению по данному виду ВБД на диаграмме \"Qн\"&lt;BR/&gt;&lt;/SPAN&gt;&lt;/P&gt;&lt;BR/&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-07-25T07:32:40.04Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-09-30T10:57:02.71Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 26
+          }
+        ]
+      },
+      "pointAssignments": [
+        {
+          "id": 40010,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442741/TestPoint/40010"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442741/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442741"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442741,
+        "name": "Вкладка Анализ ВБД"
+      },
+      "workItem": {
+        "id": 136303,
+        "name": "[Мониторинг] Анализ ВБД. График Распределение потенциала из БД фонда",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"3\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Левая диаграмма. &lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Единица измерения: шт&lt;BR/&gt;&lt;BR/&gt;По центру общее количество&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;По кускам соответствуют количеству из таблицы (колонка Вид ВБД, количество ВБД)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Правая диаграмма&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;По кускам соответствуют данным при фильтрации (колонка Вид ВБД)&lt;BR/&gt;&lt;BR/&gt;Отфильтровали по Виду ВБД, посмотрели прирост Qн&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-06-19T10:27:03.273Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-09-30T10:56:53.82Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 6
+          }
+        ]
+      },
+      "order": 1,
+      "pointAssignments": [
+        {
+          "id": 40009,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442741/TestPoint/40009"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442741/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442741"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442741,
+        "name": "Вкладка Анализ ВБД"
+      },
+      "workItem": {
+        "id": 226046,
+        "name": "[Мониторинг] Анализ ВБД. Выгрузка выполнения графика ВБД",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"8\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;СПекТР UAT&lt;BR/&gt;Мониторинг / Анализ ВБД&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В правом нижнем углу отображается таблица \"Выполнение графика ВБД\"&lt;BR/&gt;&lt;BR/&gt;Слева от выбора даты отображается кнопка выгрузки&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать дату в таблице выполнения графика, где есть ненулевые значения&lt;BR/&gt;&lt;BR/&gt;Нажать на кнопку выгрузки&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Вместо кнопки появляется лоадер, выгружается отчёт&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Сравнить отчёт с шаблоном &lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Структура отчёта соответствует шаблону (вложение)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Сравнить отчёт с таблицей на фронте&lt;BR/&gt;&lt;BR/&gt;Отфильтровать по полю \"Статус факт\" по статусу \"Запуск\"&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Кол-во отфильтрованных строк совпадает со значением поля \"Количество/ Факт\" по строке \"Запуск\"&lt;BR/&gt;&lt;BR/&gt;Сумма по полю Дебит нефти / факт = значению в поле \"Сумм. дебит нефти/ Факт\" &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;по строке \"Запуск\"&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Отфильтровать по полю \"Статус факт\" по остальным статусам&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Кол-во отфильтрованных строк совпадает со значением поля \"Количество/ Факт\" по &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;выбранному статусу&lt;BR/&gt;&lt;BR/&gt;&lt;/SPAN&gt;Сумма по полю Дебит нефти / график = значению в поле \"Сумм. дебит нефти/ Факт\" &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;по &lt;/SPAN&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;выбранному статусу&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Отфильтровать по полю \"Статус план\" по всем статусам&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Кол-во отфильтрованных строк совпадает со значением поля \"Количество/ План\" по выбранному статусу&lt;BR/&gt;&lt;BR/&gt;Сумма по полю Дебит нефти / график = значению в поле \"Сумм. дебит нефти/ план\" &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;по &lt;/SPAN&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;выбранному статусу&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Проверить столбец таблицы \"Отклонение от плана\" (на фронте)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отклонение от плана = факт - &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;план&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2024-04-12T11:08:16.05Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-09-30T10:57:12.91Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 11
+          }
+        ]
+      },
+      "order": 2,
+      "pointAssignments": [
+        {
+          "id": 40011,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442741/TestPoint/40011"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442741/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442741"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 3
+}

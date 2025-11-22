@@ -1,0 +1,1528 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442824,
+        "name": "Загрузчик"
+      },
+      "workItem": {
+        "id": 436811,
+        "name": "[Загрузчик] Проверка прав доступа",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"5\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Авторизоваться под &lt;B&gt;Гостем &lt;/B&gt;в браузере в режиме инкогнито\n\nМеню / Добывающий фонд / выбрать любое ДО\nРазвернуть меню повторно&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В меню нет раздела \"Загрузка данных для расчета\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Авторизоваться под &lt;B&gt;Пользователем &lt;/B&gt;в браузере в режиме инкогнито\n\nМеню / Добывающий фонд / выбрать любое ДО\nРазвернуть меню повторно&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В меню нет раздела \"Загрузка данных для расчета\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Авторизоваться под &lt;B&gt;Экспертом &lt;/B&gt;в браузере в режиме инкогнито\n\nМеню / Добывающий фонд / выбрать любое ДО\nРазвернуть меню повторно&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В меню есть раздел \"Загрузка данных для расчета\"\nРаздел открывается, все кнопки доступны (загрузка, скачивание шаблонов, выбор ДО…)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Авторизоваться под &lt;B&gt;Специалистом поддержки&lt;/B&gt; в браузере в режиме инкогнито\n\nМеню / Добывающий фонд / выбрать любое ДО\nРазвернуть меню повторно&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;В меню есть раздел \"Загрузка данных для расчета\"\nРаздел открывается, все кнопки доступны (загрузка, скачивание шаблонов, выбор ДО…)&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-08-25T04:43:58.127Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-08-25T04:50:06.863Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "pointAssignments": [
+        {
+          "id": 40291,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestPoint/40291"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442824,
+        "name": "Загрузчик"
+      },
+      "workItem": {
+        "id": 436816,
+        "name": "[Загрузчик] Общий вид",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"3\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Авторизоваться под экспертом или специалистом поддержки\n\nМеню / Добывающий фонд / выбрать любое ДО\n\nМеню / открыть \"Загрузка данных для расчета\"&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открылась страница загрузки данных\n\nДоступен выбор из ДО, согласно ролевой модели\n\nОтображаются блоки загрузки:\n - Скважина\n - Объект Разработки\n - Пласт\n - Техрежим добывающего фонда\n - Техрежим нагнетательного фонда\n - Данные исторических МЭР\n - Данные PVT\n - Фрак-лист\n - Пластопересечения (координаты)\n - Данные РИГИС\n - Интервалы перфораций по скважинам\n - Данные инклинометрии\n - История ГТМ\n - История отказов\n - Темпы падения\n\n\nОтображаются боковые панели: \n - Исторрия загрузок\n - Аналитика данных\n - Ошибки&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Скачать шаблоны всех доступных блоков&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Шаблоны скачиваются, открываются. \nВ каждом шаблоне есть преднастроенная таблица со своей шапкой.&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-08-25T04:45:57.2Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-08-25T04:50:03.15Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "order": 1,
+      "pointAssignments": [
+        {
+          "id": 40292,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestPoint/40292"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442824,
+        "name": "Загрузчик"
+      },
+      "workItem": {
+        "id": 436821,
+        "name": "[Загрузчик] Загрузка скважин",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"7\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Авторизоваться под экспертом или специалистом поддержки\n\nМеню / Добывающий фонд / выбрать любое ДО\n\nМеню / открыть \"Загрузка данных для расчета\"\n\nВ шапке страницы выбрать ДО&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ДО выбрано&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;В блоке Скважина нажать \"Загрузить файл\"&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открывается модальное окно для выбора файла и ввода комментария.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;*Excel &lt;B&gt;c полностью некорректными данными &lt;/B&gt;(неверный шаблон/кривые данные)&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Срабатывает валидация файла. Данные не загружаются.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;*Excel &lt;B&gt;с частично корректными&lt;/B&gt;, &lt;B&gt;с частично некорректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки отображаются какие именно ошибки были найдены в файле&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;Excel &lt;B&gt;с полностью корректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки не отображается ошибочных записей&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Нажать \"Скачать загруженные данные\"\n\nСравнить скачанные данные с ранее загруженными&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Скачивается Excel с ранее загруженными данными\n\nДанные внутри скачанного Excel совпадают с ранее загруженными данными&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-08-25T04:49:54.68Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-08-25T04:49:58.83Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "order": 2,
+      "pointAssignments": [
+        {
+          "id": 40293,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestPoint/40293"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442824,
+        "name": "Загрузчик"
+      },
+      "workItem": {
+        "id": 436822,
+        "name": "[Загрузчик] Загрузка объектов",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"7\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Авторизоваться под экспертом или специалистом поддержки\n\nМеню / Добывающий фонд / выбрать любое ДО\n\nМеню / открыть \"Загрузка данных для расчета\"\n\nВ шапке страницы выбрать ДО&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ДО выбрано&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В блоке Объект нажать \"Загрузить файл\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открывается модальное окно для выбора файла и ввода комментария.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;*Excel &lt;B&gt;c полностью некорректными данными &lt;/B&gt;(неверный шаблон/кривые данные)&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Срабатывает валидация файла. Данные не загружаются.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;*Excel &lt;B&gt;с частично корректными&lt;/B&gt;, &lt;B&gt;с частично некорректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки отображаются какие именно ошибки были найдены в файле&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;Excel &lt;B&gt;с полностью корректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки не отображается ошибочных записей&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Нажать \"Скачать загруженные данные\"\n\nСравнить скачанные данные с ранее загруженными&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Скачивается Excel с ранее загруженными данными\n\nДанные внутри скачанного Excel совпадают с ранее загруженными данными&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-08-25T04:49:54.68Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-08-25T04:49:58.83Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "order": 3,
+      "pointAssignments": [
+        {
+          "id": 40294,
+          "configurationName": "Windows 10",
+          "tester": null,
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestPoint/40294"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442824,
+        "name": "Загрузчик"
+      },
+      "workItem": {
+        "id": 436823,
+        "name": "[Загрузчик] Загрузка пластов",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"7\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Авторизоваться под экспертом или специалистом поддержки\n\nМеню / Добывающий фонд / выбрать любое ДО\n\nМеню / открыть \"Загрузка данных для расчета\"\n\nВ шапке страницы выбрать ДО&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ДО выбрано&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;В блоке Пласт нажать \"Загрузить файл\"&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открывается модальное окно для выбора файла и ввода комментария.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;*Excel &lt;B&gt;c полностью некорректными данными &lt;/B&gt;(неверный шаблон/кривые данные)&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Срабатывает валидация файла. Данные не загружаются.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;*Excel &lt;B&gt;с частично корректными&lt;/B&gt;, &lt;B&gt;с частично некорректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки отображаются какие именно ошибки были найдены в файле&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;Excel &lt;B&gt;с полностью корректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки не отображается ошибочных записей&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Нажать \"Скачать загруженные данные\"\n\nСравнить скачанные данные с ранее загруженными&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Скачивается Excel с ранее загруженными данными\n\nДанные внутри скачанного Excel совпадают с ранее загруженными данными&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-08-25T04:49:54.68Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-08-25T04:49:58.83Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "order": 4,
+      "pointAssignments": [
+        {
+          "id": 40295,
+          "configurationName": "Windows 10",
+          "tester": null,
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestPoint/40295"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442824,
+        "name": "Загрузчик"
+      },
+      "workItem": {
+        "id": 436824,
+        "name": "[Загрузчик] Загрузка ТР добывающего фонда",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"7\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Авторизоваться под экспертом или специалистом поддержки\n\nМеню / Добывающий фонд / выбрать любое ДО\n\nМеню / открыть \"Загрузка данных для расчета\"\n\nВ шапке страницы выбрать ДО&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ДО выбрано&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В блоке Техрежим добывающего фонда нажать \"Загрузить файл\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открывается модальное окно для выбора файла и ввода комментария.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;*Excel &lt;B&gt;c полностью некорректными данными &lt;/B&gt;(неверный шаблон/кривые данные)&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Срабатывает валидация файла. Данные не загружаются.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;*Excel &lt;B&gt;с частично корректными&lt;/B&gt;, &lt;B&gt;с частично некорректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки отображаются какие именно ошибки были найдены в файле&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;Excel &lt;B&gt;с полностью корректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки не отображается ошибочных записей&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Запросить загруженный тех.режим ДОБ фонда по api&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Поле &lt;SPAN style=\"color: rgb(0, 0, 128);font-family: Consolas;font-size: 13.3333px;background-color: rgb(255, 255, 255)\"&gt;\"TubingWidth\"&lt;/SPAN&gt; == &lt;SPAN style=\"background-color: rgb(255, 255, 255);color: rgb(23, 43, 77);font-size: 14px\"&gt;5,5&lt;/SPAN&gt; &lt;BR/&gt;&amp;nbsp;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-08-25T04:49:54.68Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-08-25T04:49:58.83Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 5
+          }
+        ]
+      },
+      "order": 5,
+      "pointAssignments": [
+        {
+          "id": 40296,
+          "configurationName": "Windows 10",
+          "tester": null,
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestPoint/40296"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442824,
+        "name": "Загрузчик"
+      },
+      "workItem": {
+        "id": 436825,
+        "name": "[Загрузчик] Загрузка ТР нагнетательного фонда",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"7\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Авторизоваться под экспертом или специалистом поддержки\n\nМеню / Добывающий фонд / выбрать любое ДО\n\nМеню / открыть \"Загрузка данных для расчета\"\n\nВ шапке страницы выбрать ДО&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ДО выбрано&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;В блоке Техрежим нагнетательного фонда нажать \"Загрузить файл\"&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открывается модальное окно для выбора файла и ввода комментария.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;*Excel &lt;B&gt;c полностью некорректными данными &lt;/B&gt;(неверный шаблон/кривые данные)&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Срабатывает валидация файла. Данные не загружаются.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;*Excel &lt;B&gt;с частично корректными&lt;/B&gt;, &lt;B&gt;с частично некорректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки отображаются какие именно ошибки были найдены в файле&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;Excel &lt;B&gt;с полностью корректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки не отображается ошибочных записей&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Нажать \"Скачать загруженные данные\"\n\nСравнить скачанные данные с ранее загруженными&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Скачивается Excel с ранее загруженными данными\n\nДанные внутри скачанного Excel совпадают с ранее загруженными данными&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-08-25T04:49:54.68Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-08-25T04:49:58.83Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "order": 6,
+      "pointAssignments": [
+        {
+          "id": 40297,
+          "configurationName": "Windows 10",
+          "tester": null,
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestPoint/40297"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442824,
+        "name": "Загрузчик"
+      },
+      "workItem": {
+        "id": 436826,
+        "name": "[Загрузчик] Загрузка МЭР",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"6\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Авторизоваться под экспертом или специалистом поддержки\n\nМеню / Добывающий фонд / выбрать любое ДО\n\nМеню / открыть \"Загрузка данных для расчета\"\n\nВ шапке страницы выбрать ДО&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ДО выбрано&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;В блоке Данные исторических МЭР нажать \"Загрузить файл\"&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открывается модальное окно для выбора файла и ввода комментария.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;*Excel &lt;B&gt;c полностью некорректными данными &lt;/B&gt;(неверный шаблон/кривые данные)&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Срабатывает валидация файла. Данные не загружаются.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;*Excel &lt;B&gt;с частично корректными&lt;/B&gt;, &lt;B&gt;с частично некорректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки отображаются какие именно ошибки были найдены в файле&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;Excel &lt;B&gt;с полностью корректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки не отображается ошибочных записей&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-08-25T04:49:54.68Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-08-25T04:49:58.83Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "order": 7,
+      "pointAssignments": [
+        {
+          "id": 40298,
+          "configurationName": "Windows 10",
+          "tester": null,
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestPoint/40298"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442824,
+        "name": "Загрузчик"
+      },
+      "workItem": {
+        "id": 436827,
+        "name": "[Загрузчик] Загрузка PVT",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"6\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Авторизоваться под экспертом или специалистом поддержки\n\nМеню / Добывающий фонд / выбрать любое ДО\n\nМеню / открыть \"Загрузка данных для расчета\"\n\nВ шапке страницы выбрать ДО&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ДО выбрано&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;В блоке  Данные PVT нажать \"Загрузить файл\"&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открывается модальное окно для выбора файла и ввода комментария.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;*Excel &lt;B&gt;c полностью некорректными данными &lt;/B&gt;(неверный шаблон/кривые данные)&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Срабатывает валидация файла. Данные не загружаются.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;*Excel &lt;B&gt;с частично корректными&lt;/B&gt;, &lt;B&gt;с частично некорректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки отображаются какие именно ошибки были найдены в файле&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;Excel &lt;B&gt;с полностью корректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки не отображается ошибочных записей&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-08-25T04:49:54.68Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-08-25T04:49:58.83Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "order": 8,
+      "pointAssignments": [
+        {
+          "id": 40299,
+          "configurationName": "Windows 10",
+          "tester": null,
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestPoint/40299"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442824,
+        "name": "Загрузчик"
+      },
+      "workItem": {
+        "id": 436828,
+        "name": "[Загрузчик] Загрузка Фрак-листов",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"6\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Авторизоваться под экспертом или специалистом поддержки\n\nМеню / Добывающий фонд / выбрать любое ДО\n\nМеню / открыть \"Загрузка данных для расчета\"\n\nВ шапке страницы выбрать ДО&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ДО выбрано&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;В блоке  Фрак-лист нажать \"Загрузить файл\"&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открывается модальное окно для выбора файла и ввода комментария.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;*Excel &lt;B&gt;c полностью некорректными данными &lt;/B&gt;(неверный шаблон/кривые данные)&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Срабатывает валидация файла. Данные не загружаются.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;*Excel &lt;B&gt;с частично корректными&lt;/B&gt;, &lt;B&gt;с частично некорректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки отображаются какие именно ошибки были найдены в файле&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;Excel &lt;B&gt;с полностью корректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки не отображается ошибочных записей&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-08-25T04:49:54.68Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-08-25T04:49:58.83Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "order": 9,
+      "pointAssignments": [
+        {
+          "id": 40300,
+          "configurationName": "Windows 10",
+          "tester": null,
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestPoint/40300"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442824,
+        "name": "Загрузчик"
+      },
+      "workItem": {
+        "id": 436829,
+        "name": "[Загрузчик] Загрузка Пластопересечений (координаты)",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"6\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Авторизоваться под экспертом или специалистом поддержки\n\nМеню / Добывающий фонд / выбрать любое ДО\n\nМеню / открыть \"Загрузка данных для расчета\"\n\nВ шапке страницы выбрать ДО&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ДО выбрано&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;В блоке Пластопересечения (координаты) нажать \"Загрузить файл\"&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открывается модальное окно для выбора файла и ввода комментария.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;*Excel &lt;B&gt;c полностью некорректными данными &lt;/B&gt;(неверный шаблон/кривые данные)&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Срабатывает валидация файла. Данные не загружаются.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;*Excel &lt;B&gt;с частично корректными&lt;/B&gt;, &lt;B&gt;с частично некорректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки отображаются какие именно ошибки были найдены в файле&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;Excel &lt;B&gt;с полностью корректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки не отображается ошибочных записей&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-08-25T04:49:54.68Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-08-25T04:49:58.83Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "order": 10,
+      "pointAssignments": [
+        {
+          "id": 40301,
+          "configurationName": "Windows 10",
+          "tester": null,
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestPoint/40301"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442824,
+        "name": "Загрузчик"
+      },
+      "workItem": {
+        "id": 436830,
+        "name": "[Загрузчик] Загрузка РИГИС",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"6\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Авторизоваться под экспертом или специалистом поддержки\n\nМеню / Добывающий фонд / выбрать любое ДО\n\nМеню / открыть \"Загрузка данных для расчета\"\n\nВ шапке страницы выбрать ДО&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ДО выбрано&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;В блоке Данные РИГИС нажать \"Загрузить файл\"&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открывается модальное окно для выбора файла и ввода комментария.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;*Excel &lt;B&gt;c полностью некорректными данными &lt;/B&gt;(неверный шаблон/кривые данные)&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Срабатывает валидация файла. Данные не загружаются.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;*Excel &lt;B&gt;с частично корректными&lt;/B&gt;, &lt;B&gt;с частично некорректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки отображаются какие именно ошибки были найдены в файле&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;Excel &lt;B&gt;с полностью корректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки не отображается ошибочных записей&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-08-25T04:49:54.68Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-08-25T04:49:58.83Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "order": 11,
+      "pointAssignments": [
+        {
+          "id": 40302,
+          "configurationName": "Windows 10",
+          "tester": null,
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestPoint/40302"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442824,
+        "name": "Загрузчик"
+      },
+      "workItem": {
+        "id": 436831,
+        "name": "[Загрузчик] Загрузка Интервалы перфорации по скважинам",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"6\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Авторизоваться под экспертом или специалистом поддержки\n\nМеню / Добывающий фонд / выбрать любое ДО\n\nМеню / открыть \"Загрузка данных для расчета\"\n\nВ шапке страницы выбрать ДО&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ДО выбрано&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;В блоке Интервалы перфорации по скважинам нажать \"Загрузить файл\"&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открывается модальное окно для выбора файла и ввода комментария.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;*Excel &lt;B&gt;c полностью некорректными данными &lt;/B&gt;(неверный шаблон/кривые данные)&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Срабатывает валидация файла. Данные не загружаются.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;*Excel &lt;B&gt;с частично корректными&lt;/B&gt;, &lt;B&gt;с частично некорректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки отображаются какие именно ошибки были найдены в файле&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;Excel &lt;B&gt;с полностью корректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки не отображается ошибочных записей&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-08-25T04:49:54.68Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-08-25T04:49:58.83Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "order": 12,
+      "pointAssignments": [
+        {
+          "id": 40303,
+          "configurationName": "Windows 10",
+          "tester": null,
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestPoint/40303"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442824,
+        "name": "Загрузчик"
+      },
+      "workItem": {
+        "id": 436832,
+        "name": "[Загрузчик] Загрузка Инклинометрии",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"7\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Авторизоваться под экспертом или специалистом поддержки\n\nМеню / Добывающий фонд / выбрать любое ДО\n\nМеню / открыть \"Загрузка данных для расчета\"\n\nВ шапке страницы выбрать ДО&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ДО выбрано&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В блоке Данные по инклинометрии нажать \"Загрузить файл\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открывается модальное окно для выбора файла и ввода комментария.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;*Excel &lt;B&gt;c полностью некорректными данными &lt;/B&gt;(неверный шаблон/кривые данные)&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Срабатывает валидация файла. Данные не загружаются.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;*Excel &lt;B&gt;с частично корректными&lt;/B&gt;, &lt;B&gt;с частично некорректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки отображаются какие именно ошибки были найдены в файле&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;Excel &lt;B&gt;с полностью корректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки не отображается ошибочных записей&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Запросить загруженные данные по инклинометрии через api&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;&lt;SPAN style=\"background-color: rgb(255, 255, 255);font-size: 13.3333px;color: rgb(0, 0, 128)\"&gt;\"WellboreId\"&lt;/SPAN&gt;&lt;SPAN style=\"color: rgb(0, 0, 0);background-color: rgb(255, 255, 255);font-size: 13.3333px\"&gt;&amp;nbsp;=&amp;nbsp;&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgb(255, 255, 255);font-size: 13.3333px;color: rgb(0, 128, 0)\"&gt;'00000000-0000-0000-0000-000000000000'&lt;/SPAN&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-08-25T04:49:54.68Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-08-25T04:49:58.83Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 6
+          }
+        ]
+      },
+      "order": 13,
+      "pointAssignments": [
+        {
+          "id": 40304,
+          "configurationName": "Windows 10",
+          "tester": null,
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestPoint/40304"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442824,
+        "name": "Загрузчик"
+      },
+      "workItem": {
+        "id": 436833,
+        "name": "[Загрузчик] Загрузка  История ГТМ",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"6\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Авторизоваться под экспертом или специалистом поддержки\n\nМеню / Добывающий фонд / выбрать любое ДО\n\nМеню / открыть \"Загрузка данных для расчета\"\n\nВ шапке страницы выбрать ДО&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ДО выбрано&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;В блоке  История ГТМ нажать \"Загрузить файл\"&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открывается модальное окно для выбора файла и ввода комментария.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;*Excel &lt;B&gt;c полностью некорректными данными &lt;/B&gt;(неверный шаблон/кривые данные)&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Срабатывает валидация файла. Данные не загружаются.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;*Excel &lt;B&gt;с частично корректными&lt;/B&gt;, &lt;B&gt;с частично некорректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки отображаются какие именно ошибки были найдены в файле&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;Excel &lt;B&gt;с полностью корректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки не отображается ошибочных записей&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-08-25T04:49:54.68Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-08-25T04:49:58.83Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "order": 14,
+      "pointAssignments": [
+        {
+          "id": 40305,
+          "configurationName": "Windows 10",
+          "tester": null,
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestPoint/40305"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442824,
+        "name": "Загрузчик"
+      },
+      "workItem": {
+        "id": 436834,
+        "name": "[Загрузчик] Загрузка История отказов ",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"6\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Авторизоваться под экспертом или специалистом поддержки\n\nМеню / Добывающий фонд / выбрать любое ДО\n\nМеню / открыть \"Загрузка данных для расчета\"\n\nВ шапке страницы выбрать ДО&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ДО выбрано&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;В блоке История отказов нажать \"Загрузить файл\"&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открывается модальное окно для выбора файла и ввода комментария.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;*Excel &lt;B&gt;c полностью некорректными данными &lt;/B&gt;(неверный шаблон/кривые данные)&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Срабатывает валидация файла. Данные не загружаются.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;*Excel &lt;B&gt;с частично корректными&lt;/B&gt;, &lt;B&gt;с частично некорректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки отображаются какие именно ошибки были найдены в файле&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;Excel &lt;B&gt;с полностью корректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки не отображается ошибочных записей&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-08-25T04:49:54.68Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-08-25T04:49:58.83Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "order": 15,
+      "pointAssignments": [
+        {
+          "id": 40306,
+          "configurationName": "Windows 10",
+          "tester": null,
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestPoint/40306"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442824,
+        "name": "Загрузчик"
+      },
+      "workItem": {
+        "id": 436835,
+        "name": "[Загрузчик] Загрузка Темпы падения ",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"6\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Авторизоваться под экспертом или специалистом поддержки\n\nМеню / Добывающий фонд / выбрать любое ДО\n\nМеню / открыть \"Загрузка данных для расчета\"\n\nВ шапке страницы выбрать ДО&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ДО выбрано&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;В блоке Темпы падения нажать \"Загрузить файл\"&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открывается модальное окно для выбора файла и ввода комментария.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;*Excel &lt;B&gt;c полностью некорректными данными &lt;/B&gt;(неверный шаблон/кривые данные)&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Срабатывает валидация файла. Данные не загружаются.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;*Excel &lt;B&gt;с частично корректными&lt;/B&gt;, &lt;B&gt;с частично некорректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки отображаются какие именно ошибки были найдены в файле&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать файл* / указать комментарий / нажать \"Загрузить\"&lt;BR/&gt;&lt;BR/&gt;Excel &lt;B&gt;с полностью корректными&lt;/B&gt; данными&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Модальное окно закрывается.\n\nВ панели История загрузок появляется запись о загрузке, есть дата, ФИО, название файла, комментарий\n\nВ панели Аналитика данных отображаются обработанные записи, сколько ошибок было найдено\n\nВ панели Ошибки не отображается ошибочных записей&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-08-25T04:49:54.68Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-08-25T04:49:58.83Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "order": 16,
+      "pointAssignments": [
+        {
+          "id": 40307,
+          "configurationName": "Windows 10",
+          "tester": null,
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestPoint/40307"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442824,
+        "name": "Загрузчик"
+      },
+      "workItem": {
+        "id": 436836,
+        "name": "[Загрузчик] Отображение загруженных данных",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"10\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Авторизоваться под экспертом или специалистом поддержки\n\nМеню / Добывающий фонд / выбрать ДО\n\nМеню / открыть \"Загрузка данных для расчета\"\n\nЗагрузить все данные для расчета (все блоки)&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Все Excel загружены, ошибок нет.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Вызвать api ///////\n\nДождаться расчетов\n\nМеню / Добывающий фонд / открыть проект\n\n&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Проект рассчитался\nГрафики строятся, есть Кандидаты. Не кандидаты, Ошибки&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меню / Добывающий фонд / Выбрать ДО / Открыть настройки\nРазвернуть дерево объектов&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Данные в интерфейсе соответствуют данным из загруженного Excel&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;В настройках выбрать объект, по которому загружали PVT через Excel\n\nОткрыть вкладку PVT\n&lt;/P&gt;&lt;/DIV&gt;&lt;DIV&gt;&lt;BR/&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Данные в интерфейсе соответствуют данным из загруженного Excel&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;В настройках выбрать объект, по которому загружали темпы падения через Excel\n\nОткрыть вкладку Темпы падения\n&lt;/P&gt;&lt;/DIV&gt;&lt;DIV&gt;&lt;BR/&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Данные в интерфейсе соответствуют данным из загруженного Excel&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Открыть вкладку Кандидаты&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Скважины и пласты соответствуют данным из загруженного Excel\n\nФактически значения в таблице соответствуют загруженным тех.режимам из Excel  &lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;На вкладке Кандидаты выбрать скважину\nОткрыть панель Историю отказов&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Данные в интерфейсе соответствуют данным из загруженного Excel&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;На вкладке Кандидаты выбрать скважину\nОткрыть панель РИГИС&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Интервалы перфорации соответствуют  данным из загруженного Excel\nРИГИС соответствуют данным из загруженного Excel&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;На вкладке Кандидаты выбрать скважину\nОткрыть панель Информация о скважине&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Фрак-листы соответствуют данным из загруженного Excel&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-08-25T05:06:46.397Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-09-30T10:26:10.557Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 6
+          }
+        ]
+      },
+      "order": 17,
+      "pointAssignments": [
+        {
+          "id": 40308,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestPoint/40308"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442824"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 18
+}

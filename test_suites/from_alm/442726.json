@@ -1,0 +1,98 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442726,
+        "name": "Вкладка Графики"
+      },
+      "workItem": {
+        "id": 275132,
+        "name": "Проверка счетчиков на центральном графике",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"5\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;SPAN style=\"color: rgb(106, 135, 89);background-color: rgb(43, 43, 43);font-family: &amp;amp;amp\"&gt;Проверяем: счетчики на кнопках легких, тяжелых и операционных ГТМ&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;True&lt;/P&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;SPAN style=\"color: rgb(106, 135, 89);background-color: rgb(43, 43, 43);font-family: &amp;amp;amp\"&gt;Проверяем: Полный расчетный потенциал и согласованный потенциал&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;True&lt;/P&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;SPAN style=\"color: rgb(106, 135, 89);background-color: rgb(43, 43, 43);font-family: &amp;amp;amp\"&gt;Проверяем: счетчики по каждому виду ГТМ&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;True&lt;/P&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;&lt;SPAN style=\"color: rgb(106, 135, 89);background-color: rgb(43, 43, 43);font-family: &amp;amp;quot\"&gt;Проверяем: счетчики по легким, тяжелым и операционным ГТМ на графике&lt;/SPAN&gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;True&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2024-09-08T16:36:44.667Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2024-09-08T16:36:44.667Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 2
+          }
+        ]
+      },
+      "pointAssignments": [
+        {
+          "id": 39986,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442726/TestPoint/39986"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442726/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442726"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 1
+}

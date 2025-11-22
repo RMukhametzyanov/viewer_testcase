@@ -1,0 +1,98 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442847,
+        "name": "Мониторинг ППД"
+      },
+      "workItem": {
+        "id": 385988,
+        "name": "Мониторинг. Мониторинг ППД",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"2\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Мониторинг -&amp;gt; Мониторинг ППД:&lt;BR/&gt;&lt;A href=\"https://spektr-u210001901.apps.test.paas.gazprom-neft.local/monitoring/monitoring-ppd\" style=\"font-size: 14px;background-color: rgb(255, 255, 255)\" tabindex=\"-1\"&gt;https://spektr-u210001901.apps.test.paas.gazprom-neft.local/monitoring/monitoring-ppd&lt;/A&gt;&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;- Получить экспертизы мониторинга НАГ фонда:&lt;BR/&gt;GET https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/monitoring/v1/injectionMonitoring/get?orgIds=6\n&lt;BR/&gt;- Получить словарь критериев отбора в таблице мониторинга ППД&lt;BR/&gt;GET https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/spektr/InjectionDiag/GetCriteriasDescription\n\n- Получить данные для графика &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Сравнение параметров:&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt; &lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;GET https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/monitoring/v1/InjectionMonitoringCharts/PlanFactDelta?organizationIds=6&amp;amp;startDate=2024-05-01&amp;amp;endDate=2025-05-31&amp;amp;gtmTypes=536870912&amp;amp;gtmTypes=1073741824&amp;amp;leftComparisonPart=Potential&amp;amp;rightComparisonPart=Start\n&lt;BR/&gt;- Получить данные для графиков: Факторный анализ достижения потенциала и Динамика приемистости:\nGET https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/monitoring/v1/InjectionMonitoringCharts/MonitoringCharts?organizationIds=6&amp;amp;startDate=2024-05-01&amp;amp;endDate=2025-05-31&amp;amp;gtmTypes=536870912&amp;amp;gtmTypes=1073741824&lt;BR/&gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&amp;lt; 5 сек.&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-05-13T12:13:16.157Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-05-13T13:05:06.253Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 10
+          }
+        ]
+      },
+      "pointAssignments": [
+        {
+          "id": 40342,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Лобанов Сергей Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+              }
+            },
+            "id": "cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "uniqueName": "GAZPROM-NEFT\\Lobanov.SI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442847/TestPoint/40342"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442847/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442847"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 1
+}

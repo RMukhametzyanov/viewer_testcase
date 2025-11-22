@@ -1,0 +1,287 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442739,
+        "name": "Вкладка Дашборд"
+      },
+      "workItem": {
+        "id": 197985,
+        "name": "[Мониторинг] Дашборд. Отображение ключевых индикаторов риска на дашборде",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"9\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Перейти на Дашборд: &lt;BR/&gt;&lt;A href=\"https://spektr-u210001901.apps.test.paas.gazprom-neft.local/monitoring?tab=dashboard\" tabindex=\"-1\"&gt;СПекТР (gazprom-neft.local)&lt;/A&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В левом нижнем углу - отображается график \"Ключевые индикаторы риска\"&lt;BR/&gt;&lt;BR/&gt;По нажатию на название графика в выпадающем списке доступны график&lt;BR/&gt;\"Факторный анализ достижения плана\"&lt;BR/&gt;&lt;BR/&gt;У названия графика - 2 выпадающих списка:&lt;BR/&gt;Уровень&lt;BR/&gt;По периоду/По месяцам&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать \"Уровень 1\" и \"По периоду\"&lt;BR/&gt;&lt;BR/&gt;В новой вкладке - перейти на вкладку \"Мониторинг\"&lt;BR/&gt;Скачать эксель из  мониторинга за тот же период&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В легенде - значения из поля \"причина неуспешности\" / успешность ремонта&lt;BR/&gt;&lt;BR/&gt;График - в виде круговой диаграммы&lt;BR/&gt;&lt;BR/&gt;\"успешный\" на диаграмме = N записей в экселе с фильтром (Дата окончания ремонта факт = заполнена И&lt;BR/&gt;Успешность ремонта = Успешная)&lt;BR/&gt;&lt;BR/&gt;\"неуспешный\" на диаграмме = &amp;nbsp;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;N записей в экселе с фильтром (Дата окончания ремонта факт = заполнена И&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;Успешность ремонта = Неуспешная // Неоконченная)&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать \"Уровень 2\"&lt;BR/&gt;&lt;BR/&gt;В новой вкладке - перейти на вкладку \"Мониторинг\"&lt;BR/&gt;на том же фильтре по датам&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В легенде - 2 значения:&lt;BR/&gt;Эффективные и неэффективные&lt;BR/&gt;&lt;BR/&gt;Сумма на диаграмме = N строк в таблице мониторинга по полю \"экон. эффективность по мин. рент дебиту нефти\" = не пустые&lt;BR/&gt;&lt;BR/&gt;&lt;B&gt;Эффективный &lt;/B&gt;= N строк с экон. эффективность = рентабельный (зеленый круг) &lt;BR/&gt;&lt;BR/&gt;&lt;B&gt;Мониторинг &lt;/B&gt;= N строк&lt;BR/&gt;- со статусом \"нерентабельный ремонт\" в столбце \"экон. эффективность по мин. рент дебиту нефти\" //  на границе рентаб-ти \n- не прошло 60 суток от запуска (Дата запуска от текущей)\n&lt;BR/&gt;&lt;B&gt;Неэффективный - &lt;/B&gt;N строк &lt;BR/&gt;- красная или желтая иконка в поле \"Тех. эфф-ть\" ИЛИ красная или жёлтая иконка в поле \"по план. затратам (по PI)\"&lt;BR/&gt;- прошло 60 суток от запуска&lt;BR/&gt;&lt;BR/&gt;&lt;B&gt;Неоконченный&lt;/B&gt; - по ключу \"Неоконченные \" в поле \"Успешность\" (столбец мин. рент. дебит по ним - пустой)&lt;BR/&gt;&lt;BR/&gt;&lt;B&gt;Неуспешный &lt;/B&gt; - по ключу Неуспешные (красный)   (столбец мин. рент. дебит по ним - пустой)\n&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать уровень 3 &lt;BR/&gt;&lt;BR/&gt;Открыть таблицу мониторинга на том же фильтре по датам&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В легенде все &lt;B&gt;категории &lt;/B&gt;выбранных вручную причин неуспешности и неэффективности + неуспешные и неэффективные&lt;BR/&gt;&lt;BR/&gt;Значение по категории = сумма записей из таблицы с такой же категорией (за тот же период)&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&lt;I&gt;* Неуспешные = Неуспешный ремонт Неэффективные = Неэффективный ремонт + Требуется доп. исследование - Без категории&lt;/I&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать \"По месяцам\"&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображается столбчатая диаграмма за скользящий год&lt;BR/&gt;&lt;BR/&gt;Значения за месяцу за уровень - по аналогии с проверкой \"за период\", с условием, что дата окончания ремонта факт. - в выбранном месяце&lt;BR/&gt;&lt;BR/&gt;&lt;I&gt;&amp;nbsp;* Дата окончания ремонта факт отображается только в экселе&lt;/I&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Проверить переход с диаграммы&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;При нажатии на сектор диаграммы - происходит переход на таблицу мониторинга&lt;BR/&gt;&lt;BR/&gt;N строк в таблице совпадает cо значением на диаграмме&lt;BR/&gt;&lt;BR/&gt;Данные фильтруются согласно ожидаемому результату по данному уровню (выше)&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Нажать на сектор \"Неуспешные\" на диаграмме&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;При переходе в таблицу с графика - по всем отфильтрованным записям количество скважин соответствует количеству скважин на графике. В колонке Успешность ремонта/успешность - отметка- Неуспешный ремонт&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2024-01-30T07:28:51.373Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-09-29T13:23:52.99Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 58
+          }
+        ]
+      },
+      "pointAssignments": [
+        {
+          "id": 40000,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442739/TestPoint/40000"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442739/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442739"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442739,
+        "name": "Вкладка Дашборд"
+      },
+      "workItem": {
+        "id": 320764,
+        "name": "[Мониторинг] Дашборд. График \"Достижение мин. рент. прироста\"",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"7\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Перейти в Дашборд &lt;BR/&gt;https://spektr-u210001901.apps.test.paas.gazprom-neft.local/monitoring/dashboard&lt;BR/&gt;&lt;BR/&gt;График «Достижение мин.рент.прироста»&lt;BR/&gt;&lt;BR/&gt;-- График &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;«Достижение м&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;инимального рентабельного прироста&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;» - в разработке&lt;/SPAN&gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;График имеет название  «Достижение мин.рент.прироста»&lt;BR/&gt;-- &lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;«Достижение м&lt;/SPAN&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;инимального рентабельного прироста&lt;/SPAN&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;» - в разработке&lt;/SPAN&gt;&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&lt;BR/&gt;На графике «Достижение мин.рент.прироста» отображается надпись «Алгоритм в разработке»&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Навести на сектор графика&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображается тултип&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Клик на название в легенде \"Нет данных\"&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Сектор &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;\"Нет данных\" скрывается&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Клик на \"Скачать png\"&lt;BR/&gt;&lt;IMG src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC4AAAAhCAYAAACm75niAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGzSURBVFhH7Zi/LwNhGMe/Rw8VBgNpKkSTNlEhGAwGfwF/hDCIMHQwSA2NBJOhiVj8GjFhqMRuNKiENIykd72rqLYiCM699TYx9H1ruHvj5D7Jm7vn3uH55L33fe99TjJM4EBq6NVxuOKicax41cW5cllEIv2C53cxa7jRI2GsvQHR3mb6pDJccSL9+mEgEm5CS52Yl5N7+0Q89YT6Wokpn8/nASLOYvhENx5Mc9GQnCQ3C1VVDe4wkukhaqR/QnLypqbp7u4qwrFNfGP3oNTswjbxO1UrNbtwp4poXPEym3uHuEjd0AhIXl1ja/+IRtZhuXha07G0tg1FyyKd0bG8vgNVv6e91mG5eHRmAqGuDuTyBTwWiugJBTA/PU57rcNy8TpZRiwyhXAwgL7uIBZmJyHLHtprId/Hlsr0JzR6Jx5ebkVRDO6xduBYR3K0jUZsTs/OoWSyNOLj97ViZGiQRmx4uc3TIf88/lvxyOIqbpUMjfh0+n2Ix+ZoxKaauGOnivsBEg1XnBSupAYUDclJcrOQJIkvTqptUriKlC8XyyQ3C6/X+09/T/xl3F1FNA4VB74A3Ye/0f78nKgAAAAASUVORK5CYII=\" alt=\"\"/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Скачивается файл&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Клик на \"Отключить легенду\"&lt;BR/&gt;&lt;IMG src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACoAAAAhCAIAAAAgZq7PAAABkElEQVRYCWP4P6CAYUBt/z9q/QCG/yAL/L9//75///7FixfPqApevHjx/v37v3//ooU0uu/fvXtHVXtRDHv37h0B658/f46ig6qc58+fE7CeqtZhMWzUeqQQQE96WMILSWjJ2s0ROZWBacVB6SWtk2c/ffoUSZIoJpLVICZp1odnVwSmFcPR8TPnnj17tmbLztnL1kDQ/iMn8LuCIuvhFkMYB46ePHfpCrJgXGEtDa0PSi9BtuzQ8VMPHj5qmzKnrLUfguatXE9D64uae+HWh2aWPXjwEL9lmLIUBf6Dhw8Pnzh94OjJg8dO3rp9B9N0giIUWf/s2bOTZ88fOHry0PFTjx4/JmgZpgKKrG+eOAse+EmlDQ8ePsK0AL8IRdZjJr0nT54gJ70FqzbQ0Hq41yGMA0dPnrlwCVkwpqCGhtaHZZUhW3bs1NmnT58iFzv7jhynofV9sxaFZJZCXJBX3/nkyRP8lmHKUhT3mMaRKjJqPVIIoNd4A9zYGuCm5gA3tJHihR5M9Linh51Idgyw9QDnCOFDdpQcjgAAAABJRU5ErkJggg==\" alt=\"\"/&gt;&lt;BR/&gt;&lt;BR/&gt;Клик на &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;на \"Включить легенду\"&lt;BR/&gt;&lt;/SPAN&gt;&lt;IMG src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAmCAYAAAC/H3lnAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHDSURBVFhH7ZZNKERRFMf/75lnREpIaULmQ+MzkWyU2FhYyUaztFI0Y0EZS81mSNRESUo+CmUhNkShZkEsLCwoJE1JPlfMjJnxZuY2aprVu3OUur+6vXfOu71+77zTvVeKqOAfIbPrv0EIUyOEqRHC1AhhaoQwNUKYGu7T2vb+Mda2d/H55YckSWhpqsdgry12TwG3sM0+ii9/gEVxJkYdMJWVYN97ipfXd5YFqixG1FrNLNIGd0sky0b5VHO+xyfMLm1gfWcvMaYWVtkM7XALp/r1siSjqCAfrc2NqK4wJUZnewuboR3ulnC6Pbi6vWcRoNNlYGXahUxFYZn0wi3sDwRx9+DDdyiEaK1LDcXIzcmOPySAuyX0mUqimpLaCtlZ+tg9FdwVnpxfhvfsgkVAYX4eZsZGoCg6lkkv3MLdfcNIfoVrqB9WUxk8i+t4fvtd1hpqrOjqaGORNrhbItX3hiPh2LJ2dHKOy+ubxNjaO2QztMNd4Z4BJwLBIIviuJ12mNWN4yC6cbx9sCxQaSlHndXCIm1wC8+tbsZ2tJC6SkQxlhow7nRAlmmOKdzCfw1NGQgRwtQIYWqEMDVCmBohTAvwA8MmncTlZHbOAAAAAElFTkSuQmCC\" alt=\"\"/&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;&lt;BR/&gt;&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Легенда скрывается&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;Легенда отображается&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Клик на \"Развернуть график\"&lt;BR/&gt;&lt;IMG src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAmCAYAAACsyDmTAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEySURBVFhHY/wPBAyDCDBB6UEDRh1ECIw6iBAYdRAhMOogQmDUQYTAoHMQVSvXe4+eMnz78QPM5uLgYFCSkwazSQFUc9DTF68Ycuu7oDwI6K7KZ1CWl4XyiANUizJpCTGGnupCBk0VRagIA8P3n7+gLOIBVdPQoZPnGK7fuc9goK0OFSEdUM1Bj5+/ZNi05yBDsKczQ7S/B1iMk50NTJMEQGmIWuD2/UdQ1v//z16+hrJIA2Ql6uev3jBIiolgsKkBSI6yuw8fM2TXdoDpJeu3gdkgR1ELkOwgWM5ZunEHw7od+xgC3BwGNoRg4MLVmwxaqooMNqaGUBHqAJIdhJxzrt2+z1DS2g8uFKkFyErU1KgicIHRjiIhMOogQmDUQYTAqIMIgVEHEQKjDiIEBpmDGBgABqXv2htYdlsAAAAASUVORK5CYII=\" alt=\"\"/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;График разворачивается на экране&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2024-12-17T07:00:38.95Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-06-26T13:12:28.427Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 8
+          }
+        ]
+      },
+      "order": 1,
+      "pointAssignments": [
+        {
+          "id": 40004,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Лобанов Сергей Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+              }
+            },
+            "id": "cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "uniqueName": "GAZPROM-NEFT\\Lobanov.SI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442739/TestPoint/40004"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442739/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442739"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442739,
+        "name": "Вкладка Дашборд"
+      },
+      "workItem": {
+        "id": 432141,
+        "name": "[Мониторинг] Дашборд. График \"Достижение мин. рент. добычи\". Переход в реестр Мониторинга",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"5\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открыть UAT \\ Мониторинг&lt;BR/&gt;Перейти на вкладку \"Дашборд\"&lt;BR/&gt;&lt;BR/&gt;Правый верхний график&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;График называется \"Достижение мин. рент. добычи\"&lt;BR/&gt;&lt;BR/&gt;На графике и в легенде отображается 3 категории:\nЭффективный ремонт;\nНеэффективный ремонт:\nНет данных.&amp;nbsp;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Клик на сектор \"Эффективный ремонт\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Переход в таблицу мониторинга, количество записей совпадает с количеством в секторе&lt;BR/&gt;&lt;BR/&gt;В столбце \"По мин.рент.добыче\" отображается признак эффективности:&lt;/P&gt;&lt;P&gt;Эффективный ремонт, зеленая иконка Qн&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Клик на сектор \"Неэффективный ремонт\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Переход в таблицу мониторинга, количество записей совпадает с количеством в секторе&lt;BR/&gt;&lt;BR/&gt;В столбце \"По мин.рент.добыче\" отображается признак эффективности:\nНеэффективный ремонт, красная иконка Qн&lt;/P&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Клик на сектор \"Нет данных\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Переход в таблицу мониторинга, количество записей совпадает с количеством в секторе&lt;BR/&gt;&lt;BR/&gt;В столбце \"По мин.рент.добыче\" отображается признак эффективности:\nНет данных, серая иконка Qн&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-08-13T13:54:05.98Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-08-19T10:06:51.213Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 26
+          }
+        ]
+      },
+      "order": 2,
+      "pointAssignments": [
+        {
+          "id": 40006,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Лобанов Сергей Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+              }
+            },
+            "id": "cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "uniqueName": "GAZPROM-NEFT\\Lobanov.SI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442739/TestPoint/40006"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442739/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442739"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 3
+}

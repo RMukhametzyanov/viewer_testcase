@@ -1,11 +1,15 @@
 """Виджет формы редактирования тест-кейса"""
 
-from typing import List
+from pathlib import Path
+from typing import List, Optional
+import shutil
+import uuid
 
 from PyQt5.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QHBoxLayout,
+    QGridLayout,
     QLabel,
     QLineEdit,
     QTextEdit,
@@ -20,9 +24,15 @@ from PyQt5.QtWidgets import (
     QSizePolicy,
     QAbstractItemView,
     QMenu,
+    QTableWidget,
+    QTableWidgetItem,
+    QHeaderView,
+    QMessageBox,
+    QInputDialog,
+    QFileDialog,
 )
 from PyQt5.QtCore import Qt, pyqtSignal, QEvent, QSize, QTimer
-from PyQt5.QtGui import QFont, QTextOption, QIcon, QPixmap, QPainter, QColor
+from PyQt5.QtGui import QFont, QTextOption, QIcon, QPixmap, QPainter, QColor, QDragEnterEvent, QDropEvent, QDragLeaveEvent
 
 from ...models.test_case import TestCase, TestCaseStep
 from ...services.test_case_service import TestCaseService
@@ -41,6 +51,113 @@ class _NoWheelComboBox(QComboBox):
             event.ignore()
 
 
+class _StepsTableWidget(QTableWidget):
+    """Таблица шагов с поддержкой drag & drop для прикрепления файлов."""
+    
+    files_dropped_on_row = pyqtSignal(int, list)  # row, file_paths
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setAcceptDrops(True)
+        self.setDragDropMode(QAbstractItemView.DropOnly)
+        self.setDefaultDropAction(Qt.CopyAction)
+        self._drag_over_row = -1  # Текущая строка, над которой происходит drag
+        # Применяем стиль для обводки строки при drag & drop
+        self.setStyleSheet("""
+            QTableWidget::item {
+                border: none;
+            }
+        """)
+    
+    def dragEnterEvent(self, event: QDragEnterEvent):
+        """Обработка входа drag & drop."""
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+            self._update_drag_over_row(event.pos())
+        else:
+            event.ignore()
+    
+    def dragMoveEvent(self, event):
+        """Обработка движения drag & drop."""
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+            self._update_drag_over_row(event.pos())
+        else:
+            event.ignore()
+    
+    def dragLeaveEvent(self, event):
+        """Обработка выхода drag & drop."""
+        self._clear_drag_over_row()
+        super().dragLeaveEvent(event)
+    
+    def _update_drag_over_row(self, pos):
+        """Обновить визуальное выделение строки при drag & drop."""
+        row = self.indexAt(pos).row()
+        if row != self._drag_over_row:
+            # Убираем выделение с предыдущей строки
+            self._clear_drag_over_row()
+            # Добавляем выделение новой строке
+            if row >= 0:
+                self._drag_over_row = row
+                # Применяем стиль выделения к строке через items (обводка вокруг всей строки)
+                # Используем более яркий цвет для лучшей видимости
+                highlight_color = QColor(100, 150, 255, 120)  # Более яркий полупрозрачный синий фон
+                for col in range(self.columnCount()):
+                    item = self.item(row, col)
+                    if not item:
+                        # Создаем временный item для стилизации, если его нет
+                        item = QTableWidgetItem()
+                        item.setFlags(Qt.NoItemFlags)  # Не редактируется
+                        self.setItem(row, col, item)
+                    # Применяем фон выделения (обводка вокруг всей строки)
+                    item.setBackground(highlight_color)
+    
+    def _clear_drag_over_row(self):
+        """Убрать визуальное выделение строки."""
+        if self._drag_over_row >= 0:
+            row = self._drag_over_row
+            # Убираем выделение строки
+            self.clearSelection()
+            # Убираем фон у всех items в строке
+            for col in range(self.columnCount()):
+                item = self.item(row, col)
+                if item:
+                    if item.flags() == Qt.NoItemFlags:
+                        # Удаляем временный item, если он был создан только для стилизации
+                        self.takeItem(row, col)
+                    else:
+                        # Убираем фон у существующего item
+                        item.setBackground(QColor())
+            self._drag_over_row = -1
+    
+    def dropEvent(self, event: QDropEvent):
+        """Обработка drop файлов."""
+        # Убираем выделение
+        self._clear_drag_over_row()
+        
+        if not event.mimeData().hasUrls():
+            event.ignore()
+            return
+        
+        # Определяем строку, на которую был выполнен drop
+        row = self.indexAt(event.pos()).row()
+        if row < 0:
+            event.ignore()
+            return
+        
+        # Получаем список файлов
+        urls = event.mimeData().urls()
+        file_paths = [Path(url.toLocalFile()) for url in urls if url.isLocalFile()]
+        
+        if not file_paths:
+            event.ignore()
+            return
+        
+        # Эмитируем сигнал с номером строки и списком файлов
+        self.files_dropped_on_row.emit(row, file_paths)
+        event.acceptProposedAction()
+
+
 class TestCaseFormWidget(QWidget):
     """
     Форма редактирования тест-кейса
@@ -49,108 +166,198 @@ class TestCaseFormWidget(QWidget):
     отвечает только за отображение и редактирование формы
     """
 
-    class _StepCard(QFrame):
-        content_changed = pyqtSignal()
-        status_changed = pyqtSignal(str)
-
-        def __init__(self, parent=None):
-            super().__init__(parent)
-            self._status = "pending"
-            self._index = 1
-            self.setObjectName("StepCard")
-            layout = QVBoxLayout(self)
-            layout.setContentsMargins(
-                UI_METRICS.container_padding,
-                UI_METRICS.container_padding,
-                UI_METRICS.container_padding,
-                UI_METRICS.container_padding,
-            )
-            layout.setSpacing(UI_METRICS.base_spacing)
-
-            header = QHBoxLayout()
-            header.setSpacing(UI_METRICS.base_spacing // 2)
-            self.index_label = QLabel("Шаг 1")
-            header.addWidget(self.index_label)
-            header.addStretch(1)
-
-            self.status_widget = QWidget()
-            status_layout = QHBoxLayout(self.status_widget)
-            status_layout.setContentsMargins(0, 0, 0, 0)
-            status_layout.setSpacing(UI_METRICS.base_spacing // 2)
-            self.status_buttons = []
-            spec = [
+    # Методы для работы с таблицей шагов в стиле TestOps
+    def _create_step_text_edit(self, placeholder: str) -> QTextEdit:
+        """Создать QTextEdit для редактирования шага."""
+        edit = QTextEdit()
+        edit.setPlaceholderText(placeholder)
+        edit.setWordWrapMode(QTextOption.WordWrap)
+        edit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        edit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        edit.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+        edit.setAcceptDrops(False)  # Отключаем drag & drop для QTextEdit, чтобы не вставлялся текст
+        edit.textChanged.connect(lambda: self._on_step_content_changed())
+        return edit
+    
+    def _create_step_status_widget(self, row: int) -> QWidget:
+        """Создать виджет со статусами шага (вертикально расположенные минималистичные кнопки)."""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        layout.setContentsMargins(2, 2, 2, 2)
+        layout.setSpacing(2)
+        
+        buttons = []
+        spec = [
                 ("passed", "✓", "#2ecc71"),
                 ("failed", "✕", "#e74c3c"),
                 ("skipped", "S", "#95a5a6"),
             ]
-            for value, text, color in spec:
-                btn = QToolButton()
-                btn.setText(text)
-                btn.setCheckable(True)
-                btn.setCursor(Qt.PointingHandCursor)
-                btn.setAutoRaise(True)
-                btn.setProperty("status_value", value)
-                btn.setProperty("status_color", color)
-                btn.clicked.connect(lambda _checked, val=value: self._on_status_clicked(val))
-                status_layout.addWidget(btn)
-                self.status_buttons.append(btn)
-            self.status_widget.setVisible(False)
-            header.addWidget(self.status_widget)
-            layout.addLayout(header)
-
-            self.action_edit = QTextEdit()
-            self.action_edit.setPlaceholderText("Действие")
-            self.action_edit.textChanged.connect(self.content_changed.emit)
-
-            self.expected_edit = QTextEdit()
-            self.expected_edit.setPlaceholderText("Ожидаемый результат")
-            self.expected_edit.textChanged.connect(self.content_changed.emit)
-
-            body = QHBoxLayout()
-            body.setSpacing(10)
-            body.addWidget(self.action_edit)
-            body.addWidget(self.expected_edit)
-            layout.addLayout(body)
-
-        def set_contents(self, action: str, expected: str, status: str):
-            self.action_edit.blockSignals(True)
-            self.expected_edit.blockSignals(True)
-            self.action_edit.setPlainText(action or "")
-            self.expected_edit.setPlainText(expected or "")
-            self.action_edit.blockSignals(False)
-            self.expected_edit.blockSignals(False)
-            self.set_status(status or "pending")
-
-        def get_contents(self) -> tuple[str, str]:
-            return self.action_edit.toPlainText(), self.expected_edit.toPlainText()
-
-        def set_status(self, status: str):
-            self._status = status or "pending"
-            for btn in self.status_buttons:
-                value = btn.property("status_value")
-                color = btn.property("status_color") or "#4CAF50"
-                is_active = value == self._status
-                btn.setChecked(is_active)
-                if is_active:
+        for value, text, color in spec:
+            btn = QToolButton()
+            btn.setText(text)
+            btn.setCheckable(True)
+            btn.setCursor(Qt.PointingHandCursor)
+            btn.setAutoRaise(True)
+            btn.setFixedSize(24, 24)  # Компактный размер для вертикального расположения
+            btn.setProperty("status_value", value)
+            btn.setProperty("status_color", color)
+            btn.clicked.connect(lambda _checked, val=value, r=row: self._on_step_status_clicked(r, val))
+            layout.addWidget(btn)
+            buttons.append(btn)
+        
+        layout.addStretch()  # Растягиваем пространство, чтобы кнопки были сверху
+        # Видимость управляется через скрытие/показ колонки, а не виджета
+        widget.setProperty("status_buttons", buttons)
+        return widget
+    
+    def _create_step_actions_widget(self, row: int) -> QWidget:
+        """Создать виджет с кнопками управления шагом (вертикально расположенные минималистичные кнопки)."""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        layout.setContentsMargins(2, 2, 2, 2)
+        layout.setSpacing(2)
+        
+        # Минималистичные стили для кнопок действий
+        action_button_style = """
+            QToolButton {
+                border: 1px solid transparent;
+                border-radius: 4px;
+                padding: 0px;
+                min-width: 24px;
+                max-width: 24px;
+                min-height: 24px;
+                max-height: 24px;
+                font-size: 12px;
+            }
+            QToolButton:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                border-color: rgba(255, 255, 255, 0.2);
+            }
+        """
+        
+        # Кнопка прикрепления файла (скрепка) - первая в списке
+        attach_file_btn = QToolButton()
+        attach_file_btn.setText("📎")
+        attach_file_btn.setToolTip("Прикрепить файл")
+        attach_file_btn.setCursor(Qt.PointingHandCursor)
+        attach_file_btn.setAutoRaise(True)
+        attach_file_btn.setFixedSize(24, 24)
+        attach_file_btn.setStyleSheet(action_button_style)
+        attach_file_btn.clicked.connect(lambda: self._attach_file_to_step(row))
+        layout.addWidget(attach_file_btn)
+        
+        add_above_btn = QToolButton()
+        add_above_btn.setText("+↑")
+        add_above_btn.setToolTip("Добавить шаг выше")
+        add_above_btn.setCursor(Qt.PointingHandCursor)
+        add_above_btn.setAutoRaise(True)
+        add_above_btn.setFixedSize(24, 24)
+        add_above_btn.setStyleSheet(action_button_style)
+        add_above_btn.clicked.connect(lambda: self._insert_step_above(row))
+        layout.addWidget(add_above_btn)
+        
+        add_below_btn = QToolButton()
+        add_below_btn.setText("+↓")
+        add_below_btn.setToolTip("Добавить шаг ниже")
+        add_below_btn.setCursor(Qt.PointingHandCursor)
+        add_below_btn.setAutoRaise(True)
+        add_below_btn.setFixedSize(24, 24)
+        add_below_btn.setStyleSheet(action_button_style)
+        add_below_btn.clicked.connect(lambda: self._insert_step_below(row))
+        layout.addWidget(add_below_btn)
+        
+        move_up_btn = QToolButton()
+        move_up_btn.setText("↑")
+        move_up_btn.setToolTip("Переместить вверх")
+        move_up_btn.setCursor(Qt.PointingHandCursor)
+        move_up_btn.setAutoRaise(True)
+        move_up_btn.setFixedSize(24, 24)
+        move_up_btn.setStyleSheet(action_button_style)
+        move_up_btn.clicked.connect(lambda: self._move_step_up(row))
+        layout.addWidget(move_up_btn)
+        
+        move_down_btn = QToolButton()
+        move_down_btn.setText("↓")
+        move_down_btn.setToolTip("Переместить вниз")
+        move_down_btn.setCursor(Qt.PointingHandCursor)
+        move_down_btn.setAutoRaise(True)
+        move_down_btn.setFixedSize(24, 24)
+        move_down_btn.setStyleSheet(action_button_style)
+        move_down_btn.clicked.connect(lambda: self._move_step_down(row))
+        layout.addWidget(move_down_btn)
+        
+        remove_btn = QToolButton()
+        remove_btn.setText("×")
+        remove_btn.setToolTip("Удалить шаг")
+        remove_btn.setCursor(Qt.PointingHandCursor)
+        remove_btn.setAutoRaise(True)
+        remove_btn.setFixedSize(24, 24)
+        remove_btn.setStyleSheet(action_button_style)
+        remove_btn.clicked.connect(lambda: self._remove_step_by_row(row))
+        layout.addWidget(remove_btn)
+        
+        layout.addStretch()  # Растягиваем пространство, чтобы кнопки были сверху
+        
+        # Видимость управляется через скрытие/показ колонки, а не виджета
+        widget.setProperty("move_up_btn", move_up_btn)
+        widget.setProperty("move_down_btn", move_down_btn)
+        return widget
+    
+    def _on_step_status_clicked(self, row: int, status: str):
+        """Обработчик клика по статусу шага."""
+        if row < 0 or row >= len(self.step_statuses):
+            return
+        if self.step_statuses[row] == status:
+            return
+        self.step_statuses[row] = status
+        self._update_step_status_widget(row, status)
+        if self.current_test_case and row < len(self.current_test_case.steps):
+            self.current_test_case.steps[row].status = status
+            self._auto_save_status_change()
+    
+    def _update_step_status_widget(self, row: int, status: str):
+        """Обновить виджет статуса для указанной строки."""
+        status_widget = self.steps_table.cellWidget(row, 3)
+        if not status_widget:
+            return
+        buttons = status_widget.property("status_buttons")
+        if not buttons:
+            return
+        for btn in buttons:
+            value = btn.property("status_value")
+            color = btn.property("status_color") or "#4CAF50"
+            is_active = value == status
+            btn.setChecked(is_active)
+            if is_active:
                     btn.setStyleSheet(
                         f"""
                         QToolButton {{
                             background-color: {color};
                             color: #0f1117;
-                            border-radius: 9px;
-                            font-weight: 700;
-                            padding: 2px 10px;
+                        border-radius: 4px;
+                        font-weight: 600;
+                        padding: 0px;
+                        min-width: 24px;
+                        max-width: 24px;
+                        min-height: 24px;
+                        max-height: 24px;
+                        font-size: 12px;
                         }}
-                        """
-                    )
-                else:
-                    btn.setStyleSheet(
+                    """
+                )
+            else:
+                btn.setStyleSheet(
                         f"""
                         QToolButton {{
                             border: 1px solid {color};
                             color: {color};
-                            border-radius: 9px;
-                            padding: 2px 10px;
+                        border-radius: 4px;
+                        padding: 0px;
+                        min-width: 24px;
+                        max-width: 24px;
+                        min-height: 24px;
+                        max-height: 24px;
+                        font-size: 12px;
                         }}
                         QToolButton:hover {{
                             background-color: {color}33;
@@ -158,46 +365,26 @@ class TestCaseFormWidget(QWidget):
                         """
                     )
 
-        def status(self) -> str:
-            return self._status
-
-        def set_index(self, index: int):
-            self._index = index
-            self.index_label.setText(f"Шаг {index}")
-
-        def set_edit_mode(self, enabled: bool):
-            self.action_edit.setReadOnly(not enabled)
-            self.expected_edit.setReadOnly(not enabled)
-
-        def set_run_mode(self, enabled: bool):
-            self.status_widget.setVisible(enabled)
-            for btn in self.status_buttons:
-                btn.setEnabled(enabled)
-
-        def sizeHint(self):
-            header_height = self.index_label.sizeHint().height() + 16
-            line_height = self.action_edit.fontMetrics().lineSpacing()
-            min_content_height = line_height * 7
-
-            hints = [
-                max(self.action_edit.document().size().height(), min_content_height / 2),
-                max(self.expected_edit.document().size().height(), min_content_height / 2),
-            ]
-            total_height = header_height + sum(hints) + 32
-            min_total = header_height + min_content_height + 32
-            return QSize(self.width() or 400, int(max(min_total, total_height)))
-
-        def _on_status_clicked(self, status: str):
-            if status == self._status:
-                return
-            self._status = status
-            self.set_status(status)
-            self.status_changed.emit(status)
+    def _on_step_content_changed(self):
+        """Обработчик изменения содержимого шага."""
+        if self._is_loading:
+            return
+        # Обновляем высоту всех строк таблицы для корректного отображения
+        QTimer.singleShot(0, self._update_table_row_heights)
+        self._mark_changed()
+    
+    def _update_table_row_heights(self):
+        """Обновить высоты всех строк таблицы."""
+        for row in range(self.steps_table.rowCount()):
+            self.steps_table.resizeRowToContents(row)
+        # Также обновляем ширину колонки с номером
+        self.steps_table.resizeColumnToContents(0)
     
 
     # Сигналы
     test_case_saved = pyqtSignal()
     unsaved_changes_state = pyqtSignal(bool)
+    before_save = pyqtSignal(object)  # Сигнал перед сохранением с передачей тест-кейса
     
     def __init__(self, service: TestCaseService, parent=None):
         super().__init__(parent)
@@ -208,6 +395,7 @@ class TestCaseFormWidget(QWidget):
         self._edit_mode_enabled = True
         self._run_mode_enabled = False
         self.step_statuses: List[str] = []
+        self._step_attachments: List[List[str]] = []  # Список attachments для каждого шага
 
         self.setup_ui()
 
@@ -250,10 +438,6 @@ class TestCaseFormWidget(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(UI_METRICS.base_spacing)
         
-        # Заголовок
-        header = self._create_header()
-        layout.addWidget(header)
-        
         # Scrollable форма
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
@@ -269,47 +453,13 @@ class TestCaseFormWidget(QWidget):
             UI_METRICS.container_padding,
         )
         
-        # Кнопка сворачивания секций
-        self.sections_toggle_btn = QToolButton()
-        self.sections_toggle_btn.setArrowType(Qt.DownArrow)
-        self.sections_toggle_btn.setToolButtonStyle(Qt.ToolButtonIconOnly)
-        self.sections_toggle_btn.setCheckable(True)
-        self.sections_toggle_btn.setChecked(True)
-        self.sections_toggle_btn.setMinimumHeight(max(28, UI_METRICS.control_min_height // 2))
-        self.sections_toggle_btn.setMinimumWidth(UI_METRICS.control_min_width)
-        self.sections_toggle_btn.clicked.connect(self._toggle_sections)
-        form_layout.addWidget(self.sections_toggle_btn, alignment=Qt.AlignLeft)
-
-        self.sections_widgets = []
-
-        # Основная информация
-        self.main_info_group = self._create_main_info_group()
-        form_layout.addWidget(self.main_info_group)
-        self.sections_widgets.append(self.main_info_group)
-
-        # Теги
-        self.tags_group = self._create_tags_group()
-        form_layout.addWidget(self.tags_group)
-        self.sections_widgets.append(self.tags_group)
-
-        # Контекст
-        self.domain_group = self._create_domain_group()
-        form_layout.addWidget(self.domain_group)
-        self.sections_widgets.append(self.domain_group)
-
-        # Описание
-        self.description_group = self._create_description_group()
-        form_layout.addWidget(self.description_group)
-        self.sections_widgets.append(self.description_group)
+        # Название тест-кейса
+        title_group = self._create_title_group()
+        form_layout.addWidget(title_group)
 
         # Предусловия
         precond_group = self._create_precondition_group()
         form_layout.addWidget(precond_group)
-
-        # Общий ожидаемый результат
-        expected_group = self._create_expected_result_group()
-        form_layout.addWidget(expected_group)
-        self.sections_widgets.append(expected_group)
 
         # Шаги тестирования
         steps_group = self._create_steps_group()
@@ -321,50 +471,6 @@ class TestCaseFormWidget(QWidget):
         scroll.setWidget(form_widget)
         layout.addWidget(scroll)
         self.scroll_area = scroll  # Сохраняем ссылку для прокрутки
-    
-    def _create_header(self) -> QWidget:
-        """Создать заголовок"""
-        header = QFrame()
-        header.setMinimumHeight(90)
-
-        layout = QHBoxLayout(header)
-        layout.setContentsMargins(
-            UI_METRICS.container_padding,
-            UI_METRICS.section_spacing,
-            UI_METRICS.container_padding,
-            UI_METRICS.section_spacing,
-        )
-        layout.setSpacing(UI_METRICS.section_spacing)
-
-        text_layout = QVBoxLayout()
-        text_layout.setSpacing(UI_METRICS.base_spacing // 2)
-
-        row_layout = QHBoxLayout()
-        row_layout.setSpacing(UI_METRICS.base_spacing)
-
-        self.title_edit = QLineEdit()
-        self.title_edit.setFont(QFont("Segoe UI", 14, QFont.Bold))
-        self.title_edit.setPlaceholderText("Название тест-кейса")
-        self.title_edit.textChanged.connect(self._mark_changed)
-        row_layout.addWidget(self.title_edit, stretch=1)
-
-        self.save_button = QPushButton("Сохранить")
-        self.save_button.setMinimumHeight(UI_METRICS.control_min_height)
-        self.save_button.setCursor(Qt.PointingHandCursor)
-        self.save_button.setEnabled(False)
-        self.save_button.clicked.connect(self._save)
-        row_layout.addWidget(self.save_button, alignment=Qt.AlignRight)
-
-        text_layout.addLayout(row_layout)
-        layout.addLayout(text_layout, stretch=1)
-
-        return header
-    
-    def _toggle_sections(self):
-        expanded = self.sections_toggle_btn.isChecked()
-        self.sections_toggle_btn.setArrowType(Qt.DownArrow if expanded else Qt.RightArrow)
-        for widget in self.sections_widgets:
-            widget.setVisible(expanded)
 
     def _create_main_info_group(self) -> QGroupBox:
         group = QGroupBox("Основная информация")
@@ -372,7 +478,7 @@ class TestCaseFormWidget(QWidget):
         layout.setSpacing(UI_METRICS.base_spacing)
         layout.setContentsMargins(
             UI_METRICS.container_padding,
-            UI_METRICS.base_spacing,
+            UI_METRICS.group_title_spacing,  # Отступ сверху для заголовка
             UI_METRICS.container_padding,
             UI_METRICS.base_spacing,
         )
@@ -460,7 +566,7 @@ class TestCaseFormWidget(QWidget):
     def _create_tags_group(self) -> QGroupBox:
         group = QGroupBox("Теги")
         layout = QVBoxLayout(group)
-        layout.setContentsMargins(10, 8, 10, 8)
+        layout.setContentsMargins(10, UI_METRICS.group_title_spacing, 10, 8)  # Отступ сверху для заголовка
         layout.setSpacing(6)
 
         self.tags_input = QTextEdit()
@@ -473,7 +579,7 @@ class TestCaseFormWidget(QWidget):
     def _create_description_group(self) -> QGroupBox:
         group = QGroupBox("Описание")
         layout = QVBoxLayout(group)
-        layout.setContentsMargins(10, 8, 10, 8)
+        layout.setContentsMargins(10, UI_METRICS.group_title_spacing, 10, 8)  # Отступ сверху для заголовка
         layout.setSpacing(6)
 
         self.description_input = QTextEdit()
@@ -486,6 +592,7 @@ class TestCaseFormWidget(QWidget):
     def _create_domain_group(self) -> QGroupBox:
         group = QGroupBox("Контекст (epic / feature / story / component)")
         layout = QHBoxLayout(group)
+        layout.setContentsMargins(10, UI_METRICS.group_title_spacing, 10, 8)  # Отступ сверху для заголовка
         layout.setSpacing(12)
 
         self.epic_input = self._create_line_edit()
@@ -506,10 +613,24 @@ class TestCaseFormWidget(QWidget):
 
         return group
     
+    def _create_title_group(self) -> QGroupBox:
+        """Группа названия тест-кейса"""
+        group = QGroupBox("Название")
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, UI_METRICS.group_title_spacing, 0, 0)  # Отступ сверху для заголовка
+        
+        self.title_edit = self._create_line_edit()
+        self.title_edit.setPlaceholderText("Название тест-кейса")
+        layout.addWidget(self.title_edit)
+        
+        group.setLayout(layout)
+        return group
+    
     def _create_precondition_group(self) -> QGroupBox:
         """Группа предусловий"""
         group = QGroupBox("Предусловия")
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, UI_METRICS.group_title_spacing, 0, 0)  # Отступ сверху для заголовка
         
         self.precondition_input = QTextEdit()
         self.precondition_input.setPlaceholderText("Предусловия для выполнения тест-кейса")
@@ -523,6 +644,7 @@ class TestCaseFormWidget(QWidget):
     def _create_expected_result_group(self) -> QGroupBox:
         group = QGroupBox("Общий ожидаемый результат")
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, UI_METRICS.group_title_spacing, 0, 0)  # Отступ сверху для заголовка
 
         self.expected_result_input = QTextEdit()
         self.expected_result_input.setPlaceholderText("Что должно получиться по завершении кейса")
@@ -560,37 +682,64 @@ class TestCaseFormWidget(QWidget):
         combo.blockSignals(False)
     
     def _create_steps_group(self) -> QGroupBox:
-        """Группа шагов тестирования"""
+        """Группа шагов тестирования в формате TestOps - единая таблица"""
         group = QGroupBox("Шаги тестирования")
         layout = QVBoxLayout()
         layout.setContentsMargins(
             UI_METRICS.container_padding,
-            UI_METRICS.base_spacing,
+            UI_METRICS.group_title_spacing,  # Отступ сверху для заголовка
             UI_METRICS.container_padding,
             UI_METRICS.base_spacing,
         )
         layout.setSpacing(UI_METRICS.base_spacing)
 
-        self.steps_list = QListWidget()
-        self.steps_list.setSpacing(6)
-        self.steps_list.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
-        self.steps_list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.steps_list.setFrameShape(QFrame.NoFrame)
-        self.steps_list.setStyleSheet(
-            """
-            QListWidget {
-                background: transparent;
-                border: none;
-            }
-            QListWidget::item {
-                margin: 0;
-            }
-            """
-        )
-        self.steps_list.itemSelectionChanged.connect(self._update_step_controls_state)
-        self.steps_list.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.steps_list.customContextMenuRequested.connect(self._show_steps_context_menu)
-        layout.addWidget(self.steps_list)
+        # Таблица шагов в стиле TestOps
+        self.steps_table = _StepsTableWidget(self)  # 5 колонок: №, Действие, Ожидаемый результат, Статус, Действия
+        self.steps_table.setColumnCount(5)
+        
+        # Убираем заголовки таблицы
+        self.steps_table.horizontalHeader().setVisible(False)
+        
+        # Настройка колонок
+        self.steps_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)  # № - автоматическая ширина
+        self.steps_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)  # Действие - растягивается
+        self.steps_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)  # Ожидаемый результат - растягивается
+        self.steps_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.Fixed)  # Статус - фиксированная
+        self.steps_table.horizontalHeader().setSectionResizeMode(4, QHeaderView.Fixed)  # Действия - фиксированная
+        
+        # Устанавливаем минимальную ширину для колонки с номером
+        self.steps_table.horizontalHeader().setMinimumSectionSize(30)  # Минимальная ширина для всех колонок
+        self.steps_table.setColumnWidth(0, 40)   # № - начальная ширина (будет автоматически подстраиваться)
+        self.steps_table.setColumnWidth(3, 60)   # Статус (уменьшено для вертикальных кнопок)
+        self.steps_table.setColumnWidth(4, 60)   # Действия (уменьшено для вертикальных кнопок)
+        
+        # Настройка вертикального заголовка для автоматической подстройки высоты строк
+        self.steps_table.verticalHeader().setVisible(False)
+        self.steps_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.steps_table.verticalHeader().setMinimumSectionSize(50)
+        
+        # Настройка таблицы
+        self.steps_table.setShowGrid(True)
+        self.steps_table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.steps_table.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.steps_table.setEditTriggers(QAbstractItemView.NoEditTriggers)  # Редактирование через виджеты
+        # Убираем чередующиеся цвета строк - единый стиль для всей таблицы
+        self.steps_table.setAlternatingRowColors(False)
+        
+        # Подключение сигналов
+        self.steps_table.itemSelectionChanged.connect(self._update_step_controls_state)
+        self.steps_table.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.steps_table.customContextMenuRequested.connect(self._show_steps_context_menu)
+        
+        # Подключаем сигнал drop файлов
+        self.steps_table.files_dropped_on_row.connect(self._on_files_dropped_on_step)
+        
+        # Устанавливаем видимость колонок по умолчанию (режим редактирования)
+        # В режиме редактирования: скрыть статусы (колонка 3), показать действия (колонка 4)
+        self.steps_table.setColumnHidden(3, True)  # Статусы скрыты по умолчанию (режим редактирования)
+        self.steps_table.setColumnHidden(4, False)  # Действия видны по умолчанию (режим редактирования)
+        
+        layout.addWidget(self.steps_table)
         
         group.setLayout(layout)
         return group
@@ -603,137 +752,43 @@ class TestCaseFormWidget(QWidget):
 
         if test_case:
             self.title_edit.blockSignals(True)
-            self.title_edit.setText(test_case.name)
+            self.title_edit.setText(test_case.name or "")
             self.title_edit.blockSignals(False)
 
-            self.id_label.setText(f"ID: {test_case.id or '-'}")
-            created_text = format_datetime(test_case.created_at) if test_case.created_at else "-"
-            updated_text = format_datetime(test_case.updated_at) if test_case.updated_at else "-"
-            self.created_label.setText(f"Создан: {created_text}")
-            self.updated_label.setText(f"Обновлён: {updated_text}")
-
-            self.author_input.blockSignals(True)
-            self.author_input.setText(test_case.author)
-            self.author_input.blockSignals(False)
-
-            self.owner_input.blockSignals(True)
-            self.owner_input.setText(test_case.owner)
-            self.owner_input.blockSignals(False)
-
-            self.reviewer_input.blockSignals(True)
-            self.reviewer_input.setText(test_case.reviewer)
-            self.reviewer_input.blockSignals(False)
-
-            self._set_combo_value(self.status_input, test_case.status)
-            self._set_combo_value(self.test_layer_input, test_case.test_layer)
-            self._set_combo_value(self.test_type_input, test_case.test_type)
-            self._set_combo_value(self.severity_input, test_case.severity)
-            self._set_combo_value(self.priority_input, test_case.priority)
-
-            self.tags_input.blockSignals(True)
-            self.tags_input.setText('\n'.join(test_case.tags))
-            self.tags_input.blockSignals(False)
-
-            self.description_input.blockSignals(True)
-            self.description_input.setText(test_case.description)
-            self.description_input.blockSignals(False)
-
             self.precondition_input.blockSignals(True)
-            self.precondition_input.setText(test_case.preconditions)
+            self.precondition_input.setText(test_case.preconditions or "")
             self.precondition_input.blockSignals(False)
 
-            self.expected_result_input.blockSignals(True)
-            self.expected_result_input.setText(test_case.expected_result)
-            self.expected_result_input.blockSignals(False)
-
-            self.environment_input.blockSignals(True)
-            self.environment_input.setText(test_case.environment)
-            self.environment_input.blockSignals(False)
-
-            self.browser_input.blockSignals(True)
-            self.browser_input.setText(test_case.browser)
-            self.browser_input.blockSignals(False)
-
-            self.test_case_id_input.blockSignals(True)
-            self.test_case_id_input.setText(test_case.test_case_id)
-            self.test_case_id_input.blockSignals(False)
-
-            self.issue_links_input.blockSignals(True)
-            self.issue_links_input.setText(test_case.issue_links)
-            self.issue_links_input.blockSignals(False)
-
-            self.test_case_links_input.blockSignals(True)
-            self.test_case_links_input.setText(test_case.test_case_links)
-            self.test_case_links_input.blockSignals(False)
-
-            self.epic_input.blockSignals(True)
-            self.epic_input.setText(test_case.epic)
-            self.epic_input.blockSignals(False)
-
-            self.feature_input.blockSignals(True)
-            self.feature_input.setText(test_case.feature)
-            self.feature_input.blockSignals(False)
-
-            self.story_input.blockSignals(True)
-            self.story_input.setText(test_case.story)
-            self.story_input.blockSignals(False)
-
-            self.component_input.blockSignals(True)
-            self.component_input.setText(test_case.component)
-            self.component_input.blockSignals(False)
-
-            self.steps_list.blockSignals(True)
-            self.steps_list.clear()
+            self.steps_table.blockSignals(True)
+            self.steps_table.setRowCount(0)
             self.step_statuses = []
+            # Сохраняем attachments из шагов при загрузке
+            self._step_attachments = []
             for step in test_case.steps:
-                self._add_step(step.description, step.expected_result, step.status or "pending")
-            self.steps_list.blockSignals(False)
-            self.steps_list.clearSelection()
+                step_attachments = list(step.attachments) if step.attachments else []
+                self._add_step(
+                    step.description, 
+                    step.expected_result, 
+                    step.status or "pending",
+                    attachments=step_attachments
+                )
+            self.steps_table.blockSignals(False)
+            self.steps_table.clearSelection()
             self._refresh_step_indices()
-            self._update_steps_list_height()
+            self._update_table_row_heights()
         else:
             self.title_edit.blockSignals(True)
             self.title_edit.setText("Не выбран тест-кейс")
             self.title_edit.blockSignals(False)
-            self.id_label.setText("ID: -")
-            self.created_label.setText("Создан: -")
-            self.updated_label.setText("Обновлён: -")
-            self.author_input.clear()
-            self.owner_input.clear()
-            self.reviewer_input.clear()
-            self.status_input.setCurrentIndex(0)
-            self.test_layer_input.setCurrentIndex(0)
-            self.test_type_input.setCurrentIndex(0)
-            self.severity_input.setCurrentIndex(0)
-            self.priority_input.setCurrentIndex(0)
-            self.environment_input.clear()
-            self.browser_input.clear()
-            self.test_case_id_input.clear()
-            self.issue_links_input.clear()
-            self.test_case_links_input.clear()
-            self.epic_input.clear()
-            self.feature_input.clear()
-            self.story_input.clear()
-            self.component_input.clear()
-            self.tags_input.clear()
-            self.description_input.clear()
             self.precondition_input.clear()
-            self.expected_result_input.clear()
-            self.steps_list.clear()
+            self.steps_table.setRowCount(0)
             self.step_statuses = []
-            self._update_steps_list_height()
+            self._step_attachments = []
+            self._update_table_row_heights()
 
-        self.save_button.setEnabled(False)
         self._is_loading = False
         self.unsaved_changes_state.emit(False)
         self._update_step_controls_state()
-    
-    def _on_title_edit_finished(self):
-        """Завершение редактирования названия"""
-        new_title = self.title_edit.text().strip() or "Без названия"
-        self.title_edit.setText(new_title)
-        if self.current_test_case:
-            self._mark_changed()
     
     def _create_step_control_button(self, text: str, tooltip: str) -> QToolButton:
         """Создает кнопку панели управления шагами."""
@@ -749,15 +804,15 @@ class TestCaseFormWidget(QWidget):
     def _show_steps_context_menu(self, pos):
         if not self._edit_mode_enabled:
             return
-        row = self.steps_list.indexAt(pos).row()
+        row = self.steps_table.indexAt(pos).row()
         if row != -1:
-            self.steps_list.setCurrentRow(row)
+            self.steps_table.selectRow(row)
 
         menu = QMenu(self)
         actions = {
             "add_new": menu.addAction("➕ Добавить новый шаг"),
-            "insert_above": menu.addAction("⬆️ Вставить шаг выше"),
-            "insert_below": menu.addAction("⬇️ Вставить шаг ниже"),
+            "insert_above": menu.addAction("↑ Вставить шаг выше"),
+            "insert_below": menu.addAction("↓ Вставить шаг ниже"),
             "move_up": menu.addAction("⇡ Переместить наверх"),
             "move_down": menu.addAction("⇣ Переместить вниз"),
             "remove": menu.addAction("✕ Удалить"),
@@ -768,9 +823,9 @@ class TestCaseFormWidget(QWidget):
                 actions[key].setEnabled(False)
         else:
             actions["move_up"].setEnabled(row > 0)
-            actions["move_down"].setEnabled(row < self.steps_list.count() - 1)
+            actions["move_down"].setEnabled(row < self.steps_table.rowCount() - 1)
 
-        action = menu.exec_(self.steps_list.mapToGlobal(pos))
+        action = menu.exec_(self.steps_table.mapToGlobal(pos))
         if not action:
             return
 
@@ -787,105 +842,191 @@ class TestCaseFormWidget(QWidget):
         elif action == actions["remove"]:
             self._remove_step()
 
-    def _add_step(self, step_text="", expected_text="", status="pending", row=None):
-        widget = self._StepCard(self)
-        widget.set_contents(step_text, expected_text, status)
-        widget.set_edit_mode(self._edit_mode_enabled)
-        widget.set_run_mode(self._run_mode_enabled)
-        widget.content_changed.connect(self._on_step_card_content_changed)
-        widget.status_changed.connect(lambda value, w=widget: self._on_step_status_changed(w, value))
-
-        item = QListWidgetItem()
-        if row is None or row >= self.steps_list.count():
-            self.steps_list.addItem(item)
-            row = self.steps_list.count() - 1
+    def _add_step(self, step_text="", expected_text="", status="pending", row=None, attachments=None):
+        """Добавить шаг в таблицу."""
+        if row is None or row >= self.steps_table.rowCount():
+            row = self.steps_table.rowCount()
+            self.steps_table.insertRow(row)
         else:
-            self.steps_list.insertItem(row, item)
-        self.steps_list.setItemWidget(item, widget)
+            self.steps_table.insertRow(row)
+        
+        # Колонка 0: № (номер шага)
+        index_item = QTableWidgetItem(str(row + 1))
+        index_item.setTextAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        index_item.setFlags(Qt.ItemIsEnabled)  # Не редактируется
+        self.steps_table.setItem(row, 0, index_item)
+        
+        # Колонка 1: Действие
+        action_edit = self._create_step_text_edit("Действие...")
+        action_edit.blockSignals(True)
+        action_edit.setPlainText(step_text or "")
+        action_edit.setReadOnly(not self._edit_mode_enabled)
+        action_edit.blockSignals(False)
+        self.steps_table.setCellWidget(row, 1, action_edit)
+        
+        # Колонка 2: Ожидаемый результат
+        expected_edit = self._create_step_text_edit("Ожидаемый результат...")
+        expected_edit.blockSignals(True)
+        expected_edit.setPlainText(expected_text or "")
+        expected_edit.setReadOnly(not self._edit_mode_enabled)
+        expected_edit.blockSignals(False)
+        self.steps_table.setCellWidget(row, 2, expected_edit)
+        
+        # Колонка 3: Статус
+        status_widget = self._create_step_status_widget(row)
+        self.steps_table.setCellWidget(row, 3, status_widget)
+        
+        # Колонка 4: Действия (кнопки управления)
+        actions_widget = self._create_step_actions_widget(row)
+        self.steps_table.setCellWidget(row, 4, actions_widget)
+        
+        # Сохраняем статус
         self.step_statuses.insert(row, status or "pending")
+        
+        # Сохраняем attachments
+        if attachments is None:
+            attachments = []
+        self._step_attachments.insert(row, list(attachments) if attachments else [])
+        
+        # Обновляем статус виджета
+        self._update_step_status_widget(row, status or "pending")
+        
+        # Обновляем индексы и высоты строк
         self._refresh_step_indices()
+        self._update_table_row_heights()
+        self._update_step_controls_state()
+        
         if not self._is_loading:
             self._mark_changed()
-        self._update_step_controls_state()
+        
         return row
 
     def _add_step_to_end(self):
         """Добавить шаг в конец."""
         new_row = self._add_step()
-        self.steps_list.setCurrentRow(new_row)
+        self.steps_table.selectRow(new_row)
         self._scroll_to_step_and_focus(new_row)
 
-    def _insert_step_above(self):
-        """Добавить шаг выше выбранного."""
-        row = self.steps_list.currentRow()
+    def _insert_step_above(self, row=None):
+        """Добавить шаг выше выбранного или указанной строки."""
+        if row is None:
+            row = self.steps_table.currentRow()
         if row < 0:
             self._add_step_to_end()
             return
         new_row = self._add_step(row=row)
-        self.steps_list.setCurrentRow(new_row)
+        self.steps_table.selectRow(new_row)
         self._scroll_to_step_and_focus(new_row)
 
-    def _insert_step_below(self):
-        """Добавить шаг ниже выбранного."""
-        row = self.steps_list.currentRow()
-        insert_row = row + 1 if row >= 0 else self.steps_list.count()
+    def _insert_step_below(self, row=None):
+        """Добавить шаг ниже выбранного или указанной строки."""
+        if row is None:
+            row = self.steps_table.currentRow()
+        insert_row = row + 1 if row >= 0 else self.steps_table.rowCount()
         new_row = self._add_step(row=insert_row)
-        self.steps_list.setCurrentRow(new_row)
+        self.steps_table.selectRow(new_row)
         self._scroll_to_step_and_focus(new_row)
 
-    def _move_step_up(self):
-        """Переместить выбранный шаг выше."""
-        row = self.steps_list.currentRow()
+    def _move_step_up(self, row=None):
+        """Переместить шаг выше."""
+        if row is None:
+            row = self.steps_table.currentRow()
         if row <= 0:
             return
         self._swap_step_rows(row, row - 1)
-        self.steps_list.setCurrentRow(row - 1)
+        self.steps_table.selectRow(row - 1)
         self._mark_changed()
         self._update_step_controls_state()
 
-    def _move_step_down(self):
-        """Переместить выбранный шаг ниже."""
-        row = self.steps_list.currentRow()
-        if row < 0 or row >= self.steps_list.count() - 1:
+    def _move_step_down(self, row=None):
+        """Переместить шаг ниже."""
+        if row is None:
+            row = self.steps_table.currentRow()
+        if row < 0 or row >= self.steps_table.rowCount() - 1:
             return
         self._swap_step_rows(row, row + 1)
-        self.steps_list.setCurrentRow(row + 1)
+        self.steps_table.selectRow(row + 1)
         self._mark_changed()
+        self._update_step_controls_state()
+    
+    def _remove_step_by_row(self, row: int):
+        """Удалить шаг по номеру строки."""
+        if row < 0 or row >= self.steps_table.rowCount():
+            return
+        self.steps_table.removeRow(row)
+        if row < len(self.step_statuses):
+            self.step_statuses.pop(row)
+        if row < len(self._step_attachments):
+            self._step_attachments.pop(row)
+        self._refresh_step_indices()
+        self._update_table_row_heights()
+        if not self._is_loading:
+            self._mark_changed()
         self._update_step_controls_state()
 
     def _swap_step_rows(self, row_a: int, row_b: int):
         """Поменять местами строки шагов."""
-        if not (0 <= row_a < self.steps_list.count() and 0 <= row_b < self.steps_list.count()):
+        if not (0 <= row_a < self.steps_table.rowCount() and 0 <= row_b < self.steps_table.rowCount()):
             return
-        widget_a = self._get_step_widget(row_a)
-        widget_b = self._get_step_widget(row_b)
-        if not widget_a or not widget_b:
+        
+        # Получаем содержимое ячеек
+        action_edit_a = self.steps_table.cellWidget(row_a, 1)
+        expected_edit_a = self.steps_table.cellWidget(row_a, 2)
+        action_edit_b = self.steps_table.cellWidget(row_b, 1)
+        expected_edit_b = self.steps_table.cellWidget(row_b, 2)
+        
+        if not all([action_edit_a, expected_edit_a, action_edit_b, expected_edit_b]):
             return
-        action_a, expected_a = widget_a.get_contents()
-        action_b, expected_b = widget_b.get_contents()
-        status_a = widget_a.status()
-        status_b = widget_b.status()
-        widget_a.set_contents(action_b, expected_b, status_b)
-        widget_b.set_contents(action_a, expected_a, status_a)
+        
+        # Сохраняем содержимое
+        action_a = action_edit_a.toPlainText()
+        expected_a = expected_edit_a.toPlainText()
+        action_b = action_edit_b.toPlainText()
+        expected_b = expected_edit_b.toPlainText()
+        status_a = self.step_statuses[row_a] if row_a < len(self.step_statuses) else "pending"
+        status_b = self.step_statuses[row_b] if row_b < len(self.step_statuses) else "pending"
+        
+        # Меняем местами
+        action_edit_a.blockSignals(True)
+        expected_edit_a.blockSignals(True)
+        action_edit_b.blockSignals(True)
+        expected_edit_b.blockSignals(True)
+        
+        action_edit_a.setPlainText(action_b)
+        expected_edit_a.setPlainText(expected_b)
+        action_edit_b.setPlainText(action_a)
+        expected_edit_b.setPlainText(expected_a)
+        
+        action_edit_a.blockSignals(False)
+        expected_edit_a.blockSignals(False)
+        action_edit_b.blockSignals(False)
+        expected_edit_b.blockSignals(False)
+        
+        # Меняем статусы местами
         if row_a < len(self.step_statuses) and row_b < len(self.step_statuses):
             self.step_statuses[row_a], self.step_statuses[row_b] = (
                 self.step_statuses[row_b],
                 self.step_statuses[row_a],
             )
+            self._update_step_status_widget(row_a, self.step_statuses[row_a])
+            self._update_step_status_widget(row_b, self.step_statuses[row_b])
+        
+        # Меняем attachments местами
+        if row_a < len(self._step_attachments) and row_b < len(self._step_attachments):
+            self._step_attachments[row_a], self._step_attachments[row_b] = (
+                self._step_attachments[row_b],
+                self._step_attachments[row_a],
+            )
+        
         self._refresh_step_indices()
+        self._update_table_row_heights()
     
     def _scroll_to_step_and_focus(self, row: int):
         """Прокрутить к шагу и установить фокус на поле 'Действия'"""
-        if row < 0 or row >= self.steps_list.count():
-            return
-        
-        # Получаем виджет шага
-        step_widget = self._get_step_widget(row)
-        if not step_widget:
+        if row < 0 or row >= self.steps_table.rowCount():
             return
         
         # Прокручиваем QScrollArea к блоку шагов
-        # Находим группу шагов
         steps_group = None
         for widget in self.findChildren(QGroupBox):
             if widget.title() == "Шаги тестирования":
@@ -893,17 +1034,18 @@ class TestCaseFormWidget(QWidget):
                 break
         
         if steps_group and hasattr(self, 'scroll_area'):
-            # Прокручиваем к группе шагов
             self._scroll_to_widget(steps_group)
         
-        # Прокручиваем QListWidget к нужному элементу с небольшой задержкой
-        item = self.steps_list.item(row)
-        if item:
-            QTimer.singleShot(50, lambda: self.steps_list.scrollToItem(item, QAbstractItemView.PositionAtCenter))
+        # Прокручиваем таблицу к нужной строке
+        QTimer.singleShot(50, lambda: self.steps_table.scrollToItem(
+            self.steps_table.item(row, 0), 
+            QAbstractItemView.PositionAtCenter
+        ))
         
         # Устанавливаем фокус на поле "Действия" с задержкой
-        # чтобы прокрутка успела завершиться
-        QTimer.singleShot(150, lambda: step_widget.action_edit.setFocus())
+        action_edit = self.steps_table.cellWidget(row, 1)
+        if action_edit:
+            QTimer.singleShot(150, lambda: action_edit.setFocus())
     
     def _scroll_to_widget(self, widget: QWidget):
         """Прокрутить QScrollArea к указанному виджету"""
@@ -923,25 +1065,25 @@ class TestCaseFormWidget(QWidget):
         self.scroll_area.verticalScrollBar().setValue(scroll_y)
     
     def _remove_step(self):
-        """Удалить шаг"""
-        row = self.steps_list.currentRow()
-        if row >= 0:
-            item = self.steps_list.takeItem(row)
-            if item:
-                widget = self.steps_list.itemWidget(item)
-                if widget:
-                    widget.deleteLater()
-                del item
-            if row < len(self.step_statuses):
-                self.step_statuses.pop(row)
-            self._refresh_step_indices()
-            if not self._is_loading:
-                self._mark_changed()
-        self._update_step_controls_state()
+        """Удалить выбранный шаг"""
+        row = self.steps_table.currentRow()
+        self._remove_step_by_row(row)
 
     def _update_step_controls_state(self):
-        """Поддерживаем совместимость — пока достаточно ничего не делать."""
-        return
+        """Обновить состояние кнопок управления шагами."""
+        if not self._edit_mode_enabled:
+            return
+        
+        for row in range(self.steps_table.rowCount()):
+            actions_widget = self.steps_table.cellWidget(row, 4)
+            if actions_widget:
+                move_up_btn = actions_widget.property("move_up_btn")
+                move_down_btn = actions_widget.property("move_down_btn")
+                if move_up_btn:
+                    move_up_btn.setEnabled(row > 0)
+                if move_down_btn:
+                    move_down_btn.setEnabled(row < self.steps_table.rowCount() - 1)
+    
     def _mark_changed(self):
         """Пометить как измененное"""
         if self._is_loading:
@@ -950,56 +1092,55 @@ class TestCaseFormWidget(QWidget):
         if not self.has_unsaved_changes:
             self.has_unsaved_changes = True
             self.unsaved_changes_state.emit(True)
-        else:
-            self.unsaved_changes_state.emit(True)
-        self.save_button.setEnabled(True)
     
-    def _save(self):
+    def save(self):
         """Сохранить тест-кейс"""
         if not self.current_test_case:
             return
         
-        # Собираем данные
-        self.current_test_case.name = self.title_edit.text()
-        self.current_test_case.author = self.author_input.text()
-        self.current_test_case.owner = self.owner_input.text()
-        self.current_test_case.reviewer = self.reviewer_input.text()
-        self.current_test_case.status = self.status_input.currentText()
-        self.current_test_case.test_layer = self.test_layer_input.currentText()
-        self.current_test_case.test_type = self.test_type_input.currentText()
-        self.current_test_case.severity = self.severity_input.currentText()
-        self.current_test_case.priority = self.priority_input.currentText()
-        self.current_test_case.description = self.description_input.toPlainText()
+        # Эмитируем сигнал перед сохранением, чтобы обновить данные из панели информации
+        self.before_save.emit(self.current_test_case)
+        
+        # Собираем данные из формы (только название, предусловия и шаги)
+        self.current_test_case.name = self.title_edit.text().strip()
         self.current_test_case.preconditions = self.precondition_input.toPlainText()
-        self.current_test_case.expected_result = self.expected_result_input.toPlainText()
-        self.current_test_case.environment = self.environment_input.text()
-        self.current_test_case.browser = self.browser_input.text()
-        self.current_test_case.test_case_id = self.test_case_id_input.text()
-        self.current_test_case.issue_links = self.issue_links_input.text()
-        self.current_test_case.test_case_links = self.test_case_links_input.text()
-        self.current_test_case.epic = self.epic_input.text()
-        self.current_test_case.feature = self.feature_input.text()
-        self.current_test_case.story = self.story_input.text()
-        self.current_test_case.component = self.component_input.text()
         
-        # Теги
-        tags_text = self.tags_input.toPlainText().strip()
-        self.current_test_case.tags = [t.strip() for t in tags_text.split('\n') if t.strip()]
-        
-        # Шаги
+        # Шаги (сохраняем attachments из текущего тест-кейса, если они есть)
         steps = []
-        for row in range(self.steps_list.count()):
-            widget = self._get_step_widget(row)
-            if not widget:
+        for row in range(self.steps_table.rowCount()):
+            action_edit = self.steps_table.cellWidget(row, 1)
+            expected_edit = self.steps_table.cellWidget(row, 2)
+            if not action_edit or not expected_edit:
                 continue
-            step_text, expected_text = widget.get_contents()
-            status = self.step_statuses[row] if row < len(self.step_statuses) else widget.status()
+            step_text = action_edit.toPlainText()
+            expected_text = expected_edit.toPlainText()
+            status = self.step_statuses[row] if row < len(self.step_statuses) else "pending"
+            
+            # Сохраняем attachments из _step_attachments (источник истины для формы)
+            attachments = []
+            if row < len(self._step_attachments):
+                attachments = list(self._step_attachments[row])
+            elif row < len(self.current_test_case.steps):
+                # Если в _step_attachments нет, берем из текущего тест-кейса
+                existing_step = self.current_test_case.steps[row]
+                if existing_step.attachments:
+                    attachments = list(existing_step.attachments)
+            
+            # Получаем ID шага из текущего тест-кейса, если шаг существует
+            step_id = None
+            if row < len(self.current_test_case.steps):
+                step_id = self.current_test_case.steps[row].id
+            if not step_id:
+                step_id = str(uuid.uuid4())
+            
             steps.append(
                 TestCaseStep(
+                    id=step_id,
                     name=f"Шаг {row + 1}",
                     description=step_text,
                     expected_result=expected_text,
                     status=status,
+                    attachments=attachments,
                 )
             )
         
@@ -1011,136 +1152,61 @@ class TestCaseFormWidget(QWidget):
         # Сохраняем через сервис
         if self.service.save_test_case(self.current_test_case):
             self.has_unsaved_changes = False
-            self.save_button.setEnabled(False)
             self.unsaved_changes_state.emit(False)
             self.test_case_saved.emit()
-            
-            # Обновляем отображение времени обновления
-            self.updated_label.setText(f"Обновлён: {format_datetime(self.current_test_case.updated_at)}")
 
     def set_edit_mode(self, enabled: bool):
         self._edit_mode_enabled = enabled
         widgets_to_toggle = [
-            self.author_input,
-            self.owner_input,
-            self.reviewer_input,
-            self.status_input,
-            self.test_layer_input,
-            self.test_type_input,
-            self.severity_input,
-            self.priority_input,
-            self.tags_input,
-            self.description_input,
             self.precondition_input,
-            self.expected_result_input,
-            self.environment_input,
-            self.browser_input,
-            self.test_case_id_input,
-            self.issue_links_input,
-            self.test_case_links_input,
-            self.epic_input,
-            self.feature_input,
-            self.story_input,
-            self.component_input,
-            self.save_button,
             self.title_edit,
         ]
         for widget in widgets_to_toggle:
             widget.setEnabled(enabled)
-        self.sections_toggle_btn.setEnabled(True)
 
-        for row in range(self.steps_list.count()):
-            widget = self._get_step_widget(row)
-            if widget:
-                widget.set_edit_mode(enabled)
-
-        if not enabled:
-            self.save_button.setEnabled(False)
-        else:
-            self.save_button.setEnabled(self.has_unsaved_changes)
+        # Обновляем режим редактирования для всех шагов
+        for row in range(self.steps_table.rowCount()):
+            action_edit = self.steps_table.cellWidget(row, 1)
+            expected_edit = self.steps_table.cellWidget(row, 2)
+            if action_edit:
+                action_edit.setReadOnly(not enabled)
+            if expected_edit:
+                expected_edit.setReadOnly(not enabled)
+        
+        # В режиме редактирования: скрыть колонку статусов (3), показать колонку действий (4)
+        self.steps_table.setColumnHidden(3, enabled)  # Скрыть статусы в режиме редактирования
+        self.steps_table.setColumnHidden(4, not enabled)  # Показать действия в режиме редактирования
+        
+        self._update_step_controls_state()
 
     def set_run_mode(self, enabled: bool):
         self._run_mode_enabled = enabled
-        for row in range(self.steps_list.count()):
-            widget = self._get_step_widget(row)
-            if widget:
-                widget.set_run_mode(enabled)
-
-    def _ensure_status_capacity(self):
-        row_count = self.steps_list.count()
-        if len(self.step_statuses) < row_count:
-            self.step_statuses.extend(["pending"] * (row_count - len(self.step_statuses)))
-        elif len(self.step_statuses) > row_count:
-            self.step_statuses = self.step_statuses[:row_count]
-
-    def _rebuild_status_widgets(self):
-        self._ensure_status_capacity()
-        for row in range(self.steps_list.count()):
-            widget = self._get_step_widget(row)
-            if widget:
-                widget.set_status(self.step_statuses[row] if row < len(self.step_statuses) else "pending")
-                widget.set_run_mode(self._run_mode_enabled)
-                widget.set_edit_mode(self._edit_mode_enabled)
-                item = self.steps_list.item(row)
-                if item:
-                    item.setSizeHint(widget.sizeHint())
-
-    def _on_step_card_content_changed(self):
-        if self._is_loading:
-            return
-        widget = self.sender()
-        if isinstance(widget, self._StepCard):
-            row = self._find_widget_row(widget)
-            if row >= 0:
-                item = self.steps_list.item(row)
-                if item:
-                    item.setSizeHint(widget.sizeHint())
-        self._mark_changed()
-
-    def _on_step_status_changed(self, widget: "TestCaseFormWidget._StepCard", status: str):
-        row = self._find_widget_row(widget)
-        if row < 0:
-            return
-        if row >= len(self.step_statuses):
-            self.step_statuses.extend(["pending"] * (row - len(self.step_statuses) + 1))
-        if self.step_statuses[row] == status:
-            return
-        self.step_statuses[row] = status
-        widget.set_status(status)
-        if self.current_test_case and row < len(self.current_test_case.steps):
-            self.current_test_case.steps[row].status = status
-            self._auto_save_status_change()
-
-    def _get_step_widget(self, row: int):
-        item = self.steps_list.item(row)
-        if not item:
-            return None
-        return self.steps_list.itemWidget(item)
-
-    def _find_widget_row(self, widget: "TestCaseFormWidget._StepCard") -> int:
-        for idx in range(self.steps_list.count()):
-            if self._get_step_widget(idx) is widget:
-                return idx
-        return -1
+        
+        # В режиме запуска тестов: показать колонку статусов (3), скрыть колонку действий (4)
+        self.steps_table.setColumnHidden(3, not enabled)  # Показать статусы в режиме запуска
+        self.steps_table.setColumnHidden(4, enabled)  # Скрыть действия в режиме запуска
+        
+        # Включаем/выключаем кнопки статусов для всех строк
+        for row in range(self.steps_table.rowCount()):
+            status_widget = self.steps_table.cellWidget(row, 3)
+            if status_widget:
+                buttons = status_widget.property("status_buttons")
+                if buttons:
+                    for btn in buttons:
+                        btn.setEnabled(enabled)
 
     def _refresh_step_indices(self):
-        for idx in range(self.steps_list.count()):
-            widget = self._get_step_widget(idx)
-            if widget:
-                widget.set_index(idx + 1)
-                item = self.steps_list.item(idx)
-                if item:
-                    item.setSizeHint(widget.sizeHint())
-        self._update_steps_list_height()
-
-    def _update_steps_list_height(self):
-        total = 0
-        spacing = self.steps_list.spacing()
-        for i in range(self.steps_list.count()):
-            total += self.steps_list.sizeHintForRow(i) + spacing
-        total += 12
-        self.steps_list.setMinimumHeight(total)
-        self.steps_list.setMaximumHeight(total)
+        """Обновить номера шагов в колонке №."""
+        for idx in range(self.steps_table.rowCount()):
+            index_item = self.steps_table.item(idx, 0)
+            if index_item:
+                index_item.setText(str(idx + 1))
+            else:
+                index_item = QTableWidgetItem(str(idx + 1))
+                index_item.setTextAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+                index_item.setFlags(Qt.ItemIsEnabled)
+                self.steps_table.setItem(idx, 0, index_item)
+        self._update_table_row_heights()
 
     def _auto_save_status_change(self):
         if not self.current_test_case:
@@ -1148,8 +1214,151 @@ class TestCaseFormWidget(QWidget):
         self.current_test_case.updated_at = get_current_datetime()
         if self.service.save_test_case(self.current_test_case):
             self.has_unsaved_changes = False
-            self.save_button.setEnabled(False)
-            self.updated_label.setText(f"Обновлён: {format_datetime(self.current_test_case.updated_at)}")
+            self.unsaved_changes_state.emit(False)
             self.test_case_saved.emit()
+
+    def _on_files_dropped_on_step(self, row: int, file_paths: List[Path]):
+        """Обработчик drop файлов на строку шага."""
+        if not self.current_test_case:
+            QMessageBox.warning(
+                self,
+                "Нет выбранного тест-кейса",
+                "Пожалуйста, сначала выберите тест-кейс для прикрепления файлов."
+            )
+            return
+        
+        if row < 0 or row >= self.steps_table.rowCount():
+            return
+        
+        # Получаем шаг из текущего тест-кейса (нужен его id)
+        if row >= len(self.current_test_case.steps):
+            # Если шаг еще не сохранен, создаем временный id
+            step_id = str(uuid.uuid4())
+        else:
+            step = self.current_test_case.steps[row]
+            step_id = step.id or str(uuid.uuid4())
+        
+        test_case_id = self.current_test_case.id or ""
+        if not test_case_id:
+            QMessageBox.warning(
+                self,
+                "Нет ID тест-кейса",
+                "Не удалось определить ID тест-кейса. Файлы не могут быть прикреплены."
+            )
+            return
+        
+        # Получаем директорию _attachment
+        if not self.current_test_case._filepath:
+            QMessageBox.warning(
+                self,
+                "Нет пути к тест-кейсу",
+                "Не удалось определить путь к тест-кейсу. Файлы не могут быть прикреплены."
+            )
+            return
+        
+        test_case_dir = self.current_test_case._filepath.parent
+        attachment_dir = test_case_dir / "_attachment"
+        attachment_dir.mkdir(exist_ok=True)
+        
+        # Обрабатываем каждый файл
+        for source_file in file_paths:
+            if not source_file.exists() or not source_file.is_file():
+                continue
+            
+            # Формируем новое имя: {id тест-кейса}-{id шага}_{оригинальное имя}.{расширение}
+            original_name = source_file.stem  # Имя без расширения
+            extension = source_file.suffix  # Расширение с точкой
+            new_name = f"{test_case_id}-{step_id}_{original_name}{extension}"
+            target_file = attachment_dir / new_name
+            
+            # Проверяем, существует ли уже такой файл
+            if target_file.exists():
+                # Предлагаем переименовать
+                new_name_custom, ok = QInputDialog.getText(
+                    self,
+                    "Файл уже существует",
+                    f"Файл '{new_name}' уже существует.\nВведите новое имя (без расширения):",
+                    text=original_name
+                )
+                
+                if not ok or not new_name_custom.strip():
+                    continue  # Пропускаем этот файл
+                
+                new_name = f"{test_case_id}-{step_id}_{new_name_custom.strip()}{extension}"
+                target_file = attachment_dir / new_name
+                
+                # Проверяем еще раз на случай, если пользователь ввел имя, которое тоже существует
+                if target_file.exists():
+                    QMessageBox.warning(
+                        self,
+                        "Файл уже существует",
+                        f"Файл '{new_name}' также уже существует. Файл пропущен."
+                    )
+                    continue
+            
+            try:
+                # Копируем файл
+                shutil.copy2(source_file, target_file)
+                
+                # Сохраняем относительный путь для attachments
+                try:
+                    relative_path = target_file.relative_to(attachment_dir)
+                    file_path_str = str(relative_path)
+                except ValueError:
+                    file_path_str = target_file.name
+                
+                # Добавляем в attachments шага
+                if row >= len(self._step_attachments):
+                    # Расширяем список если нужно
+                    while len(self._step_attachments) <= row:
+                        self._step_attachments.append([])
+                
+                if file_path_str not in self._step_attachments[row]:
+                    self._step_attachments[row].append(file_path_str)
+                
+                # Обновляем attachments в текущем тест-кейсе (если шаг существует)
+                if row < len(self.current_test_case.steps):
+                    step = self.current_test_case.steps[row]
+                    if file_path_str not in step.attachments:
+                        step.attachments.append(file_path_str)
+                
+                self._mark_changed()
+                
+            except Exception as e:
+                QMessageBox.critical(
+                    self,
+                    "Ошибка копирования",
+                    f"Не удалось скопировать файл '{source_file.name}':\n{str(e)}"
+                )
+    
+    def _attach_file_to_step(self, row: int):
+        """Обработчик клика по кнопке прикрепления файла."""
+        if not self.current_test_case:
+            QMessageBox.warning(
+                self,
+                "Нет выбранного тест-кейса",
+                "Пожалуйста, сначала выберите тест-кейс для прикрепления файлов."
+            )
+            return
+        
+        if row < 0 or row >= self.steps_table.rowCount():
+            return
+        
+        # Открываем диалог выбора файлов
+        files, _ = QFileDialog.getOpenFileNames(
+            self,
+            "Выберите файлы для прикрепления",
+            "",
+            "Все файлы (*.*)",
+        )
+        
+        if not files:
+            return
+        
+        # Преобразуем пути в Path объекты
+        file_paths = [Path(path) for path in files]
+        
+        # Используем существующий метод для обработки файлов
+        self._on_files_dropped_on_step(row, file_paths)
 
 

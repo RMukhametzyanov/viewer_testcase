@@ -1,0 +1,99 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442688,
+        "name": "Боковые панели"
+      },
+      "workItem": {
+        "id": 460976,
+        "name": "ДОБ. Боковые панели. Синхронизация отображаемой скважины в боковой панели с гридом",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"5\"><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открыть ДОБ \\ Верхний месяц \\ Любое ДО&lt;BR/&gt;&lt;BR/&gt;Перейти в реестр Кандидаты &lt;BR/&gt;Выбрать любую скважину&lt;BR/&gt;\nВ боковой панели включить вкладку \"Статус экспертизы\"\n&lt;BR/&gt;Отфильтровать таблицу так, чтобы выбранное мероприятие не попадало в фильтр&lt;BR/&gt;&lt;I&gt;Например, если выбрано мероприятие с ГТМ ОПЗ, в фильтре Тип ГТМ убрать ОПЗ&lt;BR/&gt;&lt;/I&gt;&lt;I&gt;&lt;BR/&gt;&lt;/I&gt;Повторить для всех вкладок:&lt;BR/&gt;- Информация по скважине&lt;BR/&gt;- Информация о ремонтах&lt;BR/&gt;- История корректировок&lt;BR/&gt;- История отказов&lt;BR/&gt;- Графики&lt;BR/&gt;- Геологические карты&lt;BR/&gt;- Системны и Узловой анализ (ОПТ)&lt;BR/&gt;- Данные РИГИС&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Весь блок Боковая панель закрывается&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Перейти в реестр Не кандидаты &lt;BR/&gt;Выбрать любую скважину&lt;BR/&gt;\nВ боковой панели включить вкладку \"Статус экспертизы\"\n&lt;BR/&gt;Отфильтровать таблицу так, чтобы выбранное мероприятие не попадало в фильтр&lt;BR/&gt;&lt;I&gt;Например, если выбрано мероприятие с ГТМ ОПЗ, в фильтре Тип ГТМ убрать ОПЗ&lt;BR/&gt;&lt;/I&gt;&lt;I&gt;&lt;BR/&gt;&lt;/I&gt;Повторить для всех вкладок:&lt;BR/&gt;- Информация по скважине&lt;BR/&gt;- Информация о ремонтах&lt;BR/&gt;- История корректировок&lt;BR/&gt;- Графики&lt;BR/&gt;- Геологические карты&lt;BR/&gt;- Системны и Узловой анализ (ОПТ)&lt;BR/&gt;- Данные РИГИС&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Весь блок Боковая панель закрывается&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Перейти в реестр Ошибки&lt;BR/&gt;Выбрать любую скважину&lt;BR/&gt;\nВ боковой панели включить вкладку \"Статус экспертизы\"\n&lt;BR/&gt;Отфильтровать таблицу так, чтобы выбранное мероприятие не попадало в фильтр&lt;BR/&gt;&lt;I&gt;Например, если выбрано мероприятие с ГТМ ОПЗ, в фильтре Тип ГТМ убрать ОПЗ&lt;BR/&gt;&lt;/I&gt;&lt;I&gt;&lt;BR/&gt;&lt;/I&gt;Повторить для всех вкладок:&lt;BR/&gt;- Информация по скважине&lt;BR/&gt;- Информация о ремонтах&lt;BR/&gt;- История корректировок&lt;BR/&gt;- Графики&lt;BR/&gt;- Геологические карты&lt;BR/&gt;- Системны и Узловой анализ (ОПТ)&lt;BR/&gt;- Данные РИГИС&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Весь блок Боковая панель закрывается&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-10-10T09:31:51.553Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Ревью"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-10-21T08:19:47.543Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 9
+          }
+        ]
+      },
+      "order": 9,
+      "pointAssignments": [
+        {
+          "id": 42765,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Лобанов Сергей Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+              }
+            },
+            "id": "cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "uniqueName": "GAZPROM-NEFT\\Lobanov.SI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442688/TestPoint/42765"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442688/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442688"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 1
+}

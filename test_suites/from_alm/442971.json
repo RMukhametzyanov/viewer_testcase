@@ -1,0 +1,98 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442971,
+        "name": "Вкладка Настройки"
+      },
+      "workItem": {
+        "id": 383148,
+        "name": "[НАГ] Настройки",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"6\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Перейти на вкладку Настройка&lt;BR/&gt;&lt;BR/&gt;Срабатывают методы:\n\nGET https://spektr-u210001901.apps.test.paas.gazprom-neft.local/maps/v1/MapType/GetTypes\n\nGET https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/spektr/Project/GetProjectStatus?prjId=05dbf634-1c0a-47b2-9792-ff45cd68543d\n\n\n\nGET https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/spektr/Organizations/GetOrganizationsObjects\n\nPOST https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/spektr/ExpertiseConditions/GetConditionsByOrg?organizationId=6\n\n\n POST\n\nhttps://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/spektr/ExpertiseOptions/GetExpertiseOptionsForOrganization?orgId=6&amp;nbsp;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Время загрузки страницы&amp;lt; 5сек&lt;/P&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать в Навигации по ДО по любому Месторождению Целевой пласт&lt;BR/&gt;&lt;BR/&gt;Срабатывают методы:&lt;BR/&gt;POST https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/spektr/ExpertiseConditions/GetConditionsByObject?objectId=4f9bfb5f-fe24-4609-95ec-557a0dd30176&lt;BR/&gt;&lt;BR/&gt;POST https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/spektr/ExpertiseOptions/GetExpertiseOptionsForObject?objectId=4f9bfb5f-fe24-4609-95ec-557a0dd30176&lt;BR/&gt;&lt;BR/&gt;GET https://spektr-u210001901.apps.test.paas.gazprom-neft.local/maps/v1/MapInformation/GetUploadedMapsForObject?developmentObject=4f9bfb5f-fe24-4609-95ec-557a0dd30176&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Время загрузки страницы&amp;lt; 5сек&lt;/P&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать вкладку Карты&lt;BR/&gt;Выбрать карты Изобар&lt;BR/&gt;&lt;BR/&gt;Срабатывают методы:&lt;BR/&gt;GET https://spektr-u210001901.apps.test.paas.gazprom-neft.local/maps/v1/MapDownload/GetBitmapPngByIdCached?id=28873&lt;BR/&gt;&lt;BR/&gt;GET https://spektr-u210001901.apps.test.paas.gazprom-neft.local/assets/palettes/ExploitStandart.alut&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Время загрузки страницы&amp;lt; 5сек&lt;/P&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В Настройках расчета по ГТМ Выбрать ГТМ ВБД&lt;BR/&gt;Выбрать любую настройку В ГЗ&lt;BR/&gt;В Опции расчета поменять учет направления стресса в поиске скважин окружения&lt;BR/&gt;&lt;BR/&gt;Срабатывают методы: &lt;BR/&gt;POST https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/spektr/ExpertiseConditions/Set\n\nPOST https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/spektr/ExpertiseOptions/GetExpertiseOptionsForOrganization?orgId=7\n\nPOST https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/spektr/InjectionProject/RecalculateProject?projectId=05dbf634-1c0a-47b2-9792-ff45cd68543d\n\nPOST https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/spektr/InjectionProject/RecalculateProject?projectId=e357fc29-9fa1-46e5-8c25-068b711a29c0&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Время загрузки страницы&amp;lt; 5сек&lt;BR/&gt;&amp;nbsp;&lt;/P&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Багаутдинова Анна Валерьевна <GAZPROM-NEFT\\Bagautdinova.AV>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-05-05T09:22:03.11Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Багаутдинова Анна Валерьевна <GAZPROM-NEFT\\Bagautdinova.AV>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-05-05T09:22:03.11Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 6
+          }
+        ]
+      },
+      "pointAssignments": [
+        {
+          "id": 40333,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Багаутдинова Анна Валерьевна",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/173402d9-ea5b-489e-80aa-38d9cc19aea6",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS02NTk5MjM"
+              }
+            },
+            "id": "173402d9-ea5b-489e-80aa-38d9cc19aea6",
+            "uniqueName": "GAZPROM-NEFT\\Bagautdinova.AV",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS02NTk5MjM",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS02NTk5MjM"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442971/TestPoint/40333"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442971/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442971"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 1
+}

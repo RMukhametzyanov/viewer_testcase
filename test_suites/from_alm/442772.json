@@ -1,0 +1,1040 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442772,
+        "name": "Расширенная система эксперти РСЭ"
+      },
+      "workItem": {
+        "id": 69800,
+        "name": "[РСЭ] РСЭ. Включение расширенной системы экспертизы",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"6\"><step id=\"2\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ПРИМЕЧАНИЕ&lt;BR/&gt;&lt;BR/&gt;Для включения настройки пользователь делает запрос в службу поддержки для своего ДО&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Инструкция&lt;BR/&gt;РСЭ отключена&lt;BR/&gt;Клик на РСЭ рядом с ФИО&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открывается информер. По клику на инструцию открывается окно с инструкцией, списком ролей как в макете &lt;BR/&gt;&lt;BR/&gt;https://www.figma.com/file/67pATxKioyFnRSEIRpKvcG/SPekTR.release?node-id=77%3A56140&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Скачать предварительно Excel Кандидатов&lt;BR/&gt;Выполнить запрос API на &lt;B&gt;включение &lt;/B&gt;РСЭ&lt;BR/&gt;&lt;BR/&gt;&lt;SPAN style=\"color: rgb(255, 255, 255);font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, &amp;amp;amp;font-size: 12px;background-color: rgb(33, 33, 33)\"&gt;https://spektr-u210001901.apps.test.gazprom-neft.local/api/spektr/Project/TurnOnExtendedExpertiseSystem?projectId=ИД_ПРОЕКТА&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;В таблице статус для &lt;I style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"&gt;&lt;B&gt;is_extended_expertise_system &lt;/B&gt;&lt;/I&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"&gt;поменялся на &lt;B&gt;true&lt;/B&gt;:&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&lt;I&gt;SELECT id, is_extended_expertise_system, name, reporting_month\nFROM spektr.project\n\tWHERE id = 'ПРОДЖЕК ИД'&lt;/I&gt;&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;РСЭ включена. Рядом с ФИО есть зеленая иконка РСЭ.&lt;BR/&gt;&lt;BR/&gt;Статусы экспертизы перенесены в соответствии с таблицей (сверять со скаченным Excel)&lt;BR/&gt;https://kb.gazprom-neft.local/pages/viewpage.action?pageId=112040081&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Инструкция&lt;BR/&gt;РСЭ включена&lt;BR/&gt;Клик на РСЭ рядом с ФИО&lt;BR/&gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Должна появится панель с инструкцией РСЭ&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Проведение экспертизы (согласовать/отклонить) не доступно&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-07-22T09:46:36.11Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2022-09-29T10:43:29.733Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 18
+          }
+        ]
+      },
+      "order": 1,
+      "pointAssignments": [
+        {
+          "id": 40092,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772/TestPoint/40092"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442772,
+        "name": "Расширенная система эксперти РСЭ"
+      },
+      "workItem": {
+        "id": 69801,
+        "name": "[РСЭ] РСЭ. Роли и права на экспертизу",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"6\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;РСЭ &lt;B&gt;отключена&lt;/B&gt;.&lt;BR/&gt;Зайти с правами Пользователь&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Доступно:&lt;BR/&gt; - проведение экспертизы (согл/откл/коррект)&lt;BR/&gt;&lt;BR/&gt;Не доступно:&lt;BR/&gt; - изменение настроек проекта&lt;BR/&gt; - пересчет ГТМ&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;РСЭ &lt;B&gt;отключена.&lt;BR/&gt;&lt;/B&gt;Зайти с правами Эксперт&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Доступно:&lt;BR/&gt; - проведение экспертизы (согл/откл/коррект)&lt;BR/&gt; - изменение настроек проекта&lt;BR/&gt; - пересчет ГТМ&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;РСЭ &lt;B&gt;включена.&lt;BR/&gt;&lt;/B&gt;Зайти с правами &lt;BR/&gt; - &lt;B&gt;Пользователь (Геолог)&lt;BR/&gt;&lt;/B&gt; - &lt;B&gt;Эксперт&lt;/B&gt; (&lt;B&gt;Геолог&lt;/B&gt;)&lt;B&gt;&lt;/B&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Доступно:&lt;BR/&gt; - проведение экспертизы за &lt;B&gt;Геолога &lt;BR/&gt;&lt;/B&gt; - проведение корректировок / перенос из Не кандидатов&lt;BR/&gt;(&lt;I&gt;Например, после согласования зеленым становится только значок геолога&lt;/I&gt;)&lt;/P&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;РСЭ &lt;B&gt;включена.&lt;BR/&gt;&lt;/B&gt;Зайти с правами &lt;BR/&gt; - &lt;B&gt;Пользователь &lt;/B&gt;&lt;B&gt; (Инфраструктура)&lt;BR/&gt;&lt;/B&gt; - &lt;B&gt;Эксперт (Инфраструктура)&lt;/B&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Доступно:&lt;BR/&gt; - проведение экспертизы за &lt;B&gt;Инф-ра &lt;/B&gt;&lt;BR/&gt;(&lt;I&gt;Например, после согласования зеленым становится только значок Инф-ра&lt;/I&gt;)&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;РСЭ &lt;B&gt;включена.&lt;BR/&gt;&lt;/B&gt;Зайти с правами &lt;BR/&gt; - &lt;B&gt;Пользователь &lt;/B&gt;&lt;B&gt; (ГНО)&lt;BR/&gt;&lt;/B&gt; - &lt;B&gt;Эксперт (ГНО)&lt;/B&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Доступно:&lt;BR/&gt; - проведение экспертизы за &lt;B&gt;ГНО &lt;BR/&gt;&lt;/B&gt; - проведение корректировок / перенос из Не кандидатов&lt;BR/&gt;(&lt;I&gt;Например, после согласования зеленым становится только значок ГНО&lt;/I&gt;)&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-07-22T09:47:02.027Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2022-09-29T10:43:33.87Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 20
+          }
+        ]
+      },
+      "order": 2,
+      "pointAssignments": [
+        {
+          "id": 40093,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772/TestPoint/40093"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442772,
+        "name": "Расширенная система эксперти РСЭ"
+      },
+      "workItem": {
+        "id": 69802,
+        "name": "[РСЭ] РСЭ. Логика экспертизы пользователей с разными ролями",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"5\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Провести экспертизу (согласовать/отклонить)&lt;BR/&gt; - за Геолога&lt;BR/&gt; &lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В бестабличном представлении&lt;BR/&gt; - иконка с соответствующей ролью стала зеленой (согл) / красной (откл) закрашенной&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt; - в разделе Статус экспертизы отображается запись за ту роль, за которую проводили экспертизу. Комментарий разворачивается&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt; - в Истории экспертизы зеленым (согл) / красным (откл) отображается запись за ту роль, за которую проводили экспертизу&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;- в Окне глобального поиска отображается статус экспертизы&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Провести экспертизу (согласовать/отклонить)&lt;BR/&gt; - за Инф-ра&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Аналогично результату как при экспертизе за Геолога, только все иконки соответствуют Инф-ра&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Провести экспертизу (согласовать/отклонить)&lt;BR/&gt;(предварительно за Геолога и Инф-ра)&lt;BR/&gt; - за ГНО&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Аналогично результату как при экспертизе за Геолога, только все иконки соответствуют ГНО&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-07-22T09:47:58.31Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2022-09-29T10:43:38.78Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 11
+          }
+        ]
+      },
+      "order": 3,
+      "pointAssignments": [
+        {
+          "id": 40094,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772/TestPoint/40094"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442772,
+        "name": "Расширенная система эксперти РСЭ"
+      },
+      "workItem": {
+        "id": 69803,
+        "name": "[РСЭ] РСЭ. Доступность корректировки в Кандидатах и переноса из Не кандидатов",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"5\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Без системной роли&lt;BR/&gt; - Корректировка кандидата&lt;BR/&gt; - Перенос из Не кандидата&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Корректировка и Перенос не доступен&lt;BR/&gt;&lt;BR/&gt;&lt;SPAN style=\"color: rgb(23, 43, 77);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;Подсказка при наведении на кнопку \"Корректировка\" и на кнопку \"В кандидаты\": \"&lt;/SPAN&gt;&lt;EM style=\"color: rgb(23, 43, 77);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;Роль экспертизы не установлена\"&lt;/EM&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Геолог&lt;BR/&gt; - Корректировка кандидата&lt;BR/&gt; - Перенос из Не кандидата&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Корректировка доступна, проходит&lt;BR/&gt;видна в истории корректировок&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Перенос доступен.&lt;BR/&gt;После переноса скважина автоматически согласовывается за Геолога&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Инфра&lt;BR/&gt; - Корректировка кандидата&lt;BR/&gt; - Перенос из Не кандидата&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;SPAN style=\"background-color: rgb(255, 255, 255);color: rgb(23, 43, 77);font-size: 14px;white-space: normal\"&gt;Подсказка при наведении на кнопку \"Корректировка\" и на кнопку \"В кандидаты\":&lt;/SPAN&gt;&lt;SPAN style=\"color: rgb(0, 0, 0);font-family: -apple-system, BlinkMacSystemFont, &amp;amp;amp;font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;&amp;nbsp;\"&lt;/SPAN&gt;&lt;EM style=\"color: rgb(0, 0, 0);font-family: -apple-system, BlinkMacSystemFont, &amp;amp;amp;font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;&lt;SPAN style=\"color: rgb(23, 43, 77)\"&gt;Доступно только для специалистов по геологии\"&lt;/SPAN&gt;&lt;/EM&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ГНО&lt;BR/&gt; - Корректировка кандидата&lt;BR/&gt; - Перенос из Не кандидата&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Корректировка доступна, проходит&lt;BR/&gt;видна в истории корректировок&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Перенос доступен.&lt;BR/&gt;После переноса скважина автоматически согласовывается за ГНО&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-07-22T09:48:13.17Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2022-09-29T10:43:42.56Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 15
+          }
+        ]
+      },
+      "order": 4,
+      "pointAssignments": [
+        {
+          "id": 40095,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772/TestPoint/40095"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442772,
+        "name": "Расширенная система эксперти РСЭ"
+      },
+      "workItem": {
+        "id": 69805,
+        "name": "[РСЭ] РСЭ. Перенос статусов экспертизы из проекта в проект",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"3\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Создать проект за сентябрь&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Состояние у скважин соответствует состоянию в файле&lt;/P&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Создать проект за октябрь&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Состояние у скважин соответствует состоянию в файле&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-07-22T09:50:12.7Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-09-30T10:53:30.423Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 7
+          }
+        ]
+      },
+      "order": 5,
+      "pointAssignments": [
+        {
+          "id": 40096,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772/TestPoint/40096"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442772,
+        "name": "Расширенная система эксперти РСЭ"
+      },
+      "workItem": {
+        "id": 72584,
+        "name": "[РСЭ] РСЭ. Отправка кандидата в ЭРА",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"8\"><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Согласовать за Геолога&lt;BR/&gt;Согласовать за Инф-ра&lt;BR/&gt;Согласовать за ГНО&lt;BR/&gt;&lt;BR/&gt;Запустить taskid = 19&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В ЭРА появилась скважина&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Согласовать за Геолога&lt;BR/&gt;Согласовать за Инф-ра&lt;BR/&gt;&lt;BR/&gt;&lt;B&gt;Не согласовывать за ГНО&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&lt;/B&gt;Запустить taskid = 19&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В ЭРА нет такой скважины&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Согласовать только за &lt;B&gt;Геолога&lt;/B&gt;&lt;BR/&gt;Запустить taskid = 19&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В ЭРА нет такой скважины&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Согласовать только за &lt;B&gt;Инф-ра&lt;/B&gt;&lt;BR/&gt;Запустить taskid = 19&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В ЭРА нет такой скважины&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Согласовать за Геолога&lt;BR/&gt;Отклонить за Инф-ра&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Запустить taskid = 19&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В ЭРА нет такой скважины&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отклонить за Геолога&lt;BR/&gt;Согласовать за Инф-ра&lt;BR/&gt;&lt;BR/&gt;Запустить taskid = 19&lt;BR/&gt;&amp;nbsp;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В ЭРА нет такой скважины&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Согласовать за Геолога&lt;BR/&gt;Согласовать за Инф-ра&lt;BR/&gt;&lt;B&gt;Отклонить &lt;/B&gt;за ГНО&lt;BR/&gt;&lt;BR/&gt;Запустить taskid = 19&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;В ЭРА нет такой скважины&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-08-11T12:02:22.76Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2022-09-29T10:43:47.843Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 7
+          }
+        ]
+      },
+      "order": 6,
+      "pointAssignments": [
+        {
+          "id": 40097,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772/TestPoint/40097"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442772,
+        "name": "Расширенная система эксперти РСЭ"
+      },
+      "workItem": {
+        "id": 76489,
+        "name": "[РСЭ] РСЭ. Список причин отклонения для ролей",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"4\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Авторизоваться под ролью Геолога&lt;BR/&gt;Отклонить скважину на каждый доступный ГТМ&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Список причин отклонения для каждого вида ГТМ соответствует списку в таблице &lt;/P&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Авторизоваться под ролью Инфры&lt;BR/&gt;Отклонить скважину на каждый доступный ГТМ&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Список причин отклонения для каждого вида ГТМ соответствует списку в таблице &lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Авторизоваться под ролью ГНО&lt;BR/&gt;Отклонить скважину на каждый доступный ГТМ&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Список причин отклонения для каждого вида ГТМ соответствует списку в таблице &lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-09-13T10:41:26.13Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2022-09-29T10:43:52.163Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 6
+          }
+        ]
+      },
+      "order": 7,
+      "pointAssignments": [
+        {
+          "id": 40099,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772/TestPoint/40099"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442772,
+        "name": "Расширенная система эксперти РСЭ"
+      },
+      "workItem": {
+        "id": 76473,
+        "name": "[РСЭ] РСЭ. Отключение расширенной системы экспертиз",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"2\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выполнить запрос API на отключение РСЭ&lt;BR/&gt;&lt;SPAN style=\"color: rgb(255, 255, 255);font-size: 12px;background-color: rgb(33, 33, 33)\"&gt;https://spektr-u210001901.apps.test.gazprom-neft.local/api/spektr/Project/TurnOffExtendedExpertiseSystem?projectId=ИД_ПРОЕКТА&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В таблице статус для &lt;I style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"&gt;&lt;B&gt;is_extended_expertise_system &lt;/B&gt;&lt;/I&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"&gt;поменялся на &lt;B&gt;false&lt;/B&gt;:&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&lt;I&gt;SELECT id, is_extended_expertise_system, name, reporting_month\nFROM spektr.project\n\tWHERE id = 'ПРОДЖЕК ИД'&lt;BR/&gt;&amp;nbsp;&lt;/I&gt;&lt;/P&gt;&lt;P&gt;&amp;nbsp;РСЭ отключена. Рядом с ФИО есть серая иконка РСЭ&lt;BR/&gt;&lt;BR/&gt;Статусы перенесены в соответствии с таблицей&lt;BR/&gt;https://kb.gazprom-neft.local/pages/viewpage.action?pageId=112040081&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-09-13T09:19:44.197Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2022-09-29T10:43:57.073Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 5
+          }
+        ]
+      },
+      "order": 8,
+      "pointAssignments": [
+        {
+          "id": 40098,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772/TestPoint/40098"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442772,
+        "name": "Расширенная система эксперти РСЭ"
+      },
+      "workItem": {
+        "id": 80094,
+        "name": "[РСЭ] РСЭ. Доступность выбора доп.мероприятия при согласовании и отображение в истории экспертизы",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"3\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Согласовать за ГЕОЛОГА&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В окне согласования доступен выбор доп.мероприятия. &lt;BR/&gt;&lt;BR/&gt;После согласования доп.мероприятие отображается через слэш вместе с ролью.&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Согласовать за ИНФРУ&lt;BR/&gt;Согласовать за ГНО&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;В окне согласования нет выбора доп.мероприятия&lt;BR/&gt;&lt;BR/&gt;После согласования в истории экспертизы отображается только роль и комментарий&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-10-12T04:02:52.35Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2022-10-12T04:02:57.98Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 13
+          }
+        ]
+      },
+      "order": 9,
+      "pointAssignments": [
+        {
+          "id": 40101,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772/TestPoint/40101"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442772,
+        "name": "Расширенная система эксперти РСЭ"
+      },
+      "workItem": {
+        "id": 80324,
+        "name": "[РСЭ] РСЭ. Автоматический сброс статуса за ГНО после отклонения ГЕО или ИНФРЫ",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"3\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Согласовать за ГЕО + ИНФРУ  + ГНО&lt;BR/&gt;Отклонить за ГЕО&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Статус ГНО сбрасывается автоматически.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Согласовать за ГЕО + ИНФРУ + ГНО&lt;BR/&gt;Отклонить за ИНФРУ&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Статус ГНО сбрасывается автоматически&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-10-12T16:49:40.717Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2022-10-12T16:52:44.537Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "order": 10,
+      "pointAssignments": [
+        {
+          "id": 40102,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772/TestPoint/40102"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442772,
+        "name": "Расширенная система эксперти РСЭ"
+      },
+      "workItem": {
+        "id": 105190,
+        "name": "[РСЭ] РСЭ. Сортировка и фильтрация статусов РСЭ в кандидатах",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"5\"><step id=\"4\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;SPAN style=\"background-color: var(--background-color,rgba(255, 255, 255, 1));color: rgba(var(--palette-neutral-100,0, 0, 0),1)\"&gt;Удалить маленький проект со включенной РСЭ (Восток)&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;DIV&gt;&lt;SPAN style=\"background-color: var(--background-color,rgba(255, 255, 255, 1));color: rgba(var(--palette-neutral-100,0, 0, 0),1)\"&gt;Выполнить все возможные варианты согласования/отклонения за 3 роли (Геолог/Инфра/ГНО - добавляются и удаляются в UAT UserService)&lt;/SPAN&gt;&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV&gt;&lt;SPAN style=\"background-color: var(--background-color,rgba(255, 255, 255, 1));color: rgba(var(--palette-neutral-100,0, 0, 0),1)\"&gt;Создать проект за текущий месяц&lt;/SPAN&gt;&lt;/DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;FONT color=\"#000000\"&gt;&lt;SPAN style=\"font-size: 14px;white-space: normal\"&gt;&lt;U&gt;Сортировка&lt;/U&gt;&lt;BR/&gt;&lt;BR/&gt;После завершения пересчёта:&lt;/SPAN&gt;&lt;/FONT&gt;&lt;/P&gt;&lt;DIV&gt;&lt;BR/&gt;&lt;/DIV&gt;&lt;P&gt;&lt;SPAN style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;&lt;/SPAN&gt;Выполнить все возможные варианты согласования/отклонения с учётом перенесённых статусов&lt;BR/&gt;&lt;BR/&gt;Нажать на заголовок столбца \"Статус\"&lt;BR/&gt;&amp;nbsp;&lt;IMG src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJwAAAAsCAYAAACQctE4AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAT0SURBVHhe7dxvTBNnHAfwL+WPB2nLDgYKY4BW2sxKWkRdEZjdHAZe0EWWuGROu0SyZdne7IVZgo5sLpMXbjEmZnGJkLCMRZxCMrYxRaQRgiWBxGZhWDbYYAiGKiS0tIi13ZUeIcNdsdAesPw+Sa/3PM9d7gLfe+55roWIaZfLC0JCxNx9G7qdWr70JAn/TogoKHBEVBQ4IioKHBEVBY6IigJHREWBI6KKaG2/Rc/hiGjowS8JKXrwS9YUChwRFQWOiMZts1DgiEicVjRfqKfAEXE4fu+G2b6TAkfEMfGgl1smCAduZPQev0ZI6FAPR0Qhi1dxy4nlBM4Nm6UZ33xZgeMVVThbb8LgJN9EiAD2BR10su7gA+f4tQHV9UNg9UYcLTdAM3uLK5sw5uY3WFNmMHyjDqahGb5MVk2cCiXlbwh/tOUbw6WlbuJLC3pqKtCQehSfFisQ5au4a0bNVSu2aTLQdOXa3DYL9uPdYyno/bEZlr5x2GXJ0OgPoizPjY6K82jht5pXoFejwwQc/OgQNPHDMFWdR2/BB3h/ux3NPzShwzqBBFUhSg0lULL8ToL8Yfuua4BbV0D35iHoMxh/EwmbpT7aijx+4sQn/Pq/TNkdkMukfGlB//etGMx6EUWb4/0V8jTk5GiRtikN+QWF2JFwH+Y722GsPALD3kwkciHL0nDdaX4+8jZO4PJlCxK0L2N3UT4KtYl40NUH9duVOGzYi6znNsDR3gq7Ih+qR334qX0ampIdsP38FTrjSvDO4X1I/PsqLvbLsS/7yYthgT9sZrYMRYmdkBWUg+2+hDvSbch8Zu4yIWEi1FHNC92kQRIFhmEQG+MrRM+tMwz3y50dh+WXWpw9eRJV35q5tgHYnUDUXHu0b2NEx/rWGURJFVDmcleJdQiDg7cxmqKFgh3HqBVIV6qQwqYi98CH+PiAem4/YQxk6lKU5bD+Xjiahea1Uqjl1MOttqADJ9vKLWYfcVMHnu+WWlML8xhfXmTS0oRLN1mUVp7C5+/t52uFMFCodUBXB0zWUSh0aqTwLcFiNyb7wzYvJhlJS96GSbgFHTjVLi1kN1vQZhngeiErzJ1tGJjOQGoSv8EiM7MubumGy2XH2Ohdf2UAzFY1CrhecOAPBTRbuIQwyUjlZtTD/VaMTY6ip/EMPmv0PUQk61HQgZNml8FYmozB69WovtCALk8ejG/pkS4wNErZZUCJahCXTn+Nlnux8D2NcT0MMKWNyoDqJe5dpcGWRF8Fi1yDERqnCedOn4PJqYWxWONrIOtQ0LPUcJux9aLtYh1se47hSO7K74HDNyq4Sc4p6J/nK0hYrbMvYA7DfKYOvz1rQFF2aAZc6a9Q2NaGSfRzk8c118OR9U2oh5vsqcUX12LXWg9H/q9sI1YgUyUcOOrdSDhQD0dEkZSmAv6yUuCIONhcA4w5LgocEQsLZbGRAkfERYEjoqL/LUJEFdE84v3PwCV6ndjdMM2XCHl6za8LfJODIxg4pec+FI3egDsTsljJFVvAzNAYjoiKAkdERYEjogrJGE4CL2QSNyLghFQSiZiI0OV41uuBw/OYO0Ic7J4oeLijPI1wnlMwVvv8l3v85VpqDLfiwMm5H4pcMoNOx5+4PmVF/8w47I8f8q0rJ4vcACWTjFflKuyRbsaUh+Fegf/yKtznFIzVPv/lHH8lAgcO+AfJ2do1cESFhwAAAABJRU5ErkJggg==\" alt=\"\" style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выполняется сортировка статусов по принципам: (согласно скрину)&lt;BR/&gt;&lt;BR/&gt;Сначала согласованные записи по всем ролям, затем по 2, затем по 1&lt;BR/&gt;Выше - согласования текущего проекта, затем согласования из прошлого&lt;BR/&gt;Сортировка по геологу важнее сортировки по инфре&lt;BR/&gt;После всех скважин с согласованиями и отклонениями отображаются скважины, на которых есть отклонения&lt;BR/&gt;&lt;IMG src=\"data:image/png;base64,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\" alt=\"\"/&gt;&lt;BR/&gt;&amp;nbsp;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;&lt;U&gt;Фильтрация&lt;BR/&gt;&lt;/U&gt;&lt;U&gt;&lt;BR/&gt;&lt;/U&gt;Открыть последовательно фильтр по столбцам:&lt;BR/&gt;Геолог&lt;BR/&gt;Инф-ра&lt;BR/&gt;ГНО&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;В фильтре отображаются пункты:&lt;BR/&gt;(Выделить все)&lt;BR/&gt;Согласован бессрочно&lt;BR/&gt;Согласован&lt;BR/&gt;Согласован ранее&lt;BR/&gt;На рассмотрении&lt;BR/&gt;Отклонен&lt;BR/&gt;Отклонен ранее&lt;/P&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Отфильтровать по одному из пунктов&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Отображаются статусы, соответствующие пункту&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-01-24T11:27:36.173Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-09-17T13:37:35.15Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 5
+          }
+        ]
+      },
+      "order": 11,
+      "pointAssignments": [
+        {
+          "id": 40104,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772/TestPoint/40104"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442772"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 11
+}

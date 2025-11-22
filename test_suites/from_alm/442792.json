@@ -1,0 +1,98 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442792,
+        "name": "Экономические расчеты"
+      },
+      "workItem": {
+        "id": 131969,
+        "name": "Проверка расчета Затрат на ГТМ на основе стоимостных моделей в настройках",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"6\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меню / ДОБ / верхний месяц / выбрать любое ДО&lt;BR/&gt;&lt;BR/&gt;Настройки / выбрать уровень ДО / открыть Стоимостные модели&lt;BR/&gt;&lt;BR/&gt;Развернуть ОПЗ / Выбрать ВСЕ галочками мероприятия&lt;BR/&gt;&lt;BR/&gt;Для каждого мероприятия указать уникальное значение&lt;BR/&gt; - целое&lt;BR/&gt; - дробное&lt;BR/&gt; - текст&lt;BR/&gt; - пусто&lt;BR/&gt; - !\"№;%:?*()&amp;nbsp;&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;Сохранить и пересчитать&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Сохраняются только целые или дробные.&lt;BR/&gt;&lt;BR/&gt;Пусто, текст или спец.символы не сохраняются, вместо них сохраняется предыдущее корректное значение.&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&amp;nbsp;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открыть вкладку Кандидаты после указания стоимостных моделей и пересчета&lt;BR/&gt;&lt;BR/&gt;Выбрать скважину без согласования&lt;BR/&gt;Выбрать скважину с согласованием&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;В колонке \"Затраты на ГТМ\" проставляется значение из настроек экономических расчетов.&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;Для НЕ согласованных скважин указывается цифра из стоимостных моделей \"Без доп.мероприятия\"&lt;BR/&gt;&lt;BR/&gt;Для согласованных скважин указывается цифра из стоимостных моделей согласно доп.мероприятию, которое у него выбрано.&lt;BR/&gt;В колонке \"PI\" (читается как пи-ай) != 0&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Например, согласовали скважину с \"При отказе\", значит у такой скважин в колонке \"Затраты на ГТМ\" должна быть цифра из стоимостных моделей \"При отказе\"&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать ранее согласованную скважину ОПЗ&lt;BR/&gt;Нажать Согласовать&lt;BR/&gt;Выбрать доп.мероприятие, отличное от ранее выбранного&lt;BR/&gt;Указать комментарий&lt;BR/&gt;Согласовать&lt;BR/&gt;&lt;BR/&gt;Подождать расчета экономики&lt;BR/&gt;Обновить таблицу Кандидатов&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В колонке \"Затраты на ГТ\" поменялось значение на значение из стоимостных моделей.&lt;BR/&gt;&lt;BR/&gt;Пример:&lt;BR/&gt;В настройках экономики включен \"С освоением\" и  выставлено 2.2&lt;BR/&gt;Согласовать скважину ОПЗ с выбором \"С освоением\", (подождать расчета экономики). У такой скважины Затраты на ГТМ  = 2.2 и посчитан PI. != 0. &lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Не кандидаты / выбрать скважину ОПЗ&lt;BR/&gt;Нажать \"В кандидаты\"&lt;BR/&gt;Выбрать доп.мероприятие&lt;BR/&gt;Указать комментарий&lt;BR/&gt;Нажать Сохранить и согласовать&lt;BR/&gt;&lt;BR/&gt;Открыть вкладку Кандидаты&lt;BR/&gt;Найти перенесенную скважину&lt;BR/&gt;&amp;nbsp;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В колонке \"Затраты на ГТМ\" у такой скважины указывается цифра из стоимостных моделей согласно доп.мероприятию, которое у него выбрано.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">Повторить сценарии для других ГТМ</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Аналогично результатам выше&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-05-30T09:41:58.55Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-09-22T05:47:21.447Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 11
+          }
+        ]
+      },
+      "pointAssignments": [
+        {
+          "id": 40183,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442792/TestPoint/40183"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442792/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442792"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 1
+}

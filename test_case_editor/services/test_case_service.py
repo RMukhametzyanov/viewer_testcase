@@ -289,6 +289,103 @@ class TestCaseService:
 
         return created_count, errors
 
+    def import_from_alm_with_hierarchy(
+        self, 
+        from_alm_dir: Path, 
+        hierarchy_map_path: Path, 
+        target_root: Path
+    ) -> Tuple[int, List[str]]:
+        """
+        Импорт всех suite из папки from_alm с созданием структуры папок согласно иерархии.
+
+        Args:
+            from_alm_dir: папка с JSON файлами suite (формат: {suite_id}.json)
+            hierarchy_map_path: путь к файлу suite_hierarchy_map.json
+            target_root: корневая папка тест-кейсов в приложении
+
+        Returns:
+            Кортеж (количество созданных тест-кейсов, список ошибок)
+        """
+        created_count = 0
+        errors: List[str] = []
+
+        # Загружаем карту иерархии
+        try:
+            with open(hierarchy_map_path, 'r', encoding='utf-8') as f:
+                hierarchy_map = json.load(f)
+        except (OSError, json.JSONDecodeError) as exc:
+            errors.append(f"Не удалось загрузить карту иерархии: {exc}")
+            return created_count, errors
+
+        # Получаем все JSON файлы из from_alm
+        if not from_alm_dir.exists():
+            errors.append(f"Папка {from_alm_dir} не существует")
+            return created_count, errors
+
+        json_files = list(from_alm_dir.glob("*.json"))
+        if not json_files:
+            errors.append(f"В папке {from_alm_dir} не найдено JSON файлов")
+            return created_count, errors
+
+        # Обрабатываем каждый файл
+        for json_file in json_files:
+            suite_id_str = json_file.stem
+            try:
+                suite_id = int(suite_id_str)
+            except ValueError:
+                errors.append(f"{json_file.name}: не удалось определить suite_id из имени файла")
+                continue
+
+            # Получаем иерархию для этого suite
+            hierarchy = hierarchy_map.get(suite_id_str, [])
+            
+            # Строим путь папок согласно иерархии (от корня к листу)
+            folder_path = target_root
+            for parent in reversed(hierarchy):  # Разворачиваем, т.к. в мапе от ближайшего к корневому
+                parent_name = self._sanitize_folder_name(parent.get('name', f"Suite_{parent.get('id')}"))
+                folder_path = folder_path / parent_name
+
+            # Создаем папку
+            folder_path.mkdir(parents=True, exist_ok=True)
+
+            # Импортируем тест-кейсы из этого файла
+            try:
+                payload = self._load_azure_payload(json_file)
+            except (OSError, json.JSONDecodeError) as exc:
+                errors.append(f"{json_file.name}: {exc}")
+                continue
+
+            parsed_cases = parse_azure_test_cases(payload)
+            if not parsed_cases:
+                # Пропускаем пустые файлы без ошибки
+                continue
+
+            for case_data in parsed_cases:
+                try:
+                    test_case = self._build_test_case_from_azure(case_data, folder_path)
+                    if not test_case._filepath:
+                        raise ValueError("Не удалось определить путь для сохранения")
+                    self._repository.save(test_case, test_case._filepath)
+                    created_count += 1
+                except Exception as exc:  # noqa: BLE001
+                    title = case_data.get("title") or case_data.get("id") or "без названия"
+                    errors.append(f"{json_file.name} → {title}: {exc}")
+
+        return created_count, errors
+
+    @staticmethod
+    def _sanitize_folder_name(name: str) -> str:
+        """Очистить имя папки от недопустимых символов."""
+        import re
+        # Заменяем недопустимые символы на подчеркивания
+        sanitized = re.sub(r'[<>:"/\\|?*]', '_', name)
+        # Убираем ведущие/замыкающие точки и пробелы
+        sanitized = sanitized.strip('. ')
+        # Ограничиваем длину
+        if len(sanitized) > 200:
+            sanitized = sanitized[:200]
+        return sanitized or "Unnamed"
+
     # --- Внутренние методы ------------------------------------------------------
 
     def _build_test_case_from_azure(self, case_data: dict, target_folder: Path) -> TestCase:

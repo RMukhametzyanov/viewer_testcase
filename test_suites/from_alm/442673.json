@@ -1,0 +1,289 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442673,
+        "name": "БД (Базы данных)"
+      },
+      "workItem": {
+        "id": 363838,
+        "name": "БД. Задача на автоматическое обновление datastore.LastMERInfos",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"6\"><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открыть БД  task_manager таблица \"Tasks\"&lt;BR/&gt;&lt;BR/&gt;Выполнить запрос:&lt;BR/&gt;&lt;/P&gt;&lt;P style=\"color: rgb(0, 0, 0);font-family: Consolas;font-size: 13.3333px;background-color: rgb(255, 255, 255)\"&gt;&lt;SPAN style=\"color: rgb(128, 0, 0);font-weight: bold\"&gt;SELECT&lt;/SPAN&gt; * &lt;SPAN style=\"color: rgb(128, 0, 0);font-weight: bold\"&gt;FROM&lt;/SPAN&gt; task_manager.&lt;SPAN style=\"color: rgb(0, 0, 128)\"&gt;\"Tasks\"&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&lt;SPAN style=\"font-family: Consolas;font-size: 13.3333px;color: rgb(128, 0, 0);font-weight: bold\"&gt;where&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgb(255, 255, 255);color: rgb(0, 0, 0);font-family: Consolas;font-size: 13.3333px\"&gt; &lt;/SPAN&gt;&lt;SPAN style=\"font-family: Consolas;font-size: 13.3333px;color: rgb(0, 0, 128)\"&gt;\"Code\"&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgb(255, 255, 255);color: rgb(0, 0, 0);font-family: Consolas;font-size: 13.3333px\"&gt; = &lt;/SPAN&gt;&lt;SPAN style=\"font-family: Consolas;font-size: 13.3333px;color: rgb(0, 128, 0)\"&gt;'updatelastmerinfos'&lt;BR/&gt;&lt;BR/&gt;&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;FONT color=\"#000000\"&gt;&lt;SPAN style=\"font-size: 14px\"&gt;В таблице task_manager.Tasks создана задача на автоматическое обновление последних МЭР с параметрами:&lt;/SPAN&gt;&lt;/FONT&gt;&lt;BR/&gt;&lt;/P&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px\"&gt;&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px\"&gt;&lt;TABLE width=\"\" style=\"font-family: Calibri;font-size: 11pt\"&gt;&lt;TBODY&gt;&lt;TR style=\"height: 14.25pt\"&gt;&lt;TD style=\"width: 48pt;vertical-align: bottom;border-width: 1px;border-style: solid;border-color: rgb(0, 0, 0)\"&gt;Name&lt;/TD&gt;&lt;TD style=\"width: 48pt;vertical-align: bottom;border-width: 1px;border-style: solid;border-color: rgb(0, 0, 0)\"&gt;Code&lt;/TD&gt;&lt;TD style=\"width: 123px;vertical-align: bottom;border-width: 1px;border-style: solid;border-color: rgb(0, 0, 0)\"&gt;Description&lt;/TD&gt;&lt;TD style=\"width: 48pt;vertical-align: bottom;border-width: 1px;border-style: solid;border-color: rgb(0, 0, 0)\"&gt;ServiceName&lt;/TD&gt;&lt;TD style=\"width: 48pt;vertical-align: bottom;border-width: 1px;border-style: solid;border-color: rgb(0, 0, 0)\"&gt;CronExpression&lt;/TD&gt;&lt;TD style=\"width: 48pt;vertical-align: bottom;border-width: 1px;border-style: solid;border-color: rgb(0, 0, 0)\"&gt;Enabled&lt;/TD&gt;&lt;TD style=\"width: 48pt;vertical-align: bottom;border-width: 1px;border-style: solid;border-color: rgb(0, 0, 0)\"&gt;Parameters&lt;/TD&gt;&lt;/TR&gt;&lt;TR style=\"height: 14.25pt\"&gt;&lt;TD style=\"width: 48pt;vertical-align: bottom;border-width: 1px;border-style: solid;border-color: rgb(0, 0, 0)\"&gt;updatelastmerinfos&lt;/TD&gt;&lt;TD style=\"width: 48pt;vertical-align: bottom;border-width: 1px;border-style: solid;border-color: rgb(0, 0, 0)\"&gt;updatelastmerinfos&lt;/TD&gt;&lt;TD style=\"vertical-align: bottom;border-width: 1px;border-style: solid;border-color: rgb(0, 0, 0)\"&gt;Обновление последнего МЭР&lt;/TD&gt;&lt;TD style=\"width: 48pt;vertical-align: bottom;border-width: 1px;border-style: solid;border-color: rgb(0, 0, 0)\"&gt;DataStore&lt;/TD&gt;&lt;TD style=\"width: 48pt;vertical-align: bottom;border-width: 1px;border-style: solid;border-color: rgb(0, 0, 0)\"&gt;0 5 3-10 * *&lt;/TD&gt;&lt;TD style=\"width: 48pt;vertical-align: bottom;border-width: 1px;border-style: solid;border-color: rgb(0, 0, 0)\"&gt;true&lt;/TD&gt;&lt;TD style=\"width: 48pt;vertical-align: bottom;border-width: 1px;border-style: solid;border-color: rgb(0, 0, 0)\"&gt;&lt;/TD&gt;&lt;/TR&gt;&lt;/TBODY&gt;&lt;/TABLE&gt;&lt;/DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Перейти в БД task_manager в таблицу \"TasksProcessingEvents\"&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;P&gt;Выполнить запрос:&lt;BR/&gt;&lt;SPAN style=\"font-family: Consolas;font-size: 10pt;background-color: rgb(255, 255, 255);color: rgb(128, 0, 0);font-weight: bold\"&gt;SELECT&lt;/SPAN&gt;&lt;SPAN style=\"color: rgb(0, 0, 0);font-family: Consolas;font-size: 10pt;background-color: rgb(255, 255, 255)\"&gt; * &lt;/SPAN&gt;&lt;SPAN style=\"font-family: Consolas;font-size: 10pt;background-color: rgb(255, 255, 255);color: rgb(128, 0, 0);font-weight: bold\"&gt;FROM&lt;/SPAN&gt;&lt;SPAN style=\"color: rgb(0, 0, 0);font-family: Consolas;font-size: 10pt;background-color: rgb(255, 255, 255)\"&gt; task_manager.&lt;/SPAN&gt;&lt;SPAN style=\"font-family: Consolas;font-size: 10pt;background-color: rgb(255, 255, 255);color: rgb(0, 0, 128)\"&gt;\"TasksProcessingEvents\"&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;DIV style=\"background-color: rgb(255, 255, 255);padding: 0px 0px 0px 2px\"&gt;&lt;P&gt;&lt;SPAN style=\"color: rgb(128, 0, 0);font-family: Consolas;font-size: 10pt;font-weight: bold\"&gt;where&lt;/SPAN&gt;&lt;FONT color=\"#000000\" face=\"Consolas\"&gt;&lt;SPAN style=\"font-size: 10pt\"&gt; &lt;/SPAN&gt;&lt;/FONT&gt;&lt;SPAN style=\"color: rgb(0, 0, 128);font-family: Consolas;font-size: 10pt\"&gt;\"TaskId\"&lt;/SPAN&gt;&lt;FONT color=\"#000000\" face=\"Consolas\"&gt;&lt;SPAN style=\"font-size: 10pt\"&gt; = &lt;/SPAN&gt;&lt;/FONT&gt;&lt;SPAN style=\"color: rgb(0, 128, 0);font-family: Consolas;font-size: 10pt\"&gt;'' &lt;/SPAN&gt;&lt;FONT color=\"#008000\" face=\"Consolas\"&gt;&lt;SPAN style=\"font-size: 13.3333px\"&gt;--id таски можно получить выполнив запрос из шага 1&lt;/SPAN&gt;&lt;/FONT&gt;&lt;SPAN style=\"color: rgb(0, 128, 0);font-family: Consolas;font-size: 10pt\"&gt;&lt;BR/&gt;&lt;/SPAN&gt;&lt;SPAN style=\"color: rgb(128, 0, 0);font-family: Consolas;font-size: 10pt;font-weight: bold\"&gt;order&lt;/SPAN&gt;&lt;SPAN style=\"color: rgb(0, 0, 0);font-family: Consolas;font-size: 10pt;background-color: rgb(232, 242, 254)\"&gt; &lt;/SPAN&gt;&lt;SPAN style=\"color: rgb(128, 0, 0);font-family: Consolas;font-size: 10pt;font-weight: bold\"&gt;by&lt;/SPAN&gt;&lt;SPAN style=\"color: rgb(0, 0, 0);font-family: Consolas;font-size: 10pt;background-color: rgb(232, 242, 254)\"&gt; &lt;/SPAN&gt;&lt;SPAN style=\"color: rgb(0, 0, 128);font-family: Consolas;font-size: 10pt\"&gt;\"Date\"&lt;/SPAN&gt;&lt;SPAN style=\"color: rgb(0, 0, 0);font-family: Consolas;font-size: 10pt;background-color: rgb(232, 242, 254)\"&gt; &lt;/SPAN&gt;&lt;SPAN style=\"color: rgb(128, 0, 0);font-family: Consolas;font-size: 10pt;font-weight: bold\"&gt;desc&lt;/SPAN&gt;&lt;SPAN style=\"color: rgb(0, 0, 0);font-family: Consolas;font-size: 10pt;background-color: rgb(232, 242, 254)\"&gt; &lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В результате запроса есть записи с периодом дат по условию:&lt;BR/&gt;3 &amp;lt;= 'Тек. дата' &amp;lt;= 10:&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;В колонке \"Status\" значение 0&lt;BR/&gt;&lt;IMG src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAAvCAYAAAAVfW/7AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAP+SURBVHhe7ZpNSFRRFMf/kwkNheZHmTMSGGU6RS0sdVcQYZiLbFO0sEVBDPQhBbUwEqGwoKAPWrhoMS2ilW5UEmnRJnIkIigNC1fj6GTFaIGSmd1z330zb8aZYUZG5w6dn1zeO+fd9xbnf885vvvG1jYwtQgmI3ztuoGOjg5lGaxRR0YTWBDNYEE0gwXRjIRNvf2DTx7bdpfJ4+TcPDq/BOQ5cW57Cbasyw3Ns4m/XCHx77+LoXtCeK+gvfWpMppxauAedijrfyWlpk5B3luwXlkGJMa1KocMNolhikM2jeu7HLi8s1T6IvB34kkrhAhTEAsAbZ4KfPfShZfoOdyAN345KwHJzst+4gpySQT2mLNAWQYU9HU5xi0bc3PkMZrbI/6l2eEbhc9VgSJlwnEOdTXqPMtpHx6XizfhEHOSJa4g8QJuckcE/sDmPGUZGXX30yTqSzcqj4WaBlQPX0d315hyELTqT+IthtB/ehPa77+U3s/3xflhNaQv1rzojLHaY3hzKfyMHpmJK0ebyymiaFNWDMQ1OSdJ4goSj7mFvzL4tUUbcNAiCGXF1apS9E8E8UKMSA6hcWAQu17VWoJEvueoxn7Ue0QZazkkZ+5oUWWNrvXeE0GOPS8u3sfoL3+unjGFxlXIxLiipCgGkZIg1NQpM05sLcKRWJkgIGEGv/9SlpVtqHsgguS5iUBrgpVLzV+ubsqKZVBWgbLek3gSkY0rzxJRliEGkZIg1MSpmVfm2ZUnnDEmJFpCRP9ocu/H29dGiYogovkPot6l/Kkgnn9G3N+E86tSsqyERFmmGERcQajsmIGmoxloEoVsc1CTp//GTNsULQJvp6Xej2H01RDKtpYr24K1+fsH8HFYemNQjmLXEL6Z68DbtySbCo/34YIQPuBb/UxZrhhE2jYXg/ML+PJzFvsKNyiPFbMxK46KGq96ATXxZ72mr1w05Fr0kxCuZtE3RlB8rQ91juh54l7re81RMbdXzPWIub7sed+J9R7Cu70ZhHd7swAWRDNYEM1gQTSDBdEMFkQzWBDNYEE0w+Z2u/nFUCNoe5IFyRDBYBDvJhaUZcAlSzNCGXKhK7yFzqwsj44bn7g5Q7IAFiTdOAvxsMkpR2vVWuVMHhYkrdhxtgbwdI/jYvcPBCqL0Bj+2UFSsCDpxGnHHv+s+hA3i75PwF5nalnCgqQRR14uAjPh3xT4xXmJ8KUCC6IZLIhmsCBpJLpERZewZGBB0snPPwg47KiWhh0NlcD78T/SShYWJJ3MzOCWFzgt30MKAW8APTPqWpLw1kkG4K2TLIIF0Qz+HpJBuGRlATahEmeIRtgWBeqcWWWmp6eRn5+vLAMuWZrBgmgGC6IVwD/cDa8NSBkhoAAAAABJRU5ErkJggg==\" alt=\"\"/&gt;&lt;BR/&gt;&lt;BR/&gt;&lt;B&gt;Пример:&lt;BR/&gt;&lt;/B&gt;Если сегодня 7 число, в результате запроса будут записи с датой начиная с 3 по 7 число месяца&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Перейти в логи data_store&lt;BR/&gt;&lt;BR/&gt;&lt;A href=\"https://console.apps.test.paas.gazprom-neft.local/k8s/ns/u210001901/deployments/spektr-datastore\" tabindex=\"-1\"&gt;spektr-datastore · Details · OKD (gazprom-neft.local)&lt;BR/&gt;&lt;BR/&gt;&lt;/A&gt;Найти лог от 5 утра*&lt;BR/&gt;&lt;BR/&gt;* по ТЗ таска стартует в 5 утра&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Задача стартует и завершается, в логах нет ошибок level: \"Fatal\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-03-24T10:09:58.413Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Ревью"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-03-24T12:08:45.843Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 13
+          }
+        ]
+      },
+      "pointAssignments": [
+        {
+          "id": 39854,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Лобанов Сергей Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+              }
+            },
+            "id": "cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "uniqueName": "GAZPROM-NEFT\\Lobanov.SI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442673/TestPoint/39854"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442673/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442673"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442673,
+        "name": "БД (Базы данных)"
+      },
+      "workItem": {
+        "id": 354292,
+        "name": "БД. Проверка получения только согласованных ТР ДОБ и НАГ фонда",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"9\"><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Получить выгрузку данных из KLAD по запросу:&lt;BR/&gt;&lt;BR/&gt;Для ДОБ фонда:&lt;BR/&gt;&lt;/P&gt;&lt;DIV style=\"color: rgb(0, 0, 0);background-color: rgb(255, 255, 255);font-family: Consolas;font-size: 10pt\"&gt;select f_op.id,&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);background-color: rgb(255, 255, 255);font-family: Consolas;font-size: 10pt\"&gt;...&lt;DIV&gt;&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV&gt;from dm_udh_prod5.t_facility_op f_op&lt;/DIV&gt;&lt;DIV&gt;left join dm_udh_prod5.facility_state fs2 on fs2.id = f_op.facility_state_id&lt;/DIV&gt;&lt;DIV&gt;left join dm_udh_prod5.layer l on l.id = f_ops.layer_id&lt;/DIV&gt;&lt;DIV&gt;join (select * from (VALUES @wellIdsValueStr)vals)tt on tt.column1 = f_op.facility_id&lt;/DIV&gt;&lt;DIV&gt;where f_op.begin_date is not null and f_op.source = 'oil'&lt;/DIV&gt;and f_op.begin_date &amp;gt;= @dBeginDate and f_op.begin_date &amp;lt;= @dEndDate\"&lt;/DIV&gt;&lt;P&gt;&lt;SPAN style=\"color: rgb(0, 0, 0);font-family: Consolas;font-size: 10pt;background-color: rgb(0, 255, 0)\"&gt;​&lt;/SPAN&gt;&lt;SPAN style=\"color: rgb(0, 0, 0);font-family: Consolas;font-size: 10pt;background-color: rgb(0, 255, 0)\"&gt;and f_op.flag_confirm = true&lt;/SPAN&gt;&amp;nbsp;&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;Для НАГ фонда:&lt;BR/&gt;&lt;/P&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;background-color: rgb(255, 255, 255)\"&gt;select&lt;/DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;background-color: rgb(255, 255, 255)\"&gt;&lt;DIV&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; f_op.id,&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; ...&lt;/DIV&gt;&lt;DIV&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; from dm_udh_prod5.t_facility_op f_op&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; left join dm_udh_prod5.facility_state fs2 on fs2.id = f_op.facility_state_id&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; inner join dm_udh_prod5.layer l on l.id = f_ops.layer_id&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; join (select * from (VALUES @wellIdsValueStr)vals)tt on tt.column1 = f_op.facility_id&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; where f_op.begin_date is not null and f_op.source = 'inj'&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; and f_op.begin_date &amp;gt;= @dBeginDate and f_op.begin_date &amp;lt;= @dEndDate\"&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;SPAN style=\"background-color: rgb(0, 255, 0)\"&gt;and f_op.flag_confirm = true&lt;/SPAN&gt;&lt;/DIV&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Есть результат запроса&lt;BR/&gt;&lt;BR/&gt;* полный запрос во вложении&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Обновить ТР ДОБ фонда:&lt;BR/&gt;curl --location --request POST 'https://datastore-swagger-u210001901.apps.test.paas.gazprom-neft.local/datastore/v1/TechMode/showcase?reportingMonth=2025-03-01'&lt;BR/&gt;&lt;BR/&gt;* в &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;reportingMonth= передать месяц загрузки ТР&lt;BR/&gt;&lt;BR/&gt;&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Выполнить запрос в БД data_store.\"Operations\":&lt;/SPAN&gt;&lt;/P&gt;SELECT * FROM data_store.\"Operations\"\nWHERE \"OperationInfoId\" = 1\nPRDER BY \"OperationStartDate\" DESC&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Задача успешно завершена*&lt;BR/&gt;&lt;BR/&gt;* в \"OperationStatusId\" = 3&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Выполнить запрос в БД data_store.\"TechModes\":&lt;BR/&gt;SELECT * FROM data_store.\"TechModes\"&lt;BR/&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;WHERE \"OrgId\" = '@id организации'&lt;/SPAN&gt;\n&lt;/P&gt;AND \"ReportingMonth\" = '@ месяц проекта'&lt;BR/&gt;AND \"IsOtherFund\" is false&lt;BR/&gt;&lt;DIV&gt;&lt;BR/&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Кол-во записей в БД == кол-ву записей из выгрузки&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Обновить ТР НАГ фонда:&lt;BR/&gt;curl --location --request POST 'https://datastore-swagger-u210001901.apps.test.paas.gazprom-neft.local/api/v1/InjectionFund?orgIds=6&amp;amp;orgIds=8&amp;amp;orgIds=9&amp;amp;orgIds=10&amp;amp;orgIds=13&amp;amp;orgIds=2&amp;amp;orgIds=7&amp;amp;orgIds=1&amp;amp;orgIds=5&amp;amp;startDate=2024-12-01&amp;amp;endDate=2024-12-31''&lt;BR/&gt;&lt;BR/&gt;* в &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;orgIds= передать id организации&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt; &lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&amp;nbsp; в startDate=&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt; передать месяц загрузки ТР&lt;BR/&gt;&lt;BR/&gt;&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Выполнить запрос в БД data_store.\"Operations\":&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;SELECT * FROM data_store.\"Operations\"\nWHERE \"OperationInfoId\" = 14\nPRDER BY \"OperationStartDate\" DESC&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Задача успешно завершена*&lt;BR/&gt;&lt;BR/&gt;* в \"OperationStatusId\" = 3&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Выполнить запрос в БД data_store.\"InjectionFund\":&lt;BR/&gt;SELECT * FROM data_store.\"InjectionFund\"\nWHERE \"OrgId\" = '@id организации'\nAND \"ReportingMonth\" = '@ месяц проекта'&lt;BR/&gt;AND \"IsOtherFund\" is false&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Кол-во записей в БД == кол-ву записей из выгрузки&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Получить выгрузку данных из KLAD по запросу:&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Для ДОБ фонда:&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;DIV style=\"color: rgb(0, 0, 0);background-color: rgb(255, 255, 255);font-family: Consolas;font-size: 10pt\"&gt;select f_op.id,&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);background-color: rgb(255, 255, 255);font-family: Consolas;font-size: 10pt\"&gt;...&lt;DIV&gt;&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV&gt;from dm_udh_prod5.t_facility_op f_op&lt;/DIV&gt;&lt;DIV&gt;left join dm_udh_prod5.facility_state fs2 on fs2.id = f_op.facility_state_id&lt;/DIV&gt;&lt;DIV&gt;left join dm_udh_prod5.layer l on l.id = f_ops.layer_id&lt;/DIV&gt;&lt;DIV&gt;join (select * from (VALUES @wellIdsValueStr)vals)tt on tt.column1 = f_op.facility_id&lt;/DIV&gt;&lt;DIV&gt;where f_op.begin_date is not null and f_op.source = 'oil'&lt;/DIV&gt;and f_op.begin_date &amp;gt;= @dBeginDate and f_op.begin_date &amp;lt;= @dEndDate\"&lt;/DIV&gt;&lt;P&gt;&lt;SPAN style=\"color: rgb(0, 0, 0);font-family: Consolas;font-size: 10pt;background-color: rgb(0, 255, 0)\"&gt;​&lt;/SPAN&gt;&lt;SPAN style=\"color: rgb(0, 0, 0);font-family: Consolas;font-size: 10pt;background-color: rgb(0, 255, 0)\"&gt;and f_op.flag_confirm = false&lt;/SPAN&gt;&amp;nbsp;&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;Для НАГ фонда:&lt;BR/&gt;&lt;/P&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;background-color: rgb(255, 255, 255)\"&gt;select&lt;/DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;background-color: rgb(255, 255, 255)\"&gt;&lt;DIV&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; f_op.id,&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; ...&lt;/DIV&gt;&lt;DIV&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; from dm_udh_prod5.t_facility_op f_op&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; left join dm_udh_prod5.facility_state fs2 on fs2.id = f_op.facility_state_id&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; inner join dm_udh_prod5.layer l on l.id = f_ops.layer_id&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; join (select * from (VALUES @wellIdsValueStr)vals)tt on tt.column1 = f_op.facility_id&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; where f_op.begin_date is not null and f_op.source = 'inj'&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; and f_op.begin_date &amp;gt;= @dBeginDate and f_op.begin_date &amp;lt;= @dEndDate\"&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;SPAN style=\"background-color: rgb(0, 255, 0)\"&gt;and f_op.flag_confirm = false&lt;/SPAN&gt;&lt;/DIV&gt;&lt;/DIV&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Есть результат запроса&lt;BR/&gt;&lt;BR/&gt;* полный запрос во вложении&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выполнить запрос в БД data_store.\"TechModes\":&lt;BR/&gt;SELECT * FROM data_store.\"TechModes\"&lt;BR/&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;WHERE \"OrgId\" = '@id организации'&lt;/SPAN&gt;\n&lt;/P&gt;&lt;P&gt;AND \"ReportingMonth\" = '@ месяц проекта'&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В БД нет записей из выгрузки&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выполнить запрос в БД data_store.\"InjectionFund\":&lt;BR/&gt;SELECT * FROM data_store.\"InjectionFund\"\nWHERE \"OrgId\" = '@id организации'\nAND \"ReportingMonth\" = '@ месяц проекта'&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В БД нет записей из выгрузки&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-03-03T20:42:41.73Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Ревью"
+          },
+          {
+            "System.AssignedTo": "Багаутдинова Анна Валерьевна <GAZPROM-NEFT\\Bagautdinova.AV>"
+          },
+          {
+            "Microsoft.VSTS.TCM.Parameters": "<parameters><param name=\"id\" bind=\"default\"/><param name=\"wellIdsValueStr\" bind=\"default\"/><param name=\"dBeginDate\" bind=\"default\"/><param name=\"dEndDate\" bind=\"default\"/></parameters>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-03-03T21:03:15.773Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 17
+          }
+        ]
+      },
+      "order": 1,
+      "pointAssignments": [
+        {
+          "id": 39853,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Лобанов Сергей Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+              }
+            },
+            "id": "cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "uniqueName": "GAZPROM-NEFT\\Lobanov.SI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442673/TestPoint/39853"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442673/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442673"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442673,
+        "name": "БД (Базы данных)"
+      },
+      "workItem": {
+        "id": 435140,
+        "name": "БД. task_manager.Tasks. Изменение передаваемого периода при запуске таски для загрузки ТРов НАГ фонда",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"3\"><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Перейти в БД &lt;SPAN style=\"color: rgb(0, 0, 0);font-family: Consolas;font-size: 13.3333px;background-color: rgb(255, 255, 255)\"&gt;data_store&lt;/SPAN&gt;&lt;SPAN style=\"color: rgb(0, 0, 0);font-family: Consolas;font-size: 13.3333px;background-color: rgb(255, 255, 255)\"&gt;.&lt;/SPAN&gt;&lt;SPAN style=\"font-family: Consolas;font-size: 13.3333px;background-color: rgb(255, 255, 255);color: rgb(0, 0, 128)\"&gt;\"Operations\"&lt;/SPAN&gt;&lt;BR/&gt;Выполнить запрос:&lt;BR/&gt;&lt;/P&gt;&lt;DIV style=\"background-color:#ffffff;padding:0px 0px 0px 2px\"&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-family: Consolas;font-size: 10pt\"&gt;&lt;P&gt;&lt;SPAN style=\"color:#800000;font-weight:bold\"&gt;SELECT&lt;/SPAN&gt; a.&lt;SPAN style=\"color:#000080\"&gt;\"Id\"&lt;/SPAN&gt;, &lt;SPAN style=\"color:#000080\"&gt;\"OperationInfoId\"&lt;/SPAN&gt;, b.&lt;SPAN style=\"color:#000080\"&gt;\"Description\"&lt;/SPAN&gt;, &lt;SPAN style=\"color:#000080\"&gt;\"OperationStatusId\"&lt;/SPAN&gt;, &lt;SPAN style=\"color:#000080\"&gt;\"OperationStartDate\"&lt;/SPAN&gt;, &lt;SPAN style=\"color:#000080\"&gt;\"OperationEndDate\"&lt;/SPAN&gt;, &lt;SPAN style=\"color:#000080\"&gt;\"ErrorDetails\"&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&lt;SPAN style=\"color:#800000;font-weight:bold\"&gt;FROM&lt;/SPAN&gt; data_store.&lt;SPAN style=\"color:#000080\"&gt;\"Operations\"&lt;/SPAN&gt; a &lt;SPAN style=\"color:#800000;font-weight:bold\"&gt;left&lt;/SPAN&gt; &lt;SPAN style=\"color:#800000;font-weight:bold\"&gt;join&lt;/SPAN&gt; data_store.&lt;SPAN style=\"color:#000080\"&gt;\"OperationInfo\"&lt;/SPAN&gt; b&lt;/P&gt;&lt;P&gt;&lt;SPAN style=\"color:#800000;font-weight:bold\"&gt;ON&lt;/SPAN&gt; a.&lt;SPAN style=\"color:#000080\"&gt;\"OperationInfoId\"&lt;/SPAN&gt; = b.&lt;SPAN style=\"color:#000080\"&gt;\"Id\"&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&lt;SPAN style=\"color:#800000;font-weight:bold\"&gt;WHERE&lt;/SPAN&gt; &lt;SPAN style=\"color:#000080\"&gt;\"OperationStatusId\"&lt;/SPAN&gt; != &lt;SPAN style=\"color:#0000ff\"&gt;3&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&lt;SPAN style=\"color:#800000;font-weight:bold\"&gt;and&lt;/SPAN&gt; &lt;SPAN style=\"color:#000080\"&gt;\"OperationInfoId\"&lt;/SPAN&gt; = &lt;SPAN style=\"color:#0000ff\"&gt;14&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&lt;SPAN style=\"color:#800000;font-weight:bold\"&gt;and&lt;/SPAN&gt; &lt;SPAN style=\"color:#000080\"&gt;\"ErrorDetails\"&lt;/SPAN&gt; &lt;SPAN style=\"color:#800000;font-weight:bold\"&gt;is&lt;/SPAN&gt; &lt;SPAN style=\"color:#800000;font-weight:bold\"&gt;not&lt;/SPAN&gt; &lt;SPAN style=\"color:#800000;font-weight:bold\"&gt;null&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&lt;SPAN style=\"color:#800000;font-weight:bold\"&gt;and&lt;/SPAN&gt; &lt;SPAN style=\"color:#000080\"&gt;\"OperationStartDate\"&lt;/SPAN&gt; &amp;gt; &lt;SPAN style=\"color:#008000\"&gt;'гггг-мм-дд'&lt;/SPAN&gt; --передать дату (тек дата - &lt;SPAN style=\"color:#0000ff\"&gt;2&lt;/SPAN&gt; дня)&lt;/P&gt;&lt;P&gt;&lt;SPAN style=\"color:#800000;font-weight:bold\"&gt;order&lt;/SPAN&gt; &lt;SPAN style=\"color:#800000;font-weight:bold\"&gt;by&lt;/SPAN&gt; &lt;SPAN style=\"color:#000080\"&gt;\"OperationStartDate\"&lt;/SPAN&gt; &lt;SPAN style=\"color:#800000;font-weight:bold\"&gt;desc&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В результате запроса 0 записей&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Перейти в логи:&lt;BR/&gt;https://console.apps.test.paas.gazprom-neft.local/k8s/ns/u210001901/deployments/spektr-datastore/pods&lt;BR/&gt;&lt;BR/&gt;Найти запись формата:&lt;BR/&gt;&lt;BR/&gt;{ \"Log_date\": \"2025-08-20 00:45:06.1917\", \"level\": \"Info\", \"well\": \"ANY\", \"message\": \"Запрос перечня ТР-ов за период &lt;B&gt;&lt;I&gt;дата начала &lt;/I&gt;&lt;/B&gt;- &lt;I&gt;&lt;B&gt;дата конца&lt;/B&gt;&lt;/I&gt;.\", \"company\": \"ANY\", \"ms\": \"ANY\", \"class\": \"InjectionFundGreenplumClient\", \"func\": \"GetInjectionFundDataAsync\", \"log_type\": \"SYSTEM\", \"vendor\": \"GPNDS\", \"service_name\": \"spektr-datastore\" }  &lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Период указан согласно формата:&lt;BR/&gt;дата начала = (текущая дата - 1 месяц)\nдата конца = текущая дата.&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-08-20T08:12:05.72Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Ревью"
+          },
+          {
+            "System.AssignedTo": "Багаутдинова Анна Валерьевна <GAZPROM-NEFT\\Bagautdinova.AV>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-08-20T09:01:10.11Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 7
+          }
+        ]
+      },
+      "order": 2,
+      "pointAssignments": [
+        {
+          "id": 39855,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Лобанов Сергей Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+              }
+            },
+            "id": "cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "uniqueName": "GAZPROM-NEFT\\Lobanov.SI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442673/TestPoint/39855"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442673/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442673"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 3
+}
