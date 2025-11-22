@@ -83,6 +83,9 @@ class TestCaseTreeWidget(QTreeWidget):
 
     def _populate_directory(self, directory: Path, parent_item: QTreeWidgetItem, test_cases: list):
         for subdir in sorted([d for d in directory.iterdir() if d.is_dir()]):
+            # Пропускаем папки _attachment
+            if subdir.name == "_attachment":
+                continue
             folder_item = QTreeWidgetItem(parent_item)
             folder_item.setText(0, f"📁 {subdir.name}")
             folder_item.setData(0, Qt.UserRole, {'type': 'folder', 'path': subdir})

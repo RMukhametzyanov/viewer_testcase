@@ -1,0 +1,98 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442968,
+        "name": "Вкладка Не кандидаты"
+      },
+      "workItem": {
+        "id": 385971,
+        "name": "[НАГ] Не кандидаты",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"2\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открыть вкладку Не кандидаты&lt;BR/&gt;Срабатывают Методы: &lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;\nGET https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/spektr/InjectionDiag/GetCriteriasDescription&lt;BR/&gt;&lt;BR/&gt;\nGET https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/spektr/InjectionDiag/GetGrid?projectId=05dbf634-1c0a-47b2-9792-ff45cd68543d&lt;BR/&gt;&lt;BR/&gt;GET https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/spektr/Project/GetById?prjId=05dbf634-1c0a-47b2-9792-ff45cd68543d&lt;BR/&gt;&lt;BR/&gt;POST https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/users/userSettings/save&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Время загрузки &amp;lt; 5 сек&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Багаутдинова Анна Валерьевна <GAZPROM-NEFT\\Bagautdinova.AV>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-05-13T12:05:02.907Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Багаутдинова Анна Валерьевна <GAZPROM-NEFT\\Bagautdinova.AV>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-05-13T12:05:02.907Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 3
+          }
+        ]
+      },
+      "pointAssignments": [
+        {
+          "id": 40336,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Багаутдинова Анна Валерьевна",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/173402d9-ea5b-489e-80aa-38d9cc19aea6",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS02NTk5MjM"
+              }
+            },
+            "id": "173402d9-ea5b-489e-80aa-38d9cc19aea6",
+            "uniqueName": "GAZPROM-NEFT\\Bagautdinova.AV",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS02NTk5MjM",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS02NTk5MjM"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442968/TestPoint/40336"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442968/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442968"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 1
+}

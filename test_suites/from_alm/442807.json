@@ -1,0 +1,644 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442807,
+        "name": "Ревизия ППД"
+      },
+      "workItem": {
+        "id": 268875,
+        "name": "Корректировка Ревизии ППД",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"15\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать скважину ревизии ППД&lt;BR/&gt;Открыть окно корректировки &lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В блоке &lt;B&gt;фактические параметры&lt;/B&gt; доступны:&lt;BR/&gt;а) Радиобаттон&lt;BR/&gt; -  \"Ввести фактическую Qприём\";&lt;BR/&gt;б) Поля:&lt;BR/&gt; - Qприём, м3/сут (доступно если выбрать реадиобаттон \"&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Ввести фактическую Qприём&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;\";&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt; - поле Pзаб, атм (доступно всегда).&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;В блоке Целевые параметры:&lt;BR/&gt;а) Радиобаттоны:&lt;BR/&gt; - Ввести целевые Qприём и Кприём\n - Ввести целевые Pзаб и Кприём\n - Ввести целевые Pуст и Кприём&lt;BR/&gt;&lt;BR/&gt;б) Поля: &lt;BR/&gt; - Целевая Qприём, м3/сут\n - Целевое Pзаб, атм\n - Целевое Pуст, атм\n - Целевой Кприём, м3/сут/атм\n - Целевой прирост Qприём, м3/сут\n - Целевой прирост Pзаб, атм&lt;BR/&gt;&amp;nbsp;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать радиобаттон:&lt;BR/&gt;&amp;nbsp;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;\"Ввести фактическую Qприём\"&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В блоке фактических параметров становится доступным поле &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Qприём, м3/сут&lt;BR/&gt;&lt;BR/&gt;В блоке целевые параметры блокируются все поля&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать радиобаттон:&lt;BR/&gt;\"Ввести целевые Qприём и Кприём\"&lt;BR/&gt;&amp;nbsp;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Доступны:\n - Целевая Qприём, м3/сут\n - Целевой Кприём, м3/сут/атм\n\nНе доступны:\n - Целевое Pзаб, атм\n - Целевое Pуст, атм\n - Целевой прирост Qприём, м3/сут\n - Целевой прирост Pзаб, атм&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;радиобаттон:&lt;/SPAN&gt;&lt;/P&gt;\"Ввести целевые Pзаб и Кприём\"&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Доступны:\n - Целевое Pзаб, атм\n - Целевой Кприём, м3/сут/атм\n\nНе доступны:\n - Целевая Qприём, м3/сут\n - Целевое Pуст, атм\n - Целевой прирост Qприём, м3/сут\n - Целевой прирост Pзаб, атм&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;радиобаттон:&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;\"Ввести целевые Pуст и Кприём\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Доступны:\n - Целевое Pуст, атм\n - Целевой Кприём, м3/сут/атм\n\nНе доступны:\n - Целевая Qприём, м3/сут\n - Целевое Pзаб, атм\n - Целевой прирост Qприём, м3/сут\n - Целевой прирост Pзаб, атм&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Изменить фактическое Qприём, м3/сут&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меняются:&lt;BR/&gt;Фактические:&lt;BR/&gt;&amp;nbsp;- Рзаб&lt;BR/&gt;&lt;BR/&gt;Целевые:&lt;BR/&gt; - Целевой прирост Qприём, м3/сут\n - Целевой прирост Pзаб, атм&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Изменить фактическое Рзаб&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Не меняются никакие другие поля&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Изменить Целевая Qприём, м3/сут&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меняются целевые:&lt;BR/&gt; - Целевая Qприём, м3/сут\n - Целевое Pзаб, атм\n - Целевое Pуст, атм\n - Целевой прирост Qприём, м3/сут\n - Целевой прирост Pзаб, атм&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Изменить &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Целевое Pзаб, атм&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меняются: целевые:&lt;BR/&gt; - Целевая Qприём, м3/сут\n - Целевое Pуст, атм\n - Целевой прирост Qприём, м3/сут\n - Целевой прирост Pзаб, атм&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"11\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Изменить &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Целевое Pуст, атм&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меняются целевые:&lt;BR/&gt; - Целевая Qприём, м3/сут\n - Целевое Pзаб, атм\n - Целевой прирост Qприём, м3/сут\n - Целевой прирост Pзаб, атм&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"12\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Изменить &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Целевой Кприём, м3/сут/атм&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меняются целевые:\n - Целевое Pзаб, атм\n - Целевое Pуст, атм\n - Целевой прирост Pзаб, атм&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"13\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать многопластовую скважину&lt;BR/&gt;Открыть форму корректировок&lt;BR/&gt;Выбрать пласт 1&lt;BR/&gt;Внести изменения&lt;BR/&gt;&lt;BR/&gt;Перевыбрать пласт 2&lt;BR/&gt;Внести изменения&lt;BR/&gt;&lt;BR/&gt;Вернуться на пласт 1&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Изменения применяются на выбранном пласте.&lt;BR/&gt;&lt;BR/&gt;При возврате на ранее выбранный пласт все изменения пользователя подтягиваются.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"14\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Внести изменения в блоке Дополнительно&lt;BR/&gt; - Бизнес кейсы&lt;BR/&gt; - Доп.мероприятия&lt;BR/&gt; - Период сохранения&lt;BR/&gt; - Плановая дата ГТМ&lt;BR/&gt; - Отправить в  ЭРА&lt;BR/&gt; - Добавить обоснование / Добавить причину корректировки&lt;BR/&gt;&lt;BR/&gt;Сохранить&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt; - Бизнес кейсы: выбираются, если созданы в разделе \"Бизнес-кейсы\" главного меню и подходят для выбранной скважины (привязка к ДО, месторождению). Не обязательно для заполнения.&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt; - Доп.мероприятия: пустые. Для ревизии ППД нет списка доп.мероприятий.&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt; - Период сохранения: 1-6, 12 месяцев. Обязательно для заполнения.&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt; - Плановая дата ГТМ: выбирается, сохраняется. Необязательно для заполнения.&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt; - Отправить в  ЭРА: Не обязательно для заполнения. В случае выбора после согласования скважина будет отправлена в ЭРА: Ремонты.&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt; - Добавить обоснование / Добавить причину корректировки:&lt;BR/&gt;Вводится, сохраняется. Не обязательно для заполнения.&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;После сохранения информация отражается в истории корректировок, в гриде таблицы Кандидаты.(По многопластовой скважине информация сохраняется по совокупному пласту)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"15\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Не кандидаты / выбрать скважину Ревизии ППД&lt;BR/&gt;Нажать \"В кандидаты\"&lt;BR/&gt;Внести изменения&lt;BR/&gt;&lt;BR/&gt;Сохранить и согласовать&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Скважина переносится в Кандидаты с автосогласованием&lt;BR/&gt;&lt;BR/&gt;Есть запись в истории корректировок и в истории экспертизы&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2024-08-21T11:31:34.463Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2024-08-21T11:31:34.463Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 9
+          }
+        ]
+      },
+      "pointAssignments": [
+        {
+          "id": 40274,
+          "configurationName": "Windows 10",
+          "tester": null,
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442807/TestPoint/40274"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442807/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442807"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442807,
+        "name": "Ревизия ППД"
+      },
+      "workItem": {
+        "id": 269062,
+        "name": "Ревизия ППД. Критериальный отбор (граничные значения)",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"12\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ВКЛ Максимальный суммарный дебит скважин окружения&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Если дебит скважин окружения больше граничного значения, то скважина Не кандидат&lt;BR/&gt;&lt;BR/&gt;Критерий \"Высокий суммарный дебит скважин окружения\"&lt;BR/&gt;&lt;BR/&gt;ГЗ по умолчанию 30 т/сут&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;ВКЛ Минимальный суммарный дебит скважин окружения&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Если дебит скважин окружения меньше граничного значения, заданного пользователем, то скважина Не кандидат&lt;BR/&gt;&lt;BR/&gt;Критерий: Низкий суммарный дебит скважин окружения&lt;BR/&gt;&lt;BR/&gt;ГЗ по умолчанию 5т/сут&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;ВКЛ Минимальный МРП пакера и/или НКТ для бездействующего фонда&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Если межремонтный период по пакеру и/или НКТ меньше граничного значения, заданного пользователем, то скважина Не кандидат. &lt;BR/&gt;&lt;BR/&gt;Проверяются только скважины со статусом В бездействии прошлых лет, В ожидании ликвидации, В бездействии текущего года, Наблюдательная, В консервации, Пьезометрическая, Остановлена&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;Критерий: Низкий МРП по БД\n\nГЗ по умолчанию 1000 дней&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;ВКЛ Минимальный МРП пакера и/или НКТ для действующего фонда&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Если межремонтный период по пакеру и/или НКТ меньше граничного значения, заданного пользователем, то скважина Не кандидат. &lt;BR/&gt;&lt;BR/&gt;Проверяются только скважины со статусами \"В работе\", \"В накоплении\"&lt;BR/&gt;&lt;BR/&gt;Критерий: Низкий МРП для ДФ&lt;BR/&gt;&lt;BR/&gt;ГЗ по умолчанию 1000 дней&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;ВКЛ Предлагать кандидатов без скважин в окружении&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Если в окружении анализируемой скважины нет реагирующих скважин, то анализируемая скважина НЕ кандидат. &lt;BR/&gt;&lt;BR/&gt;Ручной перенос из НЕ кандидатов заблокирован.&lt;BR/&gt;&lt;BR/&gt;Критерий: Нет скважин окружения&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;ВКЛ Предлагать кандидатов с перекрытием интервала перфорации&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Если глубина текущего забоя &amp;gt; глубины нижних отверстий перфорации, то скважина Не кандидат.\n\nСравнивать InjectionFund.BottomDepth и WellPerforations.BottomMd где значение BottomMd максимальное&lt;BR/&gt;&lt;BR/&gt;Критерий: Перекрыт интервал перфорации&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;ВКЛ Минимальная целевая приемистость&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Если целевая приемистость меньше значения, заданного пользователем, скважина НЕ Кандидат&lt;BR/&gt;&lt;BR/&gt;Критерий: Низкая приемистость&lt;BR/&gt;&lt;BR/&gt;Значение по умолчанию 10&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;ВКЛ Максимальная целевая приемистость&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Если целевая приемистость больше значения, заданного пользователем, скважина НЕ Кандидат.&lt;BR/&gt;&lt;BR/&gt;Критерий: Высокая приемистость&lt;BR/&gt;&lt;BR/&gt;Значение по умолчанию 1000&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;ВКЛ Максимальное самопроизвольное изменение закачки&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Если изменение закачки больше значения, заданного пользователем и при этом не было изменения Dшт или Dшт отсутствует, то скважина НЕ Кандидат.&lt;BR/&gt;&lt;BR/&gt;Критерий: Самопроизвольное изменение закачки&lt;BR/&gt;&lt;BR/&gt;Значение по умолчанию 50%&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"11\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Наличие пропусков по фонтанной арматуре &lt;BR/&gt;(ГЗ нет в настройках, но проверяется при критериальном отборе)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Если по скважине нет пропусков по фонтанной арматуре, скважина Не кандидат.&lt;BR/&gt;&lt;BR/&gt;Критерий: Пропуски по фонтанной арматуре&lt;BR/&gt;&lt;BR/&gt;Запрос для удобства:&lt;BR/&gt;Если скважина находится в выборе&lt;BR/&gt;select *\nfrom klad.\"StopReasonHistories\" srh\nwhere srh.\"StopReasonOisId\" in ('PP8079', 'PP0033') -- Неисправна фонтанная арматура, Ожидание капитального ремонта\nand srh.\"EnDate\" is null&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"12\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Негерметичность пакера, НКТ, Э/К.&lt;BR/&gt;(ГЗ нет в настройках, но проверяется при критериальном отборе)&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Если по скважине нет негерметичности пакера и/или НКТ и/или Э/К, то скважина Не кандидат.&lt;BR/&gt;&lt;BR/&gt;Критерий: Негерметичность пакера, НКТ, Э/К&lt;BR/&gt;&lt;BR/&gt;Тех.инфо:&lt;BR/&gt;TightnessWellConstructionElements.IntervalConclusion in (Аномалий связанных с негерметичностью Э/К на фоновом замере нет, Без явных признаков негерметичности, Голова хвостовика без явных признаков негерметичности, Колонна герметична, НКТ герметичны, Пакер межтрубный герметичен, Стеклопластиковая колонна герметична) то негерметичности нет ⇒ Не кандидат\n\nTightnessWellConstructionElements.IntervalConclusion in (Негерметичен забой, Негерметичность головы хвостовика, Негерметичность изолирована 2-х пакерной компоновкой, Негерметичность муфты колонны, Негерметичность муфты НКТ, Негерметичность муфты пластиковой колонны, Негерметичность пластиковой трубы, Негерметичность трубы колонны, Негерметичность трубы НКТ, Некачественная изоляция, Пакер межтрубный негерметичен) то негерметичность есть ⇒ Кандидат&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2024-08-21T17:10:56.133Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Багаутдинова Анна Валерьевна <GAZPROM-NEFT\\Bagautdinova.AV>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2024-08-21T17:10:56.133Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 5
+          }
+        ]
+      },
+      "order": 1,
+      "pointAssignments": [
+        {
+          "id": 40275,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Багаутдинова Анна Валерьевна",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/173402d9-ea5b-489e-80aa-38d9cc19aea6",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS02NTk5MjM"
+              }
+            },
+            "id": "173402d9-ea5b-489e-80aa-38d9cc19aea6",
+            "uniqueName": "GAZPROM-NEFT\\Bagautdinova.AV",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS02NTk5MjM",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS02NTk5MjM"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442807/TestPoint/40275"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442807/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442807"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442807,
+        "name": "Ревизия ППД"
+      },
+      "workItem": {
+        "id": 269066,
+        "name": "Ревизия ППД. Критериальный отбор (опции расчета)",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"7\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;ВКЛ опция Минимальная дополнительная добыча нефти после корректировки&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Проверяется только после корректировки\n\nЕсли по скважине дополнительная добыча нефти меньше граничного значения, заданного пользователем, то выводить информацию в боковой панели «Статус экспертизы» информер «Дополнительная добыча после внесения корректировки снизилась»&lt;BR/&gt;&lt;BR/&gt;Примечание:&lt;BR/&gt;Скважина не отправляется в Кандидаты или Не Кандидаты по результату проверки. Выводится только информер в боковой панели&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ВКЛ опция Учитывать причины остановки&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Если по скважине причина остановки совпадает со списком, то скважина Кандидат. Проверяются только скважины, у которых статус НЕ \"В работе\" или \"В накоплении/под циклической закачкой/\".&lt;BR/&gt;&lt;BR/&gt;список причин остановок с чекбоксами открывается в отдельном окне по кнопке \"Причины остановки\".&lt;BR/&gt;&lt;BR/&gt;&lt;B&gt;Перечень причин остановки:&lt;/B&gt;\nОжидание капитального ремонта;\nОжидание подзем.(текущ.)ремонта;\nРемонт запорной арматуры;\nСкважина остановлена из-за ремонта соседней скважины (Окончание КР соседней скважины);\nСкважина остановлена из-за бурения соседней скважины (Окончание бурения соседней скважины);\nОтсутствие приемистости;\nОжидание капитального ремонта (без обнуления МРП);\nОжидание подземного (текущ.)ремонта (без обнуления МРП);\nРемонт запорной арматуры (без обнуления МРП);\nСкважина остановлена из-за ремонта соседних скважин (без обнуления МРП);\nСкважина остановлена из-за бурения соседних скважин (без обнуления МРП);\nОтсутствие приемистости (без обнуления МРП);&lt;BR/&gt;&lt;BR/&gt;Запрос для удобства:&lt;BR/&gt;select *\nfrom klad.\"StopReasonHistories\" srh\nwhere srh.\"StopReasonOisId\" in (\n'PP0158',\n'PP0034',\n'PP0359',\n'PP0364',\n'PP0360',\n'PP0362',\n'PP0361',\n'PP0018',\n'PP0358',\n'PP0059',\n'PP0047',\n'PP0033'\n)\nand srh.\"EnDate\" is null&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;ВКЛ Учитывать в анализе выбывающие/прибывающие скважины&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt; Блок Поиск скважин окружения                                                                               Для проверки:&lt;B style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;&amp;nbsp;                                                                                                                                                    Изменить опции расчёта для выбранного месторождения&lt;/B&gt;&lt;BR/&gt;&lt;/P&gt;1) Включить \"С учетом направления стресса\"                                                             2) Уменьшить радиус поиска скважин окружения в 2 раза&lt;BR/&gt;3) Увеличить сектор перекрытия на 10 градусов                                                     \n&lt;P class=\"MsoNormal\" style=\"margin-bottom: 0.0001pt;line-height: normal;background-image: initial;background-position: initial;background-repeat: initial;background-attachment: initial\"&gt;&lt;B&gt;&lt;SPAN style=\"font-size:10.0pt;font-family:&amp;amp;amp\"&gt;Пересчитать проект&lt;/SPAN&gt;&lt;/B&gt;&lt;/P&gt;\n\n&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;SPAN style=\"font-family: &amp;amp;amp;font-size: 10pt;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9));font-weight: inherit\"&gt;Без учета направления стресса &lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;P class=\"MsoNormal\" style=\"margin-bottom:0cm;margin-bottom:.0001pt;line-height:\nnormal\"&gt;&lt;SPAN style=\"font-size: 10pt;font-family: &amp;amp;amp;background-image: initial;background-position: initial;background-repeat: initial;background-attachment: initial\"&gt;   Радиус поиска скважин окружения,м &lt;/SPAN&gt;&lt;/P&gt;&lt;P class=\"MsoNormal\" style=\"margin-bottom:0cm;margin-bottom:.0001pt;line-height:\nnormal\"&gt;&lt;SPAN style=\"font-size: 10pt;font-family: &amp;amp;amp;background-image: initial;background-position: initial;background-repeat: initial;background-attachment: initial\"&gt;С учетом направления стресса &lt;/SPAN&gt;&lt;/P&gt;&lt;P class=\"MsoNormal\" style=\"margin-bottom:0cm;margin-bottom:.0001pt;line-height:\nnormal\"&gt;&lt;SPAN style=\"font-size: 10pt;font-family: &amp;amp;amp;background-image: initial;background-position: initial;background-repeat: initial;background-attachment: initial\"&gt;   Направление стресса,град &lt;/SPAN&gt;&lt;/P&gt;&lt;P class=\"MsoNormal\" style=\"margin-bottom:0cm;margin-bottom:.0001pt;line-height:\nnormal\"&gt;&lt;SPAN style=\"font-size: 10pt;font-family: &amp;amp;amp;background-image: initial;background-position: initial;background-repeat: initial;background-attachment: initial\"&gt;   Радиус вдоль стресса,м&lt;/SPAN&gt;&lt;/P&gt;&lt;P class=\"MsoNormal\" style=\"margin-bottom:0cm;margin-bottom:.0001pt;line-height:\nnormal\"&gt;&lt;SPAN style=\"font-size: 10pt;font-family: &amp;amp;amp;background-image: initial;background-position: initial;background-repeat: initial;background-attachment: initial\"&gt;&amp;nbsp;  Радиус поперек стресса,м &lt;/SPAN&gt;&lt;/P&gt;&lt;P class=\"MsoNormal\" style=\"margin-bottom:0cm;margin-bottom:.0001pt;line-height:\nnormal\"&gt;&lt;SPAN style=\"font-size: 10pt;font-family: &amp;amp;amp;background-image: initial;background-position: initial;background-repeat: initial;background-attachment: initial\"&gt;Учет перекрытия                                             Сектор перекрытия ННС,град &lt;/SPAN&gt;&lt;/P&gt;&lt;P class=\"MsoNormal\" style=\"margin-bottom: 0.0001pt;line-height: normal;background-image: initial;background-position: initial;background-repeat: initial;background-attachment: initial\"&gt;&lt;SPAN style=\"font-size:10.0pt;font-family:&amp;amp;amp\"&gt;Сектор перекрытия ГОР,град&lt;B&gt; &lt;/B&gt;&lt;/SPAN&gt;&lt;/P&gt;&lt;P class=\"MsoNormal\" style=\"margin-bottom: 0.0001pt;line-height: normal;background-image: initial;background-position: initial;background-repeat: initial;background-attachment: initial\"&gt;&lt;B&gt;&lt;SPAN style=\"font-size:10.0pt;font-family:&amp;amp;amp\"&gt;После изменения\nопций расчета&lt;/SPAN&gt;&lt;/B&gt;&lt;SPAN style=\"font-size:10.0pt;font-family:&amp;amp;amp\"&gt;:&lt;BR/&gt;\n1) Заблокируется \"Радиус поиска скважин окружения,м\"&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;P class=\"MsoNormal\" style=\"margin-bottom: 0.0001pt;line-height: normal;background-image: initial;background-position: initial;background-repeat: initial;background-attachment: initial\"&gt;&lt;B&gt;&lt;SPAN style=\"font-size:10.0pt;font-family:&amp;amp;amp\"&gt;После\nзавершения пересчета&lt;/SPAN&gt;&lt;/B&gt;&lt;SPAN style=\"font-size:10.0pt;font-family:&amp;amp;amp\"&gt;:&lt;BR/&gt;\n2) Количество кандидатов по М/Р уменьшилось&lt;BR/&gt;\n3) Радиус поиска, сектор перекрытия в боковой панели \"Окружение\" по\nскважинам М/Р совпадает с выставленными настройками&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Блок Расчет дополнительной добычи от ГТМ                                                           &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Для проверки:&lt;/SPAN&gt;&lt;B style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;&amp;nbsp;                                                                                                 Изменить опции расчёта для выбранного месторождения                   &lt;/B&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Изменить прогнозный период&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;P class=\"MsoNormal\" style=\"margin-bottom: 0.0001pt;line-height: normal;background-image: initial;background-position: initial;background-repeat: initial;background-attachment: initial\"&gt;&lt;SPAN style=\"font-size: 10pt;font-family: &amp;amp;amp;background-image: initial;background-position: initial;background-repeat: initial;background-attachment: initial\"&gt;Прогнозный переод,лет&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&lt;SPAN style=\"font-family: &amp;amp;amp;font-size: 10pt;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9));font-weight: inherit\"&gt; &lt;/SPAN&gt;&lt;SPAN style=\"font-family: &amp;amp;amp;font-size: 10pt;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9));font-weight: inherit\"&gt;Расчет на &lt;/SPAN&gt;&lt;SPAN style=\"font-family: &amp;amp;amp;font-size: 10pt;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9));font-weight: inherit\"&gt;модели материального баланса&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&lt;SPAN style=\"font-family: &amp;amp;amp;font-size: 10pt;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9));font-weight: inherit\"&gt;Расчет по&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9));font-weight: inherit\"&gt; &lt;/SPAN&gt;&lt;SPAN style=\"font-family: &amp;amp;amp;font-size: 10pt;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9));font-weight: inherit\"&gt;ТП&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9));font-family: &amp;amp;amp;font-size: 10pt;font-weight: inherit\"&gt;&amp;nbsp;&lt;/SPAN&gt;&lt;/P&gt;&lt;P class=\"MsoNormal\" style=\"margin-bottom: 0.0001pt;line-height: normal;background-image: initial;background-position: initial;background-repeat: initial;background-attachment: initial\"&gt;&lt;SPAN style=\"font-size: 10pt;font-family: &amp;amp;amp;background-image: initial;background-position: initial;background-repeat: initial;background-attachment: initial\"&gt;Коэффицинет эффективности закачки,д.ед.&lt;/SPAN&gt;&lt;/P&gt;&lt;P class=\"MsoNormal\" style=\"margin-bottom: 0.0001pt;line-height: normal;background-image: initial;background-position: initial;background-repeat: initial;background-attachment: initial\"&gt;&lt;SPAN style=\"font-size: 10pt;font-family: &amp;amp;amp;background-image: initial;background-position: initial;background-repeat: initial;background-attachment: initial\"&gt;Начальный коэффициент роста базовой обводненности,д.ед.&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&lt;SPAN style=\"font-size: 10pt;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9));font-weight: inherit\"&gt;Начальный&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;P class=\"MsoNormal\" style=\"margin-bottom: 0.0001pt;line-height: normal;background-image: initial;background-position: initial;background-repeat: initial;background-attachment: initial\"&gt;&lt;SPAN style=\"font-size: 10pt;font-family: &amp;amp;amp;background-image: initial;background-position: initial;background-repeat: initial;background-attachment: initial\"&gt;коэффициент роста обводненности от ГТМ,д.ед.&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&lt;SPAN style=\"font-size: 10pt;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9));font-weight: inherit\"&gt;Начальный &lt;/SPAN&gt;&lt;SPAN style=\"font-size: 10pt;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9));font-weight: inherit\"&gt;коэффициент снижения приемистости,д.ед&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&lt;SPAN style=\"font-size: 10pt;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9));font-weight: inherit\"&gt;Начальный &lt;/SPAN&gt;&lt;SPAN style=\"font-size: 10pt;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9));font-weight: inherit\"&gt;коэффициент снижения дебита жидкости,д.ед.&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&lt;SPAN style=\"font-size: 10pt;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9));font-weight: inherit\"&gt;Период &lt;/SPAN&gt;&lt;SPAN style=\"font-size: 10pt;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9));font-weight: inherit\"&gt;реагирования на 100м,мес&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&lt;SPAN style=\"font-size: 10pt;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9));font-weight: inherit\"&gt;Kmax.гориз,д.ед.&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;P&gt;&lt;SPAN style=\"font-size: 10pt;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9));font-weight: inherit\"&gt;Кmax.верт,д.ед.&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;P&gt;&lt;SPAN style=\"font-size: 10pt;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9));font-weight: inherit\"&gt;Показатель степени,д.ед.&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;P&gt;&lt;SPAN style=\"font-size: 10pt;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9));font-weight: inherit\"&gt;Предельный дебит нефти,т/сут&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;P&gt;&lt;SPAN style=\"font-size: 10pt;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9));font-weight: inherit\"&gt;Предельная обводненность, %&lt;/SPAN&gt;&lt;/P&gt;&lt;P class=\"MsoNormal\" style=\"margin-bottom: 0.0001pt;line-height: normal;background-image: initial;background-position: initial;background-repeat: initial;background-attachment: initial\"&gt;&lt;B&gt;&lt;SPAN style=\"font-size: 10pt;font-family: &amp;amp;amp;background-image: initial;background-position: initial;background-repeat: initial;background-attachment: initial\"&gt;После завершения пересчета:&lt;/SPAN&gt;&lt;/B&gt;&lt;/P&gt;&lt;P class=\"MsoNormal\" style=\"margin-bottom: 0.0001pt;line-height: normal;background-image: initial;background-position: initial;background-repeat: initial;background-attachment: initial\"&gt;&lt;SPAN style=\"font-size: 10pt;font-family: &amp;amp;amp;background-image: initial;background-position: initial;background-repeat: initial;background-attachment: initial\"&gt;Значения по скважинам не пересчитанного месторождения не\nизменились&lt;/SPAN&gt;&lt;SPAN style=\"font-size:10.0pt;font-family:&amp;amp;amp\"&gt;&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2024-08-21T17:21:10.28Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Багаутдинова Анна Валерьевна <GAZPROM-NEFT\\Bagautdinova.AV>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2024-08-21T17:21:10.28Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 9
+          }
+        ]
+      },
+      "order": 2,
+      "pointAssignments": [
+        {
+          "id": 40276,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Багаутдинова Анна Валерьевна",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/173402d9-ea5b-489e-80aa-38d9cc19aea6",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS02NTk5MjM"
+              }
+            },
+            "id": "173402d9-ea5b-489e-80aa-38d9cc19aea6",
+            "uniqueName": "GAZPROM-NEFT\\Bagautdinova.AV",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS02NTk5MjM",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS02NTk5MjM"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442807/TestPoint/40276"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442807/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442807"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442807,
+        "name": "Ревизия ППД"
+      },
+      "workItem": {
+        "id": 269069,
+        "name": "Боковые панели. Статус экспертизы",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"10\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Информер Способ подбора&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Если на скважине нет корректировки, нет перенесенного статуса с предыдущего проекта, то должен быть Автоматизированный подбор системой СПекТР&lt;BR/&gt;&lt;BR/&gt;Если на скважине есть перенесенный статус с предыдущего проекта, то должен быть \"Перенос из предыдущего проекта\"&lt;BR/&gt;&lt;BR/&gt;Если скважина перенесена из Не кандидатов, то должен быть \"Ручной перенос из Не кандидатов\" и выводится срок действия&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Информер Другие мероприятия скважины&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Если скважина Кандидат на другие ГТМ, то указываются на какие ГТМы скважина Кандидат. &lt;BR/&gt;По клику есть переход.&lt;BR/&gt;&lt;BR/&gt;Если других мероприятий нет, то выводится \"Других мероприятий нет\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Информер Расчет доп. добычи от ГТМ&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Если в опция расчета в блоке Расчет дополнительной добычи от ГТМ\" включен \"Расчет по ТП\", то в информере выводится \"Расчет по ТП\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Блок Кандидат&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображаются параметры:&lt;BR/&gt;Qж, м³/сут\t\t\nQн, т/сут\t\t\nОбв, %\t\t\nQприем (план), м3/сут\t\nКприём, м3/сут/атм\nРзаб, атм\t\nРуст, атм&lt;BR/&gt;&lt;BR/&gt;Каждый параметр делится на \"До ГТМ\" и \"После ГТМ\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Блок Окружение&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображаются параметры:&lt;BR/&gt;Qж, м³/сут\nQн,т/сут\nΔQж, м³/сут\nΔQн (ΔQж), т/сут\nΔQн (ΔОбв), т/сут\nКтек, д.ед\nКнак, д.ед&lt;BR/&gt;&lt;BR/&gt;Каждый параметр делится только на \"До ГТМ\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Блок Доп.добыча&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображаются параметры:&lt;BR/&gt;Жидкость, тыс.м3\nНефть, тыс.т\nГаз, млн.м3\nЗакачка, тыс.м3&lt;BR/&gt;&lt;BR/&gt;Каждый параметр делится на \"Без ГТМ\", \"С ГТМ\", \"Прирост\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Блок Экономическая эффективность&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображаются параметры:\nNPV, млн. руб\t\nГЭП, мес\nLC, т.руб/т.н&lt;BR/&gt;&lt;BR/&gt;Каждый параметр делится на \"База\", \"ГТМ\", \"Прирост\"&lt;BR/&gt;&lt;BR/&gt;Отдельно отображаются поля:&lt;BR/&gt;Суммарные затраты, млн.руб &lt;BR/&gt;PI&lt;BR/&gt;&amp;nbsp;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Блок Примечания&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Сохраняются, редактируются, удаляются.&lt;BR/&gt;&lt;BR/&gt;Примечание сохраняется на скважину, а не на ГТМ (т.е. если выбрать эту же скважину на другой ГТМ, то будет видно примечание\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Убедится, что ВКЛ опция Минимальная дополнительная добыча нефти после корректировки&lt;BR/&gt;&lt;BR/&gt;Сделать корректировку на скважине так, чтоб доп.добыча нефти стала меньше, чем была до корректировки&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Если по скважине дополнительная добыча нефти после корректировки меньше, чем была до корректировки, то есть информер «Дополнительная добыча после внесения корректировки меньше ГЗ».&lt;BR/&gt;&lt;BR/&gt;Отображается только для скважин, по которым была корректировка.&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2024-08-21T17:40:44.033Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Багаутдинова Анна Валерьевна <GAZPROM-NEFT\\Bagautdinova.AV>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2024-08-21T17:40:44.033Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 5
+          }
+        ]
+      },
+      "order": 3,
+      "pointAssignments": [
+        {
+          "id": 40277,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442807/TestPoint/40277"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442807/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442807"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442807,
+        "name": "Ревизия ППД"
+      },
+      "workItem": {
+        "id": 269072,
+        "name": "Боковые панели. Информация по скважине",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"10\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Блок Общая информация&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображаются поля:&lt;BR/&gt;Организация\nМесторождение\nНомер скважины\nПласт\nКуст\nСостояние на конец месяца\nНазначение по проекту&lt;BR/&gt;&lt;BR/&gt;Заполняется данными из тех.режима&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Блок Результаты расчетов СПЕКТР&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображается подблок \"Информация об автоГРП\", который содержит поля:&lt;BR/&gt;АвтоГРП:\nДавление АвтоГРП, атм:&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Блок Конструкция скважины&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображаются поля:&lt;BR/&gt;&amp;nbsp;Тип скважины:\nD нкт, мм:\nНвдп, м:\nГлубина текущего забоя, м:\nD эк, мм:\nD шт, мм:\nУдл, м:&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Блок Фрак-листы&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображаются фрак ллисты при их наличии.&lt;BR/&gt;Каждый фрак лист можно развернуть. При развороте отображаются поля:&lt;BR/&gt;&amp;nbsp;Мпр (план/факт), т:\nИнтервал перфорации, м:\nПроницаемость трещины, Д:\nСкин-фактор (план/факт):\nПолудлина трещины xf, м:\nВысота трещины hf, м:\nСредняя ширина трещины wf, мм:\nУд. масса проппанта, т/м:\nPпл Хорнера, атм:&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Блок ГФХ&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображаются поля:&lt;BR/&gt;&amp;nbsp;Кпр, мД:\nНефтенасыщенная толщина, м:\nPпл начальное, атм:&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Блок PVT&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображаются поля:&lt;BR/&gt;В-ть воды в пл условиях, сПз:\nВ-ть нефти в пл условиях, сПз:\nПлотность нефти, г/см3:\nПлотность воды, г/см3:\nОбъёмный коэф. нефти, м3/м3:\nОбъёмный коэф. воды, м3/м3:\nГазовый фактор, м3/т:&lt;BR/&gt;Давление насыщения, атм:\n&lt;/P&gt;&lt;DIV&gt;&lt;BR/&gt;&lt;/DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Блок ГДИС&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Дата ГДИ:\nКоэф. Продуктивности:\nПроницаемость ГДИС:\nКоэф. Гидропроводности:\nИнформация с ГДИС по окружению:&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Блок ПГИ&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Выводится перечень исследований: дата и исследование. Каждое исследование можно развернуть, в котором будут отображаться поля:&lt;BR/&gt;Герметичность забоя&lt;BR/&gt;Герметичность пакера&lt;BR/&gt;Герметичность НКТ&lt;BR/&gt;Герметичность Э/К&lt;BR/&gt;Герметичность хвостовика&lt;BR/&gt;Герметичность муфт&lt;BR/&gt;Начало интервала исс-я, м&lt;BR/&gt;Конец интервала исс-я, м&lt;BR/&gt;Заключение&lt;/P&gt;</parameterizedString><description/></step><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Кнопка Перейти в отчет&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;При наведении на кнопку «Перейти в отчет» выводится информер «Необходим доступ в ГеоБД».\nПри нажатии кнопки и наличия доступа в ГеоБД открывается отчет по ссылке http://10.69.167.34:8888+(значение поля Pgi.Link).\n\nВ случае отсутствия данных по ПГИ для скважины - прописывать в блоке ПГИ «Нет данных»&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2024-08-21T17:52:00.97Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2024-08-21T17:52:00.97Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 2
+          }
+        ]
+      },
+      "order": 4,
+      "pointAssignments": [
+        {
+          "id": 40278,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442807/TestPoint/40278"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442807/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442807"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442807,
+        "name": "Ревизия ППД"
+      },
+      "workItem": {
+        "id": 269076,
+        "name": "Боковые панели. Информация о ремонтах",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"3\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открыть боковую панель там, где нет ремонтов&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Пустая панель с информером \"Для выбранного ГТМ нет информации о ремонтах\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открыть боковую панель, где есть ремонты.&lt;BR/&gt;Например, Ноябрьскнефтегаз, Вынгапуровское, 1021&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Есть ключик, по клику осуществляется переход в ЭРА на выбранную скважину&lt;BR/&gt;&lt;BR/&gt;Набор полей как на скриншоте:&lt;BR/&gt;&lt;IMG src=\"data:image/png;base64,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\" alt=\"\"/&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2024-08-21T17:59:13.74Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2024-08-21T17:59:13.74Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 2
+          }
+        ]
+      },
+      "order": 5,
+      "pointAssignments": [
+        {
+          "id": 40279,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442807/TestPoint/40279"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442807/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442807"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442807,
+        "name": "Ревизия ППД"
+      },
+      "workItem": {
+        "id": 269077,
+        "name": "Боковые панели. Скважины окружения",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2024-08-21T17:59:39.64Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2024-08-21T17:59:39.64Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 2
+          }
+        ]
+      },
+      "order": 6,
+      "pointAssignments": [
+        {
+          "id": 40280,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442807/TestPoint/40280"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442807/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442807"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 7
+}

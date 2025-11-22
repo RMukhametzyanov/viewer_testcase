@@ -1,0 +1,98 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442747,
+        "name": "Опции расчета"
+      },
+      "workItem": {
+        "id": 320831,
+        "name": "[Мониторинг] Настройки. Пороговое значение",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"7\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Открыть Мониторинг / Настройки&lt;BR/&gt;Перейти в раздел \"Опции расчета\"&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В раздел \"Опции расчета\" есть вкладка \"Пороговое значение\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Перейти во вкладку \"Пороговое значение\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;&lt;SPAN style=\"color: rgb(0, 0, 0);font-size: 14px;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Во вкладке для каждого ГТМ  (ОПЗ, Дострелы, ОПТ/Механизация, ГРП/МГРП, ЗБС/ЗБГС, ПВЛГ/ПНЛГ, ВБД) есть оцпии:&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px\"&gt;\n- Пороговое значение неуспешных ремонтов\n- Пороговое значение неоконченных ремонтов\n- Пороговое значение неэффективных ремонтов&amp;nbsp;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Проверить возможность выбора источника для опций при помощи радиобаттонов:&lt;BR/&gt;&lt;BR/&gt;&lt;SPAN style=\"color: rgb(0, 0, 0);font-size: 14px;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;- Пороговое значение неуспешных ремонтов&lt;/SPAN&gt;&lt;/P&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px\"&gt;&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;- Пороговое значение неоконченных ремонтов&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px\"&gt;- Пороговое значение неэффективных ремонтов&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;&amp;nbsp;&lt;/SPAN&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px\"&gt;&lt;BR/&gt;&lt;BR/&gt;Для \"Пороговое значение неуспешных ремонтов\" можно выбрать один из трех источников - ППДН, Ретроспективное значение, Пользовательское значение. &lt;BR/&gt;По умолчанию выбрано ППДН&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px\"&gt;&lt;BR/&gt;Для \"Пороговое значение неоконченных ремонтов\" и \"Пороговое значение неэффективных ремонтов\" можно выбрать один из двух источников - Ретроспективное значение, Пользовательское значение. &lt;BR/&gt;По умолчанию выбрано Ретроспективное значение&lt;/DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Для каждой опции в источнике \"Пользовательское значение\"&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt; ввести числовое значение от 0 до 100&lt;BR/&gt;Пример:&lt;BR/&gt;0, 1, 50, 99, 100 &lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;SPAN style=\"color: rgb(0, 0, 0);font-size: 14px;background-color: rgb(255, 255, 255)\"&gt;В поле можно вводить только числовые значения от 0 до 100&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать тип ГТМ, выбрать одну из опций&lt;BR/&gt;Нажать \"Сохранить и пересчитать\"&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В боковой панели &lt;SPAN style=\"background-color: rgb(255, 255, 255);color: rgb(0, 0, 0);font-size: 14px\"&gt;\"История корректировок\" есть запись&amp;nbsp;&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgb(255, 255, 255);color: rgb(0, 0, 0);font-size: 14px\"&gt;со всеми изменениями пользовательского значения по опциям&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Для каждой опции в источнике \"Пользовательское значение\"&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt; ввести числовое значение &amp;gt; 100&lt;BR/&gt;&lt;/SPAN&gt;Пример: &lt;BR/&gt;101&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;SPAN style=\"color: rgb(0, 0, 0);font-size: 14px;background-color: rgb(255, 255, 255)\"&gt;При вводе некорректного значения поле ввода выделяется цветом, сохранение настроек при этом недоступно.&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2024-12-17T08:41:30.543Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-11-18T14:21:19.007Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 11
+          }
+        ]
+      },
+      "pointAssignments": [
+        {
+          "id": 40021,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Лобанов Сергей Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+              }
+            },
+            "id": "cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "uniqueName": "GAZPROM-NEFT\\Lobanov.SI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442747/TestPoint/40021"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442747/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442747"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 1
+}

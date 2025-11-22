@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QPushButton,
+    QToolButton,
     QButtonGroup,
     QStackedLayout,
     QLabel,
@@ -22,6 +23,7 @@ from .review_panel import ReviewPanel
 from .json_preview_widget import JsonPreviewWidget
 from .stats_panel import StatsPanel
 from .information_panel import InformationPanel
+from .files_panel import FilesPanel
 from ...models import TestCase
 from ..styles.ui_metrics import UI_METRICS
 
@@ -46,8 +48,8 @@ class AuxiliaryPanel(QWidget):
         creation_default_files: Optional[List[Path]] = None,
     ):
         super().__init__(parent)
-        self._tabs_order = ["information", "review", "creation", "json", "stats"]
-        self._buttons: dict[str, QPushButton] = {}
+        self._tabs_order = ["information", "review", "creation", "json", "files", "stats"]
+        self._buttons: dict[str, QToolButton] = {}
         self._last_non_stats_tab = "information"
         self._methodic_path = methodic_path
         self._review_default_prompt = default_review_prompt
@@ -58,17 +60,24 @@ class AuxiliaryPanel(QWidget):
         self._setup_ui()
 
     def _setup_ui(self):
-        main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(
+        main_layout = QHBoxLayout(self)  # Горизонтальный layout: минипанель слева, контент справа
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
+
+        # Вертикальная минипанель с кнопками переключения
+        self.button_panel = self._create_button_panel()
+        main_layout.addWidget(self.button_panel, stretch=0)
+
+        # Контентная область с панелями
+        content_widget = QWidget()
+        content_layout = QVBoxLayout(content_widget)
+        content_layout.setContentsMargins(
             UI_METRICS.container_padding,
             UI_METRICS.container_padding,
             UI_METRICS.container_padding,
             UI_METRICS.container_padding,
         )
-        main_layout.setSpacing(UI_METRICS.section_spacing)
-
-        button_row = self._create_button_row()
-        main_layout.addLayout(button_row)
+        content_layout.setSpacing(UI_METRICS.section_spacing)
 
         self._stack = QStackedLayout()
         self._stack.setStackingMode(QStackedLayout.StackOne)
@@ -94,53 +103,128 @@ class AuxiliaryPanel(QWidget):
         self.json_panel = JsonPreviewWidget()
         self._stack.addWidget(self.json_panel)
 
+        # Вкладка файлов
+        self.files_panel = FilesPanel()
+        self._stack.addWidget(self.files_panel)
+
         # Вкладка статистики
         self.stats_panel = StatsPanel()
         self._stack.addWidget(self.stats_panel)
 
-        main_layout.addLayout(self._stack, stretch=1)
+        content_layout.addLayout(self._stack, stretch=1)
+        main_layout.addWidget(content_widget, stretch=1)
 
         self.ensure_creation_defaults()
         self.select_tab("information")
 
-    def _create_button_row(self) -> QHBoxLayout:
-        layout = QHBoxLayout()
-        layout.setContentsMargins(
-            QMargins(
-                UI_METRICS.base_spacing,
-                0,
-                UI_METRICS.base_spacing,
-                0,
-            )
-        )
-        layout.setSpacing(UI_METRICS.base_spacing)
-        layout.setAlignment(Qt.AlignLeft)
+    def _create_button_panel(self) -> QWidget:
+        """Создать вертикальную минипанель с иконками для переключения панелей."""
+        panel = QWidget()
+        panel.setFixedWidth(50)  # Фиксированная ширина минипанели
+        layout = QVBoxLayout(panel)
+        layout.setContentsMargins(4, 4, 4, 4)
+        layout.setSpacing(4)
+        layout.setAlignment(Qt.AlignTop)
 
         button_group = QButtonGroup(self)
         button_group.setExclusive(True)
 
+        # Иконки в минималистичном стиле Cursor (геометрические формы)
         tabs = [
-            ("information", "Информация", "Информация о тест-кейсе"),
-            ("review", "Ревью", "Панель ревью"),
-            ("creation", "Создать ТК", "Создать ТК"),
-            ("json", "JSON", "JSON превью"),
-            ("stats", "Панель управления раннером", "Панель управления раннером"),
+            ("information", "◼", "Информация"),  # Закрашенный квадрат (информация)
+            ("review", "●", "Ревью"),  # Закрашенный круг (ревью/проверка)
+            ("creation", "+", "Создать ТК"),  # Плюс (создание)
+            ("json", "◉", "JSON превью"),  # Круг с центром (структура данных)
+            ("files", "📎", "Файлы"),  # Скрепка (файлы)
+            ("stats", "◆", "Панель управления раннером"),  # Закрашенный ромб (статистика)
         ]
 
-        for index, (tab_id, text, tooltip) in enumerate(tabs):
-            button = QPushButton(text)
+        for index, (tab_id, icon_text, tooltip) in enumerate(tabs):
+            button = QToolButton()
+            button.setText(icon_text)
             button.setToolTip(tooltip)
             button.setCheckable(True)
-            button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-            button.setMinimumHeight(UI_METRICS.control_min_height)
-            button.setMinimumWidth(UI_METRICS.control_min_width)
             button.setCursor(Qt.PointingHandCursor)
+            button.setAutoRaise(True)
+            button.setFixedSize(40, 40)  # Квадратные кнопки, немного больше чем в шагах
+            button.setProperty("tab_id", tab_id)
+            
+            # Минималистичный стиль кнопки (по умолчанию неактивная)
+            button.setStyleSheet(self._get_button_style(False))
+            
             button_group.addButton(button, index)
-            button.clicked.connect(lambda checked, idx=index: checked and self._stack.setCurrentIndex(idx))
+            
+            # Подключаем обработчик клика
+            button.clicked.connect(
+                lambda checked, idx=index: 
+                checked and self._stack.setCurrentIndex(idx)
+            )
+            # При изменении состояния checked обновляем стиль (для визуальной индикации)
+            button.toggled.connect(
+                lambda checked, btn=button: 
+                self._update_button_style(btn, checked)
+            )
+            
             layout.addWidget(button)
             self._buttons[tab_id] = button
 
-        return layout
+        layout.addStretch()  # Растягиваем пространство, чтобы кнопки были сверху
+        
+        return panel
+
+    @staticmethod
+    def _get_button_style(is_active: bool) -> str:
+        """Получить стиль для кнопки переключения панели.
+        
+        Важно: border-width всегда 1px, чтобы кнопка не "скакала" при активации.
+        При активации меняется только цвет границы и фон.
+        """
+        if is_active:
+            # Стиль активной (прожатой) кнопки - только обводка, без фона
+            return """
+                QToolButton {
+                    background-color: transparent;
+                    border: 1px solid rgba(255, 255, 255, 0.4);
+                    border-radius: 6px;
+                    padding: 0px;
+                    min-width: 40px;
+                    max-width: 40px;
+                    min-height: 40px;
+                    max-height: 40px;
+                    font-size: 16px;
+                    font-weight: 500;
+                }
+                QToolButton:hover {
+                    background-color: rgba(255, 255, 255, 0.05);
+                    border-color: rgba(255, 255, 255, 0.5);
+                }
+            """
+        else:
+            # Стиль неактивной кнопки - прозрачная граница того же размера
+            return """
+                QToolButton {
+                    background-color: transparent;
+                    border: 1px solid transparent;
+                    border-radius: 6px;
+                    padding: 0px;
+                    min-width: 40px;
+                    max-width: 40px;
+                    min-height: 40px;
+                    max-height: 40px;
+                    font-size: 16px;
+                    font-weight: 400;
+                }
+                QToolButton:hover {
+                    background-color: rgba(255, 255, 255, 0.05);
+                    border-color: rgba(255, 255, 255, 0.15);
+                }
+            """
+
+
+    @staticmethod
+    def _update_button_style(button: QToolButton, is_active: bool):
+        """Обновить стиль кнопки в зависимости от состояния."""
+        button.setStyleSheet(AuxiliaryPanel._get_button_style(is_active))
 
     @staticmethod
     def _build_placeholder(title: str) -> QWidget:
@@ -170,9 +254,14 @@ class AuxiliaryPanel(QWidget):
         index = self._tabs_order.index(tab_id)
         self._stack.setCurrentIndex(index)
 
-        button = self._buttons.get(tab_id)
-        if button and not button.isChecked():
-            button.setChecked(True)
+        # Обновляем состояние всех кнопок
+        for btn_tab_id, button in self._buttons.items():
+            if btn_tab_id == tab_id:
+                button.setChecked(True)
+                self._update_button_style(button, True)
+            else:
+                button.setChecked(False)
+                self._update_button_style(button, False)
 
         if tab_id == "creation":
             self.ensure_creation_defaults()
@@ -201,6 +290,13 @@ class AuxiliaryPanel(QWidget):
         """Установить режим редактирования для панели информации"""
         if hasattr(self, "information_panel"):
             self.information_panel.set_edit_mode(enabled)
+
+    # ------------------------------------------------------------------ files
+
+    def set_files_test_case(self, test_case: Optional[TestCase]):
+        """Установить тест-кейс для панели файлов"""
+        if hasattr(self, "files_panel"):
+            self.files_panel.load_test_case(test_case)
 
     # ------------------------------------------------------------------ review
 

@@ -1,6 +1,9 @@
 """Виджет формы редактирования тест-кейса"""
 
-from typing import List
+from pathlib import Path
+from typing import List, Optional
+import shutil
+import uuid
 
 from PyQt5.QtWidgets import (
     QWidget,
@@ -24,9 +27,12 @@ from PyQt5.QtWidgets import (
     QTableWidget,
     QTableWidgetItem,
     QHeaderView,
+    QMessageBox,
+    QInputDialog,
+    QFileDialog,
 )
 from PyQt5.QtCore import Qt, pyqtSignal, QEvent, QSize, QTimer
-from PyQt5.QtGui import QFont, QTextOption, QIcon, QPixmap, QPainter, QColor
+from PyQt5.QtGui import QFont, QTextOption, QIcon, QPixmap, QPainter, QColor, QDragEnterEvent, QDropEvent, QDragLeaveEvent
 
 from ...models.test_case import TestCase, TestCaseStep
 from ...services.test_case_service import TestCaseService
@@ -43,6 +49,113 @@ class _NoWheelComboBox(QComboBox):
             super().wheelEvent(event)
         else:
             event.ignore()
+
+
+class _StepsTableWidget(QTableWidget):
+    """Таблица шагов с поддержкой drag & drop для прикрепления файлов."""
+    
+    files_dropped_on_row = pyqtSignal(int, list)  # row, file_paths
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setAcceptDrops(True)
+        self.setDragDropMode(QAbstractItemView.DropOnly)
+        self.setDefaultDropAction(Qt.CopyAction)
+        self._drag_over_row = -1  # Текущая строка, над которой происходит drag
+        # Применяем стиль для обводки строки при drag & drop
+        self.setStyleSheet("""
+            QTableWidget::item {
+                border: none;
+            }
+        """)
+    
+    def dragEnterEvent(self, event: QDragEnterEvent):
+        """Обработка входа drag & drop."""
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+            self._update_drag_over_row(event.pos())
+        else:
+            event.ignore()
+    
+    def dragMoveEvent(self, event):
+        """Обработка движения drag & drop."""
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+            self._update_drag_over_row(event.pos())
+        else:
+            event.ignore()
+    
+    def dragLeaveEvent(self, event):
+        """Обработка выхода drag & drop."""
+        self._clear_drag_over_row()
+        super().dragLeaveEvent(event)
+    
+    def _update_drag_over_row(self, pos):
+        """Обновить визуальное выделение строки при drag & drop."""
+        row = self.indexAt(pos).row()
+        if row != self._drag_over_row:
+            # Убираем выделение с предыдущей строки
+            self._clear_drag_over_row()
+            # Добавляем выделение новой строке
+            if row >= 0:
+                self._drag_over_row = row
+                # Применяем стиль выделения к строке через items (обводка вокруг всей строки)
+                # Используем более яркий цвет для лучшей видимости
+                highlight_color = QColor(100, 150, 255, 120)  # Более яркий полупрозрачный синий фон
+                for col in range(self.columnCount()):
+                    item = self.item(row, col)
+                    if not item:
+                        # Создаем временный item для стилизации, если его нет
+                        item = QTableWidgetItem()
+                        item.setFlags(Qt.NoItemFlags)  # Не редактируется
+                        self.setItem(row, col, item)
+                    # Применяем фон выделения (обводка вокруг всей строки)
+                    item.setBackground(highlight_color)
+    
+    def _clear_drag_over_row(self):
+        """Убрать визуальное выделение строки."""
+        if self._drag_over_row >= 0:
+            row = self._drag_over_row
+            # Убираем выделение строки
+            self.clearSelection()
+            # Убираем фон у всех items в строке
+            for col in range(self.columnCount()):
+                item = self.item(row, col)
+                if item:
+                    if item.flags() == Qt.NoItemFlags:
+                        # Удаляем временный item, если он был создан только для стилизации
+                        self.takeItem(row, col)
+                    else:
+                        # Убираем фон у существующего item
+                        item.setBackground(QColor())
+            self._drag_over_row = -1
+    
+    def dropEvent(self, event: QDropEvent):
+        """Обработка drop файлов."""
+        # Убираем выделение
+        self._clear_drag_over_row()
+        
+        if not event.mimeData().hasUrls():
+            event.ignore()
+            return
+        
+        # Определяем строку, на которую был выполнен drop
+        row = self.indexAt(event.pos()).row()
+        if row < 0:
+            event.ignore()
+            return
+        
+        # Получаем список файлов
+        urls = event.mimeData().urls()
+        file_paths = [Path(url.toLocalFile()) for url in urls if url.isLocalFile()]
+        
+        if not file_paths:
+            event.ignore()
+            return
+        
+        # Эмитируем сигнал с номером строки и списком файлов
+        self.files_dropped_on_row.emit(row, file_paths)
+        event.acceptProposedAction()
 
 
 class TestCaseFormWidget(QWidget):
@@ -62,6 +175,7 @@ class TestCaseFormWidget(QWidget):
         edit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         edit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         edit.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+        edit.setAcceptDrops(False)  # Отключаем drag & drop для QTextEdit, чтобы не вставлялся текст
         edit.textChanged.connect(lambda: self._on_step_content_changed())
         return edit
     
@@ -74,10 +188,10 @@ class TestCaseFormWidget(QWidget):
         
         buttons = []
         spec = [
-            ("passed", "✓", "#2ecc71"),
-            ("failed", "✕", "#e74c3c"),
-            ("skipped", "S", "#95a5a6"),
-        ]
+                ("passed", "✓", "#2ecc71"),
+                ("failed", "✕", "#e74c3c"),
+                ("skipped", "S", "#95a5a6"),
+            ]
         for value, text, color in spec:
             btn = QToolButton()
             btn.setText(text)
@@ -120,6 +234,17 @@ class TestCaseFormWidget(QWidget):
                 border-color: rgba(255, 255, 255, 0.2);
             }
         """
+        
+        # Кнопка прикрепления файла (скрепка) - первая в списке
+        attach_file_btn = QToolButton()
+        attach_file_btn.setText("📎")
+        attach_file_btn.setToolTip("Прикрепить файл")
+        attach_file_btn.setCursor(Qt.PointingHandCursor)
+        attach_file_btn.setAutoRaise(True)
+        attach_file_btn.setFixedSize(24, 24)
+        attach_file_btn.setStyleSheet(action_button_style)
+        attach_file_btn.clicked.connect(lambda: self._attach_file_to_step(row))
+        layout.addWidget(attach_file_btn)
         
         add_above_btn = QToolButton()
         add_above_btn.setText("+↑")
@@ -218,8 +343,8 @@ class TestCaseFormWidget(QWidget):
                         max-height: 24px;
                         font-size: 12px;
                         }}
-                        """
-                    )
+                    """
+                )
             else:
                 btn.setStyleSheet(
                         f"""
@@ -244,17 +369,16 @@ class TestCaseFormWidget(QWidget):
         """Обработчик изменения содержимого шага."""
         if self._is_loading:
             return
-        # Обновляем высоту строки таблицы
-        current_row = self.steps_table.currentRow()
-        if current_row >= 0:
-            QTimer.singleShot(0, lambda: self.steps_table.resizeRowToContents(current_row))
-            QTimer.singleShot(10, self._update_table_row_heights)
+        # Обновляем высоту всех строк таблицы для корректного отображения
+        QTimer.singleShot(0, self._update_table_row_heights)
         self._mark_changed()
     
     def _update_table_row_heights(self):
         """Обновить высоты всех строк таблицы."""
         for row in range(self.steps_table.rowCount()):
             self.steps_table.resizeRowToContents(row)
+        # Также обновляем ширину колонки с номером
+        self.steps_table.resizeColumnToContents(0)
     
 
     # Сигналы
@@ -271,6 +395,7 @@ class TestCaseFormWidget(QWidget):
         self._edit_mode_enabled = True
         self._run_mode_enabled = False
         self.step_statuses: List[str] = []
+        self._step_attachments: List[List[str]] = []  # Список attachments для каждого шага
 
         self.setup_ui()
 
@@ -569,19 +694,22 @@ class TestCaseFormWidget(QWidget):
         layout.setSpacing(UI_METRICS.base_spacing)
 
         # Таблица шагов в стиле TestOps
-        self.steps_table = QTableWidget(0, 5, self)  # 5 колонок: №, Действие, Ожидаемый результат, Статус, Действия
+        self.steps_table = _StepsTableWidget(self)  # 5 колонок: №, Действие, Ожидаемый результат, Статус, Действия
+        self.steps_table.setColumnCount(5)
         
         # Убираем заголовки таблицы
         self.steps_table.horizontalHeader().setVisible(False)
         
         # Настройка колонок
-        self.steps_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Fixed)  # № - фиксированная
+        self.steps_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)  # № - автоматическая ширина
         self.steps_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)  # Действие - растягивается
         self.steps_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)  # Ожидаемый результат - растягивается
         self.steps_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.Fixed)  # Статус - фиксированная
         self.steps_table.horizontalHeader().setSectionResizeMode(4, QHeaderView.Fixed)  # Действия - фиксированная
         
-        self.steps_table.setColumnWidth(0, 50)   # №
+        # Устанавливаем минимальную ширину для колонки с номером
+        self.steps_table.horizontalHeader().setMinimumSectionSize(30)  # Минимальная ширина для всех колонок
+        self.steps_table.setColumnWidth(0, 40)   # № - начальная ширина (будет автоматически подстраиваться)
         self.steps_table.setColumnWidth(3, 60)   # Статус (уменьшено для вертикальных кнопок)
         self.steps_table.setColumnWidth(4, 60)   # Действия (уменьшено для вертикальных кнопок)
         
@@ -602,6 +730,9 @@ class TestCaseFormWidget(QWidget):
         self.steps_table.itemSelectionChanged.connect(self._update_step_controls_state)
         self.steps_table.setContextMenuPolicy(Qt.CustomContextMenu)
         self.steps_table.customContextMenuRequested.connect(self._show_steps_context_menu)
+        
+        # Подключаем сигнал drop файлов
+        self.steps_table.files_dropped_on_row.connect(self._on_files_dropped_on_step)
         
         # Устанавливаем видимость колонок по умолчанию (режим редактирования)
         # В режиме редактирования: скрыть статусы (колонка 3), показать действия (колонка 4)
@@ -631,8 +762,16 @@ class TestCaseFormWidget(QWidget):
             self.steps_table.blockSignals(True)
             self.steps_table.setRowCount(0)
             self.step_statuses = []
+            # Сохраняем attachments из шагов при загрузке
+            self._step_attachments = []
             for step in test_case.steps:
-                self._add_step(step.description, step.expected_result, step.status or "pending")
+                step_attachments = list(step.attachments) if step.attachments else []
+                self._add_step(
+                    step.description, 
+                    step.expected_result, 
+                    step.status or "pending",
+                    attachments=step_attachments
+                )
             self.steps_table.blockSignals(False)
             self.steps_table.clearSelection()
             self._refresh_step_indices()
@@ -644,6 +783,7 @@ class TestCaseFormWidget(QWidget):
             self.precondition_input.clear()
             self.steps_table.setRowCount(0)
             self.step_statuses = []
+            self._step_attachments = []
             self._update_table_row_heights()
 
         self._is_loading = False
@@ -702,7 +842,7 @@ class TestCaseFormWidget(QWidget):
         elif action == actions["remove"]:
             self._remove_step()
 
-    def _add_step(self, step_text="", expected_text="", status="pending", row=None):
+    def _add_step(self, step_text="", expected_text="", status="pending", row=None, attachments=None):
         """Добавить шаг в таблицу."""
         if row is None or row >= self.steps_table.rowCount():
             row = self.steps_table.rowCount()
@@ -742,6 +882,11 @@ class TestCaseFormWidget(QWidget):
         
         # Сохраняем статус
         self.step_statuses.insert(row, status or "pending")
+        
+        # Сохраняем attachments
+        if attachments is None:
+            attachments = []
+        self._step_attachments.insert(row, list(attachments) if attachments else [])
         
         # Обновляем статус виджета
         self._update_step_status_widget(row, status or "pending")
@@ -811,6 +956,8 @@ class TestCaseFormWidget(QWidget):
         self.steps_table.removeRow(row)
         if row < len(self.step_statuses):
             self.step_statuses.pop(row)
+        if row < len(self._step_attachments):
+            self._step_attachments.pop(row)
         self._refresh_step_indices()
         self._update_table_row_heights()
         if not self._is_loading:
@@ -863,6 +1010,13 @@ class TestCaseFormWidget(QWidget):
             )
             self._update_step_status_widget(row_a, self.step_statuses[row_a])
             self._update_step_status_widget(row_b, self.step_statuses[row_b])
+        
+        # Меняем attachments местами
+        if row_a < len(self._step_attachments) and row_b < len(self._step_attachments):
+            self._step_attachments[row_a], self._step_attachments[row_b] = (
+                self._step_attachments[row_b],
+                self._step_attachments[row_a],
+            )
         
         self._refresh_step_indices()
         self._update_table_row_heights()
@@ -951,7 +1105,7 @@ class TestCaseFormWidget(QWidget):
         self.current_test_case.name = self.title_edit.text().strip()
         self.current_test_case.preconditions = self.precondition_input.toPlainText()
         
-        # Шаги
+        # Шаги (сохраняем attachments из текущего тест-кейса, если они есть)
         steps = []
         for row in range(self.steps_table.rowCount()):
             action_edit = self.steps_table.cellWidget(row, 1)
@@ -961,12 +1115,32 @@ class TestCaseFormWidget(QWidget):
             step_text = action_edit.toPlainText()
             expected_text = expected_edit.toPlainText()
             status = self.step_statuses[row] if row < len(self.step_statuses) else "pending"
+            
+            # Сохраняем attachments из _step_attachments (источник истины для формы)
+            attachments = []
+            if row < len(self._step_attachments):
+                attachments = list(self._step_attachments[row])
+            elif row < len(self.current_test_case.steps):
+                # Если в _step_attachments нет, берем из текущего тест-кейса
+                existing_step = self.current_test_case.steps[row]
+                if existing_step.attachments:
+                    attachments = list(existing_step.attachments)
+            
+            # Получаем ID шага из текущего тест-кейса, если шаг существует
+            step_id = None
+            if row < len(self.current_test_case.steps):
+                step_id = self.current_test_case.steps[row].id
+            if not step_id:
+                step_id = str(uuid.uuid4())
+            
             steps.append(
                 TestCaseStep(
+                    id=step_id,
                     name=f"Шаг {row + 1}",
                     description=step_text,
                     expected_result=expected_text,
                     status=status,
+                    attachments=attachments,
                 )
             )
         
@@ -1042,5 +1216,149 @@ class TestCaseFormWidget(QWidget):
             self.has_unsaved_changes = False
             self.unsaved_changes_state.emit(False)
             self.test_case_saved.emit()
+
+    def _on_files_dropped_on_step(self, row: int, file_paths: List[Path]):
+        """Обработчик drop файлов на строку шага."""
+        if not self.current_test_case:
+            QMessageBox.warning(
+                self,
+                "Нет выбранного тест-кейса",
+                "Пожалуйста, сначала выберите тест-кейс для прикрепления файлов."
+            )
+            return
+        
+        if row < 0 or row >= self.steps_table.rowCount():
+            return
+        
+        # Получаем шаг из текущего тест-кейса (нужен его id)
+        if row >= len(self.current_test_case.steps):
+            # Если шаг еще не сохранен, создаем временный id
+            step_id = str(uuid.uuid4())
+        else:
+            step = self.current_test_case.steps[row]
+            step_id = step.id or str(uuid.uuid4())
+        
+        test_case_id = self.current_test_case.id or ""
+        if not test_case_id:
+            QMessageBox.warning(
+                self,
+                "Нет ID тест-кейса",
+                "Не удалось определить ID тест-кейса. Файлы не могут быть прикреплены."
+            )
+            return
+        
+        # Получаем директорию _attachment
+        if not self.current_test_case._filepath:
+            QMessageBox.warning(
+                self,
+                "Нет пути к тест-кейсу",
+                "Не удалось определить путь к тест-кейсу. Файлы не могут быть прикреплены."
+            )
+            return
+        
+        test_case_dir = self.current_test_case._filepath.parent
+        attachment_dir = test_case_dir / "_attachment"
+        attachment_dir.mkdir(exist_ok=True)
+        
+        # Обрабатываем каждый файл
+        for source_file in file_paths:
+            if not source_file.exists() or not source_file.is_file():
+                continue
+            
+            # Формируем новое имя: {id тест-кейса}-{id шага}_{оригинальное имя}.{расширение}
+            original_name = source_file.stem  # Имя без расширения
+            extension = source_file.suffix  # Расширение с точкой
+            new_name = f"{test_case_id}-{step_id}_{original_name}{extension}"
+            target_file = attachment_dir / new_name
+            
+            # Проверяем, существует ли уже такой файл
+            if target_file.exists():
+                # Предлагаем переименовать
+                new_name_custom, ok = QInputDialog.getText(
+                    self,
+                    "Файл уже существует",
+                    f"Файл '{new_name}' уже существует.\nВведите новое имя (без расширения):",
+                    text=original_name
+                )
+                
+                if not ok or not new_name_custom.strip():
+                    continue  # Пропускаем этот файл
+                
+                new_name = f"{test_case_id}-{step_id}_{new_name_custom.strip()}{extension}"
+                target_file = attachment_dir / new_name
+                
+                # Проверяем еще раз на случай, если пользователь ввел имя, которое тоже существует
+                if target_file.exists():
+                    QMessageBox.warning(
+                        self,
+                        "Файл уже существует",
+                        f"Файл '{new_name}' также уже существует. Файл пропущен."
+                    )
+                    continue
+            
+            try:
+                # Копируем файл
+                shutil.copy2(source_file, target_file)
+                
+                # Сохраняем относительный путь для attachments
+                try:
+                    relative_path = target_file.relative_to(attachment_dir)
+                    file_path_str = str(relative_path)
+                except ValueError:
+                    file_path_str = target_file.name
+                
+                # Добавляем в attachments шага
+                if row >= len(self._step_attachments):
+                    # Расширяем список если нужно
+                    while len(self._step_attachments) <= row:
+                        self._step_attachments.append([])
+                
+                if file_path_str not in self._step_attachments[row]:
+                    self._step_attachments[row].append(file_path_str)
+                
+                # Обновляем attachments в текущем тест-кейсе (если шаг существует)
+                if row < len(self.current_test_case.steps):
+                    step = self.current_test_case.steps[row]
+                    if file_path_str not in step.attachments:
+                        step.attachments.append(file_path_str)
+                
+                self._mark_changed()
+                
+            except Exception as e:
+                QMessageBox.critical(
+                    self,
+                    "Ошибка копирования",
+                    f"Не удалось скопировать файл '{source_file.name}':\n{str(e)}"
+                )
+    
+    def _attach_file_to_step(self, row: int):
+        """Обработчик клика по кнопке прикрепления файла."""
+        if not self.current_test_case:
+            QMessageBox.warning(
+                self,
+                "Нет выбранного тест-кейса",
+                "Пожалуйста, сначала выберите тест-кейс для прикрепления файлов."
+            )
+            return
+        
+        if row < 0 or row >= self.steps_table.rowCount():
+            return
+        
+        # Открываем диалог выбора файлов
+        files, _ = QFileDialog.getOpenFileNames(
+            self,
+            "Выберите файлы для прикрепления",
+            "",
+            "Все файлы (*.*)",
+        )
+        
+        if not files:
+            return
+        
+        # Преобразуем пути в Path объекты
+        file_paths = [Path(path) for path in files]
+        
+        # Используем существующий метод для обработки файлов
+        self._on_files_dropped_on_step(row, file_paths)
 
 

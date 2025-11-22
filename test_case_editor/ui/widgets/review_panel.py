@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QPushButton,
+    QToolButton,
     QTextEdit,
     QListWidget,
     QListWidgetItem,
@@ -45,10 +46,29 @@ class AttachmentItemWidget(QWidget):
         file_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         layout.addWidget(file_label)
 
-        delete_button = QPushButton("✕")
+        # Минималистичная кнопка удаления, как в шагах
+        delete_button = QToolButton()
+        delete_button.setText("×")
         delete_button.setToolTip("Удалить файл")
-        delete_button.setFixedSize(24, 24)
         delete_button.setCursor(Qt.PointingHandCursor)
+        delete_button.setAutoRaise(True)
+        delete_button.setFixedSize(24, 24)
+        delete_button.setStyleSheet("""
+            QToolButton {
+                border: 1px solid transparent;
+                border-radius: 4px;
+                padding: 0px;
+                min-width: 24px;
+                max-width: 24px;
+                min-height: 24px;
+                max-height: 24px;
+                font-size: 12px;
+            }
+            QToolButton:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                border-color: rgba(255, 255, 255, 0.2);
+            }
+        """)
         delete_button.clicked.connect(self._on_delete_clicked)
         layout.addWidget(delete_button, 0, Qt.AlignRight)
 

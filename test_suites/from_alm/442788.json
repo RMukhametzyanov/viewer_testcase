@@ -1,0 +1,557 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442788,
+        "name": "ОПЗ"
+      },
+      "workItem": {
+        "id": 59870,
+        "name": "[Р] Проверка комплекса ОПТ + ОПЗ",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"2\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Пересчитать проект на ОПТ и ОПЗ&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;OL style=\"padding-left: 40px;color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;&lt;LI style=\"list-style: inherit\"&gt;В кандидатах появились ОПЗ+ОПТ;&lt;/LI&gt;&lt;LI style=\"list-style: inherit\"&gt;ОПЗ+ОПТ&amp;nbsp;&lt;SPAN style=\"color: rgb(255, 0, 0)\"&gt;&lt;STRONG&gt;не предлагаются&lt;/STRONG&gt;&lt;/SPAN&gt;, если скважина не предложена на ОПЗ (нет ОПЗ, нет и ОПЗ+ОПТ);&lt;/LI&gt;&lt;LI style=\"list-style: inherit\"&gt;ОПЗ+ОПТ&amp;nbsp;&lt;SPAN style=\"color: rgb(255, 0, 0)\"&gt;&lt;STRONG&gt;не предлагаются&lt;/STRONG&gt;&lt;/SPAN&gt;, если у скважины в Техрежиме Рзаб_цель = Рзаб_факт, а ОПЗ предлагаются;&lt;/LI&gt;&lt;LI style=\"list-style: inherit\"&gt;ОПЗ+ОПТ&amp;nbsp;&lt;SPAN style=\"color: rgb(255, 0, 0)\"&gt;&lt;STRONG&gt;не предлагаются&lt;/STRONG&gt;&lt;/SPAN&gt;, если СЭ =&amp;nbsp;\"ФОН\"&amp;nbsp;&lt;STRONG&gt;или&amp;nbsp;&lt;/STRONG&gt;СЭ =&amp;nbsp;«Без способа»&amp;nbsp;&lt;STRONG&gt;или&amp;nbsp;&lt;/STRONG&gt;СЭ =&amp;nbsp;«ГЛ»&amp;nbsp;&lt;STRONG&gt;или&amp;nbsp;&lt;/STRONG&gt;тип насоса = \"фонтанный лифт\"&amp;nbsp;&lt;STRONG&gt;или&amp;nbsp;&lt;/STRONG&gt;тип насоса =&amp;nbsp;«Воронка», а ОПЗ предлагаются, если тумблер \"предлагать скважины на фонтане\" включен;&lt;/LI&gt;&lt;LI style=\"list-style: inherit\"&gt;ОПЗ+ОПТ&amp;nbsp;&lt;SPAN style=\"color: rgb(255, 0, 0)\"&gt;&lt;STRONG&gt;не предлагаются&lt;/STRONG&gt;&lt;/SPAN&gt;, если состояние скважины = \"В накоплении/под циклической закачкой\", а ОПЗ предлагаются;&lt;BR/&gt;&lt;/LI&gt;&lt;LI style=\"list-style: inherit\"&gt;ОПЗ+ОПТ&amp;nbsp;&lt;SPAN style=\"color: rgb(255, 0, 0)\"&gt;&lt;STRONG&gt;не предлагаются&lt;/STRONG&gt;&lt;/SPAN&gt;, если&amp;nbsp;&lt;SPAN style=\"color: rgb(255, 0, 0)\"&gt;&lt;EM&gt;выключен&amp;nbsp;&lt;/EM&gt;&lt;/SPAN&gt;тумблер для ОПТ \"предлагать АПВ/ПКВ\"&amp;nbsp;&lt;STRONG&gt;И&amp;nbsp;&lt;/STRONG&gt;режим работы скважины&amp;nbsp;&lt;EM&gt;равен АПВ или ПКВ или ПДД или ЧЧ; а ОПЗ предлагаются;&lt;/EM&gt;&lt;/LI&gt;&lt;LI style=\"list-style: inherit\"&gt;ОПЗ+ОПТ&amp;nbsp;&lt;SPAN style=\"color: rgb(51, 153, 102)\"&gt;&lt;STRONG&gt;предлагаются&lt;/STRONG&gt;&lt;/SPAN&gt;, если&amp;nbsp;&lt;SPAN style=\"color: rgb(255, 0, 0)\"&gt;&lt;EM&gt;выключен&amp;nbsp;&lt;/EM&gt;&lt;/SPAN&gt;тумблер для ОПТ \"предлагать АПВ/ПКВ\"&amp;nbsp;&lt;STRONG&gt;И&amp;nbsp;&lt;/STRONG&gt;режим работы скважины&amp;nbsp;&lt;EM&gt;равен ПДФ, ОПЗ тоже предлагаются;&lt;/EM&gt;&lt;EM&gt;&lt;/EM&gt;&lt;/LI&gt;&lt;LI style=\"list-style: inherit\"&gt;ОПЗ+ОПТ&amp;nbsp;&lt;SPAN style=\"color: rgb(51, 153, 102)\"&gt;&lt;STRONG&gt;предлагаются&lt;/STRONG&gt;&lt;/SPAN&gt;, если&amp;nbsp;&lt;SPAN style=\"color: rgb(51, 153, 102)\"&gt;&lt;EM&gt;включен&lt;/EM&gt;&amp;nbsp;&lt;/SPAN&gt;тумблер для ОПТ \"предлагать АПВ/ПКВ\"&amp;nbsp;&lt;STRONG&gt;И&amp;nbsp;&lt;/STRONG&gt;режим работы скважины&amp;nbsp;&lt;EM&gt;равен АПВ или ПКВ или ПДД или ЧЧ или ПДФ. ОПЗ тоже предлагаются.&lt;/EM&gt;&lt;EM&gt;&lt;/EM&gt;&lt;/LI&gt;&lt;LI style=\"list-style: inherit\"&gt;В кандидатах у ОПЗ и ОПЗ+ОПТ полностью совпадают значения фактического режима&lt;/LI&gt;&lt;LI style=\"list-style: inherit\"&gt;В кандидатах у Рзаб_цель у ОПЗ+ОПТ &amp;lt;&amp;nbsp;Рзаб_цель у ОПЗ&amp;nbsp;&lt;/LI&gt;&lt;LI style=\"list-style: inherit\"&gt;В кандидатах у Рзаб_цель у ОПЗ+ОПТ &amp;lt;&amp;nbsp;Рзаб_цель у ОПТ (если есть примеры, когда скважина кандидат и на ОПТ, и на ОПЗ+ОПТ).&lt;BR/&gt;&lt;/LI&gt;&lt;LI style=\"list-style: inherit\"&gt;В кандидатах у Qж_цель у ОПЗ+ОПТ &amp;gt;&amp;nbsp;Qж_цель&amp;nbsp;у ОПЗ&amp;nbsp;&lt;/LI&gt;&lt;LI style=\"list-style: inherit\"&gt;В кандидатах у Qн_цель у ОПЗ+ОПТ &amp;gt;&amp;nbsp;Qн_цель&amp;nbsp;у ОПЗ&amp;nbsp;&lt;/LI&gt;&lt;/OL&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-05-11T05:01:20.77Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2022-05-11T05:01:20.77Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "pointAssignments": [
+        {
+          "id": 40167,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442788/TestPoint/40167"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442788/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442788"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442788,
+        "name": "ОПЗ"
+      },
+      "workItem": {
+        "id": 67759,
+        "name": "[ревью тест] ОПЗ. Критерий отклонения \"Не ЭЦН\"",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"14\"><step id=\"2\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ПРЕДУСЛОВИЕ:&lt;BR/&gt;&lt;BR/&gt;Открыть настройки пересчета &lt;B&gt;ОПЗ &lt;/B&gt;на &lt;B&gt;Оренбурге &lt;/B&gt;/&lt;B&gt; июнь &lt;BR/&gt;&lt;U&gt;Включить критерий \"Предлагать скважины на фонтане\"&lt;/U&gt;&lt;/B&gt;&lt;BR/&gt;&lt;B&gt;После пересчета &lt;/B&gt;- перейти в Не кандидаты&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отфильтровать по критерию \"На фонтане\" и типу ГТМ \"ОПЗ\", \"ОПЗ + ГРП\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Ни одной скважины не отображается с выбранным фильтром&lt;/B&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"11\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Подключиться к БД Spektr UAT и Datastore UAT&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, 0.9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;&lt;B&gt;&lt;BR/&gt;&lt;/B&gt;&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"&gt;&lt;B&gt;Проверим скважины с СЭ = ФОН;&lt;BR/&gt;повторить для:&lt;BR/&gt;СЭ = ГЛ&lt;BR/&gt;СЭ=ЭЦН И (ТИП НАСОСА!= ВОРОНКА И ФОНТАННЫЙ ЛИФТ)&lt;BR/&gt;&lt;/B&gt;&lt;/SPAN&gt;&lt;B style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"&gt;СЭ=ЭЦН И (ТИП НАСОСА = ВОРОНКА И ФОНТАННЫЙ ЛИФТ)&lt;BR/&gt;&lt;/B&gt;&lt;B&gt;СЭ=Без способа &lt;BR/&gt;&lt;/B&gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"14\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выполнить запрос &lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, 0.9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;&amp;nbsp;&lt;B&gt;В &lt;/B&gt;&lt;/SPAN&gt;&lt;B&gt;DataStore UAT:&lt;/B&gt;&lt;BR/&gt;&lt;I&gt;select \"WellId\",\"ExploitationMode\",\"PumpType\" , \"FieldId\" from \"TechModes\"\nwhere \"ExploitationMode\" = '&lt;B&gt;ФОН&lt;/B&gt;' and \"ReportingMonth\" = '2022-06-01 00:00:00' and \"OrganizationId\" ='7'&lt;/I&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;B style=\"background-color: rgb(255, 255, 255)\"&gt;Проверим наличие скважин в не кандидатах:&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&amp;nbsp;В Spektr UAT:&lt;/B&gt;&lt;P&gt;&lt;I&gt;select * from well_diagnostic\nwhere well_id in (&lt;B&gt;id скважин из запроса в datastore&lt;/B&gt;)\nand project_id ='0c841307-d3b1-46dc-9bea-280a6f2b7115'\nand gtm_types = '2'&lt;/I&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Результат запроса пустой&lt;/B&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B style=\"background-color: rgb(255, 255, 255)\"&gt;Проверим наличие скважин в кандидатах:&lt;BR/&gt;&lt;/B&gt;&lt;B&gt;&lt;BR/&gt;В Spektr UAT:&lt;BR/&gt;&lt;/B&gt;&lt;BR/&gt;&lt;I&gt;select * from &lt;/I&gt; &lt;B&gt;&lt;I&gt;well_expertise&lt;/I&gt;&lt;/B&gt;&lt;I&gt;\nwhere well_id in (&lt;B&gt;id скважин из запроса в datastore&lt;/B&gt;)\nand project_id ='0c841307-d3b1-46dc-9bea-280a6f2b7115'\nand gtm_types = '2'&lt;/I&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Результат запроса не пустой&lt;/B&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;&lt;U&gt;Отключить критерий \"На фонтане\" и пересчитать ОПЗ на Оренбурге:&lt;BR/&gt;После пересчета:&lt;/U&gt;&lt;BR/&gt;&lt;/B&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"13\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;&lt;B style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"&gt;Проверим &lt;/B&gt;&lt;B&gt;скважины с СЭ = ФОН &lt;BR/&gt;повторить для &lt;BR/&gt;&lt;/B&gt;&lt;B&gt;СЭ=ЭЦН И (ТИП НАСОСА = ВОРОНКА И ФОНТАННЫЙ ЛИФТ)&lt;BR/&gt;&lt;/B&gt;&lt;B&gt;СЭ=Без способа &lt;BR/&gt;&lt;/B&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Скважины в Не кандидатах по причине \"На фонтане\" (Не ЭЦН не срабатывает)&lt;/B&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"12\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;СЭ = ГЛ&lt;BR/&gt;&lt;/B&gt;&lt;B style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"&gt;СЭ=ЭЦН И (ТИП НАСОСА!= ВОРОНКА И ФОНТАННЫЙ ЛИФТ)&lt;/B&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Скважины в кандидатах&lt;/B&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-07-05T11:11:00.783Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2022-07-05T11:11:00.783Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 13
+          }
+        ]
+      },
+      "order": 1,
+      "pointAssignments": [
+        {
+          "id": 40168,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442788/TestPoint/40168"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442788/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442788"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442788,
+        "name": "ОПЗ"
+      },
+      "workItem": {
+        "id": 113332,
+        "name": "Опция перевода ОПЗ в тип \"Тяжелые ГТМ\" для ГПНО",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"3\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Настройки / Опции расчета&lt;BR/&gt;для ОПЗ &lt;B&gt;включить &lt;/B&gt;тумблер:&lt;BR/&gt;&lt;B&gt;Учитывать ОПЗ при расчете ПУР (в качестве тяжелого ГТМ)&lt;/B&gt;&lt;BR/&gt;Сохранить п пересчитать&lt;BR/&gt;&lt;BR/&gt;После пересчета открыть скважину Кандидата на ОПЗ, отобразить графики&lt;BR/&gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Навести мышкой на красные столбики - ОПЗ отображается красным.&lt;BR/&gt;&lt;BR/&gt;Зеленые столбики (ПУР) расположены справа от красных столбиков (ОПЗ). &lt;SPAN style=\"background-color: rgb(255, 255, 255);color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;(ПУР может быть рассчитан от даты проведения ОПЗ)&lt;/SPAN&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Настройки / Опции расчета&lt;BR/&gt;для ОПЗ &lt;B&gt;отключить &lt;/B&gt;тумблер:&lt;BR/&gt;&lt;B&gt;Учитывать ОПЗ при расчете ПУР (в качестве тяжелого ГТМ)&lt;/B&gt;&lt;BR/&gt;Сохранить п пересчитать&lt;BR/&gt;&lt;BR/&gt;После пересчета открыть скважину Кандидата на ОПЗ, отобразить графики&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Навести мышкой на красные столбики - ОПЗ отображается серым.&lt;BR/&gt;&lt;BR/&gt;Зеленые столбики (ПУР) расположены справа от красных столбиков (НЕ ОПЗ). &lt;SPAN style=\"background-color: rgb(255, 255, 255);color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;(ПУР может быть рассчитан от даты проведения тяжелых ГТМ, коим ОПЗ в данном случае не будет являться)&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-03-01T09:35:52.567Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2023-03-01T09:35:52.567Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "order": 2,
+      "pointAssignments": [
+        {
+          "id": 40169,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442788/TestPoint/40169"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442788/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442788"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442788,
+        "name": "ОПЗ"
+      },
+      "workItem": {
+        "id": 116728,
+        "name": "Параметры расчета. ОПЗ",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"2\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Коэффициент достижения, д.ед&lt;BR/&gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;По умолчанию значение 1.&lt;BR/&gt;&lt;BR/&gt;Расчет проходит.&lt;BR/&gt;&lt;BR/&gt;При смене значения, после расчета ОПЗ, меняется целевой дебит жидкости&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-03-16T17:00:40.483Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2023-03-16T17:00:40.483Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 5
+          }
+        ]
+      },
+      "order": 3,
+      "pointAssignments": [
+        {
+          "id": 40170,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442788/TestPoint/40170"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442788/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442788"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442788,
+        "name": "ОПЗ"
+      },
+      "workItem": {
+        "id": 136484,
+        "name": "Граничное значение. ОПЗ. Минимальное Рпл, атм",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"4\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Значение по умолчанию &lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;150&lt;/P&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Включить критерий, пересчитать ОПЗ&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;В Не кандидатах появились скважины с критерием \"Низкое Рпл\", у которых Рпл меньше заданного значения&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;В отчете Не кандидатов есть колонка с минимальным Рпл и граничным значением&lt;BR/&gt;&lt;BR/&gt;В кандидатах остались только те скважины, у которых фактическое Pпл больше, чем в ГЗ, за исключением тех, кто был перенесен с предыдущего проекта (скорректирован)&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отключен критерий&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;В Не кандидатах нет скважин с причиной Низкое Pпл&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-03-06T05:29:35.17Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2023-03-06T05:29:35.17Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "order": 4,
+      "pointAssignments": [
+        {
+          "id": 40171,
+          "configurationName": "Windows 10",
+          "tester": null,
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442788/TestPoint/40171"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442788/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442788"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442788,
+        "name": "ОПЗ"
+      },
+      "workItem": {
+        "id": 174692,
+        "name": "[ДОБ] ОПЗ. Опция расчета \"Предлагать ОПЗ на БД фонде\"",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"5\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ДОБ/Выбрать любое ДО актуального месяца&lt;BR/&gt;Настройки/развернуть ОПЗ&lt;BR/&gt;\"Опции расчета\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В \"Опциях расчета\" должен присутствовать пункт \"Предлагать ОПЗ на БД как возврат базы\".&lt;BR/&gt;По умолчанию опция заблокирована и становится доступной только при выборе \"Предлагать ОПЗ на БД фонде\"&lt;BR/&gt;По умолчанию выключена.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Включить опцию  &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;\"Предлагать ОПЗ на БД как возврат базы\"&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;При включенной опции ОПЗ на БД попадают в Ошибки, если отсутствуют данные для расчета фактического Skin&lt;BR/&gt;&lt;BR/&gt;В кандидатах:&lt;BR/&gt;- У ВБД и ОПЗ на БД полностью совпадают значения фактического режима&lt;BR/&gt;- У ОПЗ на БД Целевой Skin &amp;lt; Фактического Skin у ВБД&lt;BR/&gt;- У ОПЗ на БД Целевой Qж &amp;gt; Целевой Qж у ВБД&lt;BR/&gt;- У ОПЗ на БД Целевой Qн &amp;gt; Целевой Qн у ВБД&lt;BR/&gt;&lt;BR/&gt;Скважина может быть кандидатом на ОПЗ на БД и НЕ КАНДИДАТОМ на ВБД по критерию \"Низкий прирост Qн\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Включить опцию  &lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;\"Предлагать ОПЗ на БД как возврат базы\"&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В кандидатах на ОПЗ со статусом работы: != В работе&lt;BR/&gt;У таких фактические параметры должны быть  != 0&lt;BR/&gt;&lt;BR/&gt;\"В работе\" и \"В бездействии прошлых лет\" - у таких != 0 фактические&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&amp;nbsp;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Отключить опцию  &lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;\"Предлагать ОПЗ на БД как возврат базы\"&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В кандидатах на ОПЗ со статусом работы: != В работе&lt;BR/&gt;У таких фактические параметры должны быть  = 0&lt;BR/&gt;&lt;BR/&gt;\"В работе\"  - у таких != 0 фактические&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Огилько Виктория Михайловна <GAZPROM-NEFT\\Ogilko.VM>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-11-10T11:36:32.707Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Огилько Виктория Михайловна <GAZPROM-NEFT\\Ogilko.VM>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2023-11-10T11:36:32.707Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 7
+          }
+        ]
+      },
+      "order": 5,
+      "pointAssignments": [
+        {
+          "id": 40172,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Огилько Виктория Михайловна",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/0a7f5a8a-d508-4c27-b674-a3fa98901418",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTU1MjA"
+              }
+            },
+            "id": "0a7f5a8a-d508-4c27-b674-a3fa98901418",
+            "uniqueName": "GAZPROM-NEFT\\Ogilko.VM",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTU1MjA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTU1MjA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442788/TestPoint/40172"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442788/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442788"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 6
+}

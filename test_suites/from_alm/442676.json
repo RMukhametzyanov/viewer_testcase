@@ -1,0 +1,652 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442676,
+        "name": "Расчеты"
+      },
+      "workItem": {
+        "id": 299223,
+        "name": "[ДОБ] Ежедневный пересчет ГТМ по ДО",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"3\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меню / добывающий фонд / выбрать верхний месяц&lt;BR/&gt;Выбрать ДО из списка / Открыть&lt;BR/&gt;Настройки / выбрать баблик ГТМ для пересчета / Сохранить и пересчитать&lt;BR/&gt;&lt;BR/&gt;Примечание: &lt;BR/&gt;- ДО порядок из списка согласно дня недели (из предусловия)&lt;BR/&gt;- ГТМ порядок из списка &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;(из предусловия)&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В логах не должно быть ошибок касательно расчета:&lt;BR/&gt;webapi - там внутри ВБД&lt;BR/&gt;optfsrvice - (расчеты ОПТ, МЕХ, Заглубление, УВЧ, ЧРФ)&lt;/P&gt;&lt;P&gt;opzservice - 2 пода (расчеты ОПЗ)&lt;BR/&gt;grpcalcengine - 2 пода (расчеты ГРП и МГРП)&lt;BR/&gt;pvlgcalcengine - 2 пода (расчеты ПВЛГ и ПНЛГ)&lt;BR/&gt;pprservice - (расчеты ППР)&lt;BR/&gt;addperforations (расчеты Дострелов и Дострелов  + ГРП)&lt;BR/&gt;iwfcalcservice - (расчеты ФНВ)&lt;BR/&gt;permcalcservice - (расчеты Проницаемость)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меню / добывающий фонд / развернуть верхний месяц&lt;BR/&gt;Выбрать ДО Мессояха / Открыть&lt;BR/&gt;Настройки / выбрать одно месторождение Западно-Мессояхское / баблик ГТМ* для пересчета / Сохранить и пересчитать&lt;BR/&gt;&lt;BR/&gt;*ВБД, ОПЗ, ГРП, ОПТ, ПВЛГ&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">Расчет ГТМ ДОБ фонд&lt;BR/&gt;https://logging.paas.gazprom-neft.local/app/dashboards#/view/96d6bfe0-0401-11f0-aa28-5b79f67f606e?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-15d,to:now))&amp;amp;_a=(description:'',filters:!(),fullScreenMode:!f,options:(hidePanelTitles:!f,useMargins:!t),query:(language:kuery,query:''),timeRestore:!f,title:'UAT:%20%D0%A0%D0%B0%D1%81%D1%87%D0%B5%D1%82%20%D0%93%D0%A2%D0%9C%20(%D0%94%D0%9E%D0%91%20%D1%84%D0%BE%D0%BD%D0%B4)',viewMode:view)&lt;BR/&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2024-11-06T08:21:59.363Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-09-25T12:23:11.787Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 17
+          }
+        ]
+      },
+      "order": 2,
+      "pointAssignments": [
+        {
+          "id": 40063,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Лобанов Сергей Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+              }
+            },
+            "id": "cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "uniqueName": "GAZPROM-NEFT\\Lobanov.SI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442676/TestPoint/40063"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442676/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442676"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442676,
+        "name": "Расчеты"
+      },
+      "workItem": {
+        "id": 164823,
+        "name": "[ДОБ] Расчеты проектов ДОБ фонда",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"5\"><step id=\"2\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;ПРЕДУСЛОВИЕ&lt;BR/&gt;&lt;BR/&gt;Меню / добывающий фонд / выбрать развернуть верхний месяц&lt;BR/&gt;Выбрать ДО из списка / Открыть&lt;BR/&gt;Настройки / выбрать баблик ГТМ для пересчета / Сохранить и пересчитать&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ДО: Ноябрьскнефтегаз&lt;BR/&gt;Запустить на пересчет все ГТМ одновременно&lt;BR/&gt;&lt;BR/&gt;Примечание: &lt;BR/&gt;Запомнить время старта расчета&lt;BR/&gt;и снимать время завершения расчета&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В логах не должно быть ошибок касательно расчета:&lt;BR/&gt;webapi - там внутри ВБД&lt;BR/&gt;optfsrvice (расчеты ОПТ, МЕХ, Заглубление, УВЧ)&lt;BR/&gt;opzservice - 2 пода (расчеты ОПЗ)&lt;BR/&gt;grpcalcengine - 2 пода (расчеты ГРП и МГРП)&lt;BR/&gt;pvlgcalcengine - 2 пода (расчеты ПВЛГ и ПНЛГ)&lt;BR/&gt;ppr - (расчеты ППР)&lt;BR/&gt;addperforations (расчеты Дострелов и Дострелов  + ГРП)&lt;BR/&gt;&lt;BR/&gt;&lt;A href=\"https://console-uat.test.gazprom-neft.local:8443/console/project/u210001901-spektr/browse/pods\" tabindex=\"-1\"&gt;OpenShift Web Console (gazprom-neft.local)&lt;/A&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ДО: Мегион&lt;BR/&gt;ДО: Хантос&lt;BR/&gt;Запустить все ГТМ на одном ДО, затем сразу запустить все ГТМ на другом ДО&lt;BR/&gt;&lt;BR/&gt;Примечание: &lt;BR/&gt;Запомнить время старта расчета&lt;BR/&gt;и снимать время завершения расчета&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В логах не должно быть ошибок касательно расчета:&lt;BR/&gt;webapi - там внутри ВБД&lt;BR/&gt;optfsrvice (расчеты ОПТ, МЕХ, Заглубление, УВЧ)&lt;BR/&gt;opzservice - 2 пода (расчеты ОПЗ)&lt;BR/&gt;grpcalcengine - 2 пода (расчеты ГРП и МГРП)&lt;BR/&gt;pvlgcalcengine - 2 пода (расчеты ПВЛГ и ПНЛГ)&lt;BR/&gt;ppr - (расчеты ППР)&lt;BR/&gt;addperforations (расчеты Дострелов и Дострелов  + ГРП)&lt;BR/&gt;&lt;BR/&gt;&lt;A href=\"https://console-uat.test.gazprom-neft.local:8443/console/project/u210001901-spektr/browse/pods\" tabindex=\"-1\"&gt;OpenShift Web Console (gazprom-neft.local)&lt;/A&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;ДО: Все ДО&lt;BR/&gt;Запустить только УВЧ&lt;BR/&gt;&lt;BR/&gt;Примечание: &lt;BR/&gt;Запомнить время старта расчета&lt;BR/&gt;и снимать время завершения расчета&lt;BR/&gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В логах optfservice не должно быть ошибок&lt;BR/&gt;На ДО должны появится скважины УВЧ, если они есть в самом ТР20 &lt;BR/&gt;&lt;BR/&gt;&lt;A href=\"https://console-uat.test.gazprom-neft.local:8443/console/project/u210001901-spektr/browse/pods\" tabindex=\"-1\"&gt;OpenShift Web Console (gazprom-neft.local)&lt;BR/&gt;&amp;nbsp;&lt;/A&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-10-10T10:56:37.527Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2023-10-10T10:56:37.527Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 6
+          }
+        ]
+      },
+      "order": 4,
+      "pointAssignments": [
+        {
+          "id": 39859,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442676/TestPoint/39859"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442676/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442676"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442676,
+        "name": "Расчеты"
+      },
+      "workItem": {
+        "id": 212156,
+        "name": "[ДОБ] Минимальный прирост в процентах для всех ГТМ",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"11\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Проверить настройки для всех ГТМ&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;У всех есть настройка Минимальный прирост %&lt;BR/&gt;&lt;BR/&gt;Дефолтное значение 10%&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;FONT color=\"#172b4d\" face=\"-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Fira Sans, Droid Sans, Helvetica Neue, sans-serif\"&gt;&lt;SPAN style=\"font-size: 14px\"&gt;Открыть:&lt;BR/&gt;&amp;nbsp;- Вкладка Кандидаты любого проекта&lt;BR/&gt;&amp;nbsp;- Excel Таблица Кандидатов&lt;BR/&gt;&amp;nbsp;- Excel Кандидаты ОПТ&lt;BR/&gt;&lt;/SPAN&gt;&lt;/FONT&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;В блоке прирост есть колонка \"Qн, %\"&lt;BR/&gt;&lt;BR/&gt;Для Excel Кандидаты ОПТ колонка &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;\"Qн, %\" добавлена во всех блоках Приростов&lt;BR/&gt;&lt;BR/&gt;Нет пустых ячеек, заполняемость полная&lt;/SPAN&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;ВКЛ Опцию Возврат Базы&lt;BR/&gt;Пересчитать &lt;BR/&gt;Если выбрана опция \"Возврат базы\", ``\n           \n\n&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Факт. Qн = ост. Qн&lt;BR/&gt;&lt;B&gt;для основного фонда: &lt;/B&gt;&lt;BR/&gt;из таблицы datastore.TechModeStatistic берутся значения, когда скв в последний раз была в состоянии \"В работе\" или \"В накоплении/под циклической закачкой/\"&lt;BR/&gt;&lt;B&gt;для прочего фонда:&lt;/B&gt; из таблицы datastore.TechModes берутся значения последнего актуального ТРа.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Для скважины, где фактический дебит нефти (Qн)  = 0 или NULL\n&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Столбец \"прирост в %\" не рассчитываем а принимает значение 100%&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Для скважины, где &lt;/SPAN&gt;фактический дебит нефти (Qн)  != 0 или Null&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B style=\"color: rgb(23, 43, 77);font-family: Calibri, sans-serif;font-size: 14.6667px;background-color: rgb(255, 255, 255)\"&gt;Для расчетов&amp;nbsp;целевой и фактический дебит нефти округляем до 1 знака после запятой&lt;BR/&gt;&amp;nbsp;&lt;/B&gt;&lt;BR/&gt;&amp;nbsp;формула расчета прироста в процентах &lt;BR/&gt; ((цел.Qн - факт. Qн) / факт. Qн ) * 100% .\n\n          Если выбран критерий  \"Минимальный прирост Qн, т/сут\" и выбран критерий \"Минимальный прирост Qн,%\",\n          Во время расчета в начале идет расчет \"Минимальный прирост Qн, т/сут\" если скважина не попала по данному критерию в \"Не кандидаты\", то только тогда проходит расчет по критерию \"Минимальный прирост Qн,%\"   &lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"11\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ОТКЛ Минимальный прирост Qн, т/сут&lt;BR/&gt;ОТКЛ &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Минимальный прирост Qн, %&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В НЕ кандидатах не должно быть критерия &lt;B&gt;Низкий прирост Qн&lt;/B&gt; и &lt;B style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Низкий прирост Qн, % &lt;/B&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ВКЛ Минимальный прирост Qн, т/сут&lt;BR/&gt;ВКЛ Минимальный прирост Qн, %&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Во время расчета &lt;B&gt;в начале&lt;/B&gt; идет расчет \"&lt;B&gt;Минимальный прирост Qн, т/сут&lt;/B&gt;\" если скважина не попала по данному критерию в \"Не кандидаты\", то только тогда проходит расчет по критерию \"Минимальный прирост Qн,%\"&lt;BR/&gt;&lt;BR/&gt;В Кандидатах не могут быть скв, у которых прирост % меньше НГЗ&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ВКЛ &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Минимальный прирост Qн, т/сут&lt;BR/&gt;ОТКЛ &lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Минимальный прирост Qн, %&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Критерия в Не кандидатах &lt;B&gt;Низкий прирост Qн, % &lt;/B&gt;нет ни на одной скважине&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;ОТКЛ &lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Минимальный прирост Qн, т/сут&lt;BR/&gt;ВКЛ &lt;/SPAN&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Минимальный прирост Qн, %&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Есть критерий в Не кандидатах:&lt;BR/&gt;Низкий прирост Qн %&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Нет критерия Низкий прирост Qн&lt;BR/&gt;&lt;BR/&gt;В Кандидатах не могут быть скв, у которых прирост % меньше НГЗ&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2024-03-07T05:58:58.87Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2024-03-11T04:04:09.887Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 9
+          }
+        ]
+      },
+      "order": 6,
+      "pointAssignments": [
+        {
+          "id": 40207,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442676/TestPoint/40207"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442676/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442676"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442676,
+        "name": "Расчеты"
+      },
+      "workItem": {
+        "id": 164815,
+        "name": "Создание проекта (проверка раз в неделю)",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"3\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Если кнопка Создать проект активна&lt;BR/&gt;Нажимаем создать&lt;BR/&gt;&lt;BR/&gt;Если не активна, то выполняем:&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&lt;I&gt;DELETE FROM data_store.\"TechModes\" &lt;BR/&gt;WHERE \"ReportingMonth\" = 'ГГГГ-ММ-01'\tand \"OrganizationId\" = orgId &lt;/I&gt;&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;(лучше использовать восток (orgId = 2), Мессояха (orgId = 8), или ямал (orgId = 10)&lt;BR/&gt;&lt;BR/&gt;Переходим в последний актуальный проект ДО, по которому удалили тех.режимы и жмем Создать проект&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Появляется окно, что на такой-то месяц доступно столько-то тех.режимов&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;После нажатия Создать спустя некоторое время будет информирование, что создан проект. Можно перейти в окно выбора проекта.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Следим за расчетами здесь:&lt;BR/&gt;PROD: &lt;A href=\"https://console.apps.paas.gazprom-neft.local/k8s/ns/u210001901/pods\" style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\" tabindex=\"-1\"&gt;Pods · Red Hat OpenShift Container Platform (gazprom-neft.local)&lt;BR/&gt;P&lt;/A&gt;RE-PROD: &lt;A href=\"https://console.apps.stg.paas.gazprom-neft.local/k8s/ns/u210001901-spektr/pods\" tabindex=\"-1\"&gt;Pods · Red Hat OpenShift Container Platform (gazprom-neft.local)&lt;/A&gt;&lt;BR/&gt;UAT: &lt;A href=\"https://console-uat.test.gazprom-neft.local:8443/console/project/u210001901-spektr/browse/pods\" style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\" tabindex=\"-1\"&gt;OpenShift Web Console (gazprom-neft.local)&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&lt;SPAN style=\"color: rgba(0, 0, 0, 0.9)\"&gt;spektr-&lt;/SPAN&gt;w&lt;/A&gt;ebapi&lt;BR/&gt;spektr-optfservice&lt;BR/&gt;spektr-opzservice&lt;BR/&gt;spektr-grpcalcengine&lt;BR/&gt;spektr-pvlgcalcengine&lt;BR/&gt;spektr-addperforations&lt;BR/&gt;spektr-pprservice&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Нет error в результате расчета&lt;BR/&gt;Нет необработанных исключений в результате расчета&lt;BR/&gt;&lt;BR/&gt;Все ТРы рассчитываются и распределяются по реестрам Кандидатов, Не кандидатов и Ошибок&lt;BR/&gt;&lt;BR/&gt;Нет зависших скважин в результате расчета&lt;BR/&gt;&lt;BR/&gt;Краткое инфо:&lt;BR/&gt;&amp;nbsp;&lt;A href=\"https://console-uat.test.gazprom-neft.local:8443/console/project/u210001901-spektr/browse/pods\" style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\" tabindex=\"-1\"&gt;spektr-w&lt;/A&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;ebapi  - расчеты ВБД и экономики&lt;BR/&gt;&amp;nbsp;&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;spektr-optfservice - расчеты ОПТ, Механизаций, Демеханизаций, УВЧ&lt;BR/&gt;&lt;/SPAN&gt;spektr-opzservice - Расчеты ОПЗ&lt;BR/&gt;&amp;nbsp;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;spektr-grpcalcengine (2 пода) - расчеты ГРП и МГРП&lt;BR/&gt;&lt;/SPAN&gt;spektr-pvlgcalcengine (2 пода)  - расчеты ПВЛГ/ПНЛГ&lt;BR/&gt;&amp;nbsp;spektr-pprservice - расчеты ППР&lt;BR/&gt;&amp;nbsp;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;&lt;BR/&gt;&amp;nbsp;&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;&lt;BR/&gt;&lt;/SPAN&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-10-10T10:43:23.37Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2023-10-10T10:43:23.37Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 5
+          }
+        ]
+      },
+      "order": 9,
+      "pointAssignments": [
+        {
+          "id": 39858,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442676/TestPoint/39858"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442676/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442676"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442676,
+        "name": "Расчеты"
+      },
+      "workItem": {
+        "id": 177061,
+        "name": "Оптимизация расчетов",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"4\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ДОБ/Большое ДО актуального месяца&lt;BR/&gt;\"Настройки\"&lt;BR/&gt;Запустить расчет ПО ОДНОМУ месторождению&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В боковой панели на вкладке \"История пересчета\" должна быть отображена карточка с информацией, где будет указано конкретное месторождение и принадлежащие ему пласты.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Запустить расчет ПО ОДНОМУ объекту&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В боковой панели на вкладке \"История пересчета\" должна быть отображена карточка с информацией, где будет указано конкретное месторождение и объект&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Найти в базе скважину, у которой на текущий месяц нет ТР&lt;BR/&gt;Перейти на вкладку \"Статус расчета\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;У скважины без ТР на актуальный месяц в \"Статусе расчета\" не должно быть \"Р\" и расчёт должен завершаться корректно&lt;BR/&gt;&lt;BR/&gt;Также со временем количество \"Р\" должно только уменьшаться, а не расти (наприм. было 1200 и стало 5000 - некорректно. Было 1200 стало 500 - корректно)&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Огилько Виктория Михайловна <GAZPROM-NEFT\\Ogilko.VM>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-11-17T10:43:48.51Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2023-11-17T10:43:48.51Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 3
+          }
+        ]
+      },
+      "order": 12,
+      "pointAssignments": [
+        {
+          "id": 40198,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Огилько Виктория Михайловна",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/0a7f5a8a-d508-4c27-b674-a3fa98901418",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTU1MjA"
+              }
+            },
+            "id": "0a7f5a8a-d508-4c27-b674-a3fa98901418",
+            "uniqueName": "GAZPROM-NEFT\\Ogilko.VM",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTU1MjA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTU1MjA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442676/TestPoint/40198"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442676/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442676"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442676,
+        "name": "Расчеты"
+      },
+      "workItem": {
+        "id": 120462,
+        "name": "Сохранение расчетов проекта",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"5\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Запустить на расчет проект по любому виду ГТМ&lt;BR/&gt;На вкладке Кандидаты включить столбец \"Расчет ГТМ\"&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Расчет начался:  &lt;BR/&gt; - в столбце \"Расчет ГТМ\" статус \"Расчет в процессе\" &lt;BR/&gt; - в столбце \"Рентабельность\" иконка \"В процессе\"&lt;BR/&gt;-----------------------------------&lt;BR/&gt;Расчет завершился только по ГТМ, а экономика в процессе: &lt;BR/&gt; - в столбце \"Расчет ГТМ\" статус \"Завершен\"&lt;BR/&gt; - результаты есть на вкладках Кандидаты, Не кандидаты, Ошибки&lt;BR/&gt; - в столбце \"Рентабельность\" иконка \"В процессе\"&lt;BR/&gt; - в настройках статус расчета отображается \"Завершен\"&lt;BR/&gt; &lt;BR/&gt;&amp;nbsp;- разрешено Согласование, Отклонение&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp; - запрещены Корректировки, перенос из Не кандидатов, исправление Ошибок (тултип \"&lt;SPAN style=\"color: rgb(0, 0, 0);font-family: &amp;amp;amp;font-size: 13.3333px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;&lt;I&gt;Выполняются расчеты, операция в данный момент не доступна&lt;/I&gt;\")&lt;/SPAN&gt;&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp; - запрещено Скачивание Excel Кандидатов, Не кандидатов, Ошибок (тултип \"&lt;SPAN style=\"color: rgb(0, 0, 0);font-family: &amp;amp;amp;font-size: 13.3333px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;&lt;I&gt;Выполняются расчеты, операция в данный момент не доступна&lt;/I&gt;\")&lt;/SPAN&gt;&lt;BR/&gt;--------------------------------&lt;BR/&gt;&amp;nbsp;Расчет завершился по ГТМ и экономике:&lt;BR/&gt; - &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"&gt;в столбце \"Расчет ГТМ\" статус \"Завершен\" &lt;BR/&gt; - &lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"&gt;в столбце \"Рентабельность\" иконка \"Рентабельно\" или \"Не рентабельно\" или ошибка расчета экономики&lt;/SPAN&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;&lt;SPAN style=\"color: rgb(0, 0, 0);font-family: &amp;amp;amp;font-size: 13.3333px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;Запустить расчет. &lt;BR/&gt;Дождаться статус Завершен и когда экономика в процессе расчета. &lt;BR/&gt;Запустить другой расчет&lt;/SPAN&gt;&lt;BR style=\"color: rgb(0, 0, 0);font-family: &amp;amp;amp;font-size: 13.3333px;white-space: normal;background-color: rgb(255, 255, 255)\"/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;&lt;SPAN style=\"color: rgb(0, 0, 0);font-family: &amp;amp;amp;font-size: 13.3333px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;Все расчеты экономики, которые в процессе от предыдущего расчета сбрасываются, происходит расчет экономики заново (из очереди удаляются старые расчеты экономики)&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Запустить расчеты только по&lt;BR/&gt; - месторождению&lt;BR/&gt; - объекту&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt; - в столбце \"Расчет ГТМ\" статус \"Расчет в процессе\" только по запущенному на расчет месторождению или объекту&lt;BR/&gt; - в столбце \"Рентабельность\" иконка \"В процессе\" только по запущенному на расчет месторождению или объекту&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Столбец с датой и временем расчета&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;По умолчанию скрыт&lt;BR/&gt;Доступна сортировка А-Я, Я-А&lt;BR/&gt;Не доступна фильтрация&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-04-03T05:05:15.773Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2023-04-03T05:05:15.773Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 9
+          }
+        ]
+      },
+      "order": 14,
+      "pointAssignments": [
+        {
+          "id": 39856,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442676/TestPoint/39856"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442676/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442676"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442676,
+        "name": "Расчеты"
+      },
+      "workItem": {
+        "id": 164832,
+        "name": "Проверка экономических расчетов",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<steps id=\"0\" last=\"3\">\r\n  <step id=\"2\" type=\"ValidateStep\">\r\n    <parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В экономических расчетах, например, для ОПЗ&lt;BR/&gt;Включить все тумблеры&lt;BR/&gt;Для каждого доп.мерпориятия проставить уникальное значение&lt;BR/&gt;&lt;BR/&gt;Пересчитать проект&lt;BR/&gt;Дождаться окончания расчета&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString>\r\n    <parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В поле Затраты на ГТМ таблицы кандидатов проставляется значение из настроек экономических расчетов.&lt;BR/&gt;&lt;BR/&gt;Пример:&lt;BR/&gt;В настройках экономики включен \"С освоением\" и  выставлено 2.2&lt;BR/&gt;Согласовать скважину ОПЗ с выбором \"С освоением\", (подождать расчета экономики). У такой скважины Затраты на ГТМ  = 2.2 и посчитан PI. != 0. &lt;/P&gt;&lt;/DIV&gt;</parameterizedString>\r\n    <description />\r\n  </step>\r\n  <step id=\"3\" type=\"ValidateStep\">\r\n    <parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Аналогично проверить другие ГТМы&lt;/P&gt;&lt;/DIV&gt;</parameterizedString>\r\n    <parameterizedString isformatted=\"true\">&lt;P&gt;Результат аналогичен пункту выше&lt;/P&gt;</parameterizedString>\r\n    <description />\r\n  </step>\r\n</steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-05-30T09:41:58.55Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2023-05-30T09:41:58.55Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 3
+          }
+        ]
+      },
+      "order": 22,
+      "pointAssignments": [
+        {
+          "id": 39861,
+          "configurationName": "Windows 10",
+          "tester": null,
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442676/TestPoint/39861"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442676/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442676"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 7
+}

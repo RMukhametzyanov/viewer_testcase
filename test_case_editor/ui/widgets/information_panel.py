@@ -99,6 +99,10 @@ class InformationPanel(QWidget):
             UI_METRICS.container_padding,
         )
 
+        # Описание (в самом верху)
+        self.description_group = self._create_description_group()
+        content_layout.addWidget(self.description_group)
+
         # Основная информация
         self.main_info_group = self._create_main_info_group()
         content_layout.addWidget(self.main_info_group)
@@ -110,10 +114,6 @@ class InformationPanel(QWidget):
         # Контекст
         self.domain_group = self._create_domain_group()
         content_layout.addWidget(self.domain_group)
-
-        # Описание
-        self.description_group = self._create_description_group()
-        content_layout.addWidget(self.description_group)
 
         # Общий ожидаемый результат
         self.expected_result_group = self._create_expected_result_group()
@@ -303,6 +303,8 @@ class InformationPanel(QWidget):
         """Создать LineEdit с подключением сигнала изменения"""
         edit = QLineEdit()
         edit.textChanged.connect(self._on_changed)
+        # Устанавливаем выравнивание по левому краю и показываем начало строки
+        edit.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         return edit
 
     def _add_labeled_widget(self, parent_layout: QHBoxLayout, label_text: str, widget):
@@ -382,17 +384,20 @@ class InformationPanel(QWidget):
             self.created_label.setText(f"Создан: {created_text}")
             self.updated_label.setText(f"Обновлён: {updated_text}")
 
-            # Люди
+            # Люди (устанавливаем курсор в начало, чтобы показывалось начало строки)
             self.author_input.blockSignals(True)
             self.author_input.setText(test_case.author or "")
+            self.author_input.setCursorPosition(0)  # Показываем начало строки
             self.author_input.blockSignals(False)
 
             self.owner_input.blockSignals(True)
             self.owner_input.setText(test_case.owner or "")
+            self.owner_input.setCursorPosition(0)  # Показываем начало строки
             self.owner_input.blockSignals(False)
 
             self.reviewer_input.blockSignals(True)
             self.reviewer_input.setText(test_case.reviewer or "")
+            self.reviewer_input.setCursorPosition(0)  # Показываем начало строки
             self.reviewer_input.blockSignals(False)
 
             # Статусы

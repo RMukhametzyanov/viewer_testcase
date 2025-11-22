@@ -3,15 +3,15 @@
     "DEFAULT_PROMT": "",
     "panel_sizes": {
         "left": 398,
-        "form_area": 1404,
-        "review": 576
+        "form_area": 1477,
+        "review": 470
     },
     "LLM_MODEL": "deepseek-v3.1:latest",
     "LLM_HOST": "http://spb99-vkc-dhwgpu06.devzone.local:11434",
     "LLM_METHODIC_PATH": "C:\\viewer_testcase\\test_case_editor\\docs\\test-cases-guidelines.md",
     "window_geometry": {
-        "x": 151,
-        "y": 69,
+        "x": 162,
+        "y": 38,
         "width": 1845,
         "height": 930,
         "is_fullscreen": false

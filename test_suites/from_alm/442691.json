@@ -1,0 +1,99 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442691,
+        "name": "ФНВ"
+      },
+      "workItem": {
+        "id": 173927,
+        "name": "[ДОБ] ФНВ. Критерии ФНВ на ВБД, ГРП, ПВЛГ и Дострелах",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"11\"><step id=\"4\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ПРЕДУСЛОВИЕ: &lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Проект ДОБ фонда (ННГ) / последний месяц / Настройки&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;По ВБД, ПВЛГ, Дострелам и ГРП выставлены настройки:&lt;BR/&gt;&lt;BR/&gt;Проверка риска ФНВ - ВКЛ&lt;BR/&gt;Минимальное расстояние до НАГ скважины = 2500 м&lt;BR/&gt;Минимальное расстояние до контура ФНВ  = 2500 м&lt;BR/&gt;&amp;nbsp;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Запустить Расчёт ФНВ &lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Статус расчёта - в процессе&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;В поде iwfcalcservice есть логи расчёта (&lt;A href=\"https://console.apps.test.paas.gazprom-neft.local/k8s/ns/u210001901/pods\" tabindex=\"-1\" style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Pods · OKD (gazprom-neft.local)&lt;/A&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;)&lt;BR/&gt;&lt;/SPAN&gt;&lt;BR/&gt;После завершения расчёта ФНВ - &lt;B&gt;автоматически &lt;/B&gt;запускаются расчёты ГТМ:&lt;BR/&gt;&amp;nbsp; ВБД&lt;BR/&gt;  ГРП&lt;BR/&gt;  ПВЛГ&lt;BR/&gt;  Дострелы&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Расчёты завершаются, есть результаты с новой датой сохранения&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;После расчётов ГТМ - Перейти в не кандидаты &lt;BR/&gt;Открыть панель статус экспертизы&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;1) У части не кандидатов на ВБД, ГРП, ПВЛГ и Дострелы сработали критерии &lt;B&gt;(! по каждому ГТМ)&lt;/B&gt;:&lt;BR/&gt;&lt;BR/&gt;- &lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Близко к нагнетательной скважине&lt;BR/&gt;- &lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Внутри ФНВ\t&lt;BR/&gt;- Риск прорыва ФНВ&lt;BR/&gt;&lt;BR/&gt;2) Нет скважин, у которых одновременно &lt;BR/&gt; - риск прорыва ФНВ&lt;BR/&gt; - внутри ФНВ&lt;BR/&gt;&lt;BR/&gt;3) Если на скважине сработали критерии \"Риск прорыва ФНВ\" и \"Близко к НАГ скважине\", то в сработавших значениях:&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;расстояние по риску прорыва &lt;B&gt;&amp;lt;&lt;/B&gt; расстояния до НАГ скважины&lt;/SPAN&gt;&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать не кандидата ВБД со сработавшим критерием \"&lt;B&gt;Близко к нагнетательной скважине&lt;/B&gt;\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В блоке \"Критерии отнесения в Не кандидаты\" отображается данный критерий&lt;BR/&gt;&lt;BR/&gt;У критерия:&lt;BR/&gt;Граничное значение = ВБД / Граничные значения / Минимальное расстояние до нагнетательной скважины&lt;BR/&gt;Расчётное &amp;lt; Граничное&lt;BR/&gt;Отображается номер нагнетательной скважины в расчётном значении&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;Выбрать не кандидата ВБД со сработавшим критерием \"&lt;B&gt;Внутри ФНВ&lt;/B&gt;\"&lt;BR/&gt;&lt;BR/&gt;&lt;P&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Открыть панель \"Статус экспертизы\"&lt;/SPAN&gt;&lt;I&gt;&lt;BR/&gt;&lt;/I&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;У критерия:&lt;BR/&gt;Расчётное = номер НАГ скважины&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать не кандидата ВБД со сработавшим критерием \"&lt;B&gt;Риск прорыва ФНВ&lt;/B&gt;\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;У критерия:&lt;BR/&gt;Граничное = ВБД / Граничные значения / Минимальное расстояние до контура ФНВ&lt;BR/&gt;Расчётное &amp;lt; Граничное&lt;BR/&gt;Отображается номер нагнетательной скважины в расчётном значении&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;I&gt;&lt;B&gt;Проверка отображения нескольких скважин в критерии&lt;BR/&gt;&lt;/B&gt;&lt;/I&gt;&lt;BR/&gt;Отфильтровать скважины со сработавшими критериями \"Внутри ФНВ\", \"Риск прорыва ФНВ\", \"Близко к нагнетательной скважине\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Есть скважины, у которых в расчётном значении отображаются несколько скважин. &lt;BR/&gt;&lt;BR/&gt;Для критериев \"Риск прорыва ФНВ\" и \"Близко к нагнетательной скважине\":&lt;BR/&gt;по каждой скважине в расчётном значении - отображается расстояние (больше граничного)&lt;BR/&gt;&lt;BR/&gt;Среди этих скважин - нет дублей по номеру скважины&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;I&gt;&lt;B&gt;Проверка совпадений сработавших критериев по ГРП и ВБД&lt;BR/&gt;&lt;/B&gt;&lt;/I&gt;&lt;I&gt;&lt;BR/&gt;&lt;/I&gt;Отфильтровать некандидатов по месторождению&lt;BR/&gt;Отсортировать по номеру скважин&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Если по скважине+пласту сработал один из критериев ФНВ на ВБД, то должен сработать на ГРП по той же скважине+пласту (т.к. настройки одинаковые)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;&lt;I&gt;&lt;B&gt;Проверка ПВЛГ (пример от Полянского Влада)&lt;BR/&gt;Сделать расчеты с:&lt;BR/&gt; ВКЛ: Риск прорва ФНВ&lt;BR/&gt; ВКЛ: Минимальное расстояние до НАГ скважины 2500&lt;BR/&gt; ВКЛ: Минимальное расстояние до контура ФНВ = 2500&lt;BR/&gt;&lt;BR/&gt;&lt;/B&gt;&lt;/I&gt;&lt;BR/&gt;Найти скважину 6396 Вынгапуровское на ПВЛГ (целевой пласт - БВ6)&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Скважина - не кандидат по критерию \"Близко к нагнетательной скважине\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"11\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B style=\"font-style: italic\"&gt;Запуск ФНВ по Месторождению и объекту&lt;BR/&gt;&lt;/B&gt;&lt;B style=\"font-style: italic\"&gt;&lt;BR/&gt;&lt;/B&gt;Запустить расчёт ФНВ по месторождению/объекту (изменить настройки ФНВ)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;1) ФНВ рассчитывается по выбранному М/Р //объекту&lt;BR/&gt;&lt;BR/&gt;2) После расчёта ФНВ - запускаются расчёты ВБД ГРП ПВЛГ Дострелов &lt;B&gt;по тому же уровню&lt;BR/&gt;&lt;/B&gt;&lt;B&gt;&lt;BR/&gt;&lt;/B&gt;3) После расчётов - в сработавших критериях ФНВ в граничных значениях - изменённые значения из настроек&lt;B&gt;&lt;BR/&gt;&lt;/B&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Огилько Виктория Михайловна <GAZPROM-NEFT\\Ogilko.VM>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-11-09T07:32:20.957Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-09-05T12:43:58.933Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 24
+          }
+        ]
+      },
+      "pointAssignments": [
+        {
+          "id": 39919,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442691/TestPoint/39919"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442691/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442691"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 1
+}

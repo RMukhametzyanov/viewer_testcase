@@ -1,0 +1,99 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442711,
+        "name": "Ключевые индикаторы риска"
+      },
+      "workItem": {
+        "id": 197952,
+        "name": "[Мониторинг] Ключевые индикаторы риска",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"12\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;A href=\"https://spektr-u210001901.apps.test.paas.gazprom-neft.local/monitoring?tab=monitoring\" tabindex=\"-1\"&gt;СПекТР (gazprom-neft.local)&lt;/A&gt; - перейти в таблицу Мониторинга&lt;BR/&gt;&lt;BR/&gt;Включить отображение столбцов причин неуспешности и неэффективности&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В таблице отображаются поля -&lt;BR/&gt;\"причина неуспешности\" / Успешность ремонта&lt;BR/&gt;&amp;nbsp;\"причина неэффективности\" / Тех. эффективность ремонта&lt;BR/&gt;&lt;BR/&gt;Для записей, у которых доступно для редактирование причина неуспешности - заблокировано поле (и наоборот)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Причина неуспешности&lt;/B&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Поле доступно для редактирования для скважин с красным ключом в поле \"Успешность\" ИЛИ&lt;BR/&gt;светло-серым ключом  (\"Неоконченный\") - если с даты окончания ремонта факт в отчёте прошло больше 90 дней&lt;BR/&gt;&lt;BR/&gt;&lt;I&gt;* Причина неуспешности заблокирована, если ключ красный, но \"Дата запуска\" заполнена\n&lt;/I&gt;&lt;I&gt;* Дату окончания ремонта можно узнать скачав отчет Excel в поле \"&lt;/I&gt;&lt;SPAN style=\"background-color: rgb(239, 246, 252);color: rgba(0, 0, 0, 0.9)\"&gt;Дата окончания ремонта факт&lt;/SPAN&gt;&lt;I style=\"background-color: var(--background-color,rgba(255, 255, 255, 1));color: rgba(var(--palette-neutral-100,0, 0, 0),1)\"&gt;\"&lt;/I&gt;&lt;/P&gt;&lt;P&gt;&lt;BR/&gt;Для остальных записей - поле серое, редактирование недоступно&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Нажать на иконку редактирования в поле&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображается модальное окно&lt;BR/&gt;Совпадает с макетом (вложение)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Раскрыть выпадающий список&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В списке отображаются причины из таблицы причин неуспешности:&lt;BR/&gt;&lt;BR/&gt;&lt;A href=\"https://kb.gazprom-neft.local/pages/viewpage.action?pageId=294758300\" tabindex=\"-1\"&gt;Ключевые индикаторы риска - СПекТР - подбор опций легких ГТМ - Gazprom Neft Confluence (gazprom-neft.local)&lt;/A&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать причину, заполнить комментарий и сохранить&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбранная причина отображается в окне&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отобразить боковые панели по скорректированной записи&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В боковой панели - отображается вкладка \"Причины неуспешности\"&lt;BR/&gt;Во вкладке - запись о корректировки (автор, дата, значение до и после, комментарий)&lt;BR/&gt;Панель соответствует макету (вложение)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"11\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Изменить причину неуспешности по той же записи &lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Причина изменена&lt;BR/&gt;В истории корректировок - актуальная запись отображается сверху и выделена голубым&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Причина неэффективности&lt;/B&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Поле доступно для редактирования для строк, у которых выполняются ОБА условия:&lt;BR/&gt;1) с красной или желтой иконкой в поле \"По мин. рент. дебиту\" / Экономическая эффективность ИЛИ с красной или жёлтой иконкой в поле \"по план. затратам (по PI)\" &lt;BR/&gt;2) с даты запуска / запускные параметры прошло 60 дней или более&lt;BR/&gt;&lt;BR/&gt;Для остальных записей - поле серое, редактирование недоступно&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Открыть окно редактирования&lt;BR/&gt;Раскрыть выпадающий список&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В списке отображаются причины из таблицы причин неэффективности&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;A href=\"https://kb.gazprom-neft.local/pages/viewpage.action?pageId=294758300\" style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\" tabindex=\"-1\"&gt;Ключевые индикаторы риска - СПекТР - подбор опций легких ГТМ - Gazprom Neft Confluence (gazprom-neft.local)&lt;/A&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выбрать причину, заполнить комментарий и сохранить&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбранная причина отображается в окне&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"12\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Обновить страницу, перейти на другую вкладку и вернуться&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбранные причины отображаются в полях неуспешности и неэффективности&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2024-01-30T06:54:01.173Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Ревью"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2024-02-16T09:41:17.79Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 37
+          }
+        ]
+      },
+      "pointAssignments": [
+        {
+          "id": 39962,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442711/TestPoint/39962"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442711/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442711"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 1
+}

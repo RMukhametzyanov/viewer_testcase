@@ -1,0 +1,286 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 459372,
+        "name": "Общее"
+      },
+      "workItem": {
+        "id": 110235,
+        "name": "ДОБ. Настройки. Проверка сохранения настроек ГЗ",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"10\"><step id=\"8\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ПРЕДУСЛОВИЕ&lt;BR/&gt;&lt;BR/&gt;Меню / добывающий фонд / развернуть верхний месяц&lt;BR/&gt;Выбрать любое ДО / открыть&lt;BR/&gt;Перейти на вкладку Настройки&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Выбрать объект&lt;BR/&gt;В настройках ГТМ развернуть ГРП&lt;BR/&gt;Поменять любую настройку в ГРП&lt;BR/&gt;Сохранить и пересчитать&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Напротив выбранного ГТМ в статусе расчета поменялся статус на \"В процессе\"&lt;BR/&gt;&lt;BR/&gt;По окончанию расчета статус меняется на \"Завершен\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Выбрать объект&lt;BR/&gt;В настройках ГТМ развернуть ГРП&lt;BR/&gt;Поменять любую настройку в ГРП&lt;BR/&gt;Сохранить и пересчитать&lt;BR/&gt;&lt;BR/&gt;Сразу же на этом же объекте поменять любую настройку  в ГРП&lt;BR/&gt;Сохранить и пересчитать&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Не дает сохранить новую настройку, т.к. проект в процессе пересчета.&lt;/P&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Развернуть месторождение&lt;BR/&gt;Выбрать объект&lt;BR/&gt;&lt;BR/&gt;В настройках ГРП поменять любую настройку&lt;BR/&gt;Сохранить и пересчитать&lt;BR/&gt;&lt;BR/&gt;Выбрать второй объект внутри взятого месторождения&lt;BR/&gt;Развернуть настройки ГРП&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;На первом объекте сохранилась настройка по ГРП&lt;BR/&gt;&lt;BR/&gt;На втором объекте не применилась настройка по ГРП&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать месторождение&lt;BR/&gt;&lt;BR/&gt;В настройках ГРП поменять любую настройку&lt;BR/&gt;Сохранить и пересчитать&lt;BR/&gt;&lt;BR/&gt;Развернуть другое месторождение&lt;BR/&gt;Развернуть настройки ГРП&lt;BR/&gt;&lt;BR/&gt;Выбрать объект внутри месторождения, на котором меняли настройку&lt;BR/&gt;&lt;BR/&gt;Выбрать объект внутри другого месторождения&lt;BR/&gt;&lt;BR/&gt;Выбрать организации в навигации&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;На первом месторождении сохранилась настройка ГРП&lt;BR/&gt;&lt;BR/&gt;На другом месторождении не применилась настройка ГРП&lt;BR/&gt;&lt;BR/&gt;На объекте внутри месторождения, на котором меняли настройку, применилась настройка ГРП&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;На объекте внутри другого месторождения не применилась настройка ГРП&lt;BR/&gt;&lt;BR/&gt;На организации не применилась настройка ГРП, как на месторождении&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать организацию&lt;BR/&gt;В настройка ГРП поменять любую настройку&lt;BR/&gt;Сохранить и пересчитать&lt;BR/&gt;&lt;BR/&gt;Развернуть любое месторождение&lt;BR/&gt;Выбрать любой объект&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;На всех месторождениях и всех объекта применилась настройка ГРП&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-02-11T16:36:48.893Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-09-30T10:26:42.447Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 26
+          }
+        ]
+      },
+      "pointAssignments": [
+        {
+          "id": 39898,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/459372/TestPoint/39898"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/459372/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/459372"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 459372,
+        "name": "Общее"
+      },
+      "workItem": {
+        "id": 56573,
+        "name": "ДОБ. Настройки. Настройки проекта (навигация, история пересчета)",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"12\"><step id=\"8\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меню / ДОБ фонд / верхний месяц / любое ДО&lt;BR/&gt;Открыть / перейти на вкладку Настройки&lt;/P&gt;&lt;DIV&gt;&lt;SPAN style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"&gt;&lt;BR/&gt;&lt;/SPAN&gt;&lt;/DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать Организацию в навигации&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В центральной секции должны быть вкладки:&lt;BR/&gt;- Настройки расчета по ГТМ&lt;BR/&gt;- Стоимостные модели&lt;BR/&gt;&lt;BR/&gt;В верхней части доступны все баблики для выбора (ГТМ)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать месторождение в навигации&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В центральной секции должны быть вкладки:&lt;BR/&gt;- Настройки расчета по ГТМ&lt;BR/&gt;- Стоимостные модели&lt;BR/&gt;- темпы падения&lt;BR/&gt;&lt;BR/&gt;В верхней части доступны все баблики для выбора, кроме УВЧ(ГТМ)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать объект внутри месторождения в навигации&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В центральной секции должны быть вкладки:&lt;BR/&gt;- PVT и ГФХ&lt;BR/&gt;- Карты&lt;BR/&gt;- ОФП&lt;BR/&gt;- Настройки расчета по ГТМ&lt;BR/&gt;- темпы падения&lt;BR/&gt;&lt;BR/&gt;В верхней части доступны:&lt;BR/&gt; - ГРП/МГРП&lt;BR/&gt; - ПВЛГ/ПНЛГ&lt;BR/&gt; - Дострелы&lt;BR/&gt; - ЧРФ&lt;BR/&gt; - Демеханизация&lt;BR/&gt; - ФНВ&lt;BR/&gt; - ЗБС/ЗБГС&lt;BR/&gt; - Проницаемость&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В дереве объектов развернуть месторождения&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Дерево разворачивается и сворачивается.&lt;BR/&gt;Доступен скролл(прокрутка).&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Объекты дерева выбираются.&lt;BR/&gt;При выборе любого пункта навигации открываются прогружаются настройки по центру.&lt;BR/&gt;&lt;BR/&gt;При выборе ДО или месторождения доступны все ГТМы для пересчета, не заблокированы&lt;BR/&gt; &lt;BR/&gt;При выборе объекта внутри месторождения доступны ГТМы для пересчета сверху:&lt;BR/&gt; - ГРП/МГРП, ПВЛГ/ПНЛГ, Дострелы, ЧРФ, Демеханизация, ФНВ&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"11\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать любое месторождение&lt;BR/&gt;Развернуть Настройки расчета по ГТМ / выбрать ГРП&lt;BR/&gt;Включить или отключить любую настройку&lt;BR/&gt;&lt;BR/&gt;Повторить с объектом&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В момент изменения настройки напротив выбранного месторождения/объекта появляется индикатор ГТМ&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"12\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открыть историю пересчета&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В истории пересчета отображаются информация о пересчете. &lt;BR/&gt;&lt;BR/&gt;Пример:&lt;BR/&gt;&lt;B&gt;Пользователь&lt;/B&gt;\nМухаметзянов Рустэм Игоревич\n&lt;B&gt;Дата&lt;/B&gt;\n15.09.2025 07:38 (МСК)\n&lt;B&gt;Вид ГТМ&lt;/B&gt;\nПроницаемость\n&lt;B&gt;Месторождение&lt;/B&gt;\nВсе\n&lt;B&gt;Пласт&lt;/B&gt;\nВсе&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-04-11T09:08:33.697Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-10-08T09:45:11.9Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 32
+          }
+        ]
+      },
+      "order": 1,
+      "pointAssignments": [
+        {
+          "id": 39897,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/459372/TestPoint/39897"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/459372/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/459372"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 459372,
+        "name": "Общее"
+      },
+      "workItem": {
+        "id": 467343,
+        "name": "ДОБ. Настройки. Проверка соответствия признака активности настройки «ВКЛ»/«ВЫКЛ»",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"9\"><step id=\"2\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ПРЕДУСЛОВИЕ&lt;BR/&gt;&lt;BR/&gt;Меню / ДОБ фонд / развернуть верхний месяц&lt;BR/&gt;Выбрать любое ДО / открыть&lt;BR/&gt;Перейти на вкладку Настройки&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В настройках расчета по ГТМ последовательно развернуть каждый тип ГТМ&lt;BR/&gt;и входящие в него:&lt;BR/&gt;- Граничные значения&lt;BR/&gt;- Опции расчета &lt;BR/&gt;- Поиск скважин окружения&lt;BR/&gt;- Параметры расчета&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В зависимости от типа, настройки имеют вид:&lt;/P&gt;- настройка с вводом значения&lt;BR/&gt;- настройка с чек-боксом&lt;BR/&gt;- настройка с радиобаттоном&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Для каждой настройки с чек-боксом, где в Значение по умолчанию ВКЛ:&lt;BR/&gt;&lt;BR/&gt;Включить настройку&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Выключить настройку&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;BR/&gt;Галочка установлена, в колонке Пользовательское значение отображается «ВКЛ». &lt;BR/&gt;&lt;BR/&gt;Галочка отсутствует отображаться значение «ВЫКЛ»&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Для каждой настройки с радиобаттоном: &lt;BR/&gt;&lt;BR/&gt;Включить настройку&lt;BR/&gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Радиобаттон включен, в колонке Пользовательское значение отображается «ВКЛ». &lt;/P&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Перейти на вкладку Стоимостные модели&lt;BR/&gt;Последовательно развернуть каждый тип ГТМ&lt;BR/&gt;и входящие в него:&lt;BR/&gt;- Граничные значения&lt;BR/&gt;- Опции расчета &lt;BR/&gt;- Параметры расчета&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В зависимости от типа, настройка может иметь вид:&lt;/P&gt;&lt;P&gt;- строка&lt;BR/&gt;- строка с чек-боксом&lt;BR/&gt;- строка радиобаттоном &lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Для каждой настройки с чек-боксом, где в Значение по умолчанию ВКЛ:&lt;BR/&gt;&lt;BR/&gt;Включить настройку&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Выключить настройку&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;&lt;BR/&gt;&lt;BR/&gt;Галочка установлена, в колонке Пользовательское значение отображается «ВКЛ». &lt;BR/&gt;&lt;BR/&gt;Галочка отсутствует отображаться значение «ВЫКЛ»&lt;/P&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Для каждой настройки с радиобаттоном: &lt;BR/&gt;&lt;BR/&gt;Включить настройку&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Радиобаттон включен, в колонке Пользовательское значение отображается «ВКЛ». &lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-10-22T11:12:40.213Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Ревью"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-10-22T13:07:18.843Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 10
+          }
+        ]
+      },
+      "order": 2,
+      "pointAssignments": [
+        {
+          "id": 43691,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Лобанов Сергей Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+              }
+            },
+            "id": "cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "uniqueName": "GAZPROM-NEFT\\Lobanov.SI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/459372/TestPoint/43691"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/459372/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/459372"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 3
+}

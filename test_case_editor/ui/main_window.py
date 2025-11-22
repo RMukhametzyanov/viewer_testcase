@@ -1171,17 +1171,85 @@ class MainWindow(QMainWindow):
         self.mode_run_label = QLabel("Запуск тестов")
         toolbar.addWidget(self.mode_run_label)
         
-        toolbar.addSeparator()
-        
-        # Кнопка сохранения
-        self.save_button = QPushButton("Сохранить")
-        self.save_button.setMinimumHeight(UI_METRICS.control_min_height)
-        self.save_button.setCursor(Qt.PointingHandCursor)
-        self.save_button.setEnabled(False)
-        self.save_button.clicked.connect(self._on_save_button_clicked)
-        toolbar.addWidget(self.save_button)
-        
         self._update_mode_indicator()
+        
+        # Создаем кнопку "Сохранить" в статус-баре
+        self._create_statusbar_save_button()
+    
+    def _create_statusbar_save_button(self):
+        """Создать кнопку 'Сохранить' в статус-баре"""
+        statusbar = self.statusBar()
+        
+        # Создаем кнопку
+        self.statusbar_save_button = QPushButton("Сохранить")
+        self.statusbar_save_button.setMinimumHeight(28)
+        self.statusbar_save_button.setMinimumWidth(100)
+        self.statusbar_save_button.setCursor(Qt.PointingHandCursor)
+        self.statusbar_save_button.setVisible(False)  # Скрыта по умолчанию
+        self.statusbar_save_button.clicked.connect(self._on_save_button_clicked)
+        
+        # Добавляем кнопку в статус-бар (справа)
+        statusbar.addPermanentWidget(self.statusbar_save_button)
+    
+    def _highlight_save_button(self):
+        """Подсветить кнопку 'Сохранить' для привлечения внимания"""
+        if hasattr(self, "statusbar_save_button"):
+            # Получаем цвета из текущей темы
+            theme = THEME_PROVIDER.colors
+            success_color = theme.success  # Зеленый цвет для успеха
+            
+            # Применяем стиль с подсветкой (яркий зеленый фон для привлечения внимания)
+            self.statusbar_save_button.setStyleSheet(f"""
+                QPushButton {{
+                    background-color: {success_color};
+                    color: white;
+                    border: 2px solid {success_color};
+                    border-radius: 6px;
+                    padding: 6px 16px;
+                    font-weight: bold;
+                    font-size: 13px;
+                }}
+                QPushButton:hover {{
+                    background-color: {success_color};
+                    border-color: {success_color};
+                    opacity: 0.9;
+                }}
+                QPushButton:pressed {{
+                    background-color: {success_color};
+                    border-color: {success_color};
+                    opacity: 0.8;
+                }}
+            """)
+    
+    def _unhighlight_save_button(self):
+        """Убрать подсветку с кнопки 'Сохранить'"""
+        if hasattr(self, "statusbar_save_button"):
+            # Получаем цвета из текущей темы
+            theme = THEME_PROVIDER.colors
+            button_bg = theme.button_background
+            button_hover = theme.button_hover
+            button_pressed = theme.button_pressed
+            text_color = theme.text_primary
+            border_color = theme.border_primary
+            
+            # Возвращаем обычный стиль (кнопка будет скрыта, но стиль нужен для плавного перехода)
+            self.statusbar_save_button.setStyleSheet(f"""
+                QPushButton {{
+                    background-color: {button_bg};
+                    color: {text_color};
+                    border: 1px solid {border_color};
+                    border-radius: 6px;
+                    padding: 6px 16px;
+                    font-size: 13px;
+                }}
+                QPushButton:hover {{
+                    background-color: {button_hover};
+                    border-color: {theme.border_hover};
+                }}
+                QPushButton:pressed {{
+                    background-color: {button_pressed};
+                }}
+            """)
     
     def _open_git_commit_dialog(self):
         """Открыть диалог с комментарием git-коммита."""
@@ -1419,24 +1487,46 @@ class MainWindow(QMainWindow):
 
     def _on_test_case_selected(self, test_case: TestCase):
         """Обработка выбора тест-кейса"""
+        # Проверяем наличие несохраненных изменений перед переключением
+        if hasattr(self, "form_widget") and self.form_widget.has_unsaved_changes:
+            # Подсвечиваем кнопку "Сохранить" и показываем предупреждение
+            if hasattr(self, "statusbar_save_button"):
+                self.statusbar_save_button.setVisible(True)
+                self._highlight_save_button()
+            self.statusBar().showMessage(
+                "Есть несохраненные изменения. Сохраните изменения перед переключением на другой тест-кейс.",
+                5000
+            )
+            # Переключаемся на новый тест-кейс, но предупреждаем пользователя
+            # (изменения будут потеряны, но пользователь видит подсвеченную кнопку)
+        
         self.current_test_case = test_case
         self.detail_stack.setCurrentWidget(self.form_widget)
         self.form_widget.load_test_case(test_case)
         # Обновляем панель информации
         if hasattr(self, "aux_panel"):
             self.aux_panel.set_information_test_case(test_case)
+            self.aux_panel.set_files_test_case(test_case)
+            # Подключаем сигнал изменения attachments в панели файлов
+            if hasattr(self.aux_panel, "files_panel"):
+                try:
+                    self.aux_panel.files_panel.attachment_changed.disconnect()
+                except TypeError:
+                    pass
+                self.aux_panel.files_panel.attachment_changed.connect(self._on_files_attachment_changed)
         self._update_json_preview()
-        self._update_json_preview()
-        
-        # Показываем форму
         
         self.statusBar().showMessage(f"Открыт: {test_case.name}")
     
     def _on_form_unsaved_state(self, has_changes: bool):
         """Обновление статуса при изменениях в форме"""
-        # Управляем состоянием кнопки сохранения в тулбаре
-        if hasattr(self, "save_button"):
-            self.save_button.setEnabled(has_changes)
+        # Управляем видимостью и подсветкой кнопки сохранения в статус-баре
+        if hasattr(self, "statusbar_save_button"):
+            self.statusbar_save_button.setVisible(has_changes)
+            if has_changes:
+                self._highlight_save_button()
+            else:
+                self._unhighlight_save_button()
         if has_changes:
             self.statusBar().showMessage("Есть несохраненные изменения. Нажмите «Сохранить».")
         else:
@@ -1447,7 +1537,7 @@ class MainWindow(QMainWindow):
         self._update_mode_indicator()
     
     def _on_save_button_clicked(self):
-        """Обработка нажатия кнопки сохранения в тулбаре"""
+        """Обработка нажатия кнопки сохранения"""
         if hasattr(self, "form_widget"):
             self.form_widget.save()
     
@@ -1461,6 +1551,8 @@ class MainWindow(QMainWindow):
         # Обновляем панель информации после сохранения
         if hasattr(self, "aux_panel") and self.current_test_case:
             self.aux_panel.set_information_test_case(self.current_test_case)
+            # Обновляем панель "Файлы" для отображения прикрепленных файлов
+            self.aux_panel.set_files_test_case(self.current_test_case)
         self.load_all_test_cases()
         self._update_json_preview()
         self.statusBar().showMessage("Тест-кейс сохранен")
@@ -1471,6 +1563,14 @@ class MainWindow(QMainWindow):
             return
         # Обновляем тест-кейс данными из панели информации
         self.aux_panel.update_information_test_case(self.current_test_case)
+        # Помечаем изменения в форме (чтобы появилась кнопка сохранения)
+        self.form_widget.has_unsaved_changes = True
+        self.form_widget.unsaved_changes_state.emit(True)
+    
+    def _on_files_attachment_changed(self):
+        """Обработка изменения attachments в панели файлов"""
+        if not self.current_test_case:
+            return
         # Помечаем изменения в форме (чтобы появилась кнопка сохранения)
         self.form_widget.has_unsaved_changes = True
         self.form_widget.unsaved_changes_state.emit(True)
