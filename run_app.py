@@ -14,6 +14,7 @@ from PyQt5.QtWidgets import QApplication
 from test_case_editor.ui import MainWindow
 from test_case_editor.ui.styles.app_theme import build_app_style_sheet
 from test_case_editor.ui.styles.ui_metrics import UI_METRICS
+from test_case_editor.ui.styles.theme_provider import THEME_PROVIDER
 
 
 def main():
@@ -59,16 +60,34 @@ def main():
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
     
-    # Загружаем настройки и применяем к UI_METRICS перед созданием окна
+    # Загружаем настройки и применяем к UI_METRICS и THEME_PROVIDER перед созданием окна
     settings_file = Path("settings.json")
     if settings_file.exists():
         try:
             with settings_file.open("r", encoding="utf-8") as f:
                 settings = json.load(f)
+                # Настройки шрифтов
                 if 'font_family' in settings:
                     UI_METRICS.font_family = settings['font_family']
                 if 'font_size' in settings:
                     UI_METRICS.base_font_size = settings['font_size']
+                # Настройки отступов
+                if 'base_spacing' in settings:
+                    UI_METRICS.base_spacing = settings['base_spacing']
+                if 'section_spacing' in settings:
+                    UI_METRICS.section_spacing = settings['section_spacing']
+                if 'container_padding' in settings:
+                    UI_METRICS.container_padding = settings['container_padding']
+                if 'text_input_vertical_padding' in settings:
+                    UI_METRICS.text_input_vertical_padding = settings['text_input_vertical_padding']
+                if 'group_title_spacing' in settings:
+                    UI_METRICS.group_title_spacing = settings['group_title_spacing']
+                # Настройка темы
+                theme_name = settings.get('theme', 'dark').strip().lower()
+                if theme_name in ['dark', 'light']:
+                    THEME_PROVIDER.set_theme(theme_name)
+                else:
+                    THEME_PROVIDER.set_theme('dark')  # По умолчанию темная тема
         except Exception:
             # Если не удалось загрузить настройки, используем значения по умолчанию
             pass

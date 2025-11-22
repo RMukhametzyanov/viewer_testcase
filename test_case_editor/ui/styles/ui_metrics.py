@@ -5,35 +5,48 @@ from dataclasses import dataclass
 
 @dataclass
 class UIMetrics:
-    # Базовое семейство шрифтов, которое применяем к приложению
-    font_family: str = "'Inter', 'Roboto', 'Segoe UI', sans-serif"
+    # Базовое семейство шрифтов (в стиле Cursor - Inter/JetBrains Mono)
+    font_family: str = "'Inter', 'JetBrains Mono', 'Segoe UI', 'Roboto', system-ui, sans-serif"
     # Размер основного шрифта в пунктах
     base_font_size: int = 13
 
     # Внешний отступ вокруг главного окна (layout центрального виджета)
-    window_margin: int = 6
+    # Настраивается через настройки
+    window_margin: int = 8
     # Стандартный промежуток между элементами (layout spacing)
-    base_spacing: int = 10
+    # Настраивается через настройки
+    base_spacing: int = 12
     # Вертикальные интервалы между большими секциями формы/панелей
-    section_spacing: int = 5
+    # Настраивается через настройки
+    section_spacing: int = 8
     # Внутренние отступы контейнеров (панелей, групп)
-    container_padding: int = 6
+    # Настраивается через настройки
+    container_padding: int = 12
     # Отступы в шапке окна и других хедерах
+    # Настраивается через настройки
     header_padding: int = 6
 
     # Минимальная ширина контрольных элементов (кнопок и т.п.)
     control_min_width: int = 12
-    # Радиус скругления для кнопок/панелей
-    control_radius: int = 3
+    # Радиус скругления для кнопок/панелей (малые скругления как в Cursor)
+    control_radius: int = 6
     # Радиус скругления для текстовых полей/списков
-    input_radius: int = 4
+    input_radius: int = 6
 
     # Отступы внутри элементов списков/дерева
-    list_item_padding: int = 5
+    # Настраивается через настройки
+    list_item_padding: int = 8
     # Горизонтальные внутренние отступы контролов
-    control_padding_horizontal: int = 2
+    # Настраивается через настройки
+    control_padding_horizontal: int = 12
     # Дополнительные отступы внутри панелей вкладок
-    tab_padding: int = 9
+    tab_padding: int = 12
+    # Вертикальные отступы для текстовых полей (сверху и снизу до текста)
+    # Настраивается через настройки приложения
+    text_input_vertical_padding: int = 2
+    # Отступ заголовка QGroupBox до содержимого
+    # Настраивается через настройки приложения
+    group_title_spacing: int = 1
 
     @property
     def control_min_height(self) -> int:
@@ -48,12 +61,6 @@ class UIMetrics:
         """Вертикальные внутренние отступы контролов, вычисляются на основе размера шрифта"""
         # Пропорционально размеру шрифта: для 13px -> 10px, для 16px -> ~12px
         return max(int(self.base_font_size * 0.75), 8)
-
-    @property
-    def text_vertical_padding(self) -> int:
-        """Дополнительный внутренний отступ для текстовых полей сверху/снизу"""
-        # Пропорционально размеру шрифта: для 13px -> 2px, для 16px -> ~3px
-        return max(int(self.base_font_size * 0.15), 2)
 
 
 UI_METRICS = UIMetrics()

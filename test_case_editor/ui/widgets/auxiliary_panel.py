@@ -21,6 +21,7 @@ from PyQt5.QtWidgets import (
 from .review_panel import ReviewPanel
 from .json_preview_widget import JsonPreviewWidget
 from .stats_panel import StatsPanel
+from .information_panel import InformationPanel
 from ...models import TestCase
 from ..styles.ui_metrics import UI_METRICS
 
@@ -34,6 +35,8 @@ class AuxiliaryPanel(QWidget):
     creation_prompt_saved = pyqtSignal(str)
     creation_enter_clicked = pyqtSignal(str, list)
 
+    information_data_changed = pyqtSignal()
+
     def __init__(
         self,
         parent: Optional[QWidget] = None,
@@ -43,9 +46,9 @@ class AuxiliaryPanel(QWidget):
         creation_default_files: Optional[List[Path]] = None,
     ):
         super().__init__(parent)
-        self._tabs_order = ["review", "creation", "json", "stats"]
+        self._tabs_order = ["information", "review", "creation", "json", "stats"]
         self._buttons: dict[str, QPushButton] = {}
-        self._last_non_stats_tab = "review"
+        self._last_non_stats_tab = "information"
         self._methodic_path = methodic_path
         self._review_default_prompt = default_review_prompt
         self._creation_default_prompt = default_creation_prompt or "Создай ТТ"
@@ -70,6 +73,11 @@ class AuxiliaryPanel(QWidget):
         self._stack = QStackedLayout()
         self._stack.setStackingMode(QStackedLayout.StackOne)
 
+        # Вкладка информации
+        self.information_panel = InformationPanel()
+        self.information_panel.data_changed.connect(self.information_data_changed.emit)
+        self._stack.addWidget(self.information_panel)
+
         # Вкладка ревью
         self.review_panel = ReviewPanel(title_text="Панель ревью")
         self.review_panel.prompt_saved.connect(self.review_prompt_saved.emit)
@@ -93,7 +101,7 @@ class AuxiliaryPanel(QWidget):
         main_layout.addLayout(self._stack, stretch=1)
 
         self.ensure_creation_defaults()
-        self.select_tab("review")
+        self.select_tab("information")
 
     def _create_button_row(self) -> QHBoxLayout:
         layout = QHBoxLayout()
@@ -112,6 +120,7 @@ class AuxiliaryPanel(QWidget):
         button_group.setExclusive(True)
 
         tabs = [
+            ("information", "Информация", "Информация о тест-кейсе"),
             ("review", "Ревью", "Панель ревью"),
             ("creation", "Создать ТК", "Создать ТК"),
             ("json", "JSON", "JSON превью"),
@@ -156,7 +165,7 @@ class AuxiliaryPanel(QWidget):
     def select_tab(self, tab_id: str):
         """Активировать вкладку по идентификатору."""
         if tab_id not in self._tabs_order:
-            tab_id = "review"
+            tab_id = "information"
 
         index = self._tabs_order.index(tab_id)
         self._stack.setCurrentIndex(index)
@@ -174,7 +183,26 @@ class AuxiliaryPanel(QWidget):
         self.select_tab("stats")
 
     def restore_last_tab(self):
-        self.select_tab(self._last_non_stats_tab or "review")
+        self.select_tab(self._last_non_stats_tab or "information")
+
+    # ------------------------------------------------------------------ information
+
+    def set_information_test_case(self, test_case: Optional[TestCase]):
+        """Установить тест-кейс для панели информации"""
+        if hasattr(self, "information_panel"):
+            self.information_panel.load_test_case(test_case)
+
+    def update_information_test_case(self, test_case: TestCase):
+        """Обновить тест-кейс данными из панели информации"""
+        if hasattr(self, "information_panel") and test_case:
+            self.information_panel.update_test_case(test_case)
+
+    def set_information_edit_mode(self, enabled: bool):
+        """Установить режим редактирования для панели информации"""
+        if hasattr(self, "information_panel"):
+            self.information_panel.set_edit_mode(enabled)
+
+    # ------------------------------------------------------------------ review
 
     def set_review_attachments(self, attachments: Iterable[Path]):
         self.review_panel.set_attachments(attachments)

@@ -21,6 +21,9 @@ from PyQt5.QtWidgets import (
     QSizePolicy,
     QAbstractItemView,
     QMenu,
+    QTableWidget,
+    QTableWidgetItem,
+    QHeaderView,
 )
 from PyQt5.QtCore import Qt, pyqtSignal, QEvent, QSize, QTimer
 from PyQt5.QtGui import QFont, QTextOption, QIcon, QPixmap, QPainter, QColor
@@ -65,6 +68,8 @@ class TestCaseFormWidget(QWidget):
             self._index = 1
             self._edit_mode = False
             self.setObjectName("StepCard")
+            # Размерная политика - карточка подстраивается под содержимое
+            self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
             layout = QVBoxLayout(self)
             layout.setContentsMargins(
                 UI_METRICS.container_padding,
@@ -166,32 +171,46 @@ class TestCaseFormWidget(QWidget):
             layout.addLayout(header)
 
             # Таблица для действия и ожидаемого результата
-            self.body_grid = QGridLayout()
-            self.body_grid.setSpacing(10)
-            self.body_grid.setContentsMargins(0, 0, 0, 0)
+            self.step_table = QTableWidget(1, 2, self)
+            self.step_table.horizontalHeader().setVisible(False)  # Убираем заголовки
+            self.step_table.horizontalHeader().setStretchLastSection(True)
+            self.step_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+            self.step_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+            self.step_table.verticalHeader().setVisible(False)
+            self.step_table.setShowGrid(True)
+            self.step_table.setSelectionMode(QAbstractItemView.NoSelection)
+            self.step_table.setEditTriggers(QAbstractItemView.NoEditTriggers)  # Редактирование через виджеты в ячейках
+            # Настройка размерной политики - таблица подстраивается под содержимое
+            self.step_table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
             
-            # Текстовые поля
+            # Текстовые поля для ячеек таблицы
             self.action_edit = QTextEdit()
             self.action_edit.setPlaceholderText("Действие...")
-            self._init_auto_resizing_text_edit_for_step(self.action_edit)
+            self.action_edit.setWordWrapMode(QTextOption.WordWrap)
+            self.action_edit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            self.action_edit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            # Размерная политика - минимальная по вертикали для автоматической подстройки
+            self.action_edit.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
             self.action_edit.textChanged.connect(self._on_text_changed)
             
             self.expected_edit = QTextEdit()
             self.expected_edit.setPlaceholderText("Ожидаемый результат...")
-            self._init_auto_resizing_text_edit_for_step(self.expected_edit)
+            self.expected_edit.setWordWrapMode(QTextOption.WordWrap)
+            self.expected_edit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            self.expected_edit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            # Размерная политика - минимальная по вертикали для автоматической подстройки
+            self.expected_edit.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
             self.expected_edit.textChanged.connect(self._on_text_changed)
             
-            self.body_grid.addWidget(self.action_edit, 0, 0)
-            self.body_grid.addWidget(self.expected_edit, 0, 1)
+            # Размещаем текстовые поля в ячейках таблицы
+            self.step_table.setCellWidget(0, 0, self.action_edit)
+            self.step_table.setCellWidget(0, 1, self.expected_edit)
             
-            # Устанавливаем одинаковую ширину колонок
-            self.body_grid.setColumnStretch(0, 1)
-            self.body_grid.setColumnStretch(1, 1)
+            # Настройка высоты строки - автоматическая подстройка под содержимое
+            self.step_table.verticalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+            self.step_table.verticalHeader().setMinimumSectionSize(50)
             
-            layout.addLayout(self.body_grid)
-            
-            # Синхронизируем высоту полей после инициализации
-            QTimer.singleShot(100, self._sync_text_edits_height)
+            layout.addWidget(self.step_table)
 
         def set_contents(self, action: str, expected: str, status: str):
             self.action_edit.blockSignals(True)
@@ -201,9 +220,8 @@ class TestCaseFormWidget(QWidget):
             self.action_edit.blockSignals(False)
             self.expected_edit.blockSignals(False)
             self.set_status(status or "pending")
-            # Синхронизируем высоту полей после установки содержимого
-            # Используем небольшую задержку, чтобы документы успели обновиться
-            QTimer.singleShot(50, self._sync_text_edits_height)
+            # Обновляем высоту строки таблицы после установки содержимого
+            QTimer.singleShot(0, lambda: self.step_table.resizeRowToContents(0))
 
         def get_contents(self) -> tuple[str, str]:
             return self.action_edit.toPlainText(), self.expected_edit.toPlainText()
@@ -266,87 +284,18 @@ class TestCaseFormWidget(QWidget):
             for btn in self.status_buttons:
                 btn.setEnabled(enabled)
 
-        def _init_auto_resizing_text_edit_for_step(self, text_edit: QTextEdit, *, min_lines: int = 2):
-            """Настроить QTextEdit в шаге так, чтобы он подстраивал высоту под содержимое.
-            
-            Текст всегда отображается целиком (без ограничения максимальной высоты).
-            """
-            text_edit.setWordWrapMode(QTextOption.WordWrap)
-            text_edit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-            text_edit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-            line_height = text_edit.fontMetrics().lineSpacing()
-            margins = text_edit.contentsMargins()
-            doc_margin = text_edit.document().documentMargin()
-            min_height = int(line_height * min_lines + doc_margin * 2 + margins.top() + margins.bottom() + 6)
-            text_edit.setMinimumHeight(min_height)
-            # Убираем максимальную высоту, чтобы текст всегда отображался целиком
-            text_edit.setMaximumHeight(16777215)  # Максимальное значение QSize
-
-            def _resize():
-                doc = text_edit.document()
-                margins = text_edit.contentsMargins()
-                doc_height = doc.size().height() + doc.documentMargin() * 2 + margins.top() + margins.bottom() + 6
-                new_height = max(min_height, int(doc_height))
-                if text_edit.height() != new_height:
-                    text_edit.setFixedHeight(new_height)
-                    # Синхронизируем высоту обоих полей и обновляем размер шага
-                    QTimer.singleShot(0, self._sync_text_edits_height)
-
-            text_edit.textChanged.connect(_resize)
-            QTimer.singleShot(0, _resize)
-        
-        def _sync_text_edits_height(self):
-            """Синхронизировать высоту полей действия и ожидаемого результата.
-            
-            Оба поля должны иметь одинаковую высоту, равную максимальной из них.
-            Высота вычисляется на основе реального содержимого документов.
-            """
-            def _calculate_text_edit_height(text_edit: QTextEdit) -> int:
-                """Вычислить необходимую высоту текстового поля на основе содержимого."""
-                doc = text_edit.document()
-                margins = text_edit.contentsMargins()
-                doc_margin = doc.documentMargin()
-                line_height = text_edit.fontMetrics().lineSpacing()
-                min_height = int(line_height * 2 + doc_margin * 2 + margins.top() + margins.bottom() + 6)
-                
-                # Вычисляем высоту на основе содержимого документа
-                # Убеждаемся, что документ имеет правильную ширину для расчета высоты
-                viewport_width = text_edit.viewport().width()
-                if viewport_width > 0:
-                    doc.setTextWidth(viewport_width)
-                
-                doc_height = doc.size().height() + doc_margin * 2 + margins.top() + margins.bottom() + 6
-                return max(min_height, int(doc_height))
-            
-            # Вычисляем необходимую высоту для каждого поля на основе содержимого
-            action_needed_height = _calculate_text_edit_height(self.action_edit)
-            expected_needed_height = _calculate_text_edit_height(self.expected_edit)
-            
-            # Используем максимальную высоту для обоих полей
-            target_height = max(action_needed_height, expected_needed_height)
-            
-            # Обновляем высоту обоих полей
-            if self.action_edit.height() != target_height:
-                self.action_edit.setFixedHeight(target_height)
-            if self.expected_edit.height() != target_height:
-                self.expected_edit.setFixedHeight(target_height)
-            
-            # Принудительно обновляем геометрию карточки
-            self.updateGeometry()
-            
-            # Обновляем размер шага после синхронизации
-            QTimer.singleShot(0, self._update_step_size)
-
         def _on_text_changed(self):
             """Обработчик изменения текста в полях действия или ожидаемого результата."""
-            # Высота будет синхронизирована через _sync_text_edits_height
-            # который вызывается из _resize в _init_auto_resizing_text_edit_for_step
+            # Обновляем высоту строки таблицы под содержимое (с небольшой задержкой для корректного расчета)
+            QTimer.singleShot(0, lambda: self.step_table.resizeRowToContents(0))
+            # Обновляем размер карточки после обновления таблицы
+            QTimer.singleShot(10, self._update_card_size)
             self.content_changed.emit()
-
-        def _update_step_size(self):
-            """Обновить размер шага на основе содержимого."""
-            # Находим родительский виджет формы для обновления размера элемента в списке
-            # Идем вверх по иерархии виджетов до тех пор, пока не найдем виджет с steps_list
+        
+        def _update_card_size(self):
+            """Обновить размер карточки под высоту таблицы."""
+            self.updateGeometry()
+            # Обновляем размер в списке шагов, если карточка находится в списке
             parent_form = self.parent()
             while parent_form:
                 if hasattr(parent_form, 'steps_list') and hasattr(parent_form, '_find_widget_row'):
@@ -360,56 +309,8 @@ class TestCaseFormWidget(QWidget):
                 parent_form = parent_form.parent()
 
         def sizeHint(self):
-            """Вычислить размер шага на основе реального содержимого."""
-            # Получаем реальные отступы и spacing из layout'ов
-            main_layout = self.layout()
-            margins = self.contentsMargins()
-            main_spacing = main_layout.spacing() if main_layout else UI_METRICS.base_spacing
-            grid_spacing = self.body_grid.spacing() if hasattr(self, 'body_grid') else 10
-            
-            # Высота header (индекс + кнопки + статус)
-            # Используем реальную высоту header layout, если он уже отрисован
-            header_height = self.index_label.sizeHint().height()
-            # Добавляем отступ для header (учитываем padding и spacing)
-            header_total = header_height + 8
-            
-            # Получаем высоту текстовых полей (они всегда синхронизированы и имеют одинаковую высоту)
-            # Используем реальную высоту, если виджет уже отрисован, иначе sizeHint
-            if self.action_edit.height() > 0:
-                content_height = self.action_edit.height()
-            else:
-                # Если виджет еще не отрисован, вычисляем высоту на основе документа
-                doc = self.action_edit.document()
-                doc_margin = doc.documentMargin()
-                margins_edit = self.action_edit.contentsMargins()
-                line_height = self.action_edit.fontMetrics().lineSpacing()
-                min_height = int(line_height * 2 + doc_margin * 2 + margins_edit.top() + margins_edit.bottom() + 6)
-                doc_height = doc.size().height() + doc_margin * 2 + margins_edit.top() + margins_edit.bottom() + 6
-                content_height = max(min_height, int(doc_height))
-            
-            # Вычисляем общую высоту с учетом всех отступов и spacing
-            total_height = (
-                margins.top() +                    # Верхний отступ карточки
-                header_total +                     # Высота header
-                main_spacing +                     # Spacing между header и grid
-                content_height +                   # Высота текстовых полей
-                margins.bottom()                   # Нижний отступ карточки
-            )
-            
-            # Минимальная высота для пустого шага
-            line_height = self.action_edit.fontMetrics().lineSpacing()
-            min_content_height = line_height * 2
-            min_total = (
-                margins.top() + 
-                header_total + 
-                main_spacing + 
-                min_content_height + 
-                margins.bottom()
-            )
-            
-            # Возвращаем максимальное значение между минимумом и реальной высотой
-            # Добавляем запас (8px) для предотвращения обрезки из-за округлений и границ
-            return QSize(self.width() or 400, int(max(min_total, total_height) + 8))
+            """Базовый размер шага без кастомной логики вычисления высоты."""
+            return super().sizeHint()
 
         def _on_status_clicked(self, status: str):
             if status == self._status:
@@ -422,6 +323,7 @@ class TestCaseFormWidget(QWidget):
     # Сигналы
     test_case_saved = pyqtSignal()
     unsaved_changes_state = pyqtSignal(bool)
+    before_save = pyqtSignal(object)  # Сигнал перед сохранением с передачей тест-кейса
     
     def __init__(self, service: TestCaseService, parent=None):
         super().__init__(parent)
@@ -474,10 +376,6 @@ class TestCaseFormWidget(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(UI_METRICS.base_spacing)
         
-        # Заголовок
-        header = self._create_header()
-        layout.addWidget(header)
-        
         # Scrollable форма
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
@@ -493,47 +391,13 @@ class TestCaseFormWidget(QWidget):
             UI_METRICS.container_padding,
         )
         
-        # Кнопка сворачивания секций
-        self.sections_toggle_btn = QToolButton()
-        self.sections_toggle_btn.setArrowType(Qt.DownArrow)
-        self.sections_toggle_btn.setToolButtonStyle(Qt.ToolButtonIconOnly)
-        self.sections_toggle_btn.setCheckable(True)
-        self.sections_toggle_btn.setChecked(True)
-        self.sections_toggle_btn.setMinimumHeight(max(28, UI_METRICS.control_min_height // 2))
-        self.sections_toggle_btn.setMinimumWidth(UI_METRICS.control_min_width)
-        self.sections_toggle_btn.clicked.connect(self._toggle_sections)
-        form_layout.addWidget(self.sections_toggle_btn, alignment=Qt.AlignLeft)
-
-        self.sections_widgets = []
-
-        # Основная информация
-        self.main_info_group = self._create_main_info_group()
-        form_layout.addWidget(self.main_info_group)
-        self.sections_widgets.append(self.main_info_group)
-
-        # Теги
-        self.tags_group = self._create_tags_group()
-        form_layout.addWidget(self.tags_group)
-        self.sections_widgets.append(self.tags_group)
-
-        # Контекст
-        self.domain_group = self._create_domain_group()
-        form_layout.addWidget(self.domain_group)
-        self.sections_widgets.append(self.domain_group)
-
-        # Описание
-        self.description_group = self._create_description_group()
-        form_layout.addWidget(self.description_group)
-        self.sections_widgets.append(self.description_group)
+        # Название тест-кейса
+        title_group = self._create_title_group()
+        form_layout.addWidget(title_group)
 
         # Предусловия
         precond_group = self._create_precondition_group()
         form_layout.addWidget(precond_group)
-
-        # Общий ожидаемый результат
-        expected_group = self._create_expected_result_group()
-        form_layout.addWidget(expected_group)
-        self.sections_widgets.append(expected_group)
 
         # Шаги тестирования
         steps_group = self._create_steps_group()
@@ -545,50 +409,6 @@ class TestCaseFormWidget(QWidget):
         scroll.setWidget(form_widget)
         layout.addWidget(scroll)
         self.scroll_area = scroll  # Сохраняем ссылку для прокрутки
-    
-    def _create_header(self) -> QWidget:
-        """Создать заголовок"""
-        header = QFrame()
-        header.setMinimumHeight(90)
-
-        layout = QHBoxLayout(header)
-        layout.setContentsMargins(
-            UI_METRICS.container_padding,
-            UI_METRICS.section_spacing,
-            UI_METRICS.container_padding,
-            UI_METRICS.section_spacing,
-        )
-        layout.setSpacing(UI_METRICS.section_spacing)
-
-        text_layout = QVBoxLayout()
-        text_layout.setSpacing(UI_METRICS.base_spacing // 2)
-
-        row_layout = QHBoxLayout()
-        row_layout.setSpacing(UI_METRICS.base_spacing)
-
-        self.title_edit = QLineEdit()
-        self.title_edit.setFont(QFont("Segoe UI", 14, QFont.Bold))
-        self.title_edit.setPlaceholderText("Название тест-кейса")
-        self.title_edit.textChanged.connect(self._mark_changed)
-        row_layout.addWidget(self.title_edit, stretch=1)
-
-        self.save_button = QPushButton("Сохранить")
-        self.save_button.setMinimumHeight(UI_METRICS.control_min_height)
-        self.save_button.setCursor(Qt.PointingHandCursor)
-        self.save_button.setEnabled(False)
-        self.save_button.clicked.connect(self._save)
-        row_layout.addWidget(self.save_button, alignment=Qt.AlignRight)
-
-        text_layout.addLayout(row_layout)
-        layout.addLayout(text_layout, stretch=1)
-
-        return header
-    
-    def _toggle_sections(self):
-        expanded = self.sections_toggle_btn.isChecked()
-        self.sections_toggle_btn.setArrowType(Qt.DownArrow if expanded else Qt.RightArrow)
-        for widget in self.sections_widgets:
-            widget.setVisible(expanded)
 
     def _create_main_info_group(self) -> QGroupBox:
         group = QGroupBox("Основная информация")
@@ -596,7 +416,7 @@ class TestCaseFormWidget(QWidget):
         layout.setSpacing(UI_METRICS.base_spacing)
         layout.setContentsMargins(
             UI_METRICS.container_padding,
-            UI_METRICS.base_spacing,
+            UI_METRICS.group_title_spacing,  # Отступ сверху для заголовка
             UI_METRICS.container_padding,
             UI_METRICS.base_spacing,
         )
@@ -684,7 +504,7 @@ class TestCaseFormWidget(QWidget):
     def _create_tags_group(self) -> QGroupBox:
         group = QGroupBox("Теги")
         layout = QVBoxLayout(group)
-        layout.setContentsMargins(10, 8, 10, 8)
+        layout.setContentsMargins(10, UI_METRICS.group_title_spacing, 10, 8)  # Отступ сверху для заголовка
         layout.setSpacing(6)
 
         self.tags_input = QTextEdit()
@@ -697,7 +517,7 @@ class TestCaseFormWidget(QWidget):
     def _create_description_group(self) -> QGroupBox:
         group = QGroupBox("Описание")
         layout = QVBoxLayout(group)
-        layout.setContentsMargins(10, 8, 10, 8)
+        layout.setContentsMargins(10, UI_METRICS.group_title_spacing, 10, 8)  # Отступ сверху для заголовка
         layout.setSpacing(6)
 
         self.description_input = QTextEdit()
@@ -710,6 +530,7 @@ class TestCaseFormWidget(QWidget):
     def _create_domain_group(self) -> QGroupBox:
         group = QGroupBox("Контекст (epic / feature / story / component)")
         layout = QHBoxLayout(group)
+        layout.setContentsMargins(10, UI_METRICS.group_title_spacing, 10, 8)  # Отступ сверху для заголовка
         layout.setSpacing(12)
 
         self.epic_input = self._create_line_edit()
@@ -730,10 +551,24 @@ class TestCaseFormWidget(QWidget):
 
         return group
     
+    def _create_title_group(self) -> QGroupBox:
+        """Группа названия тест-кейса"""
+        group = QGroupBox("Название")
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, UI_METRICS.group_title_spacing, 0, 0)  # Отступ сверху для заголовка
+        
+        self.title_edit = self._create_line_edit()
+        self.title_edit.setPlaceholderText("Название тест-кейса")
+        layout.addWidget(self.title_edit)
+        
+        group.setLayout(layout)
+        return group
+
     def _create_precondition_group(self) -> QGroupBox:
         """Группа предусловий"""
         group = QGroupBox("Предусловия")
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, UI_METRICS.group_title_spacing, 0, 0)  # Отступ сверху для заголовка
         
         self.precondition_input = QTextEdit()
         self.precondition_input.setPlaceholderText("Предусловия для выполнения тест-кейса")
@@ -747,6 +582,7 @@ class TestCaseFormWidget(QWidget):
     def _create_expected_result_group(self) -> QGroupBox:
         group = QGroupBox("Общий ожидаемый результат")
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, UI_METRICS.group_title_spacing, 0, 0)  # Отступ сверху для заголовка
 
         self.expected_result_input = QTextEdit()
         self.expected_result_input.setPlaceholderText("Что должно получиться по завершении кейса")
@@ -789,7 +625,7 @@ class TestCaseFormWidget(QWidget):
         layout = QVBoxLayout()
         layout.setContentsMargins(
             UI_METRICS.container_padding,
-            UI_METRICS.base_spacing,
+            UI_METRICS.group_title_spacing,  # Отступ сверху для заголовка
             UI_METRICS.container_padding,
             UI_METRICS.base_spacing,
         )
@@ -827,84 +663,12 @@ class TestCaseFormWidget(QWidget):
 
         if test_case:
             self.title_edit.blockSignals(True)
-            self.title_edit.setText(test_case.name)
+            self.title_edit.setText(test_case.name or "")
             self.title_edit.blockSignals(False)
 
-            self.id_label.setText(f"ID: {test_case.id or '-'}")
-            created_text = format_datetime(test_case.created_at) if test_case.created_at else "-"
-            updated_text = format_datetime(test_case.updated_at) if test_case.updated_at else "-"
-            self.created_label.setText(f"Создан: {created_text}")
-            self.updated_label.setText(f"Обновлён: {updated_text}")
-
-            self.author_input.blockSignals(True)
-            self.author_input.setText(test_case.author)
-            self.author_input.blockSignals(False)
-
-            self.owner_input.blockSignals(True)
-            self.owner_input.setText(test_case.owner)
-            self.owner_input.blockSignals(False)
-
-            self.reviewer_input.blockSignals(True)
-            self.reviewer_input.setText(test_case.reviewer)
-            self.reviewer_input.blockSignals(False)
-
-            self._set_combo_value(self.status_input, test_case.status)
-            self._set_combo_value(self.test_layer_input, test_case.test_layer)
-            self._set_combo_value(self.test_type_input, test_case.test_type)
-            self._set_combo_value(self.severity_input, test_case.severity)
-            self._set_combo_value(self.priority_input, test_case.priority)
-
-            self.tags_input.blockSignals(True)
-            self.tags_input.setText('\n'.join(test_case.tags))
-            self.tags_input.blockSignals(False)
-
-            self.description_input.blockSignals(True)
-            self.description_input.setText(test_case.description)
-            self.description_input.blockSignals(False)
-
             self.precondition_input.blockSignals(True)
-            self.precondition_input.setText(test_case.preconditions)
+            self.precondition_input.setText(test_case.preconditions or "")
             self.precondition_input.blockSignals(False)
-
-            self.expected_result_input.blockSignals(True)
-            self.expected_result_input.setText(test_case.expected_result)
-            self.expected_result_input.blockSignals(False)
-
-            self.environment_input.blockSignals(True)
-            self.environment_input.setText(test_case.environment)
-            self.environment_input.blockSignals(False)
-
-            self.browser_input.blockSignals(True)
-            self.browser_input.setText(test_case.browser)
-            self.browser_input.blockSignals(False)
-
-            self.test_case_id_input.blockSignals(True)
-            self.test_case_id_input.setText(test_case.test_case_id)
-            self.test_case_id_input.blockSignals(False)
-
-            self.issue_links_input.blockSignals(True)
-            self.issue_links_input.setText(test_case.issue_links)
-            self.issue_links_input.blockSignals(False)
-
-            self.test_case_links_input.blockSignals(True)
-            self.test_case_links_input.setText(test_case.test_case_links)
-            self.test_case_links_input.blockSignals(False)
-
-            self.epic_input.blockSignals(True)
-            self.epic_input.setText(test_case.epic)
-            self.epic_input.blockSignals(False)
-
-            self.feature_input.blockSignals(True)
-            self.feature_input.setText(test_case.feature)
-            self.feature_input.blockSignals(False)
-
-            self.story_input.blockSignals(True)
-            self.story_input.setText(test_case.story)
-            self.story_input.blockSignals(False)
-
-            self.component_input.blockSignals(True)
-            self.component_input.setText(test_case.component)
-            self.component_input.blockSignals(False)
 
             self.steps_list.blockSignals(True)
             self.steps_list.clear()
@@ -919,45 +683,14 @@ class TestCaseFormWidget(QWidget):
             self.title_edit.blockSignals(True)
             self.title_edit.setText("Не выбран тест-кейс")
             self.title_edit.blockSignals(False)
-            self.id_label.setText("ID: -")
-            self.created_label.setText("Создан: -")
-            self.updated_label.setText("Обновлён: -")
-            self.author_input.clear()
-            self.owner_input.clear()
-            self.reviewer_input.clear()
-            self.status_input.setCurrentIndex(0)
-            self.test_layer_input.setCurrentIndex(0)
-            self.test_type_input.setCurrentIndex(0)
-            self.severity_input.setCurrentIndex(0)
-            self.priority_input.setCurrentIndex(0)
-            self.environment_input.clear()
-            self.browser_input.clear()
-            self.test_case_id_input.clear()
-            self.issue_links_input.clear()
-            self.test_case_links_input.clear()
-            self.epic_input.clear()
-            self.feature_input.clear()
-            self.story_input.clear()
-            self.component_input.clear()
-            self.tags_input.clear()
-            self.description_input.clear()
             self.precondition_input.clear()
-            self.expected_result_input.clear()
             self.steps_list.clear()
             self.step_statuses = []
             self._update_steps_list_height()
 
-        self.save_button.setEnabled(False)
         self._is_loading = False
         self.unsaved_changes_state.emit(False)
         self._update_step_controls_state()
-    
-    def _on_title_edit_finished(self):
-        """Завершение редактирования названия"""
-        new_title = self.title_edit.text().strip() or "Без названия"
-        self.title_edit.setText(new_title)
-        if self.current_test_case:
-            self._mark_changed()
     
     def _create_step_control_button(self, text: str, tooltip: str) -> QToolButton:
         """Создает кнопку панели управления шагами."""
@@ -1240,42 +973,19 @@ class TestCaseFormWidget(QWidget):
         
         if not self.has_unsaved_changes:
             self.has_unsaved_changes = True
-            self.unsaved_changes_state.emit(True)
-        else:
-            self.unsaved_changes_state.emit(True)
-        self.save_button.setEnabled(True)
+        self.unsaved_changes_state.emit(True)
     
-    def _save(self):
+    def save(self):
         """Сохранить тест-кейс"""
         if not self.current_test_case:
             return
         
-        # Собираем данные
-        self.current_test_case.name = self.title_edit.text()
-        self.current_test_case.author = self.author_input.text()
-        self.current_test_case.owner = self.owner_input.text()
-        self.current_test_case.reviewer = self.reviewer_input.text()
-        self.current_test_case.status = self.status_input.currentText()
-        self.current_test_case.test_layer = self.test_layer_input.currentText()
-        self.current_test_case.test_type = self.test_type_input.currentText()
-        self.current_test_case.severity = self.severity_input.currentText()
-        self.current_test_case.priority = self.priority_input.currentText()
-        self.current_test_case.description = self.description_input.toPlainText()
-        self.current_test_case.preconditions = self.precondition_input.toPlainText()
-        self.current_test_case.expected_result = self.expected_result_input.toPlainText()
-        self.current_test_case.environment = self.environment_input.text()
-        self.current_test_case.browser = self.browser_input.text()
-        self.current_test_case.test_case_id = self.test_case_id_input.text()
-        self.current_test_case.issue_links = self.issue_links_input.text()
-        self.current_test_case.test_case_links = self.test_case_links_input.text()
-        self.current_test_case.epic = self.epic_input.text()
-        self.current_test_case.feature = self.feature_input.text()
-        self.current_test_case.story = self.story_input.text()
-        self.current_test_case.component = self.component_input.text()
+        # Эмитируем сигнал перед сохранением, чтобы обновить данные из панели информации
+        self.before_save.emit(self.current_test_case)
         
-        # Теги
-        tags_text = self.tags_input.toPlainText().strip()
-        self.current_test_case.tags = [t.strip() for t in tags_text.split('\n') if t.strip()]
+        # Собираем данные из формы (только название, предусловия и шаги)
+        self.current_test_case.name = self.title_edit.text().strip()
+        self.current_test_case.preconditions = self.precondition_input.toPlainText()
         
         # Шаги
         steps = []
@@ -1302,43 +1012,17 @@ class TestCaseFormWidget(QWidget):
         # Сохраняем через сервис
         if self.service.save_test_case(self.current_test_case):
             self.has_unsaved_changes = False
-            self.save_button.setEnabled(False)
             self.unsaved_changes_state.emit(False)
             self.test_case_saved.emit()
-            
-            # Обновляем отображение времени обновления
-            self.updated_label.setText(f"Обновлён: {format_datetime(self.current_test_case.updated_at)}")
 
     def set_edit_mode(self, enabled: bool):
         self._edit_mode_enabled = enabled
         widgets_to_toggle = [
-            self.author_input,
-            self.owner_input,
-            self.reviewer_input,
-            self.status_input,
-            self.test_layer_input,
-            self.test_type_input,
-            self.severity_input,
-            self.priority_input,
-            self.tags_input,
-            self.description_input,
             self.precondition_input,
-            self.expected_result_input,
-            self.environment_input,
-            self.browser_input,
-            self.test_case_id_input,
-            self.issue_links_input,
-            self.test_case_links_input,
-            self.epic_input,
-            self.feature_input,
-            self.story_input,
-            self.component_input,
-            self.save_button,
             self.title_edit,
         ]
         for widget in widgets_to_toggle:
             widget.setEnabled(enabled)
-        self.sections_toggle_btn.setEnabled(True)
 
         for row in range(self.steps_list.count()):
             widget = self._get_step_widget(row)
@@ -1346,11 +1030,6 @@ class TestCaseFormWidget(QWidget):
                 widget.set_edit_mode(enabled)
         
         self._update_step_controls_state()
-
-        if not enabled:
-            self.save_button.setEnabled(False)
-        else:
-            self.save_button.setEnabled(self.has_unsaved_changes)
 
     def set_run_mode(self, enabled: bool):
         self._run_mode_enabled = enabled
@@ -1445,8 +1124,7 @@ class TestCaseFormWidget(QWidget):
         self.current_test_case.updated_at = get_current_datetime()
         if self.service.save_test_case(self.current_test_case):
             self.has_unsaved_changes = False
-            self.save_button.setEnabled(False)
-            self.updated_label.setText(f"Обновлён: {format_datetime(self.current_test_case.updated_at)}")
+            self.unsaved_changes_state.emit(False)
             self.test_case_saved.emit()
 
 
