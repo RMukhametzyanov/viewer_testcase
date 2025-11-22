@@ -930,6 +930,7 @@ class MainWindow(QMainWindow):
         self._current_test_case_path: Optional[Path] = None
         self._current_mode: str = "edit"
         self._geometry_initialized = False
+        self._preserve_panel_sizes = False  # Флаг для предотвращения автоматического изменения размеров панелей
         
         self.setup_ui()
         self._apply_model_options()
@@ -1060,6 +1061,10 @@ class MainWindow(QMainWindow):
             default_review_prompt=self.default_prompt,
             default_creation_prompt=self.create_tc_prompt,
         )
+        # Устанавливаем минимальную и максимальную ширину для aux_panel
+        # чтобы предотвратить автоматическое расширение
+        self.aux_panel.setMinimumWidth(220)
+        self.aux_panel.setMaximumWidth(2000)
         self.aux_panel.review_prompt_saved.connect(self._on_prompt_saved)
         self.aux_panel.review_enter_clicked.connect(self._on_review_enter_clicked)
         self.aux_panel.creation_prompt_saved.connect(self._on_creation_prompt_saved)
@@ -1487,6 +1492,9 @@ class MainWindow(QMainWindow):
 
     def _on_test_case_selected(self, test_case: TestCase):
         """Обработка выбора тест-кейса"""
+        # Устанавливаем флаг для предотвращения автоматического изменения размеров панелей
+        self._preserve_panel_sizes = True
+        
         # Проверяем наличие несохраненных изменений перед переключением
         if hasattr(self, "form_widget") and self.form_widget.has_unsaved_changes:
             # Подсвечиваем кнопку "Сохранить" и показываем предупреждение
@@ -1515,6 +1523,9 @@ class MainWindow(QMainWindow):
                     pass
                 self.aux_panel.files_panel.attachment_changed.connect(self._on_files_attachment_changed)
         self._update_json_preview()
+        
+        # Сбрасываем флаг после завершения операции
+        QTimer.singleShot(200, lambda: setattr(self, '_preserve_panel_sizes', False))
         
         self.statusBar().showMessage(f"Открыт: {test_case.name}")
     
@@ -2303,6 +2314,11 @@ class MainWindow(QMainWindow):
         if not hasattr(self, "detail_splitter") or not hasattr(self, "form_widget"):
             return
         
+        # Если флаг установлен, не изменяем размеры панелей
+        # (это предотвращает автоматическое изменение при выборе тест-кейса)
+        if hasattr(self, "_preserve_panel_sizes") and self._preserve_panel_sizes:
+            return
+        
         # Сохраняем текущие размеры splitter'ов перед обновлением
         current_detail_sizes = self.detail_splitter.sizes()
         current_main_sizes = self.main_splitter.sizes() if hasattr(self, "main_splitter") else None
@@ -2311,6 +2327,7 @@ class MainWindow(QMainWindow):
         self.form_widget.updateGeometry()
         
         # Если есть сохраненные размеры, применяем их пропорционально
+        # ТОЛЬКО если размер окна действительно изменился (не при выборе тест-кейса)
         if hasattr(self, "panel_sizes") and current_main_sizes and len(current_main_sizes) > 1:
             # Вычисляем пропорции на основе сохраненных размеров
             total_saved = self.panel_sizes.get('form_area', 900)
@@ -2341,7 +2358,14 @@ class MainWindow(QMainWindow):
                         new_form_width = int(new_form_width * current_total / total_needed)
                         new_review_width = current_total - new_form_width
                     
-                    self.detail_splitter.setSizes([new_form_width, new_review_width])
+                    # Применяем новые размеры только если они отличаются от текущих
+                    # (это предотвращает ненужные изменения)
+                    current_form = current_detail_sizes[0] if len(current_detail_sizes) > 0 else 0
+                    current_review = current_detail_sizes[1] if len(current_detail_sizes) > 1 else 0
+                    
+                    # Если разница больше 5 пикселей, применяем новые размеры
+                    if abs(current_form - new_form_width) > 5 or abs(current_review - new_review_width) > 5:
+                        self.detail_splitter.setSizes([new_form_width, new_review_width])
                 else:
                     # Если пропорции не определены, используем текущие размеры
                     if len(current_detail_sizes) >= 2:

@@ -3,8 +3,8 @@
     "DEFAULT_PROMT": "",
     "panel_sizes": {
         "left": 398,
-        "form_area": 1477,
-        "review": 470
+        "form_area": 1407,
+        "review": 523
     },
     "LLM_MODEL": "deepseek-v3.1:latest",
     "LLM_HOST": "http://spb99-vkc-dhwgpu06.devzone.local:11434",

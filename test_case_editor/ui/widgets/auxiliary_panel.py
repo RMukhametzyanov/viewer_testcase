@@ -60,6 +60,10 @@ class AuxiliaryPanel(QWidget):
         self._setup_ui()
 
     def _setup_ui(self):
+        # Устанавливаем правильную политику размера для панели
+        # Preferred по горизонтали - не расширяется автоматически
+        self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        
         main_layout = QHBoxLayout(self)  # Горизонтальный layout: минипанель слева, контент справа
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
@@ -70,6 +74,8 @@ class AuxiliaryPanel(QWidget):
 
         # Контентная область с панелями
         content_widget = QWidget()
+        # Устанавливаем правильную политику размера для контентной области
+        content_widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         content_layout = QVBoxLayout(content_widget)
         content_layout.setContentsMargins(
             UI_METRICS.container_padding,

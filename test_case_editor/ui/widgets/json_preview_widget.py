@@ -107,6 +107,11 @@ class JsonPreviewWidget(QWidget):
         self.text_edit.setReadOnly(True)
         self.text_edit.setLineWrapMode(QPlainTextEdit.NoWrap)
         self.text_edit.setFont(QFont("Consolas", 10))
+        # Устанавливаем правильную политику размера - не расширяется автоматически
+        from PyQt5.QtWidgets import QSizePolicy
+        self.text_edit.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        # Включаем горизонтальный скроллбар для длинных строк
+        self.text_edit.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         layout.addWidget(self.text_edit, 1)
         self._highlighter = _JsonHighlighter(self.text_edit.document())
 
@@ -137,7 +142,11 @@ class JsonPreviewWidget(QWidget):
 
         payload = test_case.to_dict()
         json_text = json.dumps(payload, ensure_ascii=False, indent=4)
+        # Блокируем обновление геометрии при установке текста
+        # чтобы предотвратить автоматическое изменение размеров панели
+        self.text_edit.blockSignals(True)
         self.text_edit.setPlainText(json_text)
+        self.text_edit.blockSignals(False)
 
         filepath = getattr(test_case, "_filepath", None)
         if filepath:
