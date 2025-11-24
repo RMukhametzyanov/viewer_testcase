@@ -46,3 +46,4 @@ class DraggableContentWidget(QWidget):
         
         self.files_dropped.emit(file_paths)
         event.acceptProposedAction()
+

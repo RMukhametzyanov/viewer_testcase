@@ -1,7 +1,8 @@
 """Виджет формы редактирования тест-кейса"""
 
+import json
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Dict
 import shutil
 import uuid
 
@@ -30,9 +31,12 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QInputDialog,
     QFileDialog,
+    QDialog,
+    QDialogButtonBox,
 )
 from PyQt5.QtCore import Qt, pyqtSignal, QEvent, QSize, QTimer
 from PyQt5.QtGui import QFont, QTextOption, QIcon, QPixmap, QPainter, QColor, QDragEnterEvent, QDropEvent, QDragLeaveEvent
+from PyQt5.QtSvg import QSvgRenderer
 
 from ...models.test_case import TestCase, TestCaseStep
 from ...services.test_case_service import TestCaseService
@@ -165,6 +169,8 @@ class TestCaseFormWidget(QWidget):
     Соответствует принципу Single Responsibility:
     отвечает только за отображение и редактирование формы
     """
+    
+    status_changed = pyqtSignal()  # Сигнал об изменении статуса шага
 
     # Методы для работы с таблицей шагов в стиле TestOps
     def _create_step_text_edit(self, placeholder: str) -> QTextEdit:
@@ -188,13 +194,32 @@ class TestCaseFormWidget(QWidget):
         
         buttons = []
         spec = [
-                ("passed", "✓", "#2ecc71"),
-                ("failed", "✕", "#e74c3c"),
-                ("skipped", "S", "#95a5a6"),
+                ("passed", "#2ecc71"),
+                ("failed", "#e74c3c"),
+                ("skipped", "#95a5a6"),
             ]
-        for value, text, color in spec:
+        for value, color in spec:
             btn = QToolButton()
-            btn.setText(text)
+            
+            # Загружаем иконку из маппинга с цветом статуса (для неактивного состояния)
+            icon_name = self._get_status_icon(value)
+            if icon_name:
+                # Сохраняем имя иконки для последующей перезагрузки
+                btn.setProperty("icon_name", icon_name)
+                # Загружаем иконку с цветом статуса для неактивного состояния
+                icon = self._load_svg_icon(icon_name, size=16, color=color)
+                if icon:
+                    btn.setIcon(icon)
+                    btn.setIconSize(QSize(16, 16))
+                else:
+                    # Fallback на текст, если иконка не загрузилась
+                    fallback_text = {"passed": "✓", "failed": "✕", "skipped": "S"}.get(value, "?")
+                    btn.setText(fallback_text)
+            else:
+                # Fallback на текст, если иконка не найдена в маппинге
+                fallback_text = {"passed": "✓", "failed": "✕", "skipped": "S"}.get(value, "?")
+                btn.setText(fallback_text)
+            
             btn.setCheckable(True)
             btn.setCursor(Qt.PointingHandCursor)
             btn.setAutoRaise(True)
@@ -235,9 +260,18 @@ class TestCaseFormWidget(QWidget):
             }
         """
         
-        # Кнопка прикрепления файла (скрепка) - первая в списке
+        # Кнопка прикрепления файла - первая в списке
         attach_file_btn = QToolButton()
-        attach_file_btn.setText("📎")
+        icon_name = self._get_step_action_icon("attach_file")
+        if icon_name:
+            icon = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+            if icon:
+                attach_file_btn.setIcon(icon)
+                attach_file_btn.setIconSize(QSize(16, 16))
+            else:
+                attach_file_btn.setText("📎")
+        else:
+            attach_file_btn.setText("📎")
         attach_file_btn.setToolTip("Прикрепить файл")
         attach_file_btn.setCursor(Qt.PointingHandCursor)
         attach_file_btn.setAutoRaise(True)
@@ -247,7 +281,16 @@ class TestCaseFormWidget(QWidget):
         layout.addWidget(attach_file_btn)
         
         add_above_btn = QToolButton()
-        add_above_btn.setText("+↑")
+        icon_name = self._get_step_action_icon("add_above")
+        if icon_name:
+            icon = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+            if icon:
+                add_above_btn.setIcon(icon)
+                add_above_btn.setIconSize(QSize(16, 16))
+            else:
+                add_above_btn.setText("+↑")
+        else:
+            add_above_btn.setText("+↑")
         add_above_btn.setToolTip("Добавить шаг выше")
         add_above_btn.setCursor(Qt.PointingHandCursor)
         add_above_btn.setAutoRaise(True)
@@ -257,7 +300,16 @@ class TestCaseFormWidget(QWidget):
         layout.addWidget(add_above_btn)
         
         add_below_btn = QToolButton()
-        add_below_btn.setText("+↓")
+        icon_name = self._get_step_action_icon("add_below")
+        if icon_name:
+            icon = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+            if icon:
+                add_below_btn.setIcon(icon)
+                add_below_btn.setIconSize(QSize(16, 16))
+            else:
+                add_below_btn.setText("+↓")
+        else:
+            add_below_btn.setText("+↓")
         add_below_btn.setToolTip("Добавить шаг ниже")
         add_below_btn.setCursor(Qt.PointingHandCursor)
         add_below_btn.setAutoRaise(True)
@@ -267,7 +319,16 @@ class TestCaseFormWidget(QWidget):
         layout.addWidget(add_below_btn)
         
         move_up_btn = QToolButton()
-        move_up_btn.setText("↑")
+        icon_name = self._get_step_action_icon("move_up")
+        if icon_name:
+            icon = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+            if icon:
+                move_up_btn.setIcon(icon)
+                move_up_btn.setIconSize(QSize(16, 16))
+            else:
+                move_up_btn.setText("↑")
+        else:
+            move_up_btn.setText("↑")
         move_up_btn.setToolTip("Переместить вверх")
         move_up_btn.setCursor(Qt.PointingHandCursor)
         move_up_btn.setAutoRaise(True)
@@ -277,7 +338,16 @@ class TestCaseFormWidget(QWidget):
         layout.addWidget(move_up_btn)
         
         move_down_btn = QToolButton()
-        move_down_btn.setText("↓")
+        icon_name = self._get_step_action_icon("move_down")
+        if icon_name:
+            icon = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+            if icon:
+                move_down_btn.setIcon(icon)
+                move_down_btn.setIconSize(QSize(16, 16))
+            else:
+                move_down_btn.setText("↓")
+        else:
+            move_down_btn.setText("↓")
         move_down_btn.setToolTip("Переместить вниз")
         move_down_btn.setCursor(Qt.PointingHandCursor)
         move_down_btn.setAutoRaise(True)
@@ -287,7 +357,16 @@ class TestCaseFormWidget(QWidget):
         layout.addWidget(move_down_btn)
         
         remove_btn = QToolButton()
-        remove_btn.setText("×")
+        icon_name = self._get_step_action_icon("delete")
+        if icon_name:
+            icon = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+            if icon:
+                remove_btn.setIcon(icon)
+                remove_btn.setIconSize(QSize(16, 16))
+            else:
+                remove_btn.setText("×")
+        else:
+            remove_btn.setText("×")
         remove_btn.setToolTip("Удалить шаг")
         remove_btn.setCursor(Qt.PointingHandCursor)
         remove_btn.setAutoRaise(True)
@@ -303,17 +382,156 @@ class TestCaseFormWidget(QWidget):
         widget.setProperty("move_down_btn", move_down_btn)
         return widget
     
+    class SkipReasonDialog(QDialog):
+        """Диалог для выбора причины пропуска тест-кейса"""
+        
+        def __init__(self, parent=None, skip_reasons: Optional[List[str]] = None):
+            super().__init__(parent)
+            self.setWindowTitle("Причина пропуска")
+            self.setMinimumWidth(400)
+            self.skip_reasons = skip_reasons or ['Автотесты', 'Нагрузочное тестирование', 'Другое']
+            self._setup_ui()
+        
+        def _setup_ui(self):
+            layout = QVBoxLayout(self)
+            
+            # Инструкция
+            label = QLabel("Выберите причину пропуска:")
+            layout.addWidget(label)
+            
+            # Дропдаун с причинами (пустой пункт по умолчанию)
+            self.reason_combo = QComboBox()
+            self.reason_combo.addItem("")  # Пустой пункт по умолчанию
+            # Добавляем причины из настроек
+            if self.skip_reasons:
+                self.reason_combo.addItems(self.skip_reasons)
+            else:
+                # Fallback на значения по умолчанию
+                self.reason_combo.addItems(["Автотесты", "Нагрузочное тестирование", "Другое"])
+            self.reason_combo.setCurrentIndex(0)  # Выбираем пустой пункт
+            self.reason_combo.currentTextChanged.connect(self._on_reason_changed)
+            layout.addWidget(self.reason_combo)
+            
+            # Поле для комментария (видно только при выборе "Другое")
+            self.comment_label = QLabel("Комментарий:")
+            self.comment_label.setVisible(False)
+            layout.addWidget(self.comment_label)
+            
+            self.comment_edit = QLineEdit()
+            self.comment_edit.setPlaceholderText("Введите причину пропуска...")
+            self.comment_edit.setVisible(False)
+            self.comment_edit.textChanged.connect(self._on_comment_changed)
+            layout.addWidget(self.comment_edit)
+            
+            # Кнопки
+            button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+            button_box.accepted.connect(self.accept)
+            button_box.rejected.connect(self.reject)
+            self.ok_button = button_box.button(QDialogButtonBox.Ok)
+            self.ok_button.setEnabled(False)  # По умолчанию заблокирована
+            layout.addWidget(button_box)
+        
+        def _on_reason_changed(self, text):
+            # Показываем поле комментария только для "Другое"
+            is_other = text == "Другое"
+            self.comment_label.setVisible(is_other)
+            self.comment_edit.setVisible(is_other)
+            # Обновляем состояние кнопки ОК
+            self._update_ok_button()
+        
+        def _on_comment_changed(self):
+            self._update_ok_button()
+        
+        def _update_ok_button(self):
+            # Кнопка ОК активна, если выбрана причина (не пустая) или введен комментарий
+            if not hasattr(self, 'ok_button') or not self.ok_button:
+                return
+            try:
+                reason = self.reason_combo.currentText().strip()
+                if not reason:
+                    # Если не выбрана причина, проверяем комментарий
+                    comment = self.comment_edit.text().strip()
+                    self.ok_button.setEnabled(bool(comment))
+                elif reason == "Другое":
+                    # Если выбрано "Другое", нужен комментарий
+                    comment = self.comment_edit.text().strip()
+                    self.ok_button.setEnabled(bool(comment))
+                else:
+                    # Если выбрана любая другая причина, кнопка активна
+                    self.ok_button.setEnabled(True)
+            except Exception:
+                # В случае ошибки оставляем кнопку заблокированной
+                if self.ok_button:
+                    self.ok_button.setEnabled(False)
+        
+        def get_skip_reason(self) -> str:
+            """Получить причину пропуска"""
+            reason = self.reason_combo.currentText().strip()
+            if not reason:
+                # Если не выбрана причина, возвращаем комментарий
+                return self.comment_edit.text().strip()
+            elif reason == "Другое":
+                # Если выбрано "Другое", возвращаем комментарий
+                return self.comment_edit.text().strip()
+            else:
+                # Если выбрана другая причина, возвращаем её значение
+                return reason
+    
     def _on_step_status_clicked(self, row: int, status: str):
         """Обработчик клика по статусу шага."""
-        if row < 0 or row >= len(self.step_statuses):
-            return
-        if self.step_statuses[row] == status:
-            return
-        self.step_statuses[row] = status
-        self._update_step_status_widget(row, status)
-        if self.current_test_case and row < len(self.current_test_case.steps):
-            self.current_test_case.steps[row].status = status
-            self._auto_save_status_change()
+        try:
+            if row < 0 or row >= len(self.step_statuses):
+                return
+            if self.step_statuses[row] == status:
+                return
+            
+            # Если выбран статус "skipped", показываем диалог выбора причины
+            if status == "skipped":
+                skip_reason = self._show_skip_reason_dialog()
+                if skip_reason is None:  # Пользователь отменил диалог
+                    return
+                # Устанавливаем статус и причину
+                self.step_statuses[row] = status
+                self._update_step_status_widget(row, status)
+                if self.current_test_case and row < len(self.current_test_case.steps):
+                    step = self.current_test_case.steps[row]
+                    step.status = status
+                    step.skip_reason = skip_reason or ""  # Убеждаемся, что это строка
+                self._auto_save_status_change()
+            else:
+                # Для других статусов работаем как раньше
+                self.step_statuses[row] = status
+                self._update_step_status_widget(row, status)
+                if self.current_test_case and row < len(self.current_test_case.steps):
+                    step = self.current_test_case.steps[row]
+                    step.status = status
+                    # Очищаем skipReason при изменении статуса на failed или passed
+                    if status in ("failed", "passed"):
+                        step.skip_reason = ""
+                self._auto_save_status_change()
+            
+            self._update_statistics()  # Обновляем статистику при изменении статуса
+            # Эмитируем сигнал для обновления статистики в главном окне
+            if hasattr(self, 'status_changed'):
+                self.status_changed.emit()
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Произошла ошибка при изменении статуса шага: {str(e)}")
+    
+    def _show_skip_reason_dialog(self) -> Optional[str]:
+        """Показать диалог выбора причины пропуска"""
+        try:
+            # Получаем список причин, проверяя наличие атрибута
+            skip_reasons = getattr(self, '_skip_reasons', None)
+            if not skip_reasons:
+                skip_reasons = ['Автотесты', 'Нагрузочное тестирование', 'Другое']
+            
+            dialog = self.SkipReasonDialog(self, skip_reasons)
+            if dialog.exec_() == QDialog.Accepted:
+                return dialog.get_skip_reason()
+            return None
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Произошла ошибка при открытии диалога выбора причины: {str(e)}")
+            return None
     
     def _update_step_status_widget(self, row: int, status: str):
         """Обновить виджет статуса для указанной строки."""
@@ -328,42 +546,55 @@ class TestCaseFormWidget(QWidget):
             color = btn.property("status_color") or "#4CAF50"
             is_active = value == status
             btn.setChecked(is_active)
+            
+            # Перезагружаем иконку в зависимости от состояния
+            icon_name = btn.property("icon_name")
+            if icon_name:
+                if is_active:
+                    # Для активного состояния: белая иконка
+                    icon = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                else:
+                    # Для неактивного состояния: иконка с цветом статуса
+                    icon = self._load_svg_icon(icon_name, size=16, color=color)
+                if icon:
+                    btn.setIcon(icon)
+                    btn.setIconSize(QSize(16, 16))
+            
             if is_active:
-                    btn.setStyleSheet(
-                        f"""
-                        QToolButton {{
-                            background-color: {color};
-                            color: #0f1117;
+                # Активное состояние: цветной фон, белая иконка, без рамки
+                btn.setStyleSheet(
+                    f"""
+                    QToolButton {{
+                        background-color: {color};
+                        border: none;
                         border-radius: 4px;
-                        font-weight: 600;
                         padding: 0px;
                         min-width: 24px;
                         max-width: 24px;
                         min-height: 24px;
                         max-height: 24px;
-                        font-size: 12px;
-                        }}
+                    }}
                     """
                 )
             else:
+                # Неактивное состояние: без рамки, прозрачный фон, иконка с цветом статуса
                 btn.setStyleSheet(
-                        f"""
-                        QToolButton {{
-                            border: 1px solid {color};
-                            color: {color};
+                    f"""
+                    QToolButton {{
+                        background-color: transparent;
+                        border: none;
                         border-radius: 4px;
                         padding: 0px;
                         min-width: 24px;
                         max-width: 24px;
                         min-height: 24px;
                         max-height: 24px;
-                        font-size: 12px;
-                        }}
-                        QToolButton:hover {{
-                            background-color: {color}33;
-                        }}
-                        """
-                    )
+                    }}
+                    QToolButton:hover {{
+                        background-color: {color}33;
+                    }}
+                    """
+                )
 
     def _on_step_content_changed(self):
         """Обработчик изменения содержимого шага."""
@@ -396,6 +627,130 @@ class TestCaseFormWidget(QWidget):
         self._run_mode_enabled = False
         self.step_statuses: List[str] = []
         self._step_attachments: List[List[str]] = []  # Список attachments для каждого шага
+        self._skip_reasons: List[str] = ['Автотесты', 'Нагрузочное тестирование', 'Другое']  # Значения по умолчанию
+        
+        # Загружаем маппинг иконок
+        self._icon_mapping = self._load_icon_mapping()
+    
+    def _load_icon_mapping(self) -> Dict[str, Dict[str, str]]:
+        """Загрузить маппинг иконок из JSON файла."""
+        # Определяем путь к файлу маппинга относительно корня проекта
+        project_root = Path(__file__).parent.parent.parent.parent
+        mapping_file = project_root / "icons" / "icon_mapping.json"
+        
+        if mapping_file.exists():
+            try:
+                with open(mapping_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    # Поддерживаем как старый формат (плоский), так и новый (с секциями)
+                    if isinstance(data, dict) and any(key in data for key in ['panels', 'context_menu', 'panel_buttons', 'status_icons', 'bulk_operations', 'step_actions']):
+                        return data
+                    else:
+                        # Старый формат - возвращаем с секциями
+                        return {
+                            'panels': data if isinstance(data, dict) else {},
+                            'context_menu': {},
+                            'panel_buttons': {},
+                            'status_icons': {},
+                            'bulk_operations': {},
+                            'step_actions': {}
+                        }
+            except (json.JSONDecodeError, IOError) as e:
+                print(f"Ошибка загрузки маппинга иконок: {e}")
+        
+        # Возвращаем значения по умолчанию, если файл не найден
+        return {
+            'panels': {},
+            'context_menu': {},
+            'panel_buttons': {},
+            'status_icons': {
+                "passed": "check-circle.svg",
+                "failed": "x-circle.svg",
+                "skipped": "skip-forward.svg"
+            },
+            'bulk_operations': {
+                "mark_all_passed": "fast-forward.svg",
+                "reset_statuses": "refresh-ccw.svg"
+            },
+            'step_actions': {
+                "attach_file": "file.svg",
+                "add_above": "corner-up-left.svg",
+                "add_below": "corner-down-left.svg",
+                "move_up": "chevron-up.svg",
+                "move_down": "chevron-down.svg",
+                "delete": "x.svg"
+            }
+        }
+
+    def _get_status_icon(self, status: str) -> Optional[str]:
+        """Получить имя файла иконки для статуса по ключу."""
+        status_icons_mapping = self._icon_mapping.get('status_icons', {})
+        return status_icons_mapping.get(status)
+
+    def _get_bulk_operation_icon(self, icon_key: str) -> Optional[str]:
+        """Получить имя файла иконки для массовых операций по ключу."""
+        bulk_operations_mapping = self._icon_mapping.get('bulk_operations', {})
+        return bulk_operations_mapping.get(icon_key)
+
+    def _get_step_action_icon(self, icon_key: str) -> Optional[str]:
+        """Получить имя файла иконки для действий со шагами по ключу."""
+        step_actions_mapping = self._icon_mapping.get('step_actions', {})
+        return step_actions_mapping.get(icon_key)
+
+    def _load_svg_icon(self, icon_name: str, size: int = 16, color: Optional[str] = None) -> Optional[QIcon]:
+        """Загрузить SVG иконку из файла и вернуть QIcon.
+        
+        Args:
+            icon_name: Имя файла иконки (например, "check-circle.svg")
+            size: Размер иконки в пикселях
+            color: Цвет иконки в формате "#RRGGBB" или None для использования цвета по умолчанию
+        """
+        # Определяем путь к папке с иконками относительно корня проекта
+        project_root = Path(__file__).parent.parent.parent.parent
+        icon_path = project_root / "icons" / icon_name
+        
+        if not icon_path.exists():
+            print(f"Иконка не найдена: {icon_path}")
+            return None
+        
+        try:
+            # Читаем содержимое SVG файла
+            with open(icon_path, 'r', encoding='utf-8') as f:
+                svg_content = f.read()
+            
+            # Если указан цвет, заменяем currentColor на конкретный цвет
+            if color:
+                svg_content = svg_content.replace('currentColor', color)
+                svg_content = svg_content.replace('stroke="currentColor"', f'stroke="{color}"')
+                svg_content = svg_content.replace('fill="currentColor"', f'fill="{color}"')
+            
+            # Создаем рендерер SVG из модифицированного содержимого
+            renderer = QSvgRenderer(svg_content.encode('utf-8'))
+            if not renderer.isValid():
+                print(f"Невалидный SVG файл: {icon_path}")
+                return None
+            
+            # Создаем пиксмап нужного размера
+            pixmap = QPixmap(size, size)
+            pixmap.fill(Qt.transparent)
+            
+            # Рендерим SVG на пиксмап
+            painter = QPainter(pixmap)
+            painter.setRenderHint(QPainter.Antialiasing)
+            renderer.render(painter)
+            painter.end()
+            
+            # Создаем иконку из пиксмапа
+            icon = QIcon(pixmap)
+            return icon
+        except Exception as e:
+            print(f"Ошибка загрузки иконки {icon_name}: {e}")
+            return None
+    
+    def set_skip_reasons(self, reasons: List[str]):
+        """Установить список причин пропуска из настроек"""
+        if reasons and isinstance(reasons, list):
+            self._skip_reasons = reasons
 
         self.setup_ui()
 
@@ -460,6 +815,11 @@ class TestCaseFormWidget(QWidget):
         # Предусловия
         precond_group = self._create_precondition_group()
         form_layout.addWidget(precond_group)
+
+        # Массовые операции (только в режиме запуска тестов)
+        self.bulk_operations_group = self._create_bulk_operations_group()
+        self.bulk_operations_group.setVisible(False)
+        form_layout.addWidget(self.bulk_operations_group)
 
         # Шаги тестирования
         steps_group = self._create_steps_group()
@@ -641,6 +1001,54 @@ class TestCaseFormWidget(QWidget):
         group.setLayout(layout)
         return group
 
+    def _create_bulk_operations_group(self) -> QGroupBox:
+        """Группа массовых операций по шагам тест-кейса (только в режиме запуска тестов)"""
+        group = QGroupBox("Массовые операции")
+        main_layout = QVBoxLayout()
+        main_layout.setContentsMargins(0, UI_METRICS.group_title_spacing, 0, 0)
+        
+        # Статистика по шагам
+        self.stats_label = QLabel("Статистика по шагам")
+        self.stats_label.setStyleSheet("padding: 8px; background-color: rgba(255, 255, 255, 0.05); border-radius: 4px; font-size: 12px;")
+        self.stats_label.setWordWrap(True)
+        main_layout.addWidget(self.stats_label)
+        
+        # Кнопки операций
+        buttons_layout = QHBoxLayout()
+        buttons_layout.setContentsMargins(0, 8, 0, 0)
+        
+        # Кнопка "Все пройдено"
+        self.mark_all_passed_btn = QPushButton("Все пройдено")
+        # Загружаем иконку из маппинга (зеленый цвет для passed)
+        icon_name = self._get_bulk_operation_icon("mark_all_passed")
+        if icon_name:
+            icon = self._load_svg_icon(icon_name, size=16, color="#2ecc71")
+            if icon:
+                self.mark_all_passed_btn.setIcon(icon)
+                self.mark_all_passed_btn.setIconSize(QSize(16, 16))
+        self.mark_all_passed_btn.setToolTip("Отметить все шаги как пройденные")
+        self.mark_all_passed_btn.clicked.connect(self._mark_all_steps_passed)
+        buttons_layout.addWidget(self.mark_all_passed_btn)
+        
+        # Кнопка "Сброс статусов"
+        self.reset_statuses_btn = QPushButton("Сброс статусов")
+        # Загружаем иконку из маппинга
+        icon_name = self._get_bulk_operation_icon("reset_statuses")
+        if icon_name:
+            icon = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+            if icon:
+                self.reset_statuses_btn.setIcon(icon)
+                self.reset_statuses_btn.setIconSize(QSize(16, 16))
+        self.reset_statuses_btn.setToolTip("Сбросить статусы всех шагов выбранного тест-кейса")
+        self.reset_statuses_btn.clicked.connect(self._reset_all_step_statuses)
+        buttons_layout.addWidget(self.reset_statuses_btn)
+        
+        buttons_layout.addStretch()
+        main_layout.addLayout(buttons_layout)
+        
+        group.setLayout(main_layout)
+        return group
+
     def _create_expected_result_group(self) -> QGroupBox:
         group = QGroupBox("Общий ожидаемый результат")
         layout = QVBoxLayout()
@@ -789,6 +1197,7 @@ class TestCaseFormWidget(QWidget):
         self._is_loading = False
         self.unsaved_changes_state.emit(False)
         self._update_step_controls_state()
+        self._update_statistics()  # Обновляем статистику при загрузке тест-кейса
     
     def _create_step_control_button(self, text: str, tooltip: str) -> QToolButton:
         """Создает кнопку панели управления шагами."""
@@ -1186,6 +1595,12 @@ class TestCaseFormWidget(QWidget):
         self.steps_table.setColumnHidden(3, not enabled)  # Показать статусы в режиме запуска
         self.steps_table.setColumnHidden(4, enabled)  # Скрыть действия в режиме запуска
         
+        # Показываем/скрываем группу массовых операций
+        if hasattr(self, 'bulk_operations_group'):
+            self.bulk_operations_group.setVisible(enabled)
+            if enabled:
+                self._update_statistics()  # Обновляем статистику при включении режима запуска
+        
         # Включаем/выключаем кнопки статусов для всех строк
         for row in range(self.steps_table.rowCount()):
             status_widget = self.steps_table.cellWidget(row, 3)
@@ -1360,5 +1775,47 @@ class TestCaseFormWidget(QWidget):
         
         # Используем существующий метод для обработки файлов
         self._on_files_dropped_on_step(row, file_paths)
+    
+    def _mark_all_steps_passed(self):
+        """Отметить все шаги как пройденные"""
+        if not self.current_test_case:
+            return
+        for row in range(self.steps_table.rowCount()):
+            self._on_step_status_clicked(row, "passed")
+        self._auto_save_status_change()
+        self._update_statistics()  # Обновляем статистику после массовой операции
+    
+    def _reset_all_step_statuses(self):
+        """Сбросить статусы всех шагов выбранного тест-кейса"""
+        if not self.current_test_case:
+            return
+        for row in range(self.steps_table.rowCount()):
+            self._on_step_status_clicked(row, "pending")
+        self._auto_save_status_change()
+        self._update_statistics()  # Обновляем статистику после массовой операции
+    
+    def _update_statistics(self):
+        """Обновить статистику по шагам в группе массовых операций"""
+        if not hasattr(self, "stats_label"):
+            return
+        
+        if not self.current_test_case or not self.current_test_case.steps:
+            self.stats_label.setText("Шаги: нет данных")
+            return
+        
+        steps = self.current_test_case.steps
+        total = len(steps)
+        passed = sum(1 for step in steps if step.status == "passed")
+        failed = sum(1 for step in steps if step.status == "failed")
+        skipped = sum(1 for step in steps if step.status == "skipped")
+        pending = sum(1 for step in steps if not step.status or step.status == "pending")
+        
+        # Формируем текст статистики
+        stats_text = f"<b>Статистика по шагам:</b><br>"
+        stats_text += f"Всего: {total} | "
+        stats_text += f"Пройдено: <span style='color: #6CC24A;'>{passed}</span> | "
+        stats_text += f"Осталось: <span style='color: #FFA931;'>{pending}</span> | "
+        stats_text += f"Не пройдено: <span style='color: #F5555D;'>{failed + skipped}</span>"
+        self.stats_label.setText(stats_text)
 
 

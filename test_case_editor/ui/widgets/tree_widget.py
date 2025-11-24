@@ -6,7 +6,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Tuple, Dict
 
 from PyQt5.QtWidgets import (
     QApplication,
@@ -16,9 +16,17 @@ from PyQt5.QtWidgets import (
     QMenu,
     QInputDialog,
     QAbstractItemView,
+    QDialog,
+    QVBoxLayout,
+    QLabel,
+    QComboBox,
+    QLineEdit,
+    QDialogButtonBox,
+    QWidget,
 )
-from PyQt5.QtCore import Qt, pyqtSignal, QMimeData, QByteArray
-from PyQt5.QtGui import QFont, QColor
+from PyQt5.QtCore import Qt, pyqtSignal, QMimeData, QByteArray, QSize
+from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter
+from PyQt5.QtSvg import QSvgRenderer
 
 from ...services.test_case_service import TestCaseService
 from ...models.test_case import TestCase
@@ -48,12 +56,24 @@ class TestCaseTreeWidget(QTreeWidget):
     test_case_selected = pyqtSignal(TestCase)
     tree_updated = pyqtSignal()
     review_requested = pyqtSignal(object)
+    test_cases_updated = pyqtSignal()  # Сигнал для обновления тест-кейсов после изменения статусов
 
     def __init__(self, service: TestCaseService, parent=None):
         super().__init__(parent)
         self.service = service
         self.test_cases_dir: Optional[Path] = None
+        self._edit_mode = True  # По умолчанию режим редактирования
+        self._skip_reasons: List[str] = ['Автотесты', 'Нагрузочное тестирование', 'Другое']  # Значения по умолчанию
+        
+        # Загружаем маппинг иконок
+        self._icon_mapping = self._load_icon_mapping()
+        
         self._setup_ui()
+    
+    def set_skip_reasons(self, reasons: List[str]):
+        """Установить список причин пропуска из настроек"""
+        if reasons and isinstance(reasons, list):
+            self._skip_reasons = reasons
 
     def _setup_ui(self):
         self.setHeaderHidden(True)
@@ -68,6 +88,119 @@ class TestCaseTreeWidget(QTreeWidget):
         self.setDropIndicatorShown(True)
         self.setDefaultDropAction(Qt.MoveAction)
         self.setDragDropMode(QAbstractItemView.DragDrop)
+        
+        # Кэш для цветных иконок кружков
+        self._icon_cache = {}
+
+    def _load_icon_mapping(self) -> Dict[str, Dict[str, str]]:
+        """Загрузить маппинг иконок из JSON файла."""
+        # Определяем путь к файлу маппинга относительно корня проекта
+        project_root = Path(__file__).parent.parent.parent.parent
+        mapping_file = project_root / "icons" / "icon_mapping.json"
+        
+        if mapping_file.exists():
+            try:
+                with open(mapping_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    # Поддерживаем как старый формат (плоский), так и новый (с секциями)
+                    if isinstance(data, dict) and any(key in data for key in ['panels', 'context_menu', 'status_icons']):
+                        return data
+                    else:
+                        # Старый формат - возвращаем с секциями
+                        return {
+                            'panels': data,
+                            'context_menu': {},
+                            'status_icons': {}
+                        }
+            except (json.JSONDecodeError, IOError) as e:
+                print(f"Ошибка загрузки маппинга иконок: {e}")
+        
+        # Возвращаем значения по умолчанию, если файл не найден
+        return {
+            'panels': {
+                "information": "info.svg",
+                "review": "eye.svg",
+                "creation": "file-plus.svg",
+                "json": "code.svg",
+                "files": "file.svg",
+                "reports": "book.svg"
+            },
+            'context_menu': {
+                "open_explorer": "external-link.svg",
+                "copy_info": "clipboard.svg",
+                "generate_api": "code.svg",
+                "rename": "edit.svg",
+                "duplicate": "copy.svg",
+                "delete": "x.svg",
+                "create_test_case": "file-plus.svg",
+                "create_folder": "folder-plus.svg"
+            },
+            'status_icons': {
+                "passed": "check-circle.svg",
+                "failed": "x-circle.svg",
+                "skipped": "skip-forward.svg"
+            }
+        }
+
+    def _get_context_menu_icon(self, icon_key: str) -> Optional[str]:
+        """Получить имя файла иконки для контекстного меню по ключу."""
+        context_menu_mapping = self._icon_mapping.get('context_menu', {})
+        return context_menu_mapping.get(icon_key)
+
+    def _get_status_icon(self, status: str) -> Optional[str]:
+        """Получить имя файла иконки для статуса по ключу."""
+        status_icons_mapping = self._icon_mapping.get('status_icons', {})
+        return status_icons_mapping.get(status)
+
+    def _load_svg_icon(self, icon_name: str, size: int = 16, color: Optional[str] = None) -> Optional[QIcon]:
+        """Загрузить SVG иконку из файла и вернуть QIcon.
+        
+        Args:
+            icon_name: Имя файла иконки (например, "info.svg")
+            size: Размер иконки в пикселях
+            color: Цвет иконки в формате "#RRGGBB" или None для использования цвета по умолчанию
+        """
+        # Определяем путь к папке с иконками относительно корня проекта
+        project_root = Path(__file__).parent.parent.parent.parent
+        icon_path = project_root / "icons" / icon_name
+        
+        if not icon_path.exists():
+            print(f"Иконка не найдена: {icon_path}")
+            return None
+        
+        try:
+            # Читаем содержимое SVG файла
+            with open(icon_path, 'r', encoding='utf-8') as f:
+                svg_content = f.read()
+            
+            # Если указан цвет, заменяем currentColor на конкретный цвет
+            if color:
+                svg_content = svg_content.replace('currentColor', color)
+                svg_content = svg_content.replace('stroke="currentColor"', f'stroke="{color}"')
+                svg_content = svg_content.replace('fill="currentColor"', f'fill="{color}"')
+            
+            # Создаем рендерер SVG из модифицированного содержимого
+            renderer = QSvgRenderer(svg_content.encode('utf-8'))
+            if not renderer.isValid():
+                print(f"Невалидный SVG файл: {icon_path}")
+                return None
+            
+            # Создаем пиксмап нужного размера
+            pixmap = QPixmap(size, size)
+            pixmap.fill(Qt.transparent)
+            
+            # Рендерим SVG на пиксмап
+            painter = QPainter(pixmap)
+            painter.setRenderHint(QPainter.Antialiasing)
+            renderer.render(painter)
+            painter.end()
+            
+            # Создаем иконку из пиксмапа
+            icon = QIcon(pixmap)
+            return icon
+        except Exception as e:
+            print(f"Ошибка загрузки иконки {icon_name}: {e}")
+            return None
 
     # ------------------------------------------------------------------ load
 
@@ -80,6 +213,75 @@ class TestCaseTreeWidget(QTreeWidget):
 
         self._populate_directory(test_cases_dir, self.invisibleRootItem(), test_cases)
         self.collapseAll()
+        # После загрузки обновляем статусы папок на основе актуальных данных дерева
+        if not self._edit_mode:
+            self._update_folder_statuses(self.invisibleRootItem())
+    
+    def set_edit_mode(self, enabled: bool):
+        """Установить режим редактирования (скрыть/показать иконки статусов)"""
+        if self._edit_mode == enabled:
+            return
+        self._edit_mode = enabled
+        # Обновляем все элементы дерева
+        self._update_tree_icons(self.invisibleRootItem())
+    
+    def _update_tree_icons(self, parent_item: QTreeWidgetItem):
+        """Обновить иконки во всех элементах дерева"""
+        # Сначала обновляем статусы папок (снизу вверх), если не в режиме редактирования
+        if not self._edit_mode:
+            self._update_folder_statuses(parent_item)
+        
+        # Затем обновляем отображение всех элементов
+        for i in range(parent_item.childCount()):
+            child = parent_item.child(i)
+            data = child.data(0, Qt.UserRole)
+            if data:
+                if data.get('type') == 'file':
+                    test_case = data.get('test_case')
+                    if test_case:
+                        # В режиме редактирования иконки не показываем
+                        if not self._edit_mode:
+                            icon, color = self._get_test_case_icon_and_color(test_case)
+                            child.setText(0, test_case.name)
+                            if icon:
+                                child.setIcon(0, icon)
+                            else:
+                                child.setIcon(0, QIcon())  # Пустая иконка
+                        else:
+                            child.setText(0, test_case.name)
+                            child.setIcon(0, QIcon())  # Пустая иконка в режиме редактирования
+                elif data.get('type') == 'folder':
+                    # Обновляем отображение папки
+                    folder_path = data.get('path')
+                    if folder_path:
+                        child.setText(0, f"📁 {folder_path.name}")
+                        if not self._edit_mode:
+                            # Пересчитываем статус папки на основе дерева
+                            folder_icon, folder_color = self._calculate_folder_status_from_tree(child)
+                            data['icon'] = folder_icon
+                            data['color'] = folder_color
+                            if folder_icon:
+                                child.setIcon(0, folder_icon)
+                            else:
+                                child.setIcon(0, QIcon())  # Пустая иконка
+                        else:
+                            child.setIcon(0, QIcon())  # Пустая иконка в режиме редактирования
+            # Рекурсивно обновляем дочерние элементы
+            self._update_tree_icons(child)
+    
+    def _update_folder_statuses(self, parent_item: QTreeWidgetItem):
+        """Обновить статусы всех папок в дереве (снизу вверх)"""
+        # Сначала обновляем дочерние элементы
+        for i in range(parent_item.childCount()):
+            child = parent_item.child(i)
+            self._update_folder_statuses(child)
+        
+        # Затем обновляем статус текущей папки, если это папка
+        data = parent_item.data(0, Qt.UserRole)
+        if data and data.get('type') == 'folder':
+            folder_icon, folder_color = self._calculate_folder_status_from_tree(parent_item)
+            data['icon'] = folder_icon
+            data['color'] = folder_color
 
     def _populate_directory(self, directory: Path, parent_item: QTreeWidgetItem, test_cases: list):
         for subdir in sorted([d for d in directory.iterdir() if d.is_dir()]):
@@ -87,24 +289,114 @@ class TestCaseTreeWidget(QTreeWidget):
             if subdir.name == "_attachment":
                 continue
             folder_item = QTreeWidgetItem(parent_item)
+            
+            # Вычисляем статус папки на основе тест-кейсов внутри
+            if not self._edit_mode:
+                folder_icon, folder_color = self._calculate_folder_status(subdir, test_cases)
+            else:
+                folder_icon, folder_color = None, ""
+            # Устанавливаем текст и иконку
             folder_item.setText(0, f"📁 {subdir.name}")
-            folder_item.setData(0, Qt.UserRole, {'type': 'folder', 'path': subdir})
+            if folder_icon:
+                folder_item.setIcon(0, folder_icon)
+            else:
+                folder_item.setIcon(0, QIcon())  # Пустая иконка
+            folder_item.setData(0, Qt.UserRole, {'type': 'folder', 'path': subdir, 'icon': folder_icon, 'color': folder_color})
             folder_item.setFont(0, QFont("Segoe UI", 10, QFont.Bold))
             self._populate_directory(subdir, folder_item, test_cases)
 
         for test_case in test_cases:
             if test_case._filepath and test_case._filepath.parent == directory:
-                icon = self._status_icon(test_case.status)
-                color = self._status_color(test_case.status)
-
+                # В режиме редактирования иконки не показываем
+                if not self._edit_mode:
+                    icon, color = self._get_test_case_icon_and_color(test_case)
+                else:
+                    icon, color = None, ""
+                
                 item = QTreeWidgetItem(parent_item)
-                item.setText(0, f"{icon} {test_case.name}")
+                # Устанавливаем текст и иконку
+                item.setText(0, test_case.name)
+                if icon:
+                    item.setIcon(0, icon)
+                else:
+                    item.setIcon(0, QIcon())  # Пустая иконка
                 item.setData(0, Qt.UserRole, {'type': 'file', 'test_case': test_case})
                 item.setFont(0, QFont("Segoe UI", 10))
-                item.setForeground(0, QColor(color))
 
+    def _create_colored_circle_icon(self, color: str, size: int = 12) -> QIcon:
+        """
+        Создать иконку с цветным кружком.
+        
+        Args:
+            color: Цвет в формате hex (например, '#6CC24A')
+            size: Размер иконки в пикселях
+            
+        Returns:
+            QIcon с цветным кружком
+        """
+        # Используем кэш для оптимизации
+        cache_key = f"{color}_{size}"
+        if cache_key in self._icon_cache:
+            return self._icon_cache[cache_key]
+        
+        pixmap = QPixmap(size, size)
+        pixmap.fill(Qt.transparent)
+        
+        painter = QPainter(pixmap)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setBrush(QColor(color))
+        painter.setPen(Qt.NoPen)
+        # Рисуем кружок с небольшими отступами для лучшего вида
+        margin = 2
+        painter.drawEllipse(margin, margin, size - 2 * margin, size - 2 * margin)
+        painter.end()
+        
+        icon = QIcon(pixmap)
+        self._icon_cache[cache_key] = icon
+        return icon
+    
+    def _get_test_case_icon_and_color(self, test_case) -> Tuple[Optional[QIcon], str]:
+        """
+        Определить иконку и цвет для тест-кейса на основе статусов шагов.
+        
+        Returns:
+            tuple: (icon, color) где icon - QIcon или None, color - цвет в формате hex
+        """
+        if not test_case or not test_case.steps:
+            # Если нет шагов, возвращаем None (без иконки)
+            return (None, '#8B9099')
+        
+        steps = test_case.steps
+        if not steps:
+            return (None, '#8B9099')
+        
+        # Получаем статусы всех шагов (включая пустые)
+        step_statuses = [(step.status or "").strip().lower() for step in steps]
+        
+        # Проверяем наличие failed (приоритет 1)
+        has_failed = any(s == "failed" for s in step_statuses)
+        if has_failed:
+            return (self._create_colored_circle_icon('#F5555D'), '#F5555D')  # Красный залитый кружок
+        
+        # Проверяем наличие skipped (приоритет 2)
+        has_skipped = any(s == "skipped" for s in step_statuses)
+        if has_skipped:
+            return (self._create_colored_circle_icon('#95a5a6'), '#95a5a6')  # Серый залитый кружок
+        
+        # Проверяем, все ли шаги имеют статус "passed"
+        # Все шаги должны иметь непустой статус и все должны быть "passed"
+        all_have_status = all(s for s in step_statuses)  # Все статусы непустые
+        all_passed = all(s == "passed" for s in step_statuses)  # Все статусы равны "passed"
+        
+        if all_have_status and all_passed:
+            return (self._create_colored_circle_icon('#6CC24A'), '#6CC24A')  # Зеленый залитый кружок
+        
+        # Не все шаги имеют статус и нет failed/skipped - без иконки
+        return (None, '#8B9099')
+    
     @staticmethod
     def _status_icon(status: str) -> str:
+        """Устаревший метод, оставлен для совместимости"""
         return {
             'Done': '✓',
             'Blocked': '⚠',
@@ -115,6 +407,7 @@ class TestCaseTreeWidget(QTreeWidget):
 
     @staticmethod
     def _status_color(status: str) -> str:
+        """Устаревший метод, оставлен для совместимости"""
         return {
             'Done': '#6CC24A',
             'Blocked': '#F5555D',
@@ -122,6 +415,111 @@ class TestCaseTreeWidget(QTreeWidget):
             'Draft': '#8B9099',
             'Deprecated': '#6B7380',
         }.get(status, '#E1E3E6')
+    
+    def _calculate_folder_status(self, folder_path: Path, test_cases: list) -> Tuple[Optional[QIcon], str]:
+        """
+        Вычислить статус папки на основе тест-кейсов внутри неё.
+        
+        Returns:
+            tuple: (icon, color) где icon - символ иконки, color - цвет в формате hex
+        """
+        # Собираем все тест-кейсы в этой папке и подпапках
+        folder_test_cases = []
+        for test_case in test_cases:
+            if test_case._filepath:
+                # Проверяем, находится ли тест-кейс в этой папке или её подпапках
+                try:
+                    relative_path = test_case._filepath.relative_to(folder_path)
+                    folder_test_cases.append(test_case)
+                except ValueError:
+                    # Тест-кейс не в этой папке
+                    continue
+        
+        if not folder_test_cases:
+            return (None, '#8B9099')  # Если нет тест-кейсов, без иконки
+        
+        # Собираем все статусы шагов из всех тест-кейсов в папке
+        all_step_statuses = []
+        total_steps_count = 0
+        for tc in folder_test_cases:
+            if tc.steps:
+                for step in tc.steps:
+                    total_steps_count += 1
+                    status = (step.status or "").strip().lower()
+                    all_step_statuses.append(status)  # Включаем пустые статусы
+        
+        if not all_step_statuses:
+            return (None, '#8B9099')  # Нет шагов
+        
+        # Проверяем наличие failed (приоритет 1)
+        has_failed = any(s == "failed" for s in all_step_statuses)
+        if has_failed:
+            return (self._create_colored_circle_icon('#F5555D'), '#F5555D')  # Красный залитый кружок
+        
+        # Проверяем наличие skipped (приоритет 2)
+        has_skipped = any(s == "skipped" for s in all_step_statuses)
+        if has_skipped:
+            return (self._create_colored_circle_icon('#95a5a6'), '#95a5a6')  # Серый залитый кружок
+        
+        # Проверяем, все ли шаги имеют статус "passed"
+        all_have_status = all(s for s in all_step_statuses)  # Все статусы непустые
+        all_passed = all(s == "passed" for s in all_step_statuses)  # Все статусы равны "passed"
+        
+        if all_have_status and all_passed:
+            return (self._create_colored_circle_icon('#6CC24A'), '#6CC24A')  # Зеленый залитый кружок
+        
+        # Не все шаги имеют статус и нет failed/skipped
+        return (None, '#8B9099')  # Без иконки
+    
+    def _calculate_folder_status_from_tree(self, folder_item: QTreeWidgetItem) -> Tuple[Optional[QIcon], str]:
+        """
+        Вычислить статус папки на основе элементов дерева внутри неё.
+        
+        Returns:
+            tuple: (icon, color) где icon - символ иконки, color - цвет в формате hex
+        """
+        all_step_statuses = []
+        
+        def collect_step_statuses(item: QTreeWidgetItem):
+            data = item.data(0, Qt.UserRole)
+            if data:
+                if data.get('type') == 'file':
+                    test_case = data.get('test_case')
+                    if test_case and test_case.steps:
+                        for step in test_case.steps:
+                            status = (step.status or "").strip().lower()
+                            all_step_statuses.append(status)  # Включаем пустые статусы
+                elif data.get('type') == 'folder':
+                    # Рекурсивно собираем статусы из подпапок
+                    for i in range(item.childCount()):
+                        collect_step_statuses(item.child(i))
+        
+        # Собираем статусы шагов из всех дочерних элементов
+        for i in range(folder_item.childCount()):
+            collect_step_statuses(folder_item.child(i))
+        
+        if not all_step_statuses:
+            return (None, '#8B9099')  # Нет шагов
+        
+        # Проверяем наличие failed (приоритет 1)
+        has_failed = any(s == "failed" for s in all_step_statuses)
+        if has_failed:
+            return (self._create_colored_circle_icon('#F5555D'), '#F5555D')  # Красный залитый кружок
+        
+        # Проверяем наличие skipped (приоритет 2)
+        has_skipped = any(s == "skipped" for s in all_step_statuses)
+        if has_skipped:
+            return (self._create_colored_circle_icon('#95a5a6'), '#95a5a6')  # Серый залитый кружок
+        
+        # Проверяем, все ли шаги имеют статус "passed"
+        all_have_status = all(s for s in all_step_statuses)  # Все статусы непустые
+        all_passed = all(s == "passed" for s in all_step_statuses)  # Все статусы равны "passed"
+        
+        if all_have_status and all_passed:
+            return (self._create_colored_circle_icon('#6CC24A'), '#6CC24A')  # Зеленый залитый кружок
+        
+        # Не все шаги имеют статус и нет failed/skipped
+        return (None, '#8B9099')  # Без иконки
 
     # ----------------------------------------------------------- interactions
 
@@ -152,18 +550,23 @@ class TestCaseTreeWidget(QTreeWidget):
     def _show_root_menu(self, position):
         menu = QMenu(self)
 
-        action_new_tc = menu.addAction("➕ Создать тест-кейс")
+        icon_name = self._get_context_menu_icon("create_test_case")
+        if icon_name:
+            icon_create = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+            action_new_tc = menu.addAction(icon_create, "Создать тест-кейс")
+        else:
+            action_new_tc = menu.addAction("Создать тест-кейс")
         action_new_tc.triggered.connect(lambda: self._create_test_case(self.test_cases_dir))
 
         menu.addSeparator()
 
-        action_new_folder = menu.addAction("📁 Создать папку")
+        icon_name = self._get_context_menu_icon("create_folder")
+        if icon_name:
+            icon_create = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+            action_new_folder = menu.addAction(icon_create, "Создать папку")
+        else:
+            action_new_folder = menu.addAction("Создать папку")
         action_new_folder.triggered.connect(lambda: self._create_folder(self.test_cases_dir))
-
-        menu.addSeparator()
-
-        action_review = menu.addAction("📝 Ревью")
-        action_review.triggered.connect(lambda: self.review_requested.emit({'type': 'root'}))
 
         menu.exec_(self.mapToGlobal(position))
 
@@ -171,64 +574,164 @@ class TestCaseTreeWidget(QTreeWidget):
         menu = QMenu(self)
 
         folder_path = folder_data['path']
+        
+        # В режиме запуска тестов показываем упрощенное меню
+        if not self._edit_mode:
+            icon_name = self._get_status_icon("passed")
+            if icon_name:
+                icon_passed = self._load_svg_icon(icon_name, size=16, color="#2ecc71")
+                action_mark_passed = menu.addAction(icon_passed, "Пометить как passed")
+            else:
+                action_mark_passed = menu.addAction("Пометить как passed")
+            action_mark_passed.triggered.connect(lambda: self._mark_folder_passed(folder_path))
+            
+            icon_name = self._get_status_icon("skipped")
+            if icon_name:
+                icon_skipped = self._load_svg_icon(icon_name, size=16, color="#95a5a6")
+                action_mark_skipped = menu.addAction(icon_skipped, "Пометить как skipped")
+            else:
+                action_mark_skipped = menu.addAction("Пометить как skipped")
+            action_mark_skipped.triggered.connect(lambda: self._mark_folder_skipped(folder_path))
+        else:
+            # В режиме редактирования показываем полное меню
+            icon_name = self._get_context_menu_icon("create_test_case")
+            if icon_name:
+                icon_create = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                action_new_tc = menu.addAction(icon_create, "Создать тест-кейс")
+            else:
+                action_new_tc = menu.addAction("Создать тест-кейс")
+            action_new_tc.triggered.connect(lambda: self._create_test_case(folder_path))
 
-        action_new_tc = menu.addAction("➕ Создать тест-кейс")
-        action_new_tc.triggered.connect(lambda: self._create_test_case(folder_path))
+            icon_name = self._get_context_menu_icon("create_folder")
+            if icon_name:
+                icon_create = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                action_new_folder = menu.addAction(icon_create, "Создать подпапку")
+            else:
+                action_new_folder = menu.addAction("Создать подпапку")
+            action_new_folder.triggered.connect(lambda: self._create_folder(folder_path))
 
-        action_new_folder = menu.addAction("📁 Создать подпапку")
-        action_new_folder.triggered.connect(lambda: self._create_folder(folder_path))
+            menu.addSeparator()
 
-        menu.addSeparator()
+            icon_name = self._get_context_menu_icon("rename")
+            if icon_name:
+                icon_edit = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                action_rename = menu.addAction(icon_edit, "Переименовать")
+            else:
+                action_rename = menu.addAction("Переименовать")
+            action_rename.triggered.connect(lambda: self._rename_folder(folder_path))
 
-        action_rename = menu.addAction("✎ Переименовать")
-        action_rename.triggered.connect(lambda: self._rename_folder(folder_path))
+            icon_name = self._get_context_menu_icon("delete")
+            if icon_name:
+                icon_x = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                action_delete = menu.addAction(icon_x, "Удалить папку")
+            else:
+                action_delete = menu.addAction("Удалить папку")
+            action_delete.triggered.connect(lambda: self._delete_folder(folder_path))
 
-        action_delete = menu.addAction("🗑️ Удалить папку")
-        action_delete.triggered.connect(lambda: self._delete_folder(folder_path))
+            menu.addSeparator()
 
-        menu.addSeparator()
-
-        action_open_explorer = menu.addAction("🪟 Открыть в проводнике")
-        action_open_explorer.triggered.connect(lambda: self._open_in_explorer(folder_path, select=False))
+            icon_name = self._get_context_menu_icon("open_explorer")
+            if icon_name:
+                icon_explorer = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                action_open_explorer = menu.addAction(icon_explorer, "Открыть в проводнике")
+            else:
+                action_open_explorer = menu.addAction("Открыть в проводнике")
+            action_open_explorer.triggered.connect(lambda: self._open_in_explorer(folder_path, select=False))
 
         menu.exec_(self.mapToGlobal(position))
 
     def _show_file_menu(self, position, file_data):
-        menu = QMenu(self)
+        try:
+            menu = QMenu(self)
 
-        test_case = file_data['test_case']
+            test_case = file_data.get('test_case')
+            if not test_case:
+                return
+            
+            # В режиме запуска тестов показываем упрощенное меню
+            if not self._edit_mode:
+                icon_name = self._get_context_menu_icon("copy_info")
+                if icon_name:
+                    icon_clipboard = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                    action_copy_info = menu.addAction(icon_clipboard, "Копировать информацию")
+                else:
+                    action_copy_info = menu.addAction("Копировать информацию")
+                action_copy_info.triggered.connect(lambda: self._copy_test_case_info(test_case))
+                
+                menu.addSeparator()
+                
+                icon_name = self._get_status_icon("passed")
+                if icon_name:
+                    icon_passed = self._load_svg_icon(icon_name, size=16, color="#2ecc71")
+                    action_mark_passed = menu.addAction(icon_passed, "Пометить как passed")
+                else:
+                    action_mark_passed = menu.addAction("Пометить как passed")
+                action_mark_passed.triggered.connect(lambda: self._mark_test_case_passed(test_case))
+                
+                icon_name = self._get_status_icon("skipped")
+                if icon_name:
+                    icon_skipped = self._load_svg_icon(icon_name, size=16, color="#95a5a6")
+                    action_mark_skipped = menu.addAction(icon_skipped, "Пометить как skipped")
+                else:
+                    action_mark_skipped = menu.addAction("Пометить как skipped")
+                action_mark_skipped.triggered.connect(lambda: self._mark_test_case_skipped(test_case))
+            else:
+                # В режиме редактирования показываем полное меню
+                icon_name = self._get_context_menu_icon("open_explorer")
+                if icon_name:
+                    icon_explorer = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                    action_open_explorer = menu.addAction(icon_explorer, "Открыть в проводнике")
+                else:
+                    action_open_explorer = menu.addAction("Открыть в проводнике")
+                action_open_explorer.triggered.connect(
+                    lambda: self._open_in_explorer(test_case._filepath, select=True)
+                )
 
-        action_open = menu.addAction("📂 Открыть")
-        action_open.triggered.connect(lambda: self.test_case_selected.emit(test_case))
+                icon_name = self._get_context_menu_icon("copy_info")
+                if icon_name:
+                    icon_clipboard = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                    action_copy_info = menu.addAction(icon_clipboard, "Копировать информацию")
+                else:
+                    action_copy_info = menu.addAction("Копировать информацию")
+                action_copy_info.triggered.connect(lambda: self._copy_test_case_info(test_case))
 
-        action_open_explorer = menu.addAction("🪟 Открыть в проводнике")
-        action_open_explorer.triggered.connect(
-            lambda: self._open_in_explorer(test_case._filepath, select=True)
-        )
+                icon_name = self._get_context_menu_icon("generate_api")
+                if icon_name:
+                    icon_code = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                    action_generate_api = menu.addAction(icon_code, "Сгенерировать каркас АТ API")
+                else:
+                    action_generate_api = menu.addAction("Сгенерировать каркас АТ API")
+                action_generate_api.triggered.connect(lambda: self._copy_pytest_skeleton(test_case))
 
-        action_copy_info = menu.addAction("📋 Копировать информацию")
-        action_copy_info.triggered.connect(lambda: self._copy_test_case_info(test_case))
+                icon_name = self._get_context_menu_icon("rename")
+                if icon_name:
+                    icon_edit = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                    action_rename = menu.addAction(icon_edit, "Переименовать файл")
+                else:
+                    action_rename = menu.addAction("Переименовать файл")
+                action_rename.triggered.connect(lambda: self._rename_file(test_case))
 
-        action_generate_api = menu.addAction("🧪 Сгенерировать каркас АТ API")
-        action_generate_api.triggered.connect(lambda: self._copy_pytest_skeleton(test_case))
+                icon_name = self._get_context_menu_icon("duplicate")
+                if icon_name:
+                    icon_copy = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                    action_duplicate = menu.addAction(icon_copy, "Дублировать")
+                else:
+                    action_duplicate = menu.addAction("Дублировать")
+                action_duplicate.triggered.connect(lambda: self._duplicate_test_case(test_case))
 
-        action_rename = menu.addAction("✎ Переименовать файл")
-        action_rename.triggered.connect(lambda: self._rename_file(test_case))
+                menu.addSeparator()
 
-        action_duplicate = menu.addAction("📋 Дублировать")
-        action_duplicate.triggered.connect(lambda: self._duplicate_test_case(test_case))
+                icon_name = self._get_context_menu_icon("delete")
+                if icon_name:
+                    icon_x = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                    action_delete = menu.addAction(icon_x, "Удалить")
+                else:
+                    action_delete = menu.addAction("Удалить")
+                action_delete.triggered.connect(lambda: self._delete_test_case(test_case))
 
-        menu.addSeparator()
-
-        action_delete = menu.addAction("🗑️ Удалить")
-        action_delete.triggered.connect(lambda: self._delete_test_case(test_case))
-
-        menu.addSeparator()
-
-        action_review = menu.addAction("📝 Ревью")
-        action_review.triggered.connect(lambda: self.review_requested.emit(file_data))
-
-        menu.exec_(self.mapToGlobal(position))
+            menu.exec_(self.mapToGlobal(position))
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Ошибка при отображении контекстного меню: {str(e)}")
 
     # ------------------------------------------------------- actions
 
@@ -572,26 +1075,270 @@ class TestCaseTreeWidget(QTreeWidget):
             slug = f"tc_{slug}"
         return slug
 
-    def filter_items(self, query: str):
+    def filter_items(self, query: str, filters: Optional[Dict] = None):
+        """Фильтровать элементы дерева по текстовому запросу и дополнительным фильтрам.
+        
+        Args:
+            query: Текстовый запрос для поиска
+            filters: Словарь с фильтрами (author, owner, status, tags)
+        """
         pattern = (query or "").strip().lower()
-        self._apply_filter(self.invisibleRootItem(), pattern)
-        if not pattern:
+        filters = filters or {}
+        self._apply_filter(self.invisibleRootItem(), pattern, filters)
+        if not pattern and not filters:
             self.collapseAll()
 
-    def _apply_filter(self, item: QTreeWidgetItem, pattern: str) -> bool:
+    def _apply_filter(self, item: QTreeWidgetItem, pattern: str, filters: Dict) -> bool:
+        """Применить фильтры к элементу дерева и его детям.
+        
+        Returns:
+            True если элемент или его дети соответствуют фильтрам
+        """
+        # Сначала обрабатываем всех детей
         matches = False
         for i in range(item.childCount()):
             child = item.child(i)
-            child_match = self._apply_filter(child, pattern)
+            child_match = self._apply_filter(child, pattern, filters)
             matches = matches or child_match
 
         own_match = False
         if item is not self.invisibleRootItem():
+            item_data = item.data(0, Qt.UserRole)
+            
+            # Проверяем текстовый поиск
             item_text = item.text(0).lower()
-            own_match = not pattern or pattern in item_text
+            text_match = not pattern or pattern in item_text
+            
+            # Проверяем фильтры для тест-кейсов
+            filter_match = True
+            if item_data and isinstance(item_data, dict) and item_data.get('type') == 'file':
+                test_case = item_data.get('test_case')
+                if test_case and isinstance(test_case, TestCase):
+                    # Фильтр по автору (поддержка множественного выбора)
+                    if 'author' in filters and filters['author']:
+                        author_filter = filters['author']
+                        if isinstance(author_filter, list):
+                            # Множественный выбор - проверяем, что автор тест-кейса в списке
+                            test_case_author = (test_case.author or "").strip()
+                            if not any(author.strip() == test_case_author for author in author_filter):
+                                filter_match = False
+                        else:
+                            # Одиночный выбор (для обратной совместимости)
+                            if filters['author'].lower() not in (test_case.author or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по владельцу (поддержка множественного выбора)
+                    if 'owner' in filters and filters['owner']:
+                        owner_filter = filters['owner']
+                        if isinstance(owner_filter, list):
+                            # Множественный выбор - проверяем, что владелец тест-кейса в списке
+                            test_case_owner = (test_case.owner or "").strip()
+                            if not any(owner.strip() == test_case_owner for owner in owner_filter):
+                                filter_match = False
+                        else:
+                            # Одиночный выбор (для обратной совместимости)
+                            if filters['owner'].lower() not in (test_case.owner or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по статусу (поддержка множественного выбора)
+                    if 'status' in filters and filters['status']:
+                        status_filter = filters['status']
+                        if isinstance(status_filter, list):
+                            test_case_status = (test_case.status or "").strip()
+                            if not any(status.strip() == test_case_status for status in status_filter):
+                                filter_match = False
+                        else:
+                            if status_filter.lower() != (test_case.status or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по reviewer
+                    if 'reviewer' in filters and filters['reviewer']:
+                        reviewer_filter = filters['reviewer']
+                        if isinstance(reviewer_filter, list):
+                            test_case_reviewer = (getattr(test_case, 'reviewer', '') or "").strip()
+                            if not any(reviewer.strip() == test_case_reviewer for reviewer in reviewer_filter):
+                                filter_match = False
+                        else:
+                            if reviewer_filter.lower() not in (getattr(test_case, 'reviewer', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по test_layer
+                    if 'test_layer' in filters and filters['test_layer']:
+                        test_layer_filter = filters['test_layer']
+                        if isinstance(test_layer_filter, list):
+                            test_case_layer = (getattr(test_case, 'test_layer', '') or "").strip()
+                            if not any(layer.strip() == test_case_layer for layer in test_layer_filter):
+                                filter_match = False
+                        else:
+                            if test_layer_filter.lower() not in (getattr(test_case, 'test_layer', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по test_type
+                    if 'test_type' in filters and filters['test_type']:
+                        test_type_filter = filters['test_type']
+                        if isinstance(test_type_filter, list):
+                            test_case_type = (getattr(test_case, 'test_type', '') or "").strip()
+                            if not any(t_type.strip() == test_case_type for t_type in test_type_filter):
+                                filter_match = False
+                        else:
+                            if test_type_filter.lower() not in (getattr(test_case, 'test_type', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по severity
+                    if 'severity' in filters and filters['severity']:
+                        severity_filter = filters['severity']
+                        if isinstance(severity_filter, list):
+                            test_case_severity = (getattr(test_case, 'severity', '') or "").strip()
+                            if not any(severity.strip() == test_case_severity for severity in severity_filter):
+                                filter_match = False
+                        else:
+                            if severity_filter.lower() not in (getattr(test_case, 'severity', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по priority
+                    if 'priority' in filters and filters['priority']:
+                        priority_filter = filters['priority']
+                        if isinstance(priority_filter, list):
+                            test_case_priority = (getattr(test_case, 'priority', '') or "").strip()
+                            if not any(priority.strip() == test_case_priority for priority in priority_filter):
+                                filter_match = False
+                        else:
+                            if priority_filter.lower() not in (getattr(test_case, 'priority', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по environment
+                    if 'environment' in filters and filters['environment']:
+                        env_filter = filters['environment']
+                        if isinstance(env_filter, list):
+                            test_case_env = (getattr(test_case, 'environment', '') or "").strip()
+                            if not any(env.strip() == test_case_env for env in env_filter):
+                                filter_match = False
+                        else:
+                            if env_filter.lower() not in (getattr(test_case, 'environment', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по browser
+                    if 'browser' in filters and filters['browser']:
+                        browser_filter = filters['browser']
+                        if isinstance(browser_filter, list):
+                            test_case_browser = (getattr(test_case, 'browser', '') or "").strip()
+                            if not any(browser.strip() == test_case_browser for browser in browser_filter):
+                                filter_match = False
+                        else:
+                            if browser_filter.lower() not in (getattr(test_case, 'browser', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по test_case_id
+                    if 'test_case_id' in filters and filters['test_case_id']:
+                        tc_id_filter = filters['test_case_id']
+                        if isinstance(tc_id_filter, list):
+                            test_case_id = (getattr(test_case, 'test_case_id', '') or "").strip()
+                            if not any(tc_id.strip() == test_case_id for tc_id in tc_id_filter):
+                                filter_match = False
+                        else:
+                            if tc_id_filter.lower() not in (getattr(test_case, 'test_case_id', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по issue_links
+                    if 'issue_links' in filters and filters['issue_links']:
+                        issue_links_filter = filters['issue_links']
+                        if isinstance(issue_links_filter, list):
+                            test_case_issue_links = (getattr(test_case, 'issue_links', '') or "").strip()
+                            if not any(links.strip() == test_case_issue_links for links in issue_links_filter):
+                                filter_match = False
+                        else:
+                            if issue_links_filter.lower() not in (getattr(test_case, 'issue_links', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по test_case_links
+                    if 'test_case_links' in filters and filters['test_case_links']:
+                        tc_links_filter = filters['test_case_links']
+                        if isinstance(tc_links_filter, list):
+                            test_case_tc_links = (getattr(test_case, 'test_case_links', '') or "").strip()
+                            if not any(links.strip() == test_case_tc_links for links in tc_links_filter):
+                                filter_match = False
+                        else:
+                            if tc_links_filter.lower() not in (getattr(test_case, 'test_case_links', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по epic
+                    if 'epic' in filters and filters['epic']:
+                        epic_filter = filters['epic']
+                        if isinstance(epic_filter, list):
+                            test_case_epic = (getattr(test_case, 'epic', '') or "").strip()
+                            if not any(epic.strip() == test_case_epic for epic in epic_filter):
+                                filter_match = False
+                        else:
+                            if epic_filter.lower() not in (getattr(test_case, 'epic', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по feature
+                    if 'feature' in filters and filters['feature']:
+                        feature_filter = filters['feature']
+                        if isinstance(feature_filter, list):
+                            test_case_feature = (getattr(test_case, 'feature', '') or "").strip()
+                            if not any(feature.strip() == test_case_feature for feature in feature_filter):
+                                filter_match = False
+                        else:
+                            if feature_filter.lower() not in (getattr(test_case, 'feature', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по story
+                    if 'story' in filters and filters['story']:
+                        story_filter = filters['story']
+                        if isinstance(story_filter, list):
+                            test_case_story = (getattr(test_case, 'story', '') or "").strip()
+                            if not any(story.strip() == test_case_story for story in story_filter):
+                                filter_match = False
+                        else:
+                            if story_filter.lower() not in (getattr(test_case, 'story', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по component
+                    if 'component' in filters and filters['component']:
+                        component_filter = filters['component']
+                        if isinstance(component_filter, list):
+                            test_case_component = (getattr(test_case, 'component', '') or "").strip()
+                            if not any(component.strip() == test_case_component for component in component_filter):
+                                filter_match = False
+                        else:
+                            if component_filter.lower() not in (getattr(test_case, 'component', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по description (текстовый поиск)
+                    if 'description' in filters and filters['description']:
+                        description_text = filters['description'].lower()
+                        test_case_description = (getattr(test_case, 'description', '') or "").lower()
+                        if description_text not in test_case_description:
+                            filter_match = False
+                    
+                    # Фильтр по тегам (поддержка множественного выбора)
+                    if 'tags' in filters and filters['tags']:
+                        test_case_tags = [tag.lower().strip() for tag in (test_case.tags or [])]
+                        filter_tags = filters['tags']
+                        if isinstance(filter_tags, list):
+                            # Множественный выбор - проверяем, что хотя бы один тег из фильтра присутствует в тест-кейсе
+                            filter_tags_lower = [tag.lower().strip() for tag in filter_tags]
+                            if not any(tag in test_case_tags for tag in filter_tags_lower):
+                                filter_match = False
+                        else:
+                            # Одиночный выбор (для обратной совместимости)
+                            filter_tag_lower = filter_tags.lower().strip()
+                            if filter_tag_lower not in test_case_tags:
+                                filter_match = False
+            
+            # Для файлов: проверяем текстовый поиск и фильтры
+            # Для папок: проверяем текстовый поиск и наличие видимых дочерних элементов
+            if item_data and isinstance(item_data, dict) and item_data.get('type') == 'folder':
+                # Для папок: видима только если имя соответствует поиску И есть видимые дочерние элементы
+                own_match = text_match and matches
+            else:
+                # Для файлов: видима если соответствует текстовому поиску и фильтрам
+                own_match = text_match and filter_match
+            
             visible = own_match or matches
             item.setHidden(not visible)
-            if pattern:
+            if pattern or filters:
                 item.setExpanded(matches or own_match)
             return visible
 
@@ -828,5 +1575,235 @@ class TestCaseTreeWidget(QTreeWidget):
                 return found
 
         return None
-
+    
+    # ----------------------------------------------------------- skip dialog
+    
+    class SkipReasonDialog(QDialog):
+        """Диалог для выбора причины пропуска тест-кейса"""
+        
+        def __init__(self, parent=None, skip_reasons: Optional[List[str]] = None):
+            super().__init__(parent)
+            self.setWindowTitle("Причина пропуска")
+            self.setMinimumWidth(400)
+            self.skip_reasons = skip_reasons or ['Автотесты', 'Нагрузочное тестирование', 'Другое']
+            self._setup_ui()
+        
+        def _setup_ui(self):
+            layout = QVBoxLayout(self)
+            
+            # Инструкция
+            label = QLabel("Выберите причину пропуска:")
+            layout.addWidget(label)
+            
+            # Дропдаун с причинами (пустой пункт по умолчанию)
+            self.reason_combo = QComboBox()
+            self.reason_combo.addItem("")  # Пустой пункт по умолчанию
+            # Добавляем причины из настроек
+            if self.skip_reasons:
+                self.reason_combo.addItems(self.skip_reasons)
+            else:
+                # Fallback на значения по умолчанию
+                self.reason_combo.addItems(["Автотесты", "Нагрузочное тестирование", "Другое"])
+            self.reason_combo.setCurrentIndex(0)  # Выбираем пустой пункт
+            self.reason_combo.currentTextChanged.connect(self._on_reason_changed)
+            layout.addWidget(self.reason_combo)
+            
+            # Поле для комментария (видно только при выборе "Другое")
+            self.comment_label = QLabel("Комментарий:")
+            self.comment_label.setVisible(False)
+            layout.addWidget(self.comment_label)
+            
+            self.comment_edit = QLineEdit()
+            self.comment_edit.setPlaceholderText("Введите причину пропуска...")
+            self.comment_edit.setVisible(False)
+            self.comment_edit.textChanged.connect(self._on_comment_changed)
+            layout.addWidget(self.comment_edit)
+            
+            # Кнопки
+            button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+            button_box.accepted.connect(self.accept)
+            button_box.rejected.connect(self.reject)
+            self.ok_button = button_box.button(QDialogButtonBox.Ok)
+            self.ok_button.setEnabled(False)  # По умолчанию заблокирована
+            layout.addWidget(button_box)
+        
+        def _on_reason_changed(self, text):
+            # Показываем поле комментария только для "Другое"
+            is_other = text == "Другое"
+            self.comment_label.setVisible(is_other)
+            self.comment_edit.setVisible(is_other)
+            # Обновляем состояние кнопки ОК
+            self._update_ok_button()
+        
+        def _on_comment_changed(self):
+            self._update_ok_button()
+        
+        def _update_ok_button(self):
+            # Кнопка ОК активна, если выбрана причина (не пустая) или введен комментарий
+            reason = self.reason_combo.currentText().strip()
+            if not reason:
+                # Если не выбрана причина, проверяем комментарий
+                comment = self.comment_edit.text().strip()
+                self.ok_button.setEnabled(bool(comment))
+            elif reason == "Другое":
+                # Если выбрано "Другое", нужен комментарий
+                comment = self.comment_edit.text().strip()
+                self.ok_button.setEnabled(bool(comment))
+            else:
+                # Если выбрана любая другая причина, кнопка активна
+                self.ok_button.setEnabled(True)
+        
+        def get_skip_reason(self) -> str:
+            """Получить причину пропуска"""
+            reason = self.reason_combo.currentText().strip()
+            if not reason:
+                # Если не выбрана причина, возвращаем комментарий
+                return self.comment_edit.text().strip()
+            elif reason == "Другое":
+                # Если выбрано "Другое", возвращаем комментарий
+                return self.comment_edit.text().strip()
+            else:
+                # Если выбрана другая причина, возвращаем её значение
+                return reason
+    
+    # ----------------------------------------------------------- mark as passed/skipped
+    
+    def _mark_test_case_passed(self, test_case: TestCase):
+        """Пометить все шаги тест-кейса как passed"""
+        try:
+            if not test_case:
+                QMessageBox.warning(self, "Ошибка", "Тест-кейс не выбран")
+                return
+            
+            if not test_case.steps:
+                QMessageBox.information(self, "Информация", "В тест-кейсе нет шагов")
+                return
+            
+            # Проверяем наличие filepath для сохранения
+            if not hasattr(test_case, "_filepath") or not test_case._filepath:
+                QMessageBox.warning(self, "Ошибка", "Не удалось определить путь к файлу тест-кейса")
+                return
+            
+            for step in test_case.steps:
+                step.status = "passed"
+                step.skip_reason = ""  # Очищаем skipReason при пометке как passed
+            
+            if not self.service.save_test_case(test_case):
+                QMessageBox.warning(self, "Ошибка", "Не удалось сохранить тест-кейс")
+                return
+            
+            self.test_cases_updated.emit()
+            test_case_name = getattr(test_case, "name", "тест-кейс")
+            QMessageBox.information(self, "Готово", f"Все шаги тест-кейса «{test_case_name}» помечены как passed")
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Произошла ошибка при пометке тест-кейса: {str(e)}")
+    
+    def _mark_test_case_skipped(self, test_case: TestCase):
+        """Пометить все шаги тест-кейса как skipped с выбором причины"""
+        try:
+            if not test_case:
+                QMessageBox.warning(self, "Ошибка", "Тест-кейс не выбран")
+                return
+            
+            if not test_case.steps:
+                QMessageBox.information(self, "Информация", "В тест-кейсе нет шагов")
+                return
+            
+            # Проверяем наличие filepath для сохранения
+            if not hasattr(test_case, "_filepath") or not test_case._filepath:
+                QMessageBox.warning(self, "Ошибка", "Не удалось определить путь к файлу тест-кейса")
+                return
+            
+            # Показываем диалог выбора причины
+            dialog = self.SkipReasonDialog(self, self._skip_reasons)
+            if dialog.exec_() != QDialog.Accepted:
+                return
+            
+            skip_reason = dialog.get_skip_reason()
+            
+            # Помечаем все шаги как skipped с причиной
+            for step in test_case.steps:
+                step.status = "skipped"
+                step.skip_reason = skip_reason
+            
+            if not self.service.save_test_case(test_case):
+                QMessageBox.warning(self, "Ошибка", "Не удалось сохранить тест-кейс")
+                return
+            
+            self.test_cases_updated.emit()
+            test_case_name = getattr(test_case, "name", "тест-кейс")
+            QMessageBox.information(self, "Готово", f"Все шаги тест-кейса «{test_case_name}» помечены как skipped")
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Произошла ошибка при пометке тест-кейса: {str(e)}")
+    
+    def _mark_folder_passed(self, folder_path: Path):
+        """Пометить все шаги всех тест-кейсов в папке и подпапках как passed"""
+        if not self.test_cases_dir or not folder_path.exists():
+            return
+        
+        # Собираем все тест-кейсы в папке и подпапках
+        test_cases_to_update = []
+        for test_case in self.service.load_all_test_cases(self.test_cases_dir):
+            if test_case._filepath:
+                try:
+                    test_case._filepath.relative_to(folder_path)
+                    test_cases_to_update.append(test_case)
+                except ValueError:
+                    continue
+        
+        if not test_cases_to_update:
+            QMessageBox.information(self, "Информация", "В выбранной папке нет тест-кейсов")
+            return
+        
+        # Помечаем все шаги как passed
+        count = 0
+        for test_case in test_cases_to_update:
+            if test_case.steps:
+                for step in test_case.steps:
+                    step.status = "passed"
+                    step.skip_reason = ""  # Очищаем skipReason при пометке как passed
+                self.service.save_test_case(test_case)
+                count += 1
+        
+        self.test_cases_updated.emit()
+        QMessageBox.information(self, "Готово", f"Все шаги {count} тест-кейсов в папке помечены как passed")
+    
+    def _mark_folder_skipped(self, folder_path: Path):
+        """Пометить все шаги всех тест-кейсов в папке и подпапках как skipped"""
+        if not self.test_cases_dir or not folder_path.exists():
+            return
+        
+        # Показываем диалог выбора причины
+        dialog = self.SkipReasonDialog(self, self._skip_reasons)
+        if dialog.exec_() != QDialog.Accepted:
+            return
+        
+        skip_reason = dialog.get_skip_reason()
+        
+        # Собираем все тест-кейсы в папке и подпапках
+        test_cases_to_update = []
+        for test_case in self.service.load_all_test_cases(self.test_cases_dir):
+            if test_case._filepath:
+                try:
+                    test_case._filepath.relative_to(folder_path)
+                    test_cases_to_update.append(test_case)
+                except ValueError:
+                    continue
+        
+        if not test_cases_to_update:
+            QMessageBox.information(self, "Информация", "В выбранной папке нет тест-кейсов")
+            return
+        
+        # Помечаем все шаги как skipped с причиной
+        count = 0
+        for test_case in test_cases_to_update:
+            if test_case.steps:
+                for step in test_case.steps:
+                    step.status = "skipped"
+                    step.skip_reason = skip_reason
+                self.service.save_test_case(test_case)
+                count += 1
+        
+        self.test_cases_updated.emit()
+        QMessageBox.information(self, "Готово", f"Все шаги {count} тест-кейсов в папке помечены как skipped")
 
