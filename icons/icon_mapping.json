@@ -1,0 +1,44 @@
+{
+  "panels": {
+    "information": "info.svg",
+    "review": "eye.svg",
+    "creation": "file-plus.svg",
+    "json": "code.svg",
+    "files": "file.svg",
+    "reports": "book.svg"
+  },
+  "context_menu": {
+    "open_explorer": "external-link.svg",
+    "copy_info": "clipboard.svg",
+    "generate_api": "code.svg",
+    "rename": "edit.svg",
+    "duplicate": "copy.svg",
+    "delete": "x.svg",
+    "create_test_case": "file-plus.svg",
+    "create_folder": "folder-plus.svg"
+  },
+  "panel_buttons": {
+    "attach_files": "file-plus.svg"
+  },
+  "status_icons": {
+    "passed": "check-circle.svg",
+    "failed": "x-circle.svg",
+    "skipped": "skip-forward.svg"
+  },
+  "bulk_operations": {
+    "mark_all_passed": "fast-forward.svg",
+    "reset_statuses": "refresh-ccw.svg"
+  },
+  "reports": {
+    "generate_report": "printer.svg"
+  },
+  "step_actions": {
+    "attach_file": "file.svg",
+    "add_above": "corner-up-left.svg",
+    "add_below": "corner-down-left.svg",
+    "move_up": "chevron-up.svg",
+    "move_down": "chevron-down.svg",
+    "delete": "x.svg"
+  }
+}
+

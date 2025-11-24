@@ -6,7 +6,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Dict
 
 from PyQt5.QtWidgets import (
     QApplication,
@@ -24,8 +24,9 @@ from PyQt5.QtWidgets import (
     QDialogButtonBox,
     QWidget,
 )
-from PyQt5.QtCore import Qt, pyqtSignal, QMimeData, QByteArray
+from PyQt5.QtCore import Qt, pyqtSignal, QMimeData, QByteArray, QSize
 from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter
+from PyQt5.QtSvg import QSvgRenderer
 
 from ...services.test_case_service import TestCaseService
 from ...models.test_case import TestCase
@@ -63,6 +64,10 @@ class TestCaseTreeWidget(QTreeWidget):
         self.test_cases_dir: Optional[Path] = None
         self._edit_mode = True  # По умолчанию режим редактирования
         self._skip_reasons: List[str] = ['Автотесты', 'Нагрузочное тестирование', 'Другое']  # Значения по умолчанию
+        
+        # Загружаем маппинг иконок
+        self._icon_mapping = self._load_icon_mapping()
+        
         self._setup_ui()
     
     def set_skip_reasons(self, reasons: List[str]):
@@ -86,6 +91,116 @@ class TestCaseTreeWidget(QTreeWidget):
         
         # Кэш для цветных иконок кружков
         self._icon_cache = {}
+
+    def _load_icon_mapping(self) -> Dict[str, Dict[str, str]]:
+        """Загрузить маппинг иконок из JSON файла."""
+        # Определяем путь к файлу маппинга относительно корня проекта
+        project_root = Path(__file__).parent.parent.parent.parent
+        mapping_file = project_root / "icons" / "icon_mapping.json"
+        
+        if mapping_file.exists():
+            try:
+                with open(mapping_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    # Поддерживаем как старый формат (плоский), так и новый (с секциями)
+                    if isinstance(data, dict) and any(key in data for key in ['panels', 'context_menu', 'status_icons']):
+                        return data
+                    else:
+                        # Старый формат - возвращаем с секциями
+                        return {
+                            'panels': data,
+                            'context_menu': {},
+                            'status_icons': {}
+                        }
+            except (json.JSONDecodeError, IOError) as e:
+                print(f"Ошибка загрузки маппинга иконок: {e}")
+        
+        # Возвращаем значения по умолчанию, если файл не найден
+        return {
+            'panels': {
+                "information": "info.svg",
+                "review": "eye.svg",
+                "creation": "file-plus.svg",
+                "json": "code.svg",
+                "files": "file.svg",
+                "reports": "book.svg"
+            },
+            'context_menu': {
+                "open_explorer": "external-link.svg",
+                "copy_info": "clipboard.svg",
+                "generate_api": "code.svg",
+                "rename": "edit.svg",
+                "duplicate": "copy.svg",
+                "delete": "x.svg",
+                "create_test_case": "file-plus.svg",
+                "create_folder": "folder-plus.svg"
+            },
+            'status_icons': {
+                "passed": "check-circle.svg",
+                "failed": "x-circle.svg",
+                "skipped": "skip-forward.svg"
+            }
+        }
+
+    def _get_context_menu_icon(self, icon_key: str) -> Optional[str]:
+        """Получить имя файла иконки для контекстного меню по ключу."""
+        context_menu_mapping = self._icon_mapping.get('context_menu', {})
+        return context_menu_mapping.get(icon_key)
+
+    def _get_status_icon(self, status: str) -> Optional[str]:
+        """Получить имя файла иконки для статуса по ключу."""
+        status_icons_mapping = self._icon_mapping.get('status_icons', {})
+        return status_icons_mapping.get(status)
+
+    def _load_svg_icon(self, icon_name: str, size: int = 16, color: Optional[str] = None) -> Optional[QIcon]:
+        """Загрузить SVG иконку из файла и вернуть QIcon.
+        
+        Args:
+            icon_name: Имя файла иконки (например, "info.svg")
+            size: Размер иконки в пикселях
+            color: Цвет иконки в формате "#RRGGBB" или None для использования цвета по умолчанию
+        """
+        # Определяем путь к папке с иконками относительно корня проекта
+        project_root = Path(__file__).parent.parent.parent.parent
+        icon_path = project_root / "icons" / icon_name
+        
+        if not icon_path.exists():
+            print(f"Иконка не найдена: {icon_path}")
+            return None
+        
+        try:
+            # Читаем содержимое SVG файла
+            with open(icon_path, 'r', encoding='utf-8') as f:
+                svg_content = f.read()
+            
+            # Если указан цвет, заменяем currentColor на конкретный цвет
+            if color:
+                svg_content = svg_content.replace('currentColor', color)
+                svg_content = svg_content.replace('stroke="currentColor"', f'stroke="{color}"')
+                svg_content = svg_content.replace('fill="currentColor"', f'fill="{color}"')
+            
+            # Создаем рендерер SVG из модифицированного содержимого
+            renderer = QSvgRenderer(svg_content.encode('utf-8'))
+            if not renderer.isValid():
+                print(f"Невалидный SVG файл: {icon_path}")
+                return None
+            
+            # Создаем пиксмап нужного размера
+            pixmap = QPixmap(size, size)
+            pixmap.fill(Qt.transparent)
+            
+            # Рендерим SVG на пиксмап
+            painter = QPainter(pixmap)
+            painter.setRenderHint(QPainter.Antialiasing)
+            renderer.render(painter)
+            painter.end()
+            
+            # Создаем иконку из пиксмапа
+            icon = QIcon(pixmap)
+            return icon
+        except Exception as e:
+            print(f"Ошибка загрузки иконки {icon_name}: {e}")
+            return None
 
     # ------------------------------------------------------------------ load
 
@@ -435,18 +550,23 @@ class TestCaseTreeWidget(QTreeWidget):
     def _show_root_menu(self, position):
         menu = QMenu(self)
 
-        action_new_tc = menu.addAction("➕ Создать тест-кейс")
+        icon_name = self._get_context_menu_icon("create_test_case")
+        if icon_name:
+            icon_create = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+            action_new_tc = menu.addAction(icon_create, "Создать тест-кейс")
+        else:
+            action_new_tc = menu.addAction("Создать тест-кейс")
         action_new_tc.triggered.connect(lambda: self._create_test_case(self.test_cases_dir))
 
         menu.addSeparator()
 
-        action_new_folder = menu.addAction("📁 Создать папку")
+        icon_name = self._get_context_menu_icon("create_folder")
+        if icon_name:
+            icon_create = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+            action_new_folder = menu.addAction(icon_create, "Создать папку")
+        else:
+            action_new_folder = menu.addAction("Создать папку")
         action_new_folder.triggered.connect(lambda: self._create_folder(self.test_cases_dir))
-
-        menu.addSeparator()
-
-        action_review = menu.addAction("📝 Ревью")
-        action_review.triggered.connect(lambda: self.review_requested.emit({'type': 'root'}))
 
         menu.exec_(self.mapToGlobal(position))
 
@@ -457,30 +577,65 @@ class TestCaseTreeWidget(QTreeWidget):
         
         # В режиме запуска тестов показываем упрощенное меню
         if not self._edit_mode:
-            action_mark_passed = menu.addAction("✓ Пометить как passed")
+            icon_name = self._get_status_icon("passed")
+            if icon_name:
+                icon_passed = self._load_svg_icon(icon_name, size=16, color="#2ecc71")
+                action_mark_passed = menu.addAction(icon_passed, "Пометить как passed")
+            else:
+                action_mark_passed = menu.addAction("Пометить как passed")
             action_mark_passed.triggered.connect(lambda: self._mark_folder_passed(folder_path))
             
-            action_mark_skipped = menu.addAction("⊘ Пометить как skipped")
+            icon_name = self._get_status_icon("skipped")
+            if icon_name:
+                icon_skipped = self._load_svg_icon(icon_name, size=16, color="#95a5a6")
+                action_mark_skipped = menu.addAction(icon_skipped, "Пометить как skipped")
+            else:
+                action_mark_skipped = menu.addAction("Пометить как skipped")
             action_mark_skipped.triggered.connect(lambda: self._mark_folder_skipped(folder_path))
         else:
             # В режиме редактирования показываем полное меню
-            action_new_tc = menu.addAction("➕ Создать тест-кейс")
+            icon_name = self._get_context_menu_icon("create_test_case")
+            if icon_name:
+                icon_create = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                action_new_tc = menu.addAction(icon_create, "Создать тест-кейс")
+            else:
+                action_new_tc = menu.addAction("Создать тест-кейс")
             action_new_tc.triggered.connect(lambda: self._create_test_case(folder_path))
 
-            action_new_folder = menu.addAction("📁 Создать подпапку")
+            icon_name = self._get_context_menu_icon("create_folder")
+            if icon_name:
+                icon_create = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                action_new_folder = menu.addAction(icon_create, "Создать подпапку")
+            else:
+                action_new_folder = menu.addAction("Создать подпапку")
             action_new_folder.triggered.connect(lambda: self._create_folder(folder_path))
 
             menu.addSeparator()
 
-            action_rename = menu.addAction("✎ Переименовать")
+            icon_name = self._get_context_menu_icon("rename")
+            if icon_name:
+                icon_edit = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                action_rename = menu.addAction(icon_edit, "Переименовать")
+            else:
+                action_rename = menu.addAction("Переименовать")
             action_rename.triggered.connect(lambda: self._rename_folder(folder_path))
 
-            action_delete = menu.addAction("🗑️ Удалить папку")
+            icon_name = self._get_context_menu_icon("delete")
+            if icon_name:
+                icon_x = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                action_delete = menu.addAction(icon_x, "Удалить папку")
+            else:
+                action_delete = menu.addAction("Удалить папку")
             action_delete.triggered.connect(lambda: self._delete_folder(folder_path))
 
             menu.addSeparator()
 
-            action_open_explorer = menu.addAction("🪟 Открыть в проводнике")
+            icon_name = self._get_context_menu_icon("open_explorer")
+            if icon_name:
+                icon_explorer = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                action_open_explorer = menu.addAction(icon_explorer, "Открыть в проводнике")
+            else:
+                action_open_explorer = menu.addAction("Открыть в проводнике")
             action_open_explorer.triggered.connect(lambda: self._open_in_explorer(folder_path, select=False))
 
         menu.exec_(self.mapToGlobal(position))
@@ -495,47 +650,84 @@ class TestCaseTreeWidget(QTreeWidget):
             
             # В режиме запуска тестов показываем упрощенное меню
             if not self._edit_mode:
-                action_copy_info = menu.addAction("📋 Копировать информацию")
+                icon_name = self._get_context_menu_icon("copy_info")
+                if icon_name:
+                    icon_clipboard = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                    action_copy_info = menu.addAction(icon_clipboard, "Копировать информацию")
+                else:
+                    action_copy_info = menu.addAction("Копировать информацию")
                 action_copy_info.triggered.connect(lambda: self._copy_test_case_info(test_case))
                 
                 menu.addSeparator()
                 
-                action_mark_passed = menu.addAction("✓ Пометить как passed")
+                icon_name = self._get_status_icon("passed")
+                if icon_name:
+                    icon_passed = self._load_svg_icon(icon_name, size=16, color="#2ecc71")
+                    action_mark_passed = menu.addAction(icon_passed, "Пометить как passed")
+                else:
+                    action_mark_passed = menu.addAction("Пометить как passed")
                 action_mark_passed.triggered.connect(lambda: self._mark_test_case_passed(test_case))
                 
-                action_mark_skipped = menu.addAction("⊘ Пометить как skipped")
+                icon_name = self._get_status_icon("skipped")
+                if icon_name:
+                    icon_skipped = self._load_svg_icon(icon_name, size=16, color="#95a5a6")
+                    action_mark_skipped = menu.addAction(icon_skipped, "Пометить как skipped")
+                else:
+                    action_mark_skipped = menu.addAction("Пометить как skipped")
                 action_mark_skipped.triggered.connect(lambda: self._mark_test_case_skipped(test_case))
             else:
                 # В режиме редактирования показываем полное меню
-                action_open = menu.addAction("📂 Открыть")
-                action_open.triggered.connect(lambda: self.test_case_selected.emit(test_case))
-
-                action_open_explorer = menu.addAction("🪟 Открыть в проводнике")
+                icon_name = self._get_context_menu_icon("open_explorer")
+                if icon_name:
+                    icon_explorer = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                    action_open_explorer = menu.addAction(icon_explorer, "Открыть в проводнике")
+                else:
+                    action_open_explorer = menu.addAction("Открыть в проводнике")
                 action_open_explorer.triggered.connect(
                     lambda: self._open_in_explorer(test_case._filepath, select=True)
                 )
 
-                action_copy_info = menu.addAction("📋 Копировать информацию")
+                icon_name = self._get_context_menu_icon("copy_info")
+                if icon_name:
+                    icon_clipboard = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                    action_copy_info = menu.addAction(icon_clipboard, "Копировать информацию")
+                else:
+                    action_copy_info = menu.addAction("Копировать информацию")
                 action_copy_info.triggered.connect(lambda: self._copy_test_case_info(test_case))
 
-                action_generate_api = menu.addAction("🧪 Сгенерировать каркас АТ API")
+                icon_name = self._get_context_menu_icon("generate_api")
+                if icon_name:
+                    icon_code = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                    action_generate_api = menu.addAction(icon_code, "Сгенерировать каркас АТ API")
+                else:
+                    action_generate_api = menu.addAction("Сгенерировать каркас АТ API")
                 action_generate_api.triggered.connect(lambda: self._copy_pytest_skeleton(test_case))
 
-                action_rename = menu.addAction("✎ Переименовать файл")
+                icon_name = self._get_context_menu_icon("rename")
+                if icon_name:
+                    icon_edit = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                    action_rename = menu.addAction(icon_edit, "Переименовать файл")
+                else:
+                    action_rename = menu.addAction("Переименовать файл")
                 action_rename.triggered.connect(lambda: self._rename_file(test_case))
 
-                action_duplicate = menu.addAction("📋 Дублировать")
+                icon_name = self._get_context_menu_icon("duplicate")
+                if icon_name:
+                    icon_copy = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                    action_duplicate = menu.addAction(icon_copy, "Дублировать")
+                else:
+                    action_duplicate = menu.addAction("Дублировать")
                 action_duplicate.triggered.connect(lambda: self._duplicate_test_case(test_case))
 
                 menu.addSeparator()
 
-                action_delete = menu.addAction("🗑️ Удалить")
+                icon_name = self._get_context_menu_icon("delete")
+                if icon_name:
+                    icon_x = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                    action_delete = menu.addAction(icon_x, "Удалить")
+                else:
+                    action_delete = menu.addAction("Удалить")
                 action_delete.triggered.connect(lambda: self._delete_test_case(test_case))
-
-                menu.addSeparator()
-
-                action_review = menu.addAction("📝 Ревью")
-                action_review.triggered.connect(lambda: self.review_requested.emit(file_data))
 
             menu.exec_(self.mapToGlobal(position))
         except Exception as e:

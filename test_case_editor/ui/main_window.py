@@ -1204,6 +1204,7 @@ class MainWindow(QMainWindow):
         self.aux_panel.creation_prompt_saved.connect(self._on_creation_prompt_saved)
         self.aux_panel.creation_enter_clicked.connect(self._on_creation_enter_clicked)
         self.aux_panel.information_data_changed.connect(self._on_information_data_changed)
+        self.aux_panel.generate_report_requested.connect(self._generate_html_report)
         self.detail_splitter.addWidget(self.aux_panel)
         
         # Применяем настройки видимости панели Информация при инициализации
@@ -2397,6 +2398,11 @@ class MainWindow(QMainWindow):
             self.tree_widget.set_edit_mode(is_edit)
         if hasattr(self, "aux_panel"):
             self.aux_panel.set_panels_enabled(is_edit, is_edit)
+            # В режиме редактирования показываем панели Ревью и Создать ТК
+            # В режиме запуска тестов скрываем их
+            # is_edit = True (режим редактирования) -> показать панели (True)
+            # is_edit = False (режим запуска) -> скрыть панели (False)
+            self.aux_panel.set_panels_visible(is_edit, is_edit)
             # Устанавливаем режим редактирования для панели информации
             self.aux_panel.set_information_edit_mode(is_edit)
         

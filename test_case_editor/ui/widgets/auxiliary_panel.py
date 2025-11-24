@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Iterable, List, Optional
+import json
+from typing import Iterable, List, Optional, Dict
 from pathlib import Path
 
-from PyQt5.QtCore import Qt, pyqtSignal, QMargins
+from PyQt5.QtCore import Qt, pyqtSignal, QMargins, QSize
 from PyQt5.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -18,6 +19,8 @@ from PyQt5.QtWidgets import (
     QSizePolicy,
     QFrame,
 )
+from PyQt5.QtGui import QIcon, QPixmap, QPainter
+from PyQt5.QtSvg import QSvgRenderer
 
 from .review_panel import ReviewPanel
 from .json_preview_widget import JsonPreviewWidget
@@ -38,6 +41,7 @@ class AuxiliaryPanel(QWidget):
     creation_enter_clicked = pyqtSignal(str, list)
 
     information_data_changed = pyqtSignal()
+    generate_report_requested = pyqtSignal()  # Сигнал для запроса генерации отчета
 
     def __init__(
         self,
@@ -55,6 +59,9 @@ class AuxiliaryPanel(QWidget):
         self._creation_default_prompt = default_creation_prompt or "Создай ТТ"
         self._creation_default_files = creation_default_files or []
         self._last_creation_prompt_default = (self._creation_default_prompt or "").strip()
+        
+        # Загружаем маппинг иконок
+        self._icon_mapping = self._load_icon_mapping()
 
         self._setup_ui()
 
@@ -114,6 +121,7 @@ class AuxiliaryPanel(QWidget):
         
         # Вкладка отчетности
         self.reports_panel = ReportsPanel()
+        self.reports_panel.generate_report_requested.connect(self.generate_report_requested.emit)
         self._stack.addWidget(self.reports_panel)
 
         content_layout.addLayout(self._stack, stretch=1)
@@ -121,6 +129,89 @@ class AuxiliaryPanel(QWidget):
 
         self.ensure_creation_defaults()
         self.select_tab("information")
+        
+        # По умолчанию показываем панели Ревью и Создать ТК (режим редактирования по умолчанию)
+        # Они будут показаны/скрыты при вызове set_panels_visible из main_window
+        self.set_panels_visible(True, True)
+
+    def _load_icon_mapping(self) -> Dict[str, str]:
+        """Загрузить маппинг панелей на иконки из JSON файла."""
+        # Определяем путь к файлу маппинга относительно корня проекта
+        project_root = Path(__file__).parent.parent.parent.parent
+        mapping_file = project_root / "icons" / "icon_mapping.json"
+        
+        if mapping_file.exists():
+            try:
+                with open(mapping_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    # Поддерживаем как старый формат (плоский), так и новый (с секциями)
+                    if isinstance(data, dict) and 'panels' in data:
+                        return data.get('panels', {})
+                    else:
+                        # Старый формат - возвращаем как есть
+                        return data
+            except (json.JSONDecodeError, IOError) as e:
+                print(f"Ошибка загрузки маппинга иконок: {e}")
+        
+        # Возвращаем значения по умолчанию, если файл не найден
+        return {
+            "information": "info.svg",
+            "review": "eye.svg",
+            "creation": "file-plus.svg",
+            "json": "code.svg",
+            "files": "file.svg",
+            "reports": "book.svg"
+        }
+
+    def _load_svg_icon(self, icon_name: str, size: int = 24, color: Optional[str] = None) -> Optional[QIcon]:
+        """Загрузить SVG иконку из файла и вернуть QIcon.
+        
+        Args:
+            icon_name: Имя файла иконки (например, "info.svg")
+            size: Размер иконки в пикселях
+            color: Цвет иконки в формате "#RRGGBB" или None для использования цвета по умолчанию
+        """
+        # Определяем путь к папке с иконками относительно корня проекта
+        project_root = Path(__file__).parent.parent.parent.parent
+        icon_path = project_root / "icons" / icon_name
+        
+        if not icon_path.exists():
+            print(f"Иконка не найдена: {icon_path}")
+            return None
+        
+        try:
+            # Читаем содержимое SVG файла
+            with open(icon_path, 'r', encoding='utf-8') as f:
+                svg_content = f.read()
+            
+            # Если указан цвет, заменяем currentColor на конкретный цвет
+            if color:
+                svg_content = svg_content.replace('currentColor', color)
+                svg_content = svg_content.replace('stroke="currentColor"', f'stroke="{color}"')
+                svg_content = svg_content.replace('fill="currentColor"', f'fill="{color}"')
+            
+            # Создаем рендерер SVG из модифицированного содержимого
+            renderer = QSvgRenderer(svg_content.encode('utf-8'))
+            if not renderer.isValid():
+                print(f"Невалидный SVG файл: {icon_path}")
+                return None
+            
+            # Создаем пиксмап нужного размера
+            pixmap = QPixmap(size, size)
+            pixmap.fill(Qt.transparent)
+            
+            # Рендерим SVG на пиксмап
+            painter = QPainter(pixmap)
+            painter.setRenderHint(QPainter.Antialiasing)
+            renderer.render(painter)
+            painter.end()
+            
+            # Создаем иконку из пиксмапа
+            icon = QIcon(pixmap)
+            return icon
+        except Exception as e:
+            print(f"Ошибка загрузки иконки {icon_name}: {e}")
+            return None
 
     def _create_button_panel(self) -> QWidget:
         """Создать вертикальную минипанель с иконками для переключения панелей."""
@@ -134,20 +225,35 @@ class AuxiliaryPanel(QWidget):
         button_group = QButtonGroup(self)
         button_group.setExclusive(True)
 
-        # Иконки в минималистичном стиле Cursor (геометрические формы)
-        tabs = [
-            ("information", "◼", "Информация"),  # Закрашенный квадрат (информация)
-            ("review", "●", "Ревью"),  # Закрашенный круг (ревью/проверка)
-            ("creation", "+", "Создать ТК"),  # Плюс (создание)
-            ("json", "◉", "JSON превью"),  # Круг с центром (структура данных)
-            ("files", "📎", "Файлы"),  # Скрепка (файлы)
-            ("reports", "📊", "Отчетность"),  # Отчетность
-        ]
+        # Маппинг панелей на подсказки
+        tooltips = {
+            "information": "Информация",
+            "review": "Ревью",
+            "creation": "Создать ТК",
+            "json": "JSON превью",
+            "files": "Файлы",
+            "reports": "Отчетность",
+        }
 
-        for index, (tab_id, icon_text, tooltip) in enumerate(tabs):
+        for index, tab_id in enumerate(self._tabs_order):
             button = QToolButton()
-            button.setText(icon_text)
-            button.setToolTip(tooltip)
+            
+            # Загружаем иконку из SVG файла
+            icon_name = self._icon_mapping.get(tab_id)
+            if icon_name:
+                # Используем белый цвет для иконок (можно настроить под тему)
+                icon = self._load_svg_icon(icon_name, size=20, color="#ffffff")
+                if icon:
+                    button.setIcon(icon)
+                    button.setIconSize(QSize(20, 20))
+                else:
+                    # Fallback на текст, если иконка не загрузилась
+                    button.setText("?")
+            else:
+                # Fallback на текст, если иконка не найдена в маппинге
+                button.setText("?")
+            
+            button.setToolTip(tooltips.get(tab_id, tab_id))
             button.setCheckable(True)
             button.setCursor(Qt.PointingHandCursor)
             button.setAutoRaise(True)
@@ -379,5 +485,24 @@ class AuxiliaryPanel(QWidget):
             button.setEnabled(review_enabled)
         if button := self._buttons.get("creation"):
             button.setEnabled(creation_enabled)
+
+    def set_panels_visible(self, review_visible: bool, creation_visible: bool):
+        """Установить видимость кнопок панелей Ревью и Создать ТК.
+        
+        Args:
+            review_visible: True для показа кнопки Ревью, False для скрытия
+            creation_visible: True для показа кнопки Создать ТК, False для скрытия
+        """
+        if button := self._buttons.get("review"):
+            button.setVisible(review_visible)
+        if button := self._buttons.get("creation"):
+            button.setVisible(creation_visible)
+        
+        # Если скрываем панели и текущая активная панель - одна из скрываемых, переключаемся на information
+        current_index = self._stack.currentIndex()
+        if not review_visible and current_index == self._tabs_order.index("review"):
+            self.select_tab("information")
+        if not creation_visible and current_index == self._tabs_order.index("creation"):
+            self.select_tab("information")
 
 

@@ -1,7 +1,8 @@
 """Виджет для отображения структуры папки Reports."""
 
+import json
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Dict
 
 from PyQt5.QtWidgets import (
     QWidget,
@@ -11,9 +12,11 @@ from PyQt5.QtWidgets import (
     QTreeWidget,
     QTreeWidgetItem,
     QScrollArea,
+    QPushButton,
 )
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import Qt, pyqtSignal, QSize
+from PyQt5.QtGui import QIcon, QPixmap, QPainter
+from PyQt5.QtSvg import QSvgRenderer
 
 from ..styles.ui_metrics import UI_METRICS
 
@@ -21,9 +24,15 @@ from ..styles.ui_metrics import UI_METRICS
 class ReportsPanel(QWidget):
     """Панель для отображения структуры папки Reports"""
     
+    generate_report_requested = pyqtSignal()  # Сигнал для запроса генерации отчета
+    
     def __init__(self, parent=None):
         super().__init__(parent)
         self.reports_dir: Optional[Path] = None
+        
+        # Загружаем маппинг иконок
+        self._icon_mapping = self._load_icon_mapping()
+        
         self._setup_ui()
     
     def _setup_ui(self):
@@ -49,10 +58,43 @@ class ReportsPanel(QWidget):
         scroll_area.setWidget(content_widget)
         main_layout.addWidget(scroll_area)
         
-        # Заголовок
+        # Заголовок с кнопкой генерации отчета
+        title_layout = QHBoxLayout()
+        title_layout.setContentsMargins(0, 0, 0, 0)
+        title_layout.setSpacing(10)
+        
         title_label = QLabel("Отчетность")
         title_label.setStyleSheet("font-weight: 600; font-size: 14px;")
-        content_layout.addWidget(title_label)
+        title_layout.addWidget(title_label)
+        
+        title_layout.addStretch()
+        
+        # Кнопка генерации отчета
+        self.generate_report_btn = QPushButton()
+        # Загружаем иконку из маппинга
+        icon_name = self._get_reports_icon("generate_report")
+        if icon_name:
+            icon = self._load_svg_icon(icon_name, size=20, color="#ffffff")
+            if icon:
+                self.generate_report_btn.setIcon(icon)
+                self.generate_report_btn.setIconSize(QSize(20, 20))
+        self.generate_report_btn.setToolTip("Сгенерировать отчет")
+        self.generate_report_btn.setFixedSize(32, 32)
+        self.generate_report_btn.setStyleSheet("""
+            QPushButton {
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 4px;
+                background-color: transparent;
+            }
+            QPushButton:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                border-color: rgba(255, 255, 255, 0.3);
+            }
+        """)
+        self.generate_report_btn.clicked.connect(self.generate_report_requested.emit)
+        title_layout.addWidget(self.generate_report_btn)
+        
+        content_layout.addLayout(title_layout)
         
         # Описание
         desc_label = QLabel("Структура папки Reports с отчетами")
@@ -87,6 +129,93 @@ class ReportsPanel(QWidget):
         
         # Загружаем отчеты
         self.refresh_reports()
+
+    def _load_icon_mapping(self) -> Dict[str, Dict[str, str]]:
+        """Загрузить маппинг иконок из JSON файла."""
+        # Определяем путь к файлу маппинга относительно корня проекта
+        project_root = Path(__file__).parent.parent.parent.parent
+        mapping_file = project_root / "icons" / "icon_mapping.json"
+        
+        if mapping_file.exists():
+            try:
+                with open(mapping_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    # Поддерживаем как старый формат (плоский), так и новый (с секциями)
+                    if isinstance(data, dict) and any(key in data for key in ['panels', 'context_menu', 'reports']):
+                        return data
+                    else:
+                        # Старый формат - возвращаем с секциями
+                        return {
+                            'panels': data if isinstance(data, dict) else {},
+                            'context_menu': {},
+                            'reports': {}
+                        }
+            except (json.JSONDecodeError, IOError) as e:
+                print(f"Ошибка загрузки маппинга иконок: {e}")
+        
+        # Возвращаем значения по умолчанию, если файл не найден
+        return {
+            'panels': {},
+            'context_menu': {},
+            'reports': {
+                "generate_report": "printer.svg"
+            }
+        }
+
+    def _get_reports_icon(self, icon_key: str) -> Optional[str]:
+        """Получить имя файла иконки для отчетов по ключу."""
+        reports_mapping = self._icon_mapping.get('reports', {})
+        return reports_mapping.get(icon_key)
+
+    def _load_svg_icon(self, icon_name: str, size: int = 20, color: Optional[str] = None) -> Optional[QIcon]:
+        """Загрузить SVG иконку из файла и вернуть QIcon.
+        
+        Args:
+            icon_name: Имя файла иконки (например, "printer.svg")
+            size: Размер иконки в пикселях
+            color: Цвет иконки в формате "#RRGGBB" или None для использования цвета по умолчанию
+        """
+        # Определяем путь к папке с иконками относительно корня проекта
+        project_root = Path(__file__).parent.parent.parent.parent
+        icon_path = project_root / "icons" / icon_name
+        
+        if not icon_path.exists():
+            print(f"Иконка не найдена: {icon_path}")
+            return None
+        
+        try:
+            # Читаем содержимое SVG файла
+            with open(icon_path, 'r', encoding='utf-8') as f:
+                svg_content = f.read()
+            
+            # Если указан цвет, заменяем currentColor на конкретный цвет
+            if color:
+                svg_content = svg_content.replace('currentColor', color)
+                svg_content = svg_content.replace('stroke="currentColor"', f'stroke="{color}"')
+                svg_content = svg_content.replace('fill="currentColor"', f'fill="{color}"')
+            
+            # Создаем рендерер SVG из модифицированного содержимого
+            renderer = QSvgRenderer(svg_content.encode('utf-8'))
+            if not renderer.isValid():
+                print(f"Невалидный SVG файл: {icon_path}")
+                return None
+            
+            # Создаем пиксмап нужного размера
+            pixmap = QPixmap(size, size)
+            pixmap.fill(Qt.transparent)
+            
+            # Рендерим SVG на пиксмап
+            painter = QPainter(pixmap)
+            painter.setRenderHint(QPainter.Antialiasing)
+            renderer.render(painter)
+            painter.end()
+            
+            # Создаем иконку из пиксмапа
+            icon = QIcon(pixmap)
+            return icon
+        except Exception as e:
+            print(f"Ошибка загрузки иконки {icon_name}: {e}")
+            return None
     
     def _find_reports_dir(self):
         """Найти папку Reports относительно корня проекта"""

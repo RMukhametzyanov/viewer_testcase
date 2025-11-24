@@ -3,18 +3,18 @@
     "DEFAULT_PROMT": "",
     "panel_sizes": {
         "left": 515,
-        "form_area": 1982,
-        "review": 850
+        "form_area": 1630,
+        "review": 561
     },
     "LLM_MODEL": "deepseek-v3.1:latest",
     "LLM_HOST": "http://spb99-vkc-dhwgpu06.devzone.local:11434",
     "LLM_METHODIC_PATH": "C:\\viewer_testcase\\test_case_editor\\docs\\test-cases-guidelines.md",
     "window_geometry": {
-        "x": 146,
-        "y": 57,
+        "x": 105,
+        "y": 35,
         "width": 2094,
         "height": 934,
-        "is_fullscreen": true
+        "is_fullscreen": false
     },
     "DEFAULT_PROMT_CREATE_TC": "Создай тест-кейсы с акцентом на аспекты указанные в методике и ЧТЗ. Поверхностное описание шагов не приемлемо. Необходимы детальные шаги.",
     "theme": "dark",
@@ -50,7 +50,6 @@
         "description": true,
         "expected_result": false
     },
-    "last_test_plan_name": "Регина",
     "skip_reasons": [
         "Автотесты",
         "Нагрузочное тестирование",
