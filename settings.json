@@ -10,8 +10,8 @@
     "LLM_HOST": "http://spb99-vkc-dhwgpu06.devzone.local:11434",
     "LLM_METHODIC_PATH": "C:\\viewer_testcase\\test_case_editor\\docs\\test-cases-guidelines.md",
     "window_geometry": {
-        "x": 105,
-        "y": 35,
+        "x": 104,
+        "y": 56,
         "width": 2094,
         "height": 934,
         "is_fullscreen": false
@@ -50,6 +50,7 @@
         "description": true,
         "expected_result": false
     },
+    "last_test_plan_name": "Регина",
     "skip_reasons": [
         "Автотесты",
         "Нагрузочное тестирование",

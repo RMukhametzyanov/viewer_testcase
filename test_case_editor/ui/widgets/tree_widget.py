@@ -1075,26 +1075,270 @@ class TestCaseTreeWidget(QTreeWidget):
             slug = f"tc_{slug}"
         return slug
 
-    def filter_items(self, query: str):
+    def filter_items(self, query: str, filters: Optional[Dict] = None):
+        """Фильтровать элементы дерева по текстовому запросу и дополнительным фильтрам.
+        
+        Args:
+            query: Текстовый запрос для поиска
+            filters: Словарь с фильтрами (author, owner, status, tags)
+        """
         pattern = (query or "").strip().lower()
-        self._apply_filter(self.invisibleRootItem(), pattern)
-        if not pattern:
+        filters = filters or {}
+        self._apply_filter(self.invisibleRootItem(), pattern, filters)
+        if not pattern and not filters:
             self.collapseAll()
 
-    def _apply_filter(self, item: QTreeWidgetItem, pattern: str) -> bool:
+    def _apply_filter(self, item: QTreeWidgetItem, pattern: str, filters: Dict) -> bool:
+        """Применить фильтры к элементу дерева и его детям.
+        
+        Returns:
+            True если элемент или его дети соответствуют фильтрам
+        """
+        # Сначала обрабатываем всех детей
         matches = False
         for i in range(item.childCount()):
             child = item.child(i)
-            child_match = self._apply_filter(child, pattern)
+            child_match = self._apply_filter(child, pattern, filters)
             matches = matches or child_match
 
         own_match = False
         if item is not self.invisibleRootItem():
+            item_data = item.data(0, Qt.UserRole)
+            
+            # Проверяем текстовый поиск
             item_text = item.text(0).lower()
-            own_match = not pattern or pattern in item_text
+            text_match = not pattern or pattern in item_text
+            
+            # Проверяем фильтры для тест-кейсов
+            filter_match = True
+            if item_data and isinstance(item_data, dict) and item_data.get('type') == 'file':
+                test_case = item_data.get('test_case')
+                if test_case and isinstance(test_case, TestCase):
+                    # Фильтр по автору (поддержка множественного выбора)
+                    if 'author' in filters and filters['author']:
+                        author_filter = filters['author']
+                        if isinstance(author_filter, list):
+                            # Множественный выбор - проверяем, что автор тест-кейса в списке
+                            test_case_author = (test_case.author or "").strip()
+                            if not any(author.strip() == test_case_author for author in author_filter):
+                                filter_match = False
+                        else:
+                            # Одиночный выбор (для обратной совместимости)
+                            if filters['author'].lower() not in (test_case.author or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по владельцу (поддержка множественного выбора)
+                    if 'owner' in filters and filters['owner']:
+                        owner_filter = filters['owner']
+                        if isinstance(owner_filter, list):
+                            # Множественный выбор - проверяем, что владелец тест-кейса в списке
+                            test_case_owner = (test_case.owner or "").strip()
+                            if not any(owner.strip() == test_case_owner for owner in owner_filter):
+                                filter_match = False
+                        else:
+                            # Одиночный выбор (для обратной совместимости)
+                            if filters['owner'].lower() not in (test_case.owner or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по статусу (поддержка множественного выбора)
+                    if 'status' in filters and filters['status']:
+                        status_filter = filters['status']
+                        if isinstance(status_filter, list):
+                            test_case_status = (test_case.status or "").strip()
+                            if not any(status.strip() == test_case_status for status in status_filter):
+                                filter_match = False
+                        else:
+                            if status_filter.lower() != (test_case.status or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по reviewer
+                    if 'reviewer' in filters and filters['reviewer']:
+                        reviewer_filter = filters['reviewer']
+                        if isinstance(reviewer_filter, list):
+                            test_case_reviewer = (getattr(test_case, 'reviewer', '') or "").strip()
+                            if not any(reviewer.strip() == test_case_reviewer for reviewer in reviewer_filter):
+                                filter_match = False
+                        else:
+                            if reviewer_filter.lower() not in (getattr(test_case, 'reviewer', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по test_layer
+                    if 'test_layer' in filters and filters['test_layer']:
+                        test_layer_filter = filters['test_layer']
+                        if isinstance(test_layer_filter, list):
+                            test_case_layer = (getattr(test_case, 'test_layer', '') or "").strip()
+                            if not any(layer.strip() == test_case_layer for layer in test_layer_filter):
+                                filter_match = False
+                        else:
+                            if test_layer_filter.lower() not in (getattr(test_case, 'test_layer', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по test_type
+                    if 'test_type' in filters and filters['test_type']:
+                        test_type_filter = filters['test_type']
+                        if isinstance(test_type_filter, list):
+                            test_case_type = (getattr(test_case, 'test_type', '') or "").strip()
+                            if not any(t_type.strip() == test_case_type for t_type in test_type_filter):
+                                filter_match = False
+                        else:
+                            if test_type_filter.lower() not in (getattr(test_case, 'test_type', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по severity
+                    if 'severity' in filters and filters['severity']:
+                        severity_filter = filters['severity']
+                        if isinstance(severity_filter, list):
+                            test_case_severity = (getattr(test_case, 'severity', '') or "").strip()
+                            if not any(severity.strip() == test_case_severity for severity in severity_filter):
+                                filter_match = False
+                        else:
+                            if severity_filter.lower() not in (getattr(test_case, 'severity', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по priority
+                    if 'priority' in filters and filters['priority']:
+                        priority_filter = filters['priority']
+                        if isinstance(priority_filter, list):
+                            test_case_priority = (getattr(test_case, 'priority', '') or "").strip()
+                            if not any(priority.strip() == test_case_priority for priority in priority_filter):
+                                filter_match = False
+                        else:
+                            if priority_filter.lower() not in (getattr(test_case, 'priority', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по environment
+                    if 'environment' in filters and filters['environment']:
+                        env_filter = filters['environment']
+                        if isinstance(env_filter, list):
+                            test_case_env = (getattr(test_case, 'environment', '') or "").strip()
+                            if not any(env.strip() == test_case_env for env in env_filter):
+                                filter_match = False
+                        else:
+                            if env_filter.lower() not in (getattr(test_case, 'environment', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по browser
+                    if 'browser' in filters and filters['browser']:
+                        browser_filter = filters['browser']
+                        if isinstance(browser_filter, list):
+                            test_case_browser = (getattr(test_case, 'browser', '') or "").strip()
+                            if not any(browser.strip() == test_case_browser for browser in browser_filter):
+                                filter_match = False
+                        else:
+                            if browser_filter.lower() not in (getattr(test_case, 'browser', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по test_case_id
+                    if 'test_case_id' in filters and filters['test_case_id']:
+                        tc_id_filter = filters['test_case_id']
+                        if isinstance(tc_id_filter, list):
+                            test_case_id = (getattr(test_case, 'test_case_id', '') or "").strip()
+                            if not any(tc_id.strip() == test_case_id for tc_id in tc_id_filter):
+                                filter_match = False
+                        else:
+                            if tc_id_filter.lower() not in (getattr(test_case, 'test_case_id', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по issue_links
+                    if 'issue_links' in filters and filters['issue_links']:
+                        issue_links_filter = filters['issue_links']
+                        if isinstance(issue_links_filter, list):
+                            test_case_issue_links = (getattr(test_case, 'issue_links', '') or "").strip()
+                            if not any(links.strip() == test_case_issue_links for links in issue_links_filter):
+                                filter_match = False
+                        else:
+                            if issue_links_filter.lower() not in (getattr(test_case, 'issue_links', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по test_case_links
+                    if 'test_case_links' in filters and filters['test_case_links']:
+                        tc_links_filter = filters['test_case_links']
+                        if isinstance(tc_links_filter, list):
+                            test_case_tc_links = (getattr(test_case, 'test_case_links', '') or "").strip()
+                            if not any(links.strip() == test_case_tc_links for links in tc_links_filter):
+                                filter_match = False
+                        else:
+                            if tc_links_filter.lower() not in (getattr(test_case, 'test_case_links', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по epic
+                    if 'epic' in filters and filters['epic']:
+                        epic_filter = filters['epic']
+                        if isinstance(epic_filter, list):
+                            test_case_epic = (getattr(test_case, 'epic', '') or "").strip()
+                            if not any(epic.strip() == test_case_epic for epic in epic_filter):
+                                filter_match = False
+                        else:
+                            if epic_filter.lower() not in (getattr(test_case, 'epic', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по feature
+                    if 'feature' in filters and filters['feature']:
+                        feature_filter = filters['feature']
+                        if isinstance(feature_filter, list):
+                            test_case_feature = (getattr(test_case, 'feature', '') or "").strip()
+                            if not any(feature.strip() == test_case_feature for feature in feature_filter):
+                                filter_match = False
+                        else:
+                            if feature_filter.lower() not in (getattr(test_case, 'feature', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по story
+                    if 'story' in filters and filters['story']:
+                        story_filter = filters['story']
+                        if isinstance(story_filter, list):
+                            test_case_story = (getattr(test_case, 'story', '') or "").strip()
+                            if not any(story.strip() == test_case_story for story in story_filter):
+                                filter_match = False
+                        else:
+                            if story_filter.lower() not in (getattr(test_case, 'story', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по component
+                    if 'component' in filters and filters['component']:
+                        component_filter = filters['component']
+                        if isinstance(component_filter, list):
+                            test_case_component = (getattr(test_case, 'component', '') or "").strip()
+                            if not any(component.strip() == test_case_component for component in component_filter):
+                                filter_match = False
+                        else:
+                            if component_filter.lower() not in (getattr(test_case, 'component', '') or "").lower():
+                                filter_match = False
+                    
+                    # Фильтр по description (текстовый поиск)
+                    if 'description' in filters and filters['description']:
+                        description_text = filters['description'].lower()
+                        test_case_description = (getattr(test_case, 'description', '') or "").lower()
+                        if description_text not in test_case_description:
+                            filter_match = False
+                    
+                    # Фильтр по тегам (поддержка множественного выбора)
+                    if 'tags' in filters and filters['tags']:
+                        test_case_tags = [tag.lower().strip() for tag in (test_case.tags or [])]
+                        filter_tags = filters['tags']
+                        if isinstance(filter_tags, list):
+                            # Множественный выбор - проверяем, что хотя бы один тег из фильтра присутствует в тест-кейсе
+                            filter_tags_lower = [tag.lower().strip() for tag in filter_tags]
+                            if not any(tag in test_case_tags for tag in filter_tags_lower):
+                                filter_match = False
+                        else:
+                            # Одиночный выбор (для обратной совместимости)
+                            filter_tag_lower = filter_tags.lower().strip()
+                            if filter_tag_lower not in test_case_tags:
+                                filter_match = False
+            
+            # Для файлов: проверяем текстовый поиск и фильтры
+            # Для папок: проверяем текстовый поиск и наличие видимых дочерних элементов
+            if item_data and isinstance(item_data, dict) and item_data.get('type') == 'folder':
+                # Для папок: видима только если имя соответствует поиску И есть видимые дочерние элементы
+                own_match = text_match and matches
+            else:
+                # Для файлов: видима если соответствует текстовому поиску и фильтрам
+                own_match = text_match and filter_match
+            
             visible = own_match or matches
             item.setHidden(not visible)
-            if pattern:
+            if pattern or filters:
                 item.setExpanded(matches or own_match)
             return visible
 

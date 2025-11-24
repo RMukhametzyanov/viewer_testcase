@@ -39,6 +39,9 @@
     "move_up": "chevron-up.svg",
     "move_down": "chevron-down.svg",
     "delete": "x.svg"
+  },
+  "search": {
+    "filter": "filter.svg"
   }
 }
 

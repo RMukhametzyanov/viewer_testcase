@@ -4,7 +4,7 @@ import json
 import re
 import subprocess
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from PyQt5.QtWidgets import (
     QApplication,
@@ -39,9 +39,12 @@ from PyQt5.QtWidgets import (
     QListWidgetItem,
     QStackedWidget,
     QCheckBox,
+    QButtonGroup,
+    QSizePolicy,
 )
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject, QStringListModel, QSortFilterProxyModel, QRegularExpression, QTimer, QEvent
-from PyQt5.QtGui import QFont
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject, QStringListModel, QSortFilterProxyModel, QRegularExpression, QTimer, QEvent, QSize
+from PyQt5.QtGui import QFont, QIcon, QPixmap, QPainter
+from PyQt5.QtSvg import QSvgRenderer
 
 from ..models.test_case import TestCase
 from ..services.test_case_service import TestCaseService
@@ -51,6 +54,7 @@ from .widgets.tree_widget import TestCaseTreeWidget
 from .widgets.form_widget import TestCaseFormWidget
 from .widgets.auxiliary_panel import AuxiliaryPanel
 from .widgets.toggle_switch import ToggleSwitch
+from .widgets.filter_panel import FilterPanel
 from ..utils import llm
 from ..utils.prompt_builder import build_review_prompt, build_creation_prompt
 from ..utils.list_models import fetch_models as fetch_llm_models
@@ -1054,6 +1058,7 @@ class MainWindow(QMainWindow):
         self._llm_thread: Optional[QThread] = None
         self._llm_worker: Optional[_LLMWorker] = None
         self._current_test_case_path: Optional[Path] = None
+        self._current_filters: Dict = {}
         self._current_mode: str = "edit"
         self._geometry_initialized = False
         self._preserve_panel_sizes = False  # Флаг для предотвращения автоматического изменения размеров панелей
@@ -1126,23 +1131,59 @@ class MainWindow(QMainWindow):
         layout.setSpacing(UI_METRICS.section_spacing)
         
         # Поиск
-        search_frame = QFrame()
-        search_frame.setMaximumHeight(48)
-        search_layout = QHBoxLayout(search_frame)
+        self.search_frame = QFrame()  # Сохраняем как атрибут класса
+        search_layout = QHBoxLayout(self.search_frame)
         search_layout.setContentsMargins(
-            UI_METRICS.base_spacing,
-            0,
-            UI_METRICS.base_spacing,
-            UI_METRICS.base_spacing // 2,
+            UI_METRICS.container_padding,
+            UI_METRICS.container_padding,
+            UI_METRICS.container_padding,
+            UI_METRICS.container_padding,
         )
+        search_layout.setSpacing(UI_METRICS.base_spacing // 2)
         
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("🔍 Поиск...")
-        self.search_input.setMinimumHeight(30)
         self.search_input.textChanged.connect(self._filter_tree)
-        search_layout.addWidget(self.search_input)
+        search_layout.addWidget(self.search_input, 1)
         
-        layout.addWidget(search_frame)
+        # Иконка фильтра
+        self.filter_button = QToolButton()
+        # Загружаем иконку фильтра из icon_mapping.json
+        project_root = Path(__file__).parent.parent.parent
+        mapping_file = project_root / "icons" / "icon_mapping.json"
+        filter_icon_name = "filter.svg"
+        if mapping_file.exists():
+            try:
+                with open(mapping_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    filter_icon_name = data.get("search", {}).get("filter", "filter.svg")
+            except:
+                pass
+        
+        filter_icon = self._load_svg_icon(filter_icon_name, size=28, color="#ffffff")
+        if filter_icon:
+            self.filter_button.setIcon(filter_icon)
+            self.filter_button.setIconSize(QSize(28, 28))
+        self.filter_button.setToolTip("Фильтры")
+        self.filter_button.setCursor(Qt.PointingHandCursor)
+        self.filter_button.setAutoRaise(True)
+        self.filter_button.setFixedSize(36, 36)
+        self.filter_button.setStyleSheet("""
+            QToolButton {
+                background-color: transparent;
+                border: none;
+                border-radius: 4px;
+            }
+            QToolButton:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+        """)
+        self.filter_button.clicked.connect(self._on_filter_button_clicked)
+        search_layout.addWidget(self.filter_button)
+        
+        layout.addWidget(self.search_frame)
+        
+        # Панель фильтров будет добавлена в detail_stack
         
         # Дерево
         self.tree_widget = TestCaseTreeWidget(self.service)
@@ -1185,6 +1226,13 @@ class MainWindow(QMainWindow):
         self.form_widget.unsaved_changes_state.connect(self._on_form_unsaved_state)
         self.form_widget.before_save.connect(self._on_form_before_save)
         self.detail_stack.addWidget(self.form_widget)
+        
+        # Панель фильтров
+        self.filter_panel = FilterPanel(test_cases=[])
+        self.filter_panel.filters_applied.connect(self._on_filters_applied)
+        self.filter_panel.filters_reset.connect(self._on_filters_reset)
+        self.detail_stack.addWidget(self.filter_panel)
+        
         self.detail_stack.setCurrentWidget(self.placeholder)
 
         self.detail_splitter.addWidget(self.detail_stack_container)
@@ -1205,7 +1253,12 @@ class MainWindow(QMainWindow):
         self.aux_panel.creation_enter_clicked.connect(self._on_creation_enter_clicked)
         self.aux_panel.information_data_changed.connect(self._on_information_data_changed)
         self.aux_panel.generate_report_requested.connect(self._generate_html_report)
+        self.aux_panel.generate_summary_report_requested.connect(self._generate_summary_report)
+        self.aux_panel.tab_changed.connect(self._on_aux_panel_tab_changed)
         self.detail_splitter.addWidget(self.aux_panel)
+        
+        # Создаем кнопки панелей в toolbar после создания aux_panel
+        self._create_panel_buttons()
         
         # Применяем настройки видимости панели Информация при инициализации
         info_visibility = self.settings.get('information_panel_visibility', {})
@@ -1213,7 +1266,7 @@ class MainWindow(QMainWindow):
             self.aux_panel.information_panel.set_visibility_settings(info_visibility)
 
         self.detail_splitter.setCollapsible(0, False)
-        self.detail_splitter.setCollapsible(1, False)
+        self.detail_splitter.setCollapsible(1, True)  # Разрешаем скрывать aux_panel
         layout.addWidget(self.detail_splitter)
         
         return panel
@@ -1284,20 +1337,32 @@ class MainWindow(QMainWindow):
     
     def _create_toolbar(self):
         """Создать панель инструментов с быстрыми действиями"""
-        toolbar = QToolBar("Основная панель", self)
-        toolbar.setMovable(False)  # Не позволяем перемещать панель
-        self.addToolBar(toolbar)
+        self.toolbar = QToolBar("Основная панель", self)
+        self.toolbar.setMovable(False)  # Не позволяем перемещать панель
+        self.addToolBar(self.toolbar)
         
         # Переключатель режима
         self.mode_edit_label = QLabel("Редактирование")
-        toolbar.addWidget(self.mode_edit_label)
+        self.toolbar.addWidget(self.mode_edit_label)
         
         self.mode_switch = ToggleSwitch()
         self.mode_switch.toggled.connect(self._on_mode_switch_changed)
-        toolbar.addWidget(self.mode_switch)
+        self.toolbar.addWidget(self.mode_switch)
         
         self.mode_run_label = QLabel("Запуск тестов")
-        toolbar.addWidget(self.mode_run_label)
+        self.toolbar.addWidget(self.mode_run_label)
+        
+        # Добавляем растягивающийся разделитель, чтобы кнопки панелей были справа
+        self.toolbar.addSeparator()
+        spacer = QWidget()
+        spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.toolbar.addWidget(spacer)
+        
+        # Кнопки панелей (будут добавлены после создания aux_panel)
+        self._panel_buttons: dict[str, QToolButton] = {}
+        self._panel_button_group = QButtonGroup(self)
+        self._panel_button_group.setExclusive(True)
+        self._current_active_panel: Optional[str] = None  # Текущая активная панель
         
         self._update_mode_indicator()
         
@@ -1306,6 +1371,248 @@ class MainWindow(QMainWindow):
         
         # Создаем кнопку "Сохранить" в статус-баре
         self._create_statusbar_save_button()
+    
+    def _load_icon_mapping(self) -> dict:
+        """Загрузить маппинг панелей на иконки из JSON файла."""
+        project_root = Path(__file__).parent.parent.parent
+        mapping_file = project_root / "icons" / "icon_mapping.json"
+        
+        if mapping_file.exists():
+            try:
+                with open(mapping_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    if isinstance(data, dict) and 'panels' in data:
+                        return data.get('panels', {})
+                    else:
+                        return data
+            except (json.JSONDecodeError, IOError) as e:
+                print(f"Ошибка загрузки маппинга иконок: {e}")
+        
+        return {
+            "information": "info.svg",
+            "review": "eye.svg",
+            "creation": "file-plus.svg",
+            "json": "code.svg",
+            "files": "file.svg",
+            "reports": "book.svg"
+        }
+    
+    def _load_svg_icon(self, icon_name: str, size: int = 24, color: Optional[str] = None) -> Optional[QIcon]:
+        """Загрузить SVG иконку из файла и вернуть QIcon."""
+        project_root = Path(__file__).parent.parent.parent
+        icon_path = project_root / "icons" / icon_name
+        
+        if not icon_path.exists():
+            print(f"Иконка не найдена: {icon_path}")
+            return None
+        
+        try:
+            with open(icon_path, 'r', encoding='utf-8') as f:
+                svg_content = f.read()
+            
+            if color:
+                svg_content = svg_content.replace('currentColor', color)
+                svg_content = svg_content.replace('stroke="currentColor"', f'stroke="{color}"')
+                svg_content = svg_content.replace('fill="currentColor"', f'fill="{color}"')
+            
+            renderer = QSvgRenderer(svg_content.encode('utf-8'))
+            if not renderer.isValid():
+                print(f"Невалидный SVG файл: {icon_path}")
+                return None
+            
+            pixmap = QPixmap(size, size)
+            pixmap.fill(Qt.transparent)
+            
+            painter = QPainter(pixmap)
+            painter.setRenderHint(QPainter.Antialiasing)
+            renderer.render(painter)
+            painter.end()
+            
+            icon = QIcon(pixmap)
+            return icon
+        except Exception as e:
+            print(f"Ошибка загрузки иконки {icon_name}: {e}")
+            return None
+    
+    def _create_panel_buttons(self):
+        """Создать кнопки панелей в toolbar."""
+        # Проверяем, что toolbar существует
+        if not hasattr(self, 'toolbar') or not self.toolbar:
+            return
+        
+        # Загружаем маппинг иконок
+        icon_mapping = self._load_icon_mapping()
+        
+        # Порядок панелей
+        tabs_order = ["information", "review", "creation", "json", "files", "reports"]
+        
+        # Маппинг панелей на подсказки
+        tooltips = {
+            "information": "Информация",
+            "review": "Ревью",
+            "creation": "Создать ТК",
+            "json": "JSON превью",
+            "files": "Файлы",
+            "reports": "Отчетность",
+        }
+        
+        for index, tab_id in enumerate(tabs_order):
+            button = QToolButton()
+            
+            # Загружаем иконку из SVG файла
+            icon_name = icon_mapping.get(tab_id)
+            if icon_name:
+                icon = self._load_svg_icon(icon_name, size=20, color="#ffffff")
+                if icon and not icon.isNull():
+                    button.setIcon(icon)
+                    button.setIconSize(QSize(20, 20))
+                else:
+                    print(f"Предупреждение: не удалось загрузить иконку {icon_name} для панели {tab_id}")
+                    button.setText("?")
+            else:
+                print(f"Предупреждение: иконка не найдена в маппинге для панели {tab_id}")
+                button.setText("?")
+            
+            button.setToolTip(tooltips.get(tab_id, tab_id))
+            button.setCheckable(True)
+            button.setCursor(Qt.PointingHandCursor)
+            button.setAutoRaise(True)
+            button.setFixedSize(32, 32)
+            button.setProperty("tab_id", tab_id)
+            
+            # Стиль кнопки
+            button.setStyleSheet(self._get_panel_button_style(False))
+            
+            self._panel_button_group.addButton(button, index)
+            
+            # Подключаем обработчик клика
+            button.clicked.connect(
+                lambda checked, tab=tab_id: 
+                self._on_panel_button_clicked(tab, checked) if hasattr(self, 'aux_panel') else None
+            )
+            
+            # Обновляем стиль при изменении состояния
+            button.toggled.connect(
+                lambda checked, btn=button: 
+                self._update_panel_button_style(btn, checked)
+            )
+            
+            self.toolbar.addWidget(button)
+            self._panel_buttons[tab_id] = button
+        
+        # Устанавливаем первую кнопку как активную
+        if "information" in self._panel_buttons:
+            self._current_active_panel = "information"
+            self._panel_buttons["information"].setChecked(True)
+            self._update_panel_button_style(self._panel_buttons["information"], True)
+            if hasattr(self, 'aux_panel'):
+                self.aux_panel.setVisible(True)
+                self.aux_panel.select_tab("information")
+    
+    def _on_panel_button_clicked(self, tab_id: str, checked: bool):
+        """Обработчик клика на кнопку панели."""
+        if not hasattr(self, 'aux_panel'):
+            return
+        
+        # Если нажата уже активная панель - скрываем её
+        if checked and self._current_active_panel == tab_id:
+            # Скрываем панель
+            self.aux_panel.setVisible(False)
+            # Снимаем выделение с кнопки
+            button = self._panel_buttons.get(tab_id)
+            if button:
+                button.setChecked(False)
+                self._update_panel_button_style(button, False)
+            self._current_active_panel = None
+        elif checked:
+            # Показываем панель и переключаемся на выбранную вкладку
+            self.aux_panel.setVisible(True)
+            self.aux_panel.select_tab(tab_id)
+            self._current_active_panel = tab_id
+        else:
+            # Если кнопка была отжата (не должно происходить при обычном клике)
+            # но на всякий случай обрабатываем
+            if self._current_active_panel == tab_id:
+                self.aux_panel.setVisible(False)
+                self._current_active_panel = None
+    
+    @staticmethod
+    def _get_panel_button_style(is_active: bool) -> str:
+        """Получить стиль для кнопки панели в toolbar."""
+        if is_active:
+            return """
+                QToolButton {
+                    background-color: rgba(255, 255, 255, 0.1);
+                    border: 1px solid rgba(255, 255, 255, 0.4);
+                    border-radius: 4px;
+                    padding: 0px;
+                    min-width: 32px;
+                    max-width: 32px;
+                    min-height: 32px;
+                    max-height: 32px;
+                }
+                QToolButton:hover {
+                    background-color: rgba(255, 255, 255, 0.15);
+                    border-color: rgba(255, 255, 255, 0.5);
+                }
+            """
+        else:
+            return """
+                QToolButton {
+                    background-color: transparent;
+                    border: 1px solid transparent;
+                    border-radius: 4px;
+                    padding: 0px;
+                    min-width: 32px;
+                    max-width: 32px;
+                    min-height: 32px;
+                    max-height: 32px;
+                }
+                QToolButton:hover {
+                    background-color: rgba(255, 255, 255, 0.05);
+                    border-color: rgba(255, 255, 255, 0.15);
+                }
+            """
+    
+    @staticmethod
+    def _update_panel_button_style(button: QToolButton, is_active: bool):
+        """Обновить стиль кнопки панели в зависимости от состояния."""
+        button.setStyleSheet(MainWindow._get_panel_button_style(is_active))
+    
+    def _on_aux_panel_tab_changed(self, tab_id: str):
+        """Обработчик изменения активной вкладки в aux_panel."""
+        # Обновляем состояние всех кнопок в toolbar
+        # Только если панель видима
+        if hasattr(self, 'aux_panel') and self.aux_panel.isVisible():
+            self._current_active_panel = tab_id
+            for btn_tab_id, button in self._panel_buttons.items():
+                if btn_tab_id == tab_id:
+                    button.setChecked(True)
+                    self._update_panel_button_style(button, True)
+                else:
+                    button.setChecked(False)
+                    self._update_panel_button_style(button, False)
+    
+    def _set_panels_visible(self, review_visible: bool, creation_visible: bool):
+        """Установить видимость кнопок панелей Ревью и Создать ТК в toolbar.
+        
+        Args:
+            review_visible: True для показа кнопки Ревью, False для скрытия
+            creation_visible: True для показа кнопки Создать ТК, False для скрытия
+        """
+        if button := self._panel_buttons.get("review"):
+            button.setVisible(review_visible)
+        if button := self._panel_buttons.get("creation"):
+            button.setVisible(creation_visible)
+        
+        # Если скрываем панели и текущая активная панель - одна из скрываемых, переключаемся на information
+        if hasattr(self, 'aux_panel'):
+            current_index = self.aux_panel._stack.currentIndex()
+            tabs_order = self.aux_panel._tabs_order
+            if not review_visible and current_index == tabs_order.index("review"):
+                self.aux_panel.select_tab("information")
+            if not creation_visible and current_index == tabs_order.index("creation"):
+                self.aux_panel.select_tab("information")
     
     def _create_statusbar_statistics_label(self):
         """Создать QLabel для отображения статистики в statusbar"""
@@ -1600,6 +1907,10 @@ class MainWindow(QMainWindow):
 
         self.test_cases = self.service.load_all_test_cases(self.test_cases_dir)
         
+        # Обновляем панель фильтров с новыми тест-кейсами
+        if hasattr(self, 'filter_panel'):
+            self.filter_panel.update_test_cases(self.test_cases)
+        
         # Обновляем дерево
         self.tree_widget.load_tree(self.test_cases_dir, self.test_cases)
         self.tree_widget.restore_expanded_state(expanded_state)
@@ -1780,7 +2091,76 @@ class MainWindow(QMainWindow):
     
     def _filter_tree(self):
         query = self.search_input.text()
-        self.tree_widget.filter_items(query)
+        # Получаем текущие фильтры
+        filters = getattr(self, '_current_filters', {})
+        self.tree_widget.filter_items(query, filters)
+    
+    def _on_filter_button_clicked(self):
+        """Обработчик клика на кнопку фильтра."""
+        if not hasattr(self, 'filter_panel'):
+            return
+        
+        # Переключаемся на панель фильтров
+        if self.detail_stack.currentWidget() == self.filter_panel:
+            # Если уже открыта панель фильтров, возвращаемся к форме
+            if self._current_test_case_path:
+                self.detail_stack.setCurrentWidget(self.form_widget)
+            else:
+                self.detail_stack.setCurrentWidget(self.placeholder)
+        else:
+            # Показываем панель фильтров
+            self.detail_stack.setCurrentWidget(self.filter_panel)
+    
+    def _on_filters_applied(self, filters: dict):
+        """Обработчик применения фильтров."""
+        # Обновляем цвет иконки фильтра на зеленый
+        if hasattr(self, 'filter_button'):
+            filter_icon_name = "filter.svg"
+            project_root = Path(__file__).parent.parent.parent
+            mapping_file = project_root / "icons" / "icon_mapping.json"
+            if mapping_file.exists():
+                try:
+                    with open(mapping_file, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                        filter_icon_name = data.get("search", {}).get("filter", "filter.svg")
+                except:
+                    pass
+            
+            filter_icon = self._load_svg_icon(filter_icon_name, size=20, color="#4CAF50")  # Зеленый цвет
+            if filter_icon:
+                self.filter_button.setIcon(filter_icon)
+        
+        # Применяем фильтры к дереву
+        query = self.search_input.text() if hasattr(self, 'search_input') else ""
+        if hasattr(self, 'tree_widget'):
+            self.tree_widget.filter_items(query, filters)
+    
+    def _on_filters_reset(self):
+        """Обработчик сброса фильтров."""
+        # Возвращаем белый цвет иконки фильтра
+        if hasattr(self, 'filter_button'):
+            filter_icon_name = "filter.svg"
+            project_root = Path(__file__).parent.parent.parent
+            mapping_file = project_root / "icons" / "icon_mapping.json"
+            if mapping_file.exists():
+                try:
+                    with open(mapping_file, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                        filter_icon_name = data.get("search", {}).get("filter", "filter.svg")
+                except:
+                    pass
+            
+            filter_icon = self._load_svg_icon(filter_icon_name, size=20, color="#ffffff")  # Белый цвет
+            if filter_icon:
+                self.filter_button.setIcon(filter_icon)
+        
+        # Сбрасываем фильтры
+        self._current_filters = {}
+        
+        # Сбрасываем фильтры в дереве
+        query = self.search_input.text() if hasattr(self, 'search_input') else ""
+        if hasattr(self, 'tree_widget'):
+            self.tree_widget.filter_items(query, {})
 
     def _on_review_requested(self, data):
         """Показ панели ревью."""
@@ -2398,11 +2778,11 @@ class MainWindow(QMainWindow):
             self.tree_widget.set_edit_mode(is_edit)
         if hasattr(self, "aux_panel"):
             self.aux_panel.set_panels_enabled(is_edit, is_edit)
-            # В режиме редактирования показываем панели Ревью и Создать ТК
+            # В режиме редактирования показываем кнопки панелей Ревью и Создать ТК в toolbar
             # В режиме запуска тестов скрываем их
-            # is_edit = True (режим редактирования) -> показать панели (True)
-            # is_edit = False (режим запуска) -> скрыть панели (False)
-            self.aux_panel.set_panels_visible(is_edit, is_edit)
+            # is_edit = True (режим редактирования) -> показать кнопки (True)
+            # is_edit = False (режим запуска) -> скрыть кнопки (False)
+            self._set_panels_visible(is_edit, is_edit)
             # Устанавливаем режим редактирования для панели информации
             self.aux_panel.set_information_edit_mode(is_edit)
         
@@ -3014,6 +3394,59 @@ class MainWindow(QMainWindow):
                 self,
                 "Ошибка генерации HTML отчета",
                 f"Не удалось сгенерировать HTML отчет:\n{e}",
+            )
+            self.statusBar().showMessage(f"Ошибка: {e}")
+
+    def _generate_summary_report(self):
+        """Генерация суммарного HTML отчета на основе всех отчетов в папке Reports"""
+        try:
+            # Определяем папку приложения
+            current_file = Path(__file__).resolve()
+            app_dir = current_file.parent.parent.parent
+            
+            # Определяем папку Reports
+            reports_dir = app_dir / "Reports"
+            
+            if not reports_dir.exists():
+                QMessageBox.warning(
+                    self,
+                    "Папка Reports не найдена",
+                    f"Папка Reports не существует:\n{reports_dir}",
+                )
+                self.statusBar().showMessage("Папка Reports не найдена")
+                return
+            
+            # Генерируем суммарный отчет
+            from ..utils.summary_report_generator import generate_summary_report
+            
+            summary_file = generate_summary_report(reports_dir, app_dir)
+            
+            if summary_file:
+                # Открываем проводник с отчетом
+                from ..utils.allure_generator import _open_explorer
+                _open_explorer(summary_file.parent)
+                
+                # Обновляем панель отчетности
+                if hasattr(self, "aux_panel"):
+                    self.aux_panel.update_reports_panel()
+                
+                self.statusBar().showMessage(
+                    f"Суммарный отчет сгенерирован: {summary_file.name}. "
+                    f"Проводник открыт."
+                )
+            else:
+                QMessageBox.warning(
+                    self,
+                    "Ошибка генерации суммарного отчета",
+                    "Не удалось сгенерировать суммарный отчет.\n"
+                    "Убедитесь, что в папке Reports есть HTML отчеты.",
+                )
+                self.statusBar().showMessage("Ошибка при генерации суммарного отчета")
+        except Exception as e:
+            QMessageBox.critical(
+                self,
+                "Ошибка генерации суммарного отчета",
+                f"Не удалось сгенерировать суммарный отчет:\n{e}",
             )
             self.statusBar().showMessage(f"Ошибка: {e}")
 
