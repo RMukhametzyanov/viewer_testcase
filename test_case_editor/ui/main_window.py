@@ -55,6 +55,7 @@ from ..utils import llm
 from ..utils.prompt_builder import build_review_prompt, build_creation_prompt
 from ..utils.list_models import fetch_models as fetch_llm_models
 from ..utils.allure_generator import generate_allure_report
+from ..utils.html_report_generator import generate_html_report
 from .styles.ui_metrics import UI_METRICS
 from .styles.app_theme import build_app_style_sheet
 from .styles.theme_provider import THEME_PROVIDER, ThemeProvider
@@ -1272,7 +1273,7 @@ class MainWindow(QMainWindow):
         generate_allure_action.triggered.connect(self._generate_allure_report)
         
         generate_report_action = self.runner_menu.addAction('Сгенерировать отчет')
-        # Пока не реализовано
+        generate_report_action.triggered.connect(self._generate_html_report)
         settings_action.setShortcut('Ctrl+,')
 
         # Меню "Git"
@@ -1615,6 +1616,9 @@ class MainWindow(QMainWindow):
         self._update_json_preview()
         # Обновляем статусбар (покажет статистику в режиме запуска или обычное сообщение в режиме редактирования)
         self._update_statusbar_statistics()
+        # Обновляем панель отчетности
+        if hasattr(self, "aux_panel"):
+            self.aux_panel.update_reports_panel()
 
     def _update_statistics_panel(self):
         # Панель статистики удалена, метод оставлен для совместимости
@@ -1710,6 +1714,10 @@ class MainWindow(QMainWindow):
             # Обновляем статистику в statusbar
             self._update_statusbar_statistics()
             
+            # Обновляем панель отчетности
+            if hasattr(self, "aux_panel"):
+                self.aux_panel.update_reports_panel()
+            
             # Обновляем форму, если открыт текущий тест-кейс
             if self.current_test_case:
                 # Находим обновленный тест-кейс
@@ -1730,6 +1738,9 @@ class MainWindow(QMainWindow):
         """Обработка изменения статуса шага"""
         # Обновляем статистику в statusbar при изменении статуса
         self._update_statusbar_statistics()
+        # Обновляем панель отчетности
+        if hasattr(self, "aux_panel"):
+            self.aux_panel.update_reports_panel()
     
     def _on_test_case_saved(self):
         """Обработка сохранения тест-кейса"""
@@ -2962,6 +2973,41 @@ class MainWindow(QMainWindow):
                 self,
                 "Ошибка генерации Allure отчета",
                 f"Не удалось сгенерировать Allure отчет:\n{e}",
+            )
+            self.statusBar().showMessage(f"Ошибка: {e}")
+    
+    def _generate_html_report(self):
+        """Генерация HTML отчета с статистикой по тест-кейсам"""
+        try:
+            # Определяем папку приложения
+            app_dir = Path(__file__).resolve().parent.parent.parent
+            
+            # Генерируем отчет
+            report_dir = generate_html_report(
+                test_cases_dir=self.test_cases_dir,
+                app_dir=app_dir,
+            )
+            
+            if report_dir:
+                # Открываем проводник с отчетом
+                from ..utils.allure_generator import _open_explorer
+                _open_explorer(report_dir)
+                
+                # Обновляем панель отчетности
+                if hasattr(self, "aux_panel"):
+                    self.aux_panel.update_reports_panel()
+                
+                self.statusBar().showMessage(
+                    f"HTML отчет сгенерирован: {report_dir.name}. "
+                    f"Проводник открыт."
+                )
+            else:
+                self.statusBar().showMessage("Ошибка при генерации HTML отчета")
+        except Exception as e:
+            QMessageBox.critical(
+                self,
+                "Ошибка генерации HTML отчета",
+                f"Не удалось сгенерировать HTML отчет:\n{e}",
             )
             self.statusBar().showMessage(f"Ошибка: {e}")
 

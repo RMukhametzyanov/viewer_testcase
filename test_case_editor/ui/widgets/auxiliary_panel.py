@@ -23,6 +23,7 @@ from .review_panel import ReviewPanel
 from .json_preview_widget import JsonPreviewWidget
 from .information_panel import InformationPanel
 from .files_panel import FilesPanel
+from .reports_panel import ReportsPanel
 from ...models import TestCase
 from ..styles.ui_metrics import UI_METRICS
 
@@ -47,7 +48,7 @@ class AuxiliaryPanel(QWidget):
         creation_default_files: Optional[List[Path]] = None,
     ):
         super().__init__(parent)
-        self._tabs_order = ["information", "review", "creation", "json", "files"]
+        self._tabs_order = ["information", "review", "creation", "json", "files", "reports"]
         self._buttons: dict[str, QToolButton] = {}
         self._methodic_path = methodic_path
         self._review_default_prompt = default_review_prompt
@@ -110,6 +111,10 @@ class AuxiliaryPanel(QWidget):
         # Вкладка файлов
         self.files_panel = FilesPanel()
         self._stack.addWidget(self.files_panel)
+        
+        # Вкладка отчетности
+        self.reports_panel = ReportsPanel()
+        self._stack.addWidget(self.reports_panel)
 
         content_layout.addLayout(self._stack, stretch=1)
         main_layout.addWidget(content_widget, stretch=1)
@@ -136,6 +141,7 @@ class AuxiliaryPanel(QWidget):
             ("creation", "+", "Создать ТК"),  # Плюс (создание)
             ("json", "◉", "JSON превью"),  # Круг с центром (структура данных)
             ("files", "📎", "Файлы"),  # Скрепка (файлы)
+            ("reports", "📊", "Отчетность"),  # Отчетность
         ]
 
         for index, (tab_id, icon_text, tooltip) in enumerate(tabs):
@@ -288,6 +294,13 @@ class AuxiliaryPanel(QWidget):
         """Установить тест-кейс для панели файлов"""
         if hasattr(self, "files_panel"):
             self.files_panel.load_test_case(test_case)
+    
+    # ------------------------------------------------------------------ reports
+
+    def update_reports_panel(self):
+        """Обновить панель отчетности"""
+        if hasattr(self, "reports_panel"):
+            self.reports_panel.refresh_reports()
 
     # ------------------------------------------------------------------ review
 
