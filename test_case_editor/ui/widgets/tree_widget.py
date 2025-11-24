@@ -6,7 +6,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from PyQt5.QtWidgets import (
     QApplication,
@@ -53,6 +53,7 @@ class TestCaseTreeWidget(QTreeWidget):
         super().__init__(parent)
         self.service = service
         self.test_cases_dir: Optional[Path] = None
+        self._edit_mode = True  # По умолчанию режим редактирования
         self._setup_ui()
 
     def _setup_ui(self):
@@ -80,6 +81,72 @@ class TestCaseTreeWidget(QTreeWidget):
 
         self._populate_directory(test_cases_dir, self.invisibleRootItem(), test_cases)
         self.collapseAll()
+        # После загрузки обновляем статусы папок на основе актуальных данных дерева
+        if not self._edit_mode:
+            self._update_folder_statuses(self.invisibleRootItem())
+    
+    def set_edit_mode(self, enabled: bool):
+        """Установить режим редактирования (скрыть/показать иконки статусов)"""
+        if self._edit_mode == enabled:
+            return
+        self._edit_mode = enabled
+        # Обновляем все элементы дерева
+        self._update_tree_icons(self.invisibleRootItem())
+    
+    def _update_tree_icons(self, parent_item: QTreeWidgetItem):
+        """Обновить иконки во всех элементах дерева"""
+        # Сначала обновляем статусы папок (снизу вверх), если не в режиме редактирования
+        if not self._edit_mode:
+            self._update_folder_statuses(parent_item)
+        
+        # Затем обновляем отображение всех элементов
+        for i in range(parent_item.childCount()):
+            child = parent_item.child(i)
+            data = child.data(0, Qt.UserRole)
+            if data:
+                if data.get('type') == 'file':
+                    test_case = data.get('test_case')
+                    if test_case:
+                        # В режиме редактирования иконки не показываем
+                        if not self._edit_mode:
+                            icon, color = self._get_test_case_icon_and_color(test_case)
+                            item_text = f"{icon} {test_case.name}".strip() if icon else test_case.name
+                            child.setText(0, item_text)
+                            if color:
+                                child.setForeground(0, QColor(color))
+                        else:
+                            child.setText(0, test_case.name)
+                elif data.get('type') == 'folder':
+                    # Обновляем отображение папки
+                    folder_path = data.get('path')
+                    if folder_path:
+                        if not self._edit_mode:
+                            # Пересчитываем статус папки на основе дерева
+                            folder_icon, folder_color = self._calculate_folder_status_from_tree(child)
+                            data['icon'] = folder_icon
+                            data['color'] = folder_color
+                            folder_text = f"{folder_icon} 📁 {folder_path.name}".strip() if folder_icon else f"📁 {folder_path.name}"
+                            child.setText(0, folder_text)
+                            if folder_color:
+                                child.setForeground(0, QColor(folder_color))
+                        else:
+                            child.setText(0, f"📁 {folder_path.name}")
+            # Рекурсивно обновляем дочерние элементы
+            self._update_tree_icons(child)
+    
+    def _update_folder_statuses(self, parent_item: QTreeWidgetItem):
+        """Обновить статусы всех папок в дереве (снизу вверх)"""
+        # Сначала обновляем дочерние элементы
+        for i in range(parent_item.childCount()):
+            child = parent_item.child(i)
+            self._update_folder_statuses(child)
+        
+        # Затем обновляем статус текущей папки, если это папка
+        data = parent_item.data(0, Qt.UserRole)
+        if data and data.get('type') == 'folder':
+            folder_icon, folder_color = self._calculate_folder_status_from_tree(parent_item)
+            data['icon'] = folder_icon
+            data['color'] = folder_color
 
     def _populate_directory(self, directory: Path, parent_item: QTreeWidgetItem, test_cases: list):
         for subdir in sorted([d for d in directory.iterdir() if d.is_dir()]):
@@ -87,24 +154,79 @@ class TestCaseTreeWidget(QTreeWidget):
             if subdir.name == "_attachment":
                 continue
             folder_item = QTreeWidgetItem(parent_item)
-            folder_item.setText(0, f"📁 {subdir.name}")
-            folder_item.setData(0, Qt.UserRole, {'type': 'folder', 'path': subdir})
+            
+            # Вычисляем статус папки на основе тест-кейсов внутри
+            if not self._edit_mode:
+                folder_icon, folder_color = self._calculate_folder_status(subdir, test_cases)
+            else:
+                folder_icon, folder_color = "", ""
+            folder_text = f"{folder_icon} 📁 {subdir.name}".strip() if folder_icon else f"📁 {subdir.name}"
+            folder_item.setText(0, folder_text)
+            folder_item.setData(0, Qt.UserRole, {'type': 'folder', 'path': subdir, 'icon': folder_icon, 'color': folder_color})
             folder_item.setFont(0, QFont("Segoe UI", 10, QFont.Bold))
+            if folder_color:
+                folder_item.setForeground(0, QColor(folder_color))
             self._populate_directory(subdir, folder_item, test_cases)
 
         for test_case in test_cases:
             if test_case._filepath and test_case._filepath.parent == directory:
-                icon = self._status_icon(test_case.status)
-                color = self._status_color(test_case.status)
-
+                # В режиме редактирования иконки не показываем
+                if not self._edit_mode:
+                    icon, color = self._get_test_case_icon_and_color(test_case)
+                else:
+                    icon, color = "", ""
+                
                 item = QTreeWidgetItem(parent_item)
-                item.setText(0, f"{icon} {test_case.name}")
+                # Добавляем иконку только если она есть
+                item_text = f"{icon} {test_case.name}".strip() if icon else test_case.name
+                item.setText(0, item_text)
                 item.setData(0, Qt.UserRole, {'type': 'file', 'test_case': test_case})
                 item.setFont(0, QFont("Segoe UI", 10))
-                item.setForeground(0, QColor(color))
+                if color:
+                    item.setForeground(0, QColor(color))
 
+    def _get_test_case_icon_and_color(self, test_case) -> Tuple[str, str]:
+        """
+        Определить иконку и цвет для тест-кейса на основе статусов шагов.
+        
+        Returns:
+            tuple: (icon, color) где icon - символ иконки, color - цвет в формате hex
+        """
+        if not test_case or not test_case.steps:
+            # Если нет шагов, показываем незалитый кружок
+            return ('○', '#8B9099')
+        
+        steps = test_case.steps
+        if not steps:
+            return ('○', '#8B9099')
+        
+        # Получаем статусы всех шагов (включая пустые)
+        step_statuses = [(step.status or "").strip().lower() for step in steps]
+        
+        # Проверяем наличие failed (приоритет 1)
+        has_failed = any(s == "failed" for s in step_statuses)
+        if has_failed:
+            return ('●', '#F5555D')  # Красный залитый кружок
+        
+        # Проверяем наличие skipped (приоритет 2)
+        has_skipped = any(s == "skipped" for s in step_statuses)
+        if has_skipped:
+            return ('●', '#95a5a6')  # Серый залитый кружок
+        
+        # Проверяем, все ли шаги имеют статус "passed"
+        # Все шаги должны иметь непустой статус и все должны быть "passed"
+        all_have_status = all(s for s in step_statuses)  # Все статусы непустые
+        all_passed = all(s == "passed" for s in step_statuses)  # Все статусы равны "passed"
+        
+        if all_have_status and all_passed:
+            return ('●', '#6CC24A')  # Зеленый залитый кружок
+        
+        # Не все шаги имеют статус и нет failed/skipped
+        return ('○', '#8B9099')  # Незалитый кружок
+    
     @staticmethod
     def _status_icon(status: str) -> str:
+        """Устаревший метод, оставлен для совместимости"""
         return {
             'Done': '✓',
             'Blocked': '⚠',
@@ -115,6 +237,7 @@ class TestCaseTreeWidget(QTreeWidget):
 
     @staticmethod
     def _status_color(status: str) -> str:
+        """Устаревший метод, оставлен для совместимости"""
         return {
             'Done': '#6CC24A',
             'Blocked': '#F5555D',
@@ -122,6 +245,111 @@ class TestCaseTreeWidget(QTreeWidget):
             'Draft': '#8B9099',
             'Deprecated': '#6B7380',
         }.get(status, '#E1E3E6')
+    
+    def _calculate_folder_status(self, folder_path: Path, test_cases: list) -> Tuple[str, str]:
+        """
+        Вычислить статус папки на основе тест-кейсов внутри неё.
+        
+        Returns:
+            tuple: (icon, color) где icon - символ иконки, color - цвет в формате hex
+        """
+        # Собираем все тест-кейсы в этой папке и подпапках
+        folder_test_cases = []
+        for test_case in test_cases:
+            if test_case._filepath:
+                # Проверяем, находится ли тест-кейс в этой папке или её подпапках
+                try:
+                    relative_path = test_case._filepath.relative_to(folder_path)
+                    folder_test_cases.append(test_case)
+                except ValueError:
+                    # Тест-кейс не в этой папке
+                    continue
+        
+        if not folder_test_cases:
+            return ('○', '#8B9099')  # Если нет тест-кейсов, незалитый кружок
+        
+        # Собираем все статусы шагов из всех тест-кейсов в папке
+        all_step_statuses = []
+        total_steps_count = 0
+        for tc in folder_test_cases:
+            if tc.steps:
+                for step in tc.steps:
+                    total_steps_count += 1
+                    status = (step.status or "").strip().lower()
+                    all_step_statuses.append(status)  # Включаем пустые статусы
+        
+        if not all_step_statuses:
+            return ('○', '#8B9099')  # Нет шагов
+        
+        # Проверяем наличие failed (приоритет 1)
+        has_failed = any(s == "failed" for s in all_step_statuses)
+        if has_failed:
+            return ('●', '#F5555D')  # Красный залитый кружок
+        
+        # Проверяем наличие skipped (приоритет 2)
+        has_skipped = any(s == "skipped" for s in all_step_statuses)
+        if has_skipped:
+            return ('●', '#95a5a6')  # Серый залитый кружок
+        
+        # Проверяем, все ли шаги имеют статус "passed"
+        all_have_status = all(s for s in all_step_statuses)  # Все статусы непустые
+        all_passed = all(s == "passed" for s in all_step_statuses)  # Все статусы равны "passed"
+        
+        if all_have_status and all_passed:
+            return ('●', '#6CC24A')  # Зеленый залитый кружок
+        
+        # Не все шаги имеют статус и нет failed/skipped
+        return ('○', '#8B9099')  # Незалитый кружок
+    
+    def _calculate_folder_status_from_tree(self, folder_item: QTreeWidgetItem) -> Tuple[str, str]:
+        """
+        Вычислить статус папки на основе элементов дерева внутри неё.
+        
+        Returns:
+            tuple: (icon, color) где icon - символ иконки, color - цвет в формате hex
+        """
+        all_step_statuses = []
+        
+        def collect_step_statuses(item: QTreeWidgetItem):
+            data = item.data(0, Qt.UserRole)
+            if data:
+                if data.get('type') == 'file':
+                    test_case = data.get('test_case')
+                    if test_case and test_case.steps:
+                        for step in test_case.steps:
+                            status = (step.status or "").strip().lower()
+                            all_step_statuses.append(status)  # Включаем пустые статусы
+                elif data.get('type') == 'folder':
+                    # Рекурсивно собираем статусы из подпапок
+                    for i in range(item.childCount()):
+                        collect_step_statuses(item.child(i))
+        
+        # Собираем статусы шагов из всех дочерних элементов
+        for i in range(folder_item.childCount()):
+            collect_step_statuses(folder_item.child(i))
+        
+        if not all_step_statuses:
+            return ('○', '#8B9099')  # Нет шагов
+        
+        # Проверяем наличие failed (приоритет 1)
+        has_failed = any(s == "failed" for s in all_step_statuses)
+        if has_failed:
+            return ('●', '#F5555D')  # Красный залитый кружок
+        
+        # Проверяем наличие skipped (приоритет 2)
+        has_skipped = any(s == "skipped" for s in all_step_statuses)
+        if has_skipped:
+            return ('●', '#95a5a6')  # Серый залитый кружок
+        
+        # Проверяем, все ли шаги имеют статус "passed"
+        all_have_status = all(s for s in all_step_statuses)  # Все статусы непустые
+        all_passed = all(s == "passed" for s in all_step_statuses)  # Все статусы равны "passed"
+        
+        if all_have_status and all_passed:
+            return ('●', '#6CC24A')  # Зеленый залитый кружок
+        
+        # Не все шаги имеют статус и нет failed/skipped
+        return ('○', '#8B9099')  # Незалитый кружок
 
     # ----------------------------------------------------------- interactions
 

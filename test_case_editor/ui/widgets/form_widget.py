@@ -461,6 +461,11 @@ class TestCaseFormWidget(QWidget):
         precond_group = self._create_precondition_group()
         form_layout.addWidget(precond_group)
 
+        # Массовые операции (только в режиме запуска тестов)
+        self.bulk_operations_group = self._create_bulk_operations_group()
+        self.bulk_operations_group.setVisible(False)
+        form_layout.addWidget(self.bulk_operations_group)
+
         # Шаги тестирования
         steps_group = self._create_steps_group()
         steps_group.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -637,6 +642,29 @@ class TestCaseFormWidget(QWidget):
         self.precondition_input.textChanged.connect(self._mark_changed)
         self._init_auto_resizing_text_edit(self.precondition_input, min_lines=3, max_lines=10)
         layout.addWidget(self.precondition_input)
+        
+        group.setLayout(layout)
+        return group
+
+    def _create_bulk_operations_group(self) -> QGroupBox:
+        """Группа массовых операций по шагам тест-кейса (только в режиме запуска тестов)"""
+        group = QGroupBox("Массовые операции")
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, UI_METRICS.group_title_spacing, 0, 0)
+        
+        # Кнопка "Все пройдено"
+        self.mark_all_passed_btn = QPushButton("Все пройдено")
+        self.mark_all_passed_btn.setToolTip("Отметить все шаги как пройденные")
+        self.mark_all_passed_btn.clicked.connect(self._mark_all_steps_passed)
+        layout.addWidget(self.mark_all_passed_btn)
+        
+        # Кнопка "Сброс статусов"
+        self.reset_statuses_btn = QPushButton("Сброс статусов")
+        self.reset_statuses_btn.setToolTip("Сбросить статусы всех шагов выбранного тест-кейса")
+        self.reset_statuses_btn.clicked.connect(self._reset_all_step_statuses)
+        layout.addWidget(self.reset_statuses_btn)
+        
+        layout.addStretch()
         
         group.setLayout(layout)
         return group
@@ -1186,6 +1214,10 @@ class TestCaseFormWidget(QWidget):
         self.steps_table.setColumnHidden(3, not enabled)  # Показать статусы в режиме запуска
         self.steps_table.setColumnHidden(4, enabled)  # Скрыть действия в режиме запуска
         
+        # Показываем/скрываем группу массовых операций
+        if hasattr(self, 'bulk_operations_group'):
+            self.bulk_operations_group.setVisible(enabled)
+        
         # Включаем/выключаем кнопки статусов для всех строк
         for row in range(self.steps_table.rowCount()):
             status_widget = self.steps_table.cellWidget(row, 3)
@@ -1360,5 +1392,21 @@ class TestCaseFormWidget(QWidget):
         
         # Используем существующий метод для обработки файлов
         self._on_files_dropped_on_step(row, file_paths)
+    
+    def _mark_all_steps_passed(self):
+        """Отметить все шаги как пройденные"""
+        if not self.current_test_case:
+            return
+        for row in range(self.steps_table.rowCount()):
+            self._on_step_status_clicked(row, "passed")
+        self._auto_save_status_change()
+    
+    def _reset_all_step_statuses(self):
+        """Сбросить статусы всех шагов выбранного тест-кейса"""
+        if not self.current_test_case:
+            return
+        for row in range(self.steps_table.rowCount()):
+            self._on_step_status_clicked(row, "pending")
+        self._auto_save_status_change()
 
 

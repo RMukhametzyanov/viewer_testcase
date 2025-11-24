@@ -143,16 +143,16 @@ class FilesPanel(QWidget):
         title_label.setStyleSheet("font-weight: 600; font-size: 14px;")
         content_layout.addWidget(title_label)
 
-        # Инструкция
+        # Список прикрепленных файлов (перемещен наверх)
+        self.files_list = QListWidget()
+        content_layout.addWidget(self.files_list, stretch=1)
+        self._update_files_height()
+
+        # Инструкция (перемещена вниз)
         instruction_label = QLabel("Отображение прикрепленных файлов. Для прикрепления файлов используйте таблицу шагов.")
         instruction_label.setStyleSheet("color: rgba(255, 255, 255, 0.6); font-size: 12px;")
         instruction_label.setWordWrap(True)
         content_layout.addWidget(instruction_label)
-
-        # Список прикрепленных файлов
-        self.files_list = QListWidget()
-        content_layout.addWidget(self.files_list, stretch=1)
-        self._update_files_height()
 
     # --- Публичные методы ---
 

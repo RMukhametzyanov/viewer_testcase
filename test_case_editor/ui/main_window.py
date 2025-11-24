@@ -107,6 +107,7 @@ class SettingsDialog(QDialog):
         self.setWindowTitle("Настройки")
         self.setModal(True)
         self.setMinimumSize(700, 600)
+        self.parent_window = parent  # Сохраняем ссылку на главное окно для доступа к методам загрузки моделей
         
         self._setup_ui()
         self._load_settings()
@@ -251,16 +252,43 @@ class SettingsDialog(QDialog):
         host_layout = QVBoxLayout()
         self.llm_host_edit = QLineEdit()
         self.llm_host_edit.setPlaceholderText("http://localhost:11434")
+        self.llm_host_edit.textChanged.connect(self._on_llm_host_changed)
         host_layout.addWidget(self.llm_host_edit)
         host_group.setLayout(host_layout)
         content_layout.addWidget(host_group)
         
-        # LLM Model
+        # LLM Model - комбобокс для выбора модели
         model_group = QGroupBox("LLM Model")
         model_layout = QVBoxLayout()
-        self.llm_model_edit = QLineEdit()
-        self.llm_model_edit.setPlaceholderText("deepseek-v3.1:latest")
-        model_layout.addWidget(self.llm_model_edit)
+        
+        # Создаем модель для комбобокса
+        self.llm_model_list_model = QStringListModel(self)
+        self.llm_model_proxy_model = QSortFilterProxyModel(self)
+        self.llm_model_proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        self.llm_model_proxy_model.setFilterKeyColumn(0)
+        self.llm_model_proxy_model.setSourceModel(self.llm_model_list_model)
+        
+        self.llm_model_edit = QComboBox()
+        self.llm_model_edit.setModel(self.llm_model_proxy_model)
+        self.llm_model_edit.setEditable(True)
+        self.llm_model_edit.setInsertPolicy(QComboBox.NoInsert)
+        self.llm_model_edit.setMinimumWidth(200)
+        self.llm_model_edit.currentTextChanged.connect(self._on_llm_model_changed)
+        line_edit = self.llm_model_edit.lineEdit()
+        if line_edit:
+            line_edit.setPlaceholderText("Выберите модель…")
+            line_edit.textEdited.connect(self._on_llm_model_text_edited)
+            line_edit.editingFinished.connect(self._on_llm_model_editing_finished)
+        
+        # Кнопка обновления списка моделей
+        refresh_btn = QPushButton("Обновить список")
+        refresh_btn.clicked.connect(self._refresh_llm_models)
+        
+        model_btn_layout = QHBoxLayout()
+        model_btn_layout.addWidget(self.llm_model_edit)
+        model_btn_layout.addWidget(refresh_btn)
+        
+        model_layout.addLayout(model_btn_layout)
         model_group.setLayout(model_layout)
         content_layout.addWidget(model_group)
         
@@ -646,7 +674,12 @@ class SettingsDialog(QDialog):
         
         # LLM
         self.llm_host_edit.setText(self.settings.get('LLM_HOST', ''))
-        self.llm_model_edit.setText(self.settings.get('LLM_MODEL', ''))
+        # Загружаем модели для комбобокса
+        self._load_llm_models()
+        # Устанавливаем текущую модель
+        current_model = self.settings.get('LLM_MODEL', '')
+        if current_model:
+            self.llm_model_edit.setEditText(current_model)
         
         # Промпты
         self.review_prompt_edit.setPlainText(self.settings.get('DEFAULT_PROMT', ''))
@@ -745,7 +778,7 @@ class SettingsDialog(QDialog):
         
         # LLM
         self.settings['LLM_HOST'] = self.llm_host_edit.text().strip()
-        self.settings['LLM_MODEL'] = self.llm_model_edit.text().strip()
+        self.settings['LLM_MODEL'] = self.llm_model_edit.currentText().strip()
         
         # Промпты
         self.settings['DEFAULT_PROMT'] = self.review_prompt_edit.toPlainText().strip()
@@ -833,6 +866,98 @@ class SettingsDialog(QDialog):
     def get_settings(self) -> dict:
         """Получить сохраненные настройки"""
         return self.settings
+    
+    def _load_llm_models(self):
+        """Загрузить список доступных LLM моделей"""
+        if not self.parent_window:
+            return
+        
+        # Получаем список моделей из главного окна
+        host = self.llm_host_edit.text().strip() or self.settings.get('LLM_HOST', '')
+        if not host:
+            # Если host не указан, используем модели из главного окна
+            if hasattr(self.parent_window, 'available_llm_models'):
+                models = self.parent_window.available_llm_models
+            else:
+                models = []
+        else:
+            # Загружаем модели с указанного хоста
+            try:
+                from ..utils.list_models import fetch_models as fetch_llm_models
+                models = fetch_llm_models(host)
+                models = [str(m).strip() for m in (models or []) if str(m or "").strip()]
+            except Exception:
+                models = []
+        
+        # Добавляем текущую модель, если её нет в списке
+        current_model = self.settings.get('LLM_MODEL', '')
+        if current_model and current_model not in models:
+            models.insert(0, current_model)
+        
+        # Обновляем модель комбобокса
+        self.llm_model_list_model.setStringList(models)
+        self._reset_llm_model_filter()
+    
+    def _refresh_llm_models(self):
+        """Обновить список LLM моделей"""
+        self._load_llm_models()
+        QMessageBox.information(self, "Обновление", "Список моделей обновлен")
+    
+    def _on_llm_host_changed(self, text: str):
+        """Обработчик изменения LLM Host"""
+        # При изменении хоста обновляем список моделей
+        if text.strip():
+            QTimer.singleShot(500, self._load_llm_models)  # Задержка для завершения ввода
+    
+    def _on_llm_model_changed(self, text: str):
+        """Обработчик изменения выбранной модели"""
+        pass  # Модель сохранится при нажатии OK
+    
+    def _on_llm_model_text_edited(self, text: str):
+        """Обработчик редактирования текста в комбобоксе модели"""
+        if text:
+            pattern = f".*{QRegularExpression.escape(text)}.*"
+            regex = QRegularExpression(pattern, QRegularExpression.CaseInsensitiveOption)
+        else:
+            regex = QRegularExpression(".*", QRegularExpression.CaseInsensitiveOption)
+        self.llm_model_proxy_model.setFilterRegularExpression(regex)
+        self.llm_model_edit.showPopup()
+        line_edit = self.llm_model_edit.lineEdit()
+        if line_edit:
+            line_edit.setFocus()
+            line_edit.setCursorPosition(len(text))
+    
+    def _on_llm_model_editing_finished(self):
+        """Обработчик завершения редактирования модели"""
+        line_edit = self.llm_model_edit.lineEdit()
+        if not line_edit:
+            return
+        value = line_edit.text().strip()
+        if not value:
+            self._reset_llm_model_filter()
+            return
+        
+        # Добавляем модель в список, если её нет
+        current_models = self.llm_model_list_model.stringList()
+        if value not in current_models:
+            current_models.append(value)
+            self.llm_model_list_model.setStringList(current_models)
+        
+        self._reset_llm_model_filter()
+        # Устанавливаем выбранную модель
+        source_index = self.llm_model_list_model.index(current_models.index(value), 0)
+        proxy_index = self.llm_model_proxy_model.mapFromSource(source_index)
+        if proxy_index.isValid():
+            self.llm_model_edit.setCurrentIndex(proxy_index.row())
+        else:
+            self.llm_model_edit.setCurrentIndex(-1)
+        self.llm_model_edit.setEditText(value)
+    
+    def _reset_llm_model_filter(self):
+        """Сбросить фильтр комбобокса моделей"""
+        self.llm_model_proxy_model.setFilterRegularExpression(
+            QRegularExpression(".*", QRegularExpression.CaseInsensitiveOption)
+        )
 
 
 class _LLMWorker(QObject):
@@ -1146,25 +1271,6 @@ class MainWindow(QMainWindow):
         toolbar.setMovable(False)  # Не позволяем перемещать панель
         self.addToolBar(toolbar)
         
-        # Селектор модели LLM
-        model_label = QLabel("LLM:")
-        toolbar.addWidget(model_label)
-        
-        self.model_selector = QComboBox()
-        self.model_selector.setModel(self._model_proxy_model)
-        self.model_selector.setEditable(True)
-        self.model_selector.setInsertPolicy(QComboBox.NoInsert)
-        self.model_selector.setMinimumWidth(200)
-        self.model_selector.currentTextChanged.connect(self._on_model_selector_changed)
-        line_edit = self.model_selector.lineEdit()
-        if line_edit:
-            line_edit.setPlaceholderText("Выберите модель…")
-            line_edit.textEdited.connect(self._on_model_selector_text_edited)
-            line_edit.editingFinished.connect(self._on_model_editing_finished)
-        toolbar.addWidget(self.model_selector)
-        
-        toolbar.addSeparator()
-        
         # Переключатель режима
         self.mode_edit_label = QLabel("Редактирование")
         toolbar.addWidget(self.mode_edit_label)
@@ -1175,6 +1281,13 @@ class MainWindow(QMainWindow):
         
         self.mode_run_label = QLabel("Запуск тестов")
         toolbar.addWidget(self.mode_run_label)
+        
+        toolbar.addSeparator()
+        
+        # Статистика по шагам (только в режиме запуска тестов)
+        self.stats_label = QLabel("")
+        self.stats_label.setVisible(False)
+        toolbar.addWidget(self.stats_label)
         
         self._update_mode_indicator()
         
@@ -1524,6 +1637,9 @@ class MainWindow(QMainWindow):
                 self.aux_panel.files_panel.attachment_changed.connect(self._on_files_attachment_changed)
         self._update_json_preview()
         
+        # Обновляем статистику в toolbar
+        self._update_toolbar_statistics()
+        
         # Сбрасываем флаг после завершения операции
         QTimer.singleShot(200, lambda: setattr(self, '_preserve_panel_sizes', False))
         
@@ -1566,6 +1682,7 @@ class MainWindow(QMainWindow):
             self.aux_panel.set_files_test_case(self.current_test_case)
         self.load_all_test_cases()
         self._update_json_preview()
+        self._update_toolbar_statistics()
         self.statusBar().showMessage("Тест-кейс сохранен")
     
     def _on_information_data_changed(self):
@@ -1763,6 +1880,31 @@ class MainWindow(QMainWindow):
             self._model_proxy_model.setFilterRegularExpression(
                 QRegularExpression(".*", QRegularExpression.CaseInsensitiveOption)
             )
+    
+    def _update_toolbar_statistics(self):
+        """Обновить статистику по шагам в toolbar (только в режиме запуска тестов)"""
+        if not hasattr(self, "stats_label"):
+            return
+        
+        # Показываем статистику только в режиме запуска тестов
+        if self._current_mode != "run":
+            self.stats_label.setText("")
+            return
+        
+        if not self.current_test_case or not self.current_test_case.steps:
+            self.stats_label.setText("Шаги: нет данных")
+            return
+        
+        steps = self.current_test_case.steps
+        total = len(steps)
+        passed = sum(1 for step in steps if step.status == "passed")
+        failed = sum(1 for step in steps if step.status == "failed")
+        skipped = sum(1 for step in steps if step.status == "skipped")
+        pending = sum(1 for step in steps if not step.status or step.status == "pending")
+        
+        # Формируем текст статистики
+        stats_text = f"Шаги: всего {total} | пройдено {passed} | осталось {pending} | не пройдено {failed + skipped}"
+        self.stats_label.setText(stats_text)
 
     def _reset_all_step_statuses(self):
         if not self.test_cases:
@@ -1788,6 +1930,7 @@ class MainWindow(QMainWindow):
         self.service.save_test_case(self.current_test_case)
         self.form_widget.load_test_case(self.current_test_case)
         self.load_all_test_cases()
+        self._update_toolbar_statistics()
         self.statusBar().showMessage("Все шаги текущего тест-кейса помечены как passed")
         self._update_statistics_panel()
 
@@ -1799,6 +1942,7 @@ class MainWindow(QMainWindow):
         self.service.save_test_case(self.current_test_case)
         self.form_widget.load_test_case(self.current_test_case)
         self.load_all_test_cases()
+        self._update_toolbar_statistics()
         self.statusBar().showMessage("Статусы текущего тест-кейса сброшены")
         self._update_statistics_panel()
 
@@ -2182,6 +2326,9 @@ class MainWindow(QMainWindow):
         if hasattr(self, "form_widget"):
             self.form_widget.set_edit_mode(is_edit)
             self.form_widget.set_run_mode(not is_edit)
+        if hasattr(self, "tree_widget"):
+            # Устанавливаем режим редактирования для дерева (скрыть/показать иконки)
+            self.tree_widget.set_edit_mode(is_edit)
         if hasattr(self, "aux_panel"):
             self.aux_panel.set_panels_enabled(is_edit, is_edit)
             # Устанавливаем режим редактирования для панели информации
@@ -2194,6 +2341,11 @@ class MainWindow(QMainWindow):
                 self.aux_panel.restore_last_tab()
             else:
                 self.aux_panel.show_stats_tab()
+        
+        # Показываем/скрываем статистику в toolbar
+        if hasattr(self, "stats_label"):
+            self.stats_label.setVisible(not is_edit)
+        self._update_toolbar_statistics()
 
     def _apply_initial_panel_sizes(self):
         left_width = max(self.panel_sizes.get('left', 350), 150)

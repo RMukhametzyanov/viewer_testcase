@@ -2,17 +2,17 @@
     "test_cases_dir": "C:/all_testcases_spektr",
     "DEFAULT_PROMT": "",
     "panel_sizes": {
-        "left": 398,
-        "form_area": 1407,
-        "review": 523
+        "left": 515,
+        "form_area": 1541,
+        "review": 652
     },
-    "LLM_MODEL": "deepseek-v3.1:latest",
+    "LLM_MODEL": "qwen2.5:32b-instruct",
     "LLM_HOST": "http://spb99-vkc-dhwgpu06.devzone.local:11434",
     "LLM_METHODIC_PATH": "C:\\viewer_testcase\\test_case_editor\\docs\\test-cases-guidelines.md",
     "window_geometry": {
-        "x": 162,
-        "y": 38,
-        "width": 1845,
+        "x": 113,
+        "y": 51,
+        "width": 2094,
         "height": 930,
         "is_fullscreen": false
     },
@@ -49,5 +49,6 @@
         "component": true,
         "description": true,
         "expected_result": false
-    }
+    },
+    "last_test_plan_name": "Регина"
 }
