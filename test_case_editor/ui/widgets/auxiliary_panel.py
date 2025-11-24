@@ -21,7 +21,6 @@ from PyQt5.QtWidgets import (
 
 from .review_panel import ReviewPanel
 from .json_preview_widget import JsonPreviewWidget
-from .stats_panel import StatsPanel
 from .information_panel import InformationPanel
 from .files_panel import FilesPanel
 from ...models import TestCase
@@ -48,9 +47,8 @@ class AuxiliaryPanel(QWidget):
         creation_default_files: Optional[List[Path]] = None,
     ):
         super().__init__(parent)
-        self._tabs_order = ["information", "review", "creation", "json", "files", "stats"]
+        self._tabs_order = ["information", "review", "creation", "json", "files"]
         self._buttons: dict[str, QToolButton] = {}
-        self._last_non_stats_tab = "information"
         self._methodic_path = methodic_path
         self._review_default_prompt = default_review_prompt
         self._creation_default_prompt = default_creation_prompt or "Создай ТТ"
@@ -113,10 +111,6 @@ class AuxiliaryPanel(QWidget):
         self.files_panel = FilesPanel()
         self._stack.addWidget(self.files_panel)
 
-        # Вкладка статистики
-        self.stats_panel = StatsPanel()
-        self._stack.addWidget(self.stats_panel)
-
         content_layout.addLayout(self._stack, stretch=1)
         main_layout.addWidget(content_widget, stretch=1)
 
@@ -142,7 +136,6 @@ class AuxiliaryPanel(QWidget):
             ("creation", "+", "Создать ТК"),  # Плюс (создание)
             ("json", "◉", "JSON превью"),  # Круг с центром (структура данных)
             ("files", "📎", "Файлы"),  # Скрепка (файлы)
-            ("stats", "◆", "Панель управления раннером"),  # Закрашенный ромб (статистика)
         ]
 
         for index, (tab_id, icon_text, tooltip) in enumerate(tabs):
@@ -271,14 +264,6 @@ class AuxiliaryPanel(QWidget):
 
         if tab_id == "creation":
             self.ensure_creation_defaults()
-        if tab_id != "stats":
-            self._last_non_stats_tab = tab_id
-
-    def show_stats_tab(self):
-        self.select_tab("stats")
-
-    def restore_last_tab(self):
-        self.select_tab(self._last_non_stats_tab or "information")
 
     # ------------------------------------------------------------------ information
 
@@ -373,9 +358,6 @@ class AuxiliaryPanel(QWidget):
         else:
             self.json_panel.clear()
 
-    def update_statistics(self, test_cases: List[TestCase]):
-        if hasattr(self, "stats_panel"):
-            self.stats_panel.update_statistics(test_cases)
 
     def set_panels_enabled(self, review_enabled: bool, creation_enabled: bool):
         self.review_panel.setEnabled(review_enabled)

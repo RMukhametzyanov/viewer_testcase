@@ -1110,7 +1110,7 @@ class MainWindow(QMainWindow):
         
         self._apply_initial_panel_sizes()
         
-        self.statusBar().showMessage("Готов к работе")
+        # Статусбар будет обновлен в _apply_mode_state()
     
     def _create_left_panel(self) -> QWidget:
         """Создать левую панель с деревом"""
@@ -1145,9 +1145,13 @@ class MainWindow(QMainWindow):
         
         # Дерево
         self.tree_widget = TestCaseTreeWidget(self.service)
+        # Передаем настройки для списка причин пропуска
+        skip_reasons = self.settings.get('skip_reasons', ['Автотесты', 'Нагрузочное тестирование', 'Другое'])
+        self.tree_widget.set_skip_reasons(skip_reasons)
         self.tree_widget.test_case_selected.connect(self._on_test_case_selected)
         self.tree_widget.tree_updated.connect(self._on_tree_updated)
         self.tree_widget.review_requested.connect(self._on_review_requested)
+        self.tree_widget.test_cases_updated.connect(self._on_test_cases_updated)
         layout.addWidget(self.tree_widget, 1)
         
         return panel
@@ -1172,7 +1176,11 @@ class MainWindow(QMainWindow):
         self.detail_stack.addWidget(self.placeholder)
         
         self.form_widget = TestCaseFormWidget(self.service)
+        # Передаем настройки для списка причин пропуска
+        skip_reasons = self.settings.get('skip_reasons', ['Автотесты', 'Нагрузочное тестирование', 'Другое'])
+        self.form_widget.set_skip_reasons(skip_reasons)
         self.form_widget.test_case_saved.connect(self._on_test_case_saved)
+        self.form_widget.status_changed.connect(self._on_status_changed)
         self.form_widget.unsaved_changes_state.connect(self._on_form_unsaved_state)
         self.form_widget.before_save.connect(self._on_form_before_save)
         self.detail_stack.addWidget(self.form_widget)
@@ -1195,10 +1203,6 @@ class MainWindow(QMainWindow):
         self.aux_panel.creation_prompt_saved.connect(self._on_creation_prompt_saved)
         self.aux_panel.creation_enter_clicked.connect(self._on_creation_enter_clicked)
         self.aux_panel.information_data_changed.connect(self._on_information_data_changed)
-        self.aux_panel.stats_panel.reset_all_statuses.connect(self._reset_all_step_statuses)
-        self.aux_panel.stats_panel.mark_current_passed.connect(self._mark_current_case_passed)
-        self.aux_panel.stats_panel.reset_current_case.connect(self._reset_current_case_statuses)
-        self.aux_panel.stats_panel.generate_allure.connect(self._generate_allure_report)
         self.detail_splitter.addWidget(self.aux_panel)
         
         # Применяем настройки видимости панели Информация при инициализации
@@ -1258,6 +1262,17 @@ class MainWindow(QMainWindow):
         # Кнопка настроек в меню "Вид"
         settings_action = self.view_menu.addAction('Настройки…')
         settings_action.triggered.connect(self._open_settings_dialog)
+        
+        # Меню "Runner"
+        self.runner_menu = menubar.addMenu('Runner')
+        reset_all_statuses_action = self.runner_menu.addAction('Сброс статусов тест-кейсов')
+        reset_all_statuses_action.triggered.connect(self._confirm_and_reset_all_statuses)
+        
+        generate_allure_action = self.runner_menu.addAction('Сгенерировать отчет Allure')
+        generate_allure_action.triggered.connect(self._generate_allure_report)
+        
+        generate_report_action = self.runner_menu.addAction('Сгенерировать отчет')
+        # Пока не реализовано
         settings_action.setShortcut('Ctrl+,')
 
         # Меню "Git"
@@ -1282,17 +1297,19 @@ class MainWindow(QMainWindow):
         self.mode_run_label = QLabel("Запуск тестов")
         toolbar.addWidget(self.mode_run_label)
         
-        toolbar.addSeparator()
-        
-        # Статистика по шагам (только в режиме запуска тестов)
-        self.stats_label = QLabel("")
-        self.stats_label.setVisible(False)
-        toolbar.addWidget(self.stats_label)
-        
         self._update_mode_indicator()
+        
+        # Создаем label для статистики в статус-баре
+        self._create_statusbar_statistics_label()
         
         # Создаем кнопку "Сохранить" в статус-баре
         self._create_statusbar_save_button()
+    
+    def _create_statusbar_statistics_label(self):
+        """Создать QLabel для отображения статистики в statusbar"""
+        self.statusbar_stats_label = QLabel("")
+        self.statusbar_stats_label.setVisible(False)
+        self.statusBar().addPermanentWidget(self.statusbar_stats_label)
     
     def _create_statusbar_save_button(self):
         """Создать кнопку 'Сохранить' в статус-баре"""
@@ -1500,6 +1517,7 @@ class MainWindow(QMainWindow):
             'LLM_HOST': llm.DEFAULT_HOST,
             'LLM_METHODIC_PATH': str(self._default_methodic_path()),
             'panel_sizes': {'left': 350, 'form_area': 900, 'review': 0},
+            'skip_reasons': ['Автотесты', 'Нагрузочное тестирование', 'Другое'],
         }
         
         if self.settings_file.exists():
@@ -1594,14 +1612,14 @@ class MainWindow(QMainWindow):
         # Обновляем счетчики
         self.placeholder.update_count(len(self.test_cases))
         
-        self.statusBar().showMessage(f"Загружено тест-кейсов: {len(self.test_cases)}")
         self._update_json_preview()
-        if hasattr(self, "aux_panel"):
-            self.aux_panel.update_statistics(self.test_cases)
+        # Обновляем статусбар (покажет статистику в режиме запуска или обычное сообщение в режиме редактирования)
+        self._update_statusbar_statistics()
 
     def _update_statistics_panel(self):
-        if hasattr(self, "aux_panel"):
-            self.aux_panel.update_statistics(self.test_cases)
+        # Панель статистики удалена, метод оставлен для совместимости
+        # Обновляем только статусбар
+        self._update_statusbar_statistics()
 
     def _on_test_case_selected(self, test_case: TestCase):
         """Обработка выбора тест-кейса"""
@@ -1637,13 +1655,14 @@ class MainWindow(QMainWindow):
                 self.aux_panel.files_panel.attachment_changed.connect(self._on_files_attachment_changed)
         self._update_json_preview()
         
-        # Обновляем статистику в toolbar
-        self._update_toolbar_statistics()
-        
         # Сбрасываем флаг после завершения операции
         QTimer.singleShot(200, lambda: setattr(self, '_preserve_panel_sizes', False))
         
-        self.statusBar().showMessage(f"Открыт: {test_case.name}")
+        # Обновляем статусбар (покажет статистику в режиме запуска или сообщение в режиме редактирования)
+        if self._current_mode == "run":
+            self._update_statusbar_statistics()
+        else:
+            self.statusBar().showMessage(f"Открыт: {test_case.name}")
     
     def _on_form_unsaved_state(self, has_changes: bool):
         """Обновление статуса при изменениях в форме"""
@@ -1673,6 +1692,45 @@ class MainWindow(QMainWindow):
         self.load_all_test_cases()
         self.statusBar().showMessage("Дерево тест-кейсов обновлено.")
     
+    def _on_test_cases_updated(self):
+        """Обработка обновления тест-кейсов после изменения статусов"""
+        try:
+            # Сохраняем состояние дерева
+            expanded_state = self.tree_widget.capture_expanded_state()
+            selected_filepath = self.tree_widget.capture_selected_item()
+            
+            # Перезагружаем тест-кейсы
+            self.load_all_test_cases()
+            
+            # Восстанавливаем состояние дерева
+            self.tree_widget.restore_expanded_state(expanded_state)
+            if selected_filepath:
+                self.tree_widget.restore_selected_item(selected_filepath)
+            
+            # Обновляем статистику в statusbar
+            self._update_statusbar_statistics()
+            
+            # Обновляем форму, если открыт текущий тест-кейс
+            if self.current_test_case:
+                # Находим обновленный тест-кейс
+                current_filepath = getattr(self.current_test_case, "_filepath", None)
+                if current_filepath:
+                    updated_case = next(
+                        (tc for tc in self.test_cases if getattr(tc, "_filepath", None) == current_filepath),
+                        None
+                    )
+                    if updated_case:
+                        self.current_test_case = updated_case
+                        self.form_widget.load_test_case(updated_case)
+        except Exception as e:
+            # Логируем ошибку, но не показываем пользователю, чтобы не прерывать работу
+            print(f"Ошибка при обновлении тест-кейсов: {e}")
+    
+    def _on_status_changed(self):
+        """Обработка изменения статуса шага"""
+        # Обновляем статистику в statusbar при изменении статуса
+        self._update_statusbar_statistics()
+    
     def _on_test_case_saved(self):
         """Обработка сохранения тест-кейса"""
         # Обновляем панель информации после сохранения
@@ -1682,8 +1740,8 @@ class MainWindow(QMainWindow):
             self.aux_panel.set_files_test_case(self.current_test_case)
         self.load_all_test_cases()
         self._update_json_preview()
-        self._update_toolbar_statistics()
-        self.statusBar().showMessage("Тест-кейс сохранен")
+        # Обновляем статистику в statusbar (всегда)
+        self._update_statusbar_statistics()
     
     def _on_information_data_changed(self):
         """Обработка изменения данных в панели информации"""
@@ -1881,31 +1939,21 @@ class MainWindow(QMainWindow):
                 QRegularExpression(".*", QRegularExpression.CaseInsensitiveOption)
             )
     
-    def _update_toolbar_statistics(self):
-        """Обновить статистику по шагам в toolbar (только в режиме запуска тестов)"""
-        if not hasattr(self, "stats_label"):
-            return
-        
-        # Показываем статистику только в режиме запуска тестов
-        if self._current_mode != "run":
-            self.stats_label.setText("")
-            return
-        
-        if not self.current_test_case or not self.current_test_case.steps:
-            self.stats_label.setText("Шаги: нет данных")
-            return
-        
-        steps = self.current_test_case.steps
-        total = len(steps)
-        passed = sum(1 for step in steps if step.status == "passed")
-        failed = sum(1 for step in steps if step.status == "failed")
-        skipped = sum(1 for step in steps if step.status == "skipped")
-        pending = sum(1 for step in steps if not step.status or step.status == "pending")
-        
-        # Формируем текст статистики
-        stats_text = f"Шаги: всего {total} | пройдено {passed} | осталось {pending} | не пройдено {failed + skipped}"
-        self.stats_label.setText(stats_text)
 
+    def _confirm_and_reset_all_statuses(self):
+        """Показать диалог подтверждения и сбросить статусы всех тест-кейсов"""
+        reply = QMessageBox.question(
+            self,
+            "Подтверждение действия",
+            "Вы уверены, что хотите сбросить статусы всех шагов во всех тест-кейсах?\n\n"
+            "Это действие нельзя отменить.",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+        
+        if reply == QMessageBox.Yes:
+            self._reset_all_step_statuses()
+    
     def _reset_all_step_statuses(self):
         if not self.test_cases:
             return
@@ -1915,23 +1963,27 @@ class MainWindow(QMainWindow):
                 continue
             for step in case.steps:
                 step.status = ""
+                step.skip_reason = ""  # Очищаем skipReason при сбросе статуса
             self.service.save_test_case(case)
             count += 1
         self.load_all_test_cases()
         if self.current_test_case:
             self.form_widget.load_test_case(self.current_test_case)
-        self.statusBar().showMessage(f"Статусы шагов сброшены: {count} тест-кейсов")
+        # Обновляем статистику в statusbar (всегда)
+        self._update_statusbar_statistics()
+        QMessageBox.information(self, "Готово", f"Статусы сброшены для {count} тест-кейсов")
 
     def _mark_current_case_passed(self):
         if not self.current_test_case or not self.current_test_case.steps:
             return
         for step in self.current_test_case.steps:
             step.status = "passed"
+            step.skip_reason = ""  # Очищаем skipReason при пометке как passed
         self.service.save_test_case(self.current_test_case)
         self.form_widget.load_test_case(self.current_test_case)
         self.load_all_test_cases()
-        self._update_toolbar_statistics()
-        self.statusBar().showMessage("Все шаги текущего тест-кейса помечены как passed")
+        # Обновляем статистику в statusbar (всегда)
+        self._update_statusbar_statistics()
         self._update_statistics_panel()
 
     def _reset_current_case_statuses(self):
@@ -1942,8 +1994,11 @@ class MainWindow(QMainWindow):
         self.service.save_test_case(self.current_test_case)
         self.form_widget.load_test_case(self.current_test_case)
         self.load_all_test_cases()
-        self._update_toolbar_statistics()
-        self.statusBar().showMessage("Статусы текущего тест-кейса сброшены")
+        # Обновляем статусбар (покажет статистику в режиме запуска или сообщение в режиме редактирования)
+        if self._current_mode == "run":
+            self._update_statusbar_statistics()
+        else:
+            self.statusBar().showMessage("Статусы текущего тест-кейса сброшены")
         self._update_statistics_panel()
 
     def _show_statistics_panel(self):
@@ -2333,19 +2388,75 @@ class MainWindow(QMainWindow):
             self.aux_panel.set_panels_enabled(is_edit, is_edit)
             # Устанавливаем режим редактирования для панели информации
             self.aux_panel.set_information_edit_mode(is_edit)
-            # Блокируем/разблокируем кнопки в панели управления раннером
-            if hasattr(self.aux_panel, "stats_panel"):
-                # В режиме редактирования блокируем, в режиме запуска - разблокируем
-                self.aux_panel.stats_panel.set_buttons_enabled(not is_edit)
-            if is_edit:
-                self.aux_panel.restore_last_tab()
-            else:
-                self.aux_panel.show_stats_tab()
         
-        # Показываем/скрываем статистику в toolbar
-        if hasattr(self, "stats_label"):
-            self.stats_label.setVisible(not is_edit)
-        self._update_toolbar_statistics()
+        # Обновляем статистику в statusbar
+        self._update_statusbar_statistics()
+
+    def _update_statusbar_statistics(self):
+        """Обновить статистику в statusbar (всегда видна)"""
+        if not hasattr(self, "statusbar_stats_label"):
+            return
+        
+        if not self.test_cases:
+            self.statusbar_stats_label.setVisible(False)
+            self.statusBar().showMessage("Тест-кейсы не загружены")
+            return
+        
+        cases = list(self.test_cases or [])
+        total = len(cases)
+        if not total:
+            self.statusbar_stats_label.setVisible(False)
+            self.statusBar().showMessage("Тест-кейсы не загружены")
+            return
+        
+        pending_cases = 0
+        passed_cases = 0
+        failed_cases = 0
+        skipped_cases = 0
+        
+        for case in cases:
+            steps = case.steps or []
+            statuses = [s.status or "" for s in steps]
+            if not statuses:
+                pending_cases += 1
+                continue
+            
+            normalized = [status.strip().lower() for status in statuses]
+            if all(status in ("", "pending") for status in normalized):
+                pending_cases += 1
+                continue
+            if all(status == "passed" for status in normalized):
+                passed_cases += 1
+                continue
+            if any(status == "failed" for status in normalized):
+                failed_cases += 1
+            if any(status == "skipped" for status in normalized):
+                skipped_cases += 1
+        
+        # Вычисляем проценты
+        passed_percent = (passed_cases / total * 100) if total > 0 else 0
+        pending_percent = (pending_cases / total * 100) if total > 0 else 0
+        
+        # Формируем текст статистики с HTML-форматированием и цветами (как в массовых операциях)
+        stats_text = (
+            f"Всего тест-кейсов: {total} | "
+            f"Успешно: <span style='color: #6CC24A;'>{passed_cases}</span> "
+            f"(<span style='color: #6CC24A;'>{passed_percent:.1f}%</span>) | "
+            f"Осталось: <span style='color: #FFA931;'>{pending_cases}</span> "
+            f"(<span style='color: #FFA931;'>{pending_percent:.1f}%</span>) | "
+            f"Есть failed: <span style='color: #F5555D;'>{failed_cases}</span> | "
+            f"Есть skipped: <span style='color: #95a5a6;'>{skipped_cases}</span>"
+        )
+        
+        # Используем QLabel с HTML вместо showMessage для поддержки цветов
+        if hasattr(self, "statusbar_stats_label"):
+            self.statusbar_stats_label.setText(stats_text)
+            self.statusbar_stats_label.setVisible(True)
+            # Очищаем обычное сообщение, чтобы показывалась только статистика
+            self.statusBar().showMessage("")
+        else:
+            # Fallback на обычный текст, если label не создан
+            self.statusBar().showMessage(stats_text.replace("<span style='color: #6CC24A;'>", "").replace("</span>", "").replace("<span style='color: #FFA931;'>", "").replace("<span style='color: #F5555D;'>", "").replace("<span style='color: #95a5a6;'>", ""))
 
     def _apply_initial_panel_sizes(self):
         left_width = max(self.panel_sizes.get('left', 350), 150)

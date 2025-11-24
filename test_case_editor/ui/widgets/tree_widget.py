@@ -16,9 +16,16 @@ from PyQt5.QtWidgets import (
     QMenu,
     QInputDialog,
     QAbstractItemView,
+    QDialog,
+    QVBoxLayout,
+    QLabel,
+    QComboBox,
+    QLineEdit,
+    QDialogButtonBox,
+    QWidget,
 )
 from PyQt5.QtCore import Qt, pyqtSignal, QMimeData, QByteArray
-from PyQt5.QtGui import QFont, QColor
+from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter
 
 from ...services.test_case_service import TestCaseService
 from ...models.test_case import TestCase
@@ -48,13 +55,20 @@ class TestCaseTreeWidget(QTreeWidget):
     test_case_selected = pyqtSignal(TestCase)
     tree_updated = pyqtSignal()
     review_requested = pyqtSignal(object)
+    test_cases_updated = pyqtSignal()  # Сигнал для обновления тест-кейсов после изменения статусов
 
     def __init__(self, service: TestCaseService, parent=None):
         super().__init__(parent)
         self.service = service
         self.test_cases_dir: Optional[Path] = None
         self._edit_mode = True  # По умолчанию режим редактирования
+        self._skip_reasons: List[str] = ['Автотесты', 'Нагрузочное тестирование', 'Другое']  # Значения по умолчанию
         self._setup_ui()
+    
+    def set_skip_reasons(self, reasons: List[str]):
+        """Установить список причин пропуска из настроек"""
+        if reasons and isinstance(reasons, list):
+            self._skip_reasons = reasons
 
     def _setup_ui(self):
         self.setHeaderHidden(True)
@@ -69,6 +83,9 @@ class TestCaseTreeWidget(QTreeWidget):
         self.setDropIndicatorShown(True)
         self.setDefaultDropAction(Qt.MoveAction)
         self.setDragDropMode(QAbstractItemView.DragDrop)
+        
+        # Кэш для цветных иконок кружков
+        self._icon_cache = {}
 
     # ------------------------------------------------------------------ load
 
@@ -110,27 +127,30 @@ class TestCaseTreeWidget(QTreeWidget):
                         # В режиме редактирования иконки не показываем
                         if not self._edit_mode:
                             icon, color = self._get_test_case_icon_and_color(test_case)
-                            item_text = f"{icon} {test_case.name}".strip() if icon else test_case.name
-                            child.setText(0, item_text)
-                            if color:
-                                child.setForeground(0, QColor(color))
+                            child.setText(0, test_case.name)
+                            if icon:
+                                child.setIcon(0, icon)
+                            else:
+                                child.setIcon(0, QIcon())  # Пустая иконка
                         else:
                             child.setText(0, test_case.name)
+                            child.setIcon(0, QIcon())  # Пустая иконка в режиме редактирования
                 elif data.get('type') == 'folder':
                     # Обновляем отображение папки
                     folder_path = data.get('path')
                     if folder_path:
+                        child.setText(0, f"📁 {folder_path.name}")
                         if not self._edit_mode:
                             # Пересчитываем статус папки на основе дерева
                             folder_icon, folder_color = self._calculate_folder_status_from_tree(child)
                             data['icon'] = folder_icon
                             data['color'] = folder_color
-                            folder_text = f"{folder_icon} 📁 {folder_path.name}".strip() if folder_icon else f"📁 {folder_path.name}"
-                            child.setText(0, folder_text)
-                            if folder_color:
-                                child.setForeground(0, QColor(folder_color))
+                            if folder_icon:
+                                child.setIcon(0, folder_icon)
+                            else:
+                                child.setIcon(0, QIcon())  # Пустая иконка
                         else:
-                            child.setText(0, f"📁 {folder_path.name}")
+                            child.setIcon(0, QIcon())  # Пустая иконка в режиме редактирования
             # Рекурсивно обновляем дочерние элементы
             self._update_tree_icons(child)
     
@@ -159,13 +179,15 @@ class TestCaseTreeWidget(QTreeWidget):
             if not self._edit_mode:
                 folder_icon, folder_color = self._calculate_folder_status(subdir, test_cases)
             else:
-                folder_icon, folder_color = "", ""
-            folder_text = f"{folder_icon} 📁 {subdir.name}".strip() if folder_icon else f"📁 {subdir.name}"
-            folder_item.setText(0, folder_text)
+                folder_icon, folder_color = None, ""
+            # Устанавливаем текст и иконку
+            folder_item.setText(0, f"📁 {subdir.name}")
+            if folder_icon:
+                folder_item.setIcon(0, folder_icon)
+            else:
+                folder_item.setIcon(0, QIcon())  # Пустая иконка
             folder_item.setData(0, Qt.UserRole, {'type': 'folder', 'path': subdir, 'icon': folder_icon, 'color': folder_color})
             folder_item.setFont(0, QFont("Segoe UI", 10, QFont.Bold))
-            if folder_color:
-                folder_item.setForeground(0, QColor(folder_color))
             self._populate_directory(subdir, folder_item, test_cases)
 
         for test_case in test_cases:
@@ -174,31 +196,64 @@ class TestCaseTreeWidget(QTreeWidget):
                 if not self._edit_mode:
                     icon, color = self._get_test_case_icon_and_color(test_case)
                 else:
-                    icon, color = "", ""
+                    icon, color = None, ""
                 
                 item = QTreeWidgetItem(parent_item)
-                # Добавляем иконку только если она есть
-                item_text = f"{icon} {test_case.name}".strip() if icon else test_case.name
-                item.setText(0, item_text)
+                # Устанавливаем текст и иконку
+                item.setText(0, test_case.name)
+                if icon:
+                    item.setIcon(0, icon)
+                else:
+                    item.setIcon(0, QIcon())  # Пустая иконка
                 item.setData(0, Qt.UserRole, {'type': 'file', 'test_case': test_case})
                 item.setFont(0, QFont("Segoe UI", 10))
-                if color:
-                    item.setForeground(0, QColor(color))
 
-    def _get_test_case_icon_and_color(self, test_case) -> Tuple[str, str]:
+    def _create_colored_circle_icon(self, color: str, size: int = 12) -> QIcon:
+        """
+        Создать иконку с цветным кружком.
+        
+        Args:
+            color: Цвет в формате hex (например, '#6CC24A')
+            size: Размер иконки в пикселях
+            
+        Returns:
+            QIcon с цветным кружком
+        """
+        # Используем кэш для оптимизации
+        cache_key = f"{color}_{size}"
+        if cache_key in self._icon_cache:
+            return self._icon_cache[cache_key]
+        
+        pixmap = QPixmap(size, size)
+        pixmap.fill(Qt.transparent)
+        
+        painter = QPainter(pixmap)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setBrush(QColor(color))
+        painter.setPen(Qt.NoPen)
+        # Рисуем кружок с небольшими отступами для лучшего вида
+        margin = 2
+        painter.drawEllipse(margin, margin, size - 2 * margin, size - 2 * margin)
+        painter.end()
+        
+        icon = QIcon(pixmap)
+        self._icon_cache[cache_key] = icon
+        return icon
+    
+    def _get_test_case_icon_and_color(self, test_case) -> Tuple[Optional[QIcon], str]:
         """
         Определить иконку и цвет для тест-кейса на основе статусов шагов.
         
         Returns:
-            tuple: (icon, color) где icon - символ иконки, color - цвет в формате hex
+            tuple: (icon, color) где icon - QIcon или None, color - цвет в формате hex
         """
         if not test_case or not test_case.steps:
-            # Если нет шагов, показываем незалитый кружок
-            return ('○', '#8B9099')
+            # Если нет шагов, возвращаем None (без иконки)
+            return (None, '#8B9099')
         
         steps = test_case.steps
         if not steps:
-            return ('○', '#8B9099')
+            return (None, '#8B9099')
         
         # Получаем статусы всех шагов (включая пустые)
         step_statuses = [(step.status or "").strip().lower() for step in steps]
@@ -206,12 +261,12 @@ class TestCaseTreeWidget(QTreeWidget):
         # Проверяем наличие failed (приоритет 1)
         has_failed = any(s == "failed" for s in step_statuses)
         if has_failed:
-            return ('●', '#F5555D')  # Красный залитый кружок
+            return (self._create_colored_circle_icon('#F5555D'), '#F5555D')  # Красный залитый кружок
         
         # Проверяем наличие skipped (приоритет 2)
         has_skipped = any(s == "skipped" for s in step_statuses)
         if has_skipped:
-            return ('●', '#95a5a6')  # Серый залитый кружок
+            return (self._create_colored_circle_icon('#95a5a6'), '#95a5a6')  # Серый залитый кружок
         
         # Проверяем, все ли шаги имеют статус "passed"
         # Все шаги должны иметь непустой статус и все должны быть "passed"
@@ -219,10 +274,10 @@ class TestCaseTreeWidget(QTreeWidget):
         all_passed = all(s == "passed" for s in step_statuses)  # Все статусы равны "passed"
         
         if all_have_status and all_passed:
-            return ('●', '#6CC24A')  # Зеленый залитый кружок
+            return (self._create_colored_circle_icon('#6CC24A'), '#6CC24A')  # Зеленый залитый кружок
         
-        # Не все шаги имеют статус и нет failed/skipped
-        return ('○', '#8B9099')  # Незалитый кружок
+        # Не все шаги имеют статус и нет failed/skipped - без иконки
+        return (None, '#8B9099')
     
     @staticmethod
     def _status_icon(status: str) -> str:
@@ -246,7 +301,7 @@ class TestCaseTreeWidget(QTreeWidget):
             'Deprecated': '#6B7380',
         }.get(status, '#E1E3E6')
     
-    def _calculate_folder_status(self, folder_path: Path, test_cases: list) -> Tuple[str, str]:
+    def _calculate_folder_status(self, folder_path: Path, test_cases: list) -> Tuple[Optional[QIcon], str]:
         """
         Вычислить статус папки на основе тест-кейсов внутри неё.
         
@@ -266,7 +321,7 @@ class TestCaseTreeWidget(QTreeWidget):
                     continue
         
         if not folder_test_cases:
-            return ('○', '#8B9099')  # Если нет тест-кейсов, незалитый кружок
+            return (None, '#8B9099')  # Если нет тест-кейсов, без иконки
         
         # Собираем все статусы шагов из всех тест-кейсов в папке
         all_step_statuses = []
@@ -279,29 +334,29 @@ class TestCaseTreeWidget(QTreeWidget):
                     all_step_statuses.append(status)  # Включаем пустые статусы
         
         if not all_step_statuses:
-            return ('○', '#8B9099')  # Нет шагов
+            return (None, '#8B9099')  # Нет шагов
         
         # Проверяем наличие failed (приоритет 1)
         has_failed = any(s == "failed" for s in all_step_statuses)
         if has_failed:
-            return ('●', '#F5555D')  # Красный залитый кружок
+            return (self._create_colored_circle_icon('#F5555D'), '#F5555D')  # Красный залитый кружок
         
         # Проверяем наличие skipped (приоритет 2)
         has_skipped = any(s == "skipped" for s in all_step_statuses)
         if has_skipped:
-            return ('●', '#95a5a6')  # Серый залитый кружок
+            return (self._create_colored_circle_icon('#95a5a6'), '#95a5a6')  # Серый залитый кружок
         
         # Проверяем, все ли шаги имеют статус "passed"
         all_have_status = all(s for s in all_step_statuses)  # Все статусы непустые
         all_passed = all(s == "passed" for s in all_step_statuses)  # Все статусы равны "passed"
         
         if all_have_status and all_passed:
-            return ('●', '#6CC24A')  # Зеленый залитый кружок
+            return (self._create_colored_circle_icon('#6CC24A'), '#6CC24A')  # Зеленый залитый кружок
         
         # Не все шаги имеют статус и нет failed/skipped
-        return ('○', '#8B9099')  # Незалитый кружок
+        return (None, '#8B9099')  # Без иконки
     
-    def _calculate_folder_status_from_tree(self, folder_item: QTreeWidgetItem) -> Tuple[str, str]:
+    def _calculate_folder_status_from_tree(self, folder_item: QTreeWidgetItem) -> Tuple[Optional[QIcon], str]:
         """
         Вычислить статус папки на основе элементов дерева внутри неё.
         
@@ -329,27 +384,27 @@ class TestCaseTreeWidget(QTreeWidget):
             collect_step_statuses(folder_item.child(i))
         
         if not all_step_statuses:
-            return ('○', '#8B9099')  # Нет шагов
+            return (None, '#8B9099')  # Нет шагов
         
         # Проверяем наличие failed (приоритет 1)
         has_failed = any(s == "failed" for s in all_step_statuses)
         if has_failed:
-            return ('●', '#F5555D')  # Красный залитый кружок
+            return (self._create_colored_circle_icon('#F5555D'), '#F5555D')  # Красный залитый кружок
         
         # Проверяем наличие skipped (приоритет 2)
         has_skipped = any(s == "skipped" for s in all_step_statuses)
         if has_skipped:
-            return ('●', '#95a5a6')  # Серый залитый кружок
+            return (self._create_colored_circle_icon('#95a5a6'), '#95a5a6')  # Серый залитый кружок
         
         # Проверяем, все ли шаги имеют статус "passed"
         all_have_status = all(s for s in all_step_statuses)  # Все статусы непустые
         all_passed = all(s == "passed" for s in all_step_statuses)  # Все статусы равны "passed"
         
         if all_have_status and all_passed:
-            return ('●', '#6CC24A')  # Зеленый залитый кружок
+            return (self._create_colored_circle_icon('#6CC24A'), '#6CC24A')  # Зеленый залитый кружок
         
         # Не все шаги имеют статус и нет failed/skipped
-        return ('○', '#8B9099')  # Незалитый кружок
+        return (None, '#8B9099')  # Без иконки
 
     # ----------------------------------------------------------- interactions
 
@@ -399,64 +454,92 @@ class TestCaseTreeWidget(QTreeWidget):
         menu = QMenu(self)
 
         folder_path = folder_data['path']
+        
+        # В режиме запуска тестов показываем упрощенное меню
+        if not self._edit_mode:
+            action_mark_passed = menu.addAction("✓ Пометить как passed")
+            action_mark_passed.triggered.connect(lambda: self._mark_folder_passed(folder_path))
+            
+            action_mark_skipped = menu.addAction("⊘ Пометить как skipped")
+            action_mark_skipped.triggered.connect(lambda: self._mark_folder_skipped(folder_path))
+        else:
+            # В режиме редактирования показываем полное меню
+            action_new_tc = menu.addAction("➕ Создать тест-кейс")
+            action_new_tc.triggered.connect(lambda: self._create_test_case(folder_path))
 
-        action_new_tc = menu.addAction("➕ Создать тест-кейс")
-        action_new_tc.triggered.connect(lambda: self._create_test_case(folder_path))
+            action_new_folder = menu.addAction("📁 Создать подпапку")
+            action_new_folder.triggered.connect(lambda: self._create_folder(folder_path))
 
-        action_new_folder = menu.addAction("📁 Создать подпапку")
-        action_new_folder.triggered.connect(lambda: self._create_folder(folder_path))
+            menu.addSeparator()
 
-        menu.addSeparator()
+            action_rename = menu.addAction("✎ Переименовать")
+            action_rename.triggered.connect(lambda: self._rename_folder(folder_path))
 
-        action_rename = menu.addAction("✎ Переименовать")
-        action_rename.triggered.connect(lambda: self._rename_folder(folder_path))
+            action_delete = menu.addAction("🗑️ Удалить папку")
+            action_delete.triggered.connect(lambda: self._delete_folder(folder_path))
 
-        action_delete = menu.addAction("🗑️ Удалить папку")
-        action_delete.triggered.connect(lambda: self._delete_folder(folder_path))
+            menu.addSeparator()
 
-        menu.addSeparator()
-
-        action_open_explorer = menu.addAction("🪟 Открыть в проводнике")
-        action_open_explorer.triggered.connect(lambda: self._open_in_explorer(folder_path, select=False))
+            action_open_explorer = menu.addAction("🪟 Открыть в проводнике")
+            action_open_explorer.triggered.connect(lambda: self._open_in_explorer(folder_path, select=False))
 
         menu.exec_(self.mapToGlobal(position))
 
     def _show_file_menu(self, position, file_data):
-        menu = QMenu(self)
+        try:
+            menu = QMenu(self)
 
-        test_case = file_data['test_case']
+            test_case = file_data.get('test_case')
+            if not test_case:
+                return
+            
+            # В режиме запуска тестов показываем упрощенное меню
+            if not self._edit_mode:
+                action_copy_info = menu.addAction("📋 Копировать информацию")
+                action_copy_info.triggered.connect(lambda: self._copy_test_case_info(test_case))
+                
+                menu.addSeparator()
+                
+                action_mark_passed = menu.addAction("✓ Пометить как passed")
+                action_mark_passed.triggered.connect(lambda: self._mark_test_case_passed(test_case))
+                
+                action_mark_skipped = menu.addAction("⊘ Пометить как skipped")
+                action_mark_skipped.triggered.connect(lambda: self._mark_test_case_skipped(test_case))
+            else:
+                # В режиме редактирования показываем полное меню
+                action_open = menu.addAction("📂 Открыть")
+                action_open.triggered.connect(lambda: self.test_case_selected.emit(test_case))
 
-        action_open = menu.addAction("📂 Открыть")
-        action_open.triggered.connect(lambda: self.test_case_selected.emit(test_case))
+                action_open_explorer = menu.addAction("🪟 Открыть в проводнике")
+                action_open_explorer.triggered.connect(
+                    lambda: self._open_in_explorer(test_case._filepath, select=True)
+                )
 
-        action_open_explorer = menu.addAction("🪟 Открыть в проводнике")
-        action_open_explorer.triggered.connect(
-            lambda: self._open_in_explorer(test_case._filepath, select=True)
-        )
+                action_copy_info = menu.addAction("📋 Копировать информацию")
+                action_copy_info.triggered.connect(lambda: self._copy_test_case_info(test_case))
 
-        action_copy_info = menu.addAction("📋 Копировать информацию")
-        action_copy_info.triggered.connect(lambda: self._copy_test_case_info(test_case))
+                action_generate_api = menu.addAction("🧪 Сгенерировать каркас АТ API")
+                action_generate_api.triggered.connect(lambda: self._copy_pytest_skeleton(test_case))
 
-        action_generate_api = menu.addAction("🧪 Сгенерировать каркас АТ API")
-        action_generate_api.triggered.connect(lambda: self._copy_pytest_skeleton(test_case))
+                action_rename = menu.addAction("✎ Переименовать файл")
+                action_rename.triggered.connect(lambda: self._rename_file(test_case))
 
-        action_rename = menu.addAction("✎ Переименовать файл")
-        action_rename.triggered.connect(lambda: self._rename_file(test_case))
+                action_duplicate = menu.addAction("📋 Дублировать")
+                action_duplicate.triggered.connect(lambda: self._duplicate_test_case(test_case))
 
-        action_duplicate = menu.addAction("📋 Дублировать")
-        action_duplicate.triggered.connect(lambda: self._duplicate_test_case(test_case))
+                menu.addSeparator()
 
-        menu.addSeparator()
+                action_delete = menu.addAction("🗑️ Удалить")
+                action_delete.triggered.connect(lambda: self._delete_test_case(test_case))
 
-        action_delete = menu.addAction("🗑️ Удалить")
-        action_delete.triggered.connect(lambda: self._delete_test_case(test_case))
+                menu.addSeparator()
 
-        menu.addSeparator()
+                action_review = menu.addAction("📝 Ревью")
+                action_review.triggered.connect(lambda: self.review_requested.emit(file_data))
 
-        action_review = menu.addAction("📝 Ревью")
-        action_review.triggered.connect(lambda: self.review_requested.emit(file_data))
-
-        menu.exec_(self.mapToGlobal(position))
+            menu.exec_(self.mapToGlobal(position))
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Ошибка при отображении контекстного меню: {str(e)}")
 
     # ------------------------------------------------------- actions
 
@@ -1056,5 +1139,235 @@ class TestCaseTreeWidget(QTreeWidget):
                 return found
 
         return None
-
+    
+    # ----------------------------------------------------------- skip dialog
+    
+    class SkipReasonDialog(QDialog):
+        """Диалог для выбора причины пропуска тест-кейса"""
+        
+        def __init__(self, parent=None, skip_reasons: Optional[List[str]] = None):
+            super().__init__(parent)
+            self.setWindowTitle("Причина пропуска")
+            self.setMinimumWidth(400)
+            self.skip_reasons = skip_reasons or ['Автотесты', 'Нагрузочное тестирование', 'Другое']
+            self._setup_ui()
+        
+        def _setup_ui(self):
+            layout = QVBoxLayout(self)
+            
+            # Инструкция
+            label = QLabel("Выберите причину пропуска:")
+            layout.addWidget(label)
+            
+            # Дропдаун с причинами (пустой пункт по умолчанию)
+            self.reason_combo = QComboBox()
+            self.reason_combo.addItem("")  # Пустой пункт по умолчанию
+            # Добавляем причины из настроек
+            if self.skip_reasons:
+                self.reason_combo.addItems(self.skip_reasons)
+            else:
+                # Fallback на значения по умолчанию
+                self.reason_combo.addItems(["Автотесты", "Нагрузочное тестирование", "Другое"])
+            self.reason_combo.setCurrentIndex(0)  # Выбираем пустой пункт
+            self.reason_combo.currentTextChanged.connect(self._on_reason_changed)
+            layout.addWidget(self.reason_combo)
+            
+            # Поле для комментария (видно только при выборе "Другое")
+            self.comment_label = QLabel("Комментарий:")
+            self.comment_label.setVisible(False)
+            layout.addWidget(self.comment_label)
+            
+            self.comment_edit = QLineEdit()
+            self.comment_edit.setPlaceholderText("Введите причину пропуска...")
+            self.comment_edit.setVisible(False)
+            self.comment_edit.textChanged.connect(self._on_comment_changed)
+            layout.addWidget(self.comment_edit)
+            
+            # Кнопки
+            button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+            button_box.accepted.connect(self.accept)
+            button_box.rejected.connect(self.reject)
+            self.ok_button = button_box.button(QDialogButtonBox.Ok)
+            self.ok_button.setEnabled(False)  # По умолчанию заблокирована
+            layout.addWidget(button_box)
+        
+        def _on_reason_changed(self, text):
+            # Показываем поле комментария только для "Другое"
+            is_other = text == "Другое"
+            self.comment_label.setVisible(is_other)
+            self.comment_edit.setVisible(is_other)
+            # Обновляем состояние кнопки ОК
+            self._update_ok_button()
+        
+        def _on_comment_changed(self):
+            self._update_ok_button()
+        
+        def _update_ok_button(self):
+            # Кнопка ОК активна, если выбрана причина (не пустая) или введен комментарий
+            reason = self.reason_combo.currentText().strip()
+            if not reason:
+                # Если не выбрана причина, проверяем комментарий
+                comment = self.comment_edit.text().strip()
+                self.ok_button.setEnabled(bool(comment))
+            elif reason == "Другое":
+                # Если выбрано "Другое", нужен комментарий
+                comment = self.comment_edit.text().strip()
+                self.ok_button.setEnabled(bool(comment))
+            else:
+                # Если выбрана любая другая причина, кнопка активна
+                self.ok_button.setEnabled(True)
+        
+        def get_skip_reason(self) -> str:
+            """Получить причину пропуска"""
+            reason = self.reason_combo.currentText().strip()
+            if not reason:
+                # Если не выбрана причина, возвращаем комментарий
+                return self.comment_edit.text().strip()
+            elif reason == "Другое":
+                # Если выбрано "Другое", возвращаем комментарий
+                return self.comment_edit.text().strip()
+            else:
+                # Если выбрана другая причина, возвращаем её значение
+                return reason
+    
+    # ----------------------------------------------------------- mark as passed/skipped
+    
+    def _mark_test_case_passed(self, test_case: TestCase):
+        """Пометить все шаги тест-кейса как passed"""
+        try:
+            if not test_case:
+                QMessageBox.warning(self, "Ошибка", "Тест-кейс не выбран")
+                return
+            
+            if not test_case.steps:
+                QMessageBox.information(self, "Информация", "В тест-кейсе нет шагов")
+                return
+            
+            # Проверяем наличие filepath для сохранения
+            if not hasattr(test_case, "_filepath") or not test_case._filepath:
+                QMessageBox.warning(self, "Ошибка", "Не удалось определить путь к файлу тест-кейса")
+                return
+            
+            for step in test_case.steps:
+                step.status = "passed"
+                step.skip_reason = ""  # Очищаем skipReason при пометке как passed
+            
+            if not self.service.save_test_case(test_case):
+                QMessageBox.warning(self, "Ошибка", "Не удалось сохранить тест-кейс")
+                return
+            
+            self.test_cases_updated.emit()
+            test_case_name = getattr(test_case, "name", "тест-кейс")
+            QMessageBox.information(self, "Готово", f"Все шаги тест-кейса «{test_case_name}» помечены как passed")
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Произошла ошибка при пометке тест-кейса: {str(e)}")
+    
+    def _mark_test_case_skipped(self, test_case: TestCase):
+        """Пометить все шаги тест-кейса как skipped с выбором причины"""
+        try:
+            if not test_case:
+                QMessageBox.warning(self, "Ошибка", "Тест-кейс не выбран")
+                return
+            
+            if not test_case.steps:
+                QMessageBox.information(self, "Информация", "В тест-кейсе нет шагов")
+                return
+            
+            # Проверяем наличие filepath для сохранения
+            if not hasattr(test_case, "_filepath") or not test_case._filepath:
+                QMessageBox.warning(self, "Ошибка", "Не удалось определить путь к файлу тест-кейса")
+                return
+            
+            # Показываем диалог выбора причины
+            dialog = self.SkipReasonDialog(self, self._skip_reasons)
+            if dialog.exec_() != QDialog.Accepted:
+                return
+            
+            skip_reason = dialog.get_skip_reason()
+            
+            # Помечаем все шаги как skipped с причиной
+            for step in test_case.steps:
+                step.status = "skipped"
+                step.skip_reason = skip_reason
+            
+            if not self.service.save_test_case(test_case):
+                QMessageBox.warning(self, "Ошибка", "Не удалось сохранить тест-кейс")
+                return
+            
+            self.test_cases_updated.emit()
+            test_case_name = getattr(test_case, "name", "тест-кейс")
+            QMessageBox.information(self, "Готово", f"Все шаги тест-кейса «{test_case_name}» помечены как skipped")
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Произошла ошибка при пометке тест-кейса: {str(e)}")
+    
+    def _mark_folder_passed(self, folder_path: Path):
+        """Пометить все шаги всех тест-кейсов в папке и подпапках как passed"""
+        if not self.test_cases_dir or not folder_path.exists():
+            return
+        
+        # Собираем все тест-кейсы в папке и подпапках
+        test_cases_to_update = []
+        for test_case in self.service.load_all_test_cases(self.test_cases_dir):
+            if test_case._filepath:
+                try:
+                    test_case._filepath.relative_to(folder_path)
+                    test_cases_to_update.append(test_case)
+                except ValueError:
+                    continue
+        
+        if not test_cases_to_update:
+            QMessageBox.information(self, "Информация", "В выбранной папке нет тест-кейсов")
+            return
+        
+        # Помечаем все шаги как passed
+        count = 0
+        for test_case in test_cases_to_update:
+            if test_case.steps:
+                for step in test_case.steps:
+                    step.status = "passed"
+                    step.skip_reason = ""  # Очищаем skipReason при пометке как passed
+                self.service.save_test_case(test_case)
+                count += 1
+        
+        self.test_cases_updated.emit()
+        QMessageBox.information(self, "Готово", f"Все шаги {count} тест-кейсов в папке помечены как passed")
+    
+    def _mark_folder_skipped(self, folder_path: Path):
+        """Пометить все шаги всех тест-кейсов в папке и подпапках как skipped"""
+        if not self.test_cases_dir or not folder_path.exists():
+            return
+        
+        # Показываем диалог выбора причины
+        dialog = self.SkipReasonDialog(self, self._skip_reasons)
+        if dialog.exec_() != QDialog.Accepted:
+            return
+        
+        skip_reason = dialog.get_skip_reason()
+        
+        # Собираем все тест-кейсы в папке и подпапках
+        test_cases_to_update = []
+        for test_case in self.service.load_all_test_cases(self.test_cases_dir):
+            if test_case._filepath:
+                try:
+                    test_case._filepath.relative_to(folder_path)
+                    test_cases_to_update.append(test_case)
+                except ValueError:
+                    continue
+        
+        if not test_cases_to_update:
+            QMessageBox.information(self, "Информация", "В выбранной папке нет тест-кейсов")
+            return
+        
+        # Помечаем все шаги как skipped с причиной
+        count = 0
+        for test_case in test_cases_to_update:
+            if test_case.steps:
+                for step in test_case.steps:
+                    step.status = "skipped"
+                    step.skip_reason = skip_reason
+                self.service.save_test_case(test_case)
+                count += 1
+        
+        self.test_cases_updated.emit()
+        QMessageBox.information(self, "Готово", f"Все шаги {count} тест-кейсов в папке помечены как skipped")
 

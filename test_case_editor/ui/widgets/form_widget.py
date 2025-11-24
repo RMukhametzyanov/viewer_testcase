@@ -30,6 +30,8 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QInputDialog,
     QFileDialog,
+    QDialog,
+    QDialogButtonBox,
 )
 from PyQt5.QtCore import Qt, pyqtSignal, QEvent, QSize, QTimer
 from PyQt5.QtGui import QFont, QTextOption, QIcon, QPixmap, QPainter, QColor, QDragEnterEvent, QDropEvent, QDragLeaveEvent
@@ -165,6 +167,8 @@ class TestCaseFormWidget(QWidget):
     Соответствует принципу Single Responsibility:
     отвечает только за отображение и редактирование формы
     """
+    
+    status_changed = pyqtSignal()  # Сигнал об изменении статуса шага
 
     # Методы для работы с таблицей шагов в стиле TestOps
     def _create_step_text_edit(self, placeholder: str) -> QTextEdit:
@@ -303,17 +307,156 @@ class TestCaseFormWidget(QWidget):
         widget.setProperty("move_down_btn", move_down_btn)
         return widget
     
+    class SkipReasonDialog(QDialog):
+        """Диалог для выбора причины пропуска тест-кейса"""
+        
+        def __init__(self, parent=None, skip_reasons: Optional[List[str]] = None):
+            super().__init__(parent)
+            self.setWindowTitle("Причина пропуска")
+            self.setMinimumWidth(400)
+            self.skip_reasons = skip_reasons or ['Автотесты', 'Нагрузочное тестирование', 'Другое']
+            self._setup_ui()
+        
+        def _setup_ui(self):
+            layout = QVBoxLayout(self)
+            
+            # Инструкция
+            label = QLabel("Выберите причину пропуска:")
+            layout.addWidget(label)
+            
+            # Дропдаун с причинами (пустой пункт по умолчанию)
+            self.reason_combo = QComboBox()
+            self.reason_combo.addItem("")  # Пустой пункт по умолчанию
+            # Добавляем причины из настроек
+            if self.skip_reasons:
+                self.reason_combo.addItems(self.skip_reasons)
+            else:
+                # Fallback на значения по умолчанию
+                self.reason_combo.addItems(["Автотесты", "Нагрузочное тестирование", "Другое"])
+            self.reason_combo.setCurrentIndex(0)  # Выбираем пустой пункт
+            self.reason_combo.currentTextChanged.connect(self._on_reason_changed)
+            layout.addWidget(self.reason_combo)
+            
+            # Поле для комментария (видно только при выборе "Другое")
+            self.comment_label = QLabel("Комментарий:")
+            self.comment_label.setVisible(False)
+            layout.addWidget(self.comment_label)
+            
+            self.comment_edit = QLineEdit()
+            self.comment_edit.setPlaceholderText("Введите причину пропуска...")
+            self.comment_edit.setVisible(False)
+            self.comment_edit.textChanged.connect(self._on_comment_changed)
+            layout.addWidget(self.comment_edit)
+            
+            # Кнопки
+            button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+            button_box.accepted.connect(self.accept)
+            button_box.rejected.connect(self.reject)
+            self.ok_button = button_box.button(QDialogButtonBox.Ok)
+            self.ok_button.setEnabled(False)  # По умолчанию заблокирована
+            layout.addWidget(button_box)
+        
+        def _on_reason_changed(self, text):
+            # Показываем поле комментария только для "Другое"
+            is_other = text == "Другое"
+            self.comment_label.setVisible(is_other)
+            self.comment_edit.setVisible(is_other)
+            # Обновляем состояние кнопки ОК
+            self._update_ok_button()
+        
+        def _on_comment_changed(self):
+            self._update_ok_button()
+        
+        def _update_ok_button(self):
+            # Кнопка ОК активна, если выбрана причина (не пустая) или введен комментарий
+            if not hasattr(self, 'ok_button') or not self.ok_button:
+                return
+            try:
+                reason = self.reason_combo.currentText().strip()
+                if not reason:
+                    # Если не выбрана причина, проверяем комментарий
+                    comment = self.comment_edit.text().strip()
+                    self.ok_button.setEnabled(bool(comment))
+                elif reason == "Другое":
+                    # Если выбрано "Другое", нужен комментарий
+                    comment = self.comment_edit.text().strip()
+                    self.ok_button.setEnabled(bool(comment))
+                else:
+                    # Если выбрана любая другая причина, кнопка активна
+                    self.ok_button.setEnabled(True)
+            except Exception:
+                # В случае ошибки оставляем кнопку заблокированной
+                if self.ok_button:
+                    self.ok_button.setEnabled(False)
+        
+        def get_skip_reason(self) -> str:
+            """Получить причину пропуска"""
+            reason = self.reason_combo.currentText().strip()
+            if not reason:
+                # Если не выбрана причина, возвращаем комментарий
+                return self.comment_edit.text().strip()
+            elif reason == "Другое":
+                # Если выбрано "Другое", возвращаем комментарий
+                return self.comment_edit.text().strip()
+            else:
+                # Если выбрана другая причина, возвращаем её значение
+                return reason
+    
     def _on_step_status_clicked(self, row: int, status: str):
         """Обработчик клика по статусу шага."""
-        if row < 0 or row >= len(self.step_statuses):
-            return
-        if self.step_statuses[row] == status:
-            return
-        self.step_statuses[row] = status
-        self._update_step_status_widget(row, status)
-        if self.current_test_case and row < len(self.current_test_case.steps):
-            self.current_test_case.steps[row].status = status
-            self._auto_save_status_change()
+        try:
+            if row < 0 or row >= len(self.step_statuses):
+                return
+            if self.step_statuses[row] == status:
+                return
+            
+            # Если выбран статус "skipped", показываем диалог выбора причины
+            if status == "skipped":
+                skip_reason = self._show_skip_reason_dialog()
+                if skip_reason is None:  # Пользователь отменил диалог
+                    return
+                # Устанавливаем статус и причину
+                self.step_statuses[row] = status
+                self._update_step_status_widget(row, status)
+                if self.current_test_case and row < len(self.current_test_case.steps):
+                    step = self.current_test_case.steps[row]
+                    step.status = status
+                    step.skip_reason = skip_reason or ""  # Убеждаемся, что это строка
+                self._auto_save_status_change()
+            else:
+                # Для других статусов работаем как раньше
+                self.step_statuses[row] = status
+                self._update_step_status_widget(row, status)
+                if self.current_test_case and row < len(self.current_test_case.steps):
+                    step = self.current_test_case.steps[row]
+                    step.status = status
+                    # Очищаем skipReason при изменении статуса на failed или passed
+                    if status in ("failed", "passed"):
+                        step.skip_reason = ""
+                self._auto_save_status_change()
+            
+            self._update_statistics()  # Обновляем статистику при изменении статуса
+            # Эмитируем сигнал для обновления статистики в главном окне
+            if hasattr(self, 'status_changed'):
+                self.status_changed.emit()
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Произошла ошибка при изменении статуса шага: {str(e)}")
+    
+    def _show_skip_reason_dialog(self) -> Optional[str]:
+        """Показать диалог выбора причины пропуска"""
+        try:
+            # Получаем список причин, проверяя наличие атрибута
+            skip_reasons = getattr(self, '_skip_reasons', None)
+            if not skip_reasons:
+                skip_reasons = ['Автотесты', 'Нагрузочное тестирование', 'Другое']
+            
+            dialog = self.SkipReasonDialog(self, skip_reasons)
+            if dialog.exec_() == QDialog.Accepted:
+                return dialog.get_skip_reason()
+            return None
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Произошла ошибка при открытии диалога выбора причины: {str(e)}")
+            return None
     
     def _update_step_status_widget(self, row: int, status: str):
         """Обновить виджет статуса для указанной строки."""
@@ -396,6 +539,12 @@ class TestCaseFormWidget(QWidget):
         self._run_mode_enabled = False
         self.step_statuses: List[str] = []
         self._step_attachments: List[List[str]] = []  # Список attachments для каждого шага
+        self._skip_reasons: List[str] = ['Автотесты', 'Нагрузочное тестирование', 'Другое']  # Значения по умолчанию
+    
+    def set_skip_reasons(self, reasons: List[str]):
+        """Установить список причин пропуска из настроек"""
+        if reasons and isinstance(reasons, list):
+            self._skip_reasons = reasons
 
         self.setup_ui()
 
@@ -649,24 +798,35 @@ class TestCaseFormWidget(QWidget):
     def _create_bulk_operations_group(self) -> QGroupBox:
         """Группа массовых операций по шагам тест-кейса (только в режиме запуска тестов)"""
         group = QGroupBox("Массовые операции")
-        layout = QHBoxLayout()
-        layout.setContentsMargins(0, UI_METRICS.group_title_spacing, 0, 0)
+        main_layout = QVBoxLayout()
+        main_layout.setContentsMargins(0, UI_METRICS.group_title_spacing, 0, 0)
+        
+        # Статистика по шагам
+        self.stats_label = QLabel("Статистика по шагам")
+        self.stats_label.setStyleSheet("padding: 8px; background-color: rgba(255, 255, 255, 0.05); border-radius: 4px; font-size: 12px;")
+        self.stats_label.setWordWrap(True)
+        main_layout.addWidget(self.stats_label)
+        
+        # Кнопки операций
+        buttons_layout = QHBoxLayout()
+        buttons_layout.setContentsMargins(0, 8, 0, 0)
         
         # Кнопка "Все пройдено"
         self.mark_all_passed_btn = QPushButton("Все пройдено")
         self.mark_all_passed_btn.setToolTip("Отметить все шаги как пройденные")
         self.mark_all_passed_btn.clicked.connect(self._mark_all_steps_passed)
-        layout.addWidget(self.mark_all_passed_btn)
+        buttons_layout.addWidget(self.mark_all_passed_btn)
         
         # Кнопка "Сброс статусов"
         self.reset_statuses_btn = QPushButton("Сброс статусов")
         self.reset_statuses_btn.setToolTip("Сбросить статусы всех шагов выбранного тест-кейса")
         self.reset_statuses_btn.clicked.connect(self._reset_all_step_statuses)
-        layout.addWidget(self.reset_statuses_btn)
+        buttons_layout.addWidget(self.reset_statuses_btn)
         
-        layout.addStretch()
+        buttons_layout.addStretch()
+        main_layout.addLayout(buttons_layout)
         
-        group.setLayout(layout)
+        group.setLayout(main_layout)
         return group
 
     def _create_expected_result_group(self) -> QGroupBox:
@@ -817,6 +977,7 @@ class TestCaseFormWidget(QWidget):
         self._is_loading = False
         self.unsaved_changes_state.emit(False)
         self._update_step_controls_state()
+        self._update_statistics()  # Обновляем статистику при загрузке тест-кейса
     
     def _create_step_control_button(self, text: str, tooltip: str) -> QToolButton:
         """Создает кнопку панели управления шагами."""
@@ -1217,6 +1378,8 @@ class TestCaseFormWidget(QWidget):
         # Показываем/скрываем группу массовых операций
         if hasattr(self, 'bulk_operations_group'):
             self.bulk_operations_group.setVisible(enabled)
+            if enabled:
+                self._update_statistics()  # Обновляем статистику при включении режима запуска
         
         # Включаем/выключаем кнопки статусов для всех строк
         for row in range(self.steps_table.rowCount()):
@@ -1400,6 +1563,7 @@ class TestCaseFormWidget(QWidget):
         for row in range(self.steps_table.rowCount()):
             self._on_step_status_clicked(row, "passed")
         self._auto_save_status_change()
+        self._update_statistics()  # Обновляем статистику после массовой операции
     
     def _reset_all_step_statuses(self):
         """Сбросить статусы всех шагов выбранного тест-кейса"""
@@ -1408,5 +1572,30 @@ class TestCaseFormWidget(QWidget):
         for row in range(self.steps_table.rowCount()):
             self._on_step_status_clicked(row, "pending")
         self._auto_save_status_change()
+        self._update_statistics()  # Обновляем статистику после массовой операции
+    
+    def _update_statistics(self):
+        """Обновить статистику по шагам в группе массовых операций"""
+        if not hasattr(self, "stats_label"):
+            return
+        
+        if not self.current_test_case or not self.current_test_case.steps:
+            self.stats_label.setText("Шаги: нет данных")
+            return
+        
+        steps = self.current_test_case.steps
+        total = len(steps)
+        passed = sum(1 for step in steps if step.status == "passed")
+        failed = sum(1 for step in steps if step.status == "failed")
+        skipped = sum(1 for step in steps if step.status == "skipped")
+        pending = sum(1 for step in steps if not step.status or step.status == "pending")
+        
+        # Формируем текст статистики
+        stats_text = f"<b>Статистика по шагам:</b><br>"
+        stats_text += f"Всего: {total} | "
+        stats_text += f"Пройдено: <span style='color: #6CC24A;'>{passed}</span> | "
+        stats_text += f"Осталось: <span style='color: #FFA931;'>{pending}</span> | "
+        stats_text += f"Не пройдено: <span style='color: #F5555D;'>{failed + skipped}</span>"
+        self.stats_label.setText(stats_text)
 
 
