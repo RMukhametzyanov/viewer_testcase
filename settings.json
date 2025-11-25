@@ -1,6 +1,6 @@
 {
-    "test_cases_dir": "C:/all_testcases_spektr",
-    "DEFAULT_PROMT": "",
+    "test_cases_dir": "",
+    "DEFAULT_PROMT": "Сделай ревью тест-кейса. Поверхностное описание шагов не приемлемо. Необходимы детальные шаги.",
     "panel_sizes": {
         "left": 515,
         "form_area": 1630,
@@ -50,7 +50,6 @@
         "description": true,
         "expected_result": false
     },
-    "last_test_plan_name": "Регина",
     "skip_reasons": [
         "Автотесты",
         "Нагрузочное тестирование",
