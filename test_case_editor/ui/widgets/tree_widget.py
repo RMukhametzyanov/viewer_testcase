@@ -208,7 +208,8 @@ class TestCaseTreeWidget(QTreeWidget):
         self.test_cases_dir = test_cases_dir
         self.clear()
 
-        if not test_cases_dir.exists():
+        # Если путь пустой или не существует, оставляем дерево пустым
+        if not test_cases_dir or str(test_cases_dir).strip() == "" or not test_cases_dir.exists():
             return
 
         self._populate_directory(test_cases_dir, self.invisibleRootItem(), test_cases)

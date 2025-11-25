@@ -1016,9 +1016,15 @@ class MainWindow(QMainWindow):
         self.panel_sizes = dict(default_sizes)
         self.panel_sizes.update(self.settings.get('panel_sizes', {}))
         self._last_review_width = self.panel_sizes.get('review', 0) or 360
-        self.test_cases_dir = Path(self.settings.get('test_cases_dir', 'testcases'))
-        if not self.test_cases_dir.exists():
+        test_cases_dir_str = self.settings.get('test_cases_dir', '').strip()
+        if not test_cases_dir_str:
+            # Если test_cases_dir пустое, запрашиваем выбор папки
             self.test_cases_dir = self.prompt_select_folder()
+        else:
+            self.test_cases_dir = Path(test_cases_dir_str)
+            if not self.test_cases_dir.exists():
+                # Если путь указан, но папка не существует, запрашиваем выбор папки
+                self.test_cases_dir = self.prompt_select_folder()
         self.default_prompt = self.settings.get('DEFAULT_PROMT', "Опиши задачу для ревью.")
         self.create_tc_prompt = self.settings.get('DEFAULT_PROMT_CREATE_TC', "Создай ТТ")
         self.llm_model = self.settings.get('LLM_MODEL', "").strip()
@@ -1330,10 +1336,18 @@ class MainWindow(QMainWindow):
         generate_report_action.triggered.connect(self._generate_html_report)
         settings_action.setShortcut('Ctrl+,')
 
-        # Меню "Git"
-        self.git_menu = menubar.addMenu('Git')
-        git_commit_action = self.git_menu.addAction('Выполнить commit и push…')
-        git_commit_action.triggered.connect(self._open_git_commit_dialog)
+        # Меню "Git" - создаем через QAction чтобы иконка отображалась рядом с текстом
+        self.git_menu_action = QAction('Git', self)
+        self.git_menu = QMenu(self)
+        self.git_menu_action.setMenu(self.git_menu)
+        menubar.addAction(self.git_menu_action)
+        self.git_commit_action = self.git_menu.addAction('Commit…')
+        self.git_commit_action.triggered.connect(self._open_git_commit_dialog)
+        self.git_push_action = self.git_menu.addAction('Push')
+        self.git_push_action.triggered.connect(self._perform_git_push)
+        
+        # Обновляем индикаторы статуса Git
+        self._update_git_status_indicators()
     
     def _create_toolbar(self):
         """Создать панель инструментов с быстрыми действиями"""
@@ -1701,35 +1715,78 @@ class MainWindow(QMainWindow):
         if dialog.exec_() == QDialog.Accepted:
             comment = dialog.get_comment().strip()
             if comment:
-                self._perform_git_commit_push(comment)
+                self._perform_git_commit(comment)
 
-    def _perform_git_commit_push(self, message: str):
-        """Выполнить git commit и push в директории тест-кейсов."""
-        repo_path = self.test_cases_dir
+    def _get_git_repo_info(self):
+        """Получить информацию о git репозитории (корень и относительный путь)."""
+        test_cases_dir = self.test_cases_dir
 
-        if not repo_path.exists():
+        if not test_cases_dir or not test_cases_dir.exists():
             QMessageBox.warning(
                 self,
                 "Git",
-                f"Папка с тест-кейсами не найдена:\n{repo_path}",
+                f"Папка с тест-кейсами не найдена:\n{test_cases_dir}",
             )
-            return
+            return None, None
 
+        # Находим корень git репозитория
         try:
-            status_proc = subprocess.run(
-                ["git", "status", "--porcelain"],
-                cwd=str(repo_path),
+            repo_root_proc = subprocess.run(
+                ["git", "rev-parse", "--show-toplevel"],
+                cwd=str(test_cases_dir),
                 capture_output=True,
                 text=True,
+                encoding='utf-8',
+                errors='replace',
                 check=True,
             )
+            repo_root = Path(repo_root_proc.stdout.strip())
         except FileNotFoundError:
             QMessageBox.critical(
                 self,
                 "Git",
                 "Команда git не найдена. Установите Git и убедитесь, что он доступен в PATH.",
             )
+            return None, None
+        except subprocess.CalledProcessError as exc:
+            error_message = exc.stderr or exc.stdout or str(exc)
+            QMessageBox.critical(
+                self,
+                "Git",
+                f"Папка с тест-кейсами не является частью git репозитория:\n{error_message}",
+            )
+            return None, None
+
+        # Вычисляем относительный путь от корня репозитория до test_cases_dir
+        try:
+            test_cases_dir_abs = test_cases_dir.resolve()
+            repo_root_abs = repo_root.resolve()
+            relative_path = test_cases_dir_abs.relative_to(repo_root_abs)
+            # Преобразуем в строку с использованием слешей (для git)
+            git_path = str(relative_path).replace("\\", "/")
+        except ValueError:
+            # Если test_cases_dir не находится внутри repo_root, используем весь репозиторий
+            git_path = "."
+
+        return repo_root, git_path
+
+    def _perform_git_commit(self, message: str):
+        """Выполнить git commit только файлов из директории тест-кейсов."""
+        repo_root, git_path = self._get_git_repo_info()
+        if repo_root is None or git_path is None:
             return
+
+        # Проверяем статус только файлов из test_cases_dir
+        try:
+            status_proc = subprocess.run(
+                ["git", "status", "--porcelain", git_path],
+                cwd=str(repo_root),
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='replace',
+                check=True,
+            )
         except subprocess.CalledProcessError as exc:
             error_message = exc.stderr or exc.stdout or str(exc)
             QMessageBox.critical(
@@ -1743,61 +1800,551 @@ class MainWindow(QMainWindow):
             QMessageBox.information(
                 self,
                 "Git",
-                "Нет изменений для коммита.",
+                "Нет изменений для коммита в папке с тест-кейсами.",
             )
             return
 
         self.statusBar().showMessage("Git: подготовка изменений…")
-        commands = [
-            ("Git: подготовка файлов…", ["git", "add", "--all"]),
-            ("Git: создаю коммит…", ["git", "commit", "-m", message]),
-            ("Git: отправляю изменения…", ["git", "push"]),
-        ]
-
-        for status_text, cmd in commands:
-            self.statusBar().showMessage(status_text)
-            try:
-                result = subprocess.run(
-                    cmd,
-                    cwd=str(repo_path),
-                    capture_output=True,
-                    text=True,
-                )
-            except FileNotFoundError:
+        
+        # Шаг 1: Добавление файлов
+        try:
+            self.statusBar().showMessage("Git: подготовка файлов…")
+            add_result = subprocess.run(
+                ["git", "add", git_path],
+                cwd=str(repo_root),
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='replace',
+            )
+            if add_result.returncode != 0:
+                stderr = (add_result.stderr or "").strip()
+                stdout = (add_result.stdout or "").strip()
+                combined_output = stderr or stdout or "Неизвестная ошибка."
                 QMessageBox.critical(
                     self,
                     "Git",
-                    "Команда git не найдена. Установите Git и убедитесь, что он доступен в PATH.",
+                    f"Не удалось добавить файлы в индекс:\n{combined_output}",
                 )
-                self.statusBar().showMessage("Git: ошибка выполнения")
+                self.statusBar().showMessage("Git: ошибка при добавлении файлов")
                 return
+        except FileNotFoundError:
+            QMessageBox.critical(
+                self,
+                "Git",
+                "Команда git не найдена. Установите Git и убедитесь, что он доступен в PATH.",
+            )
+            self.statusBar().showMessage("Git: ошибка выполнения")
+            return
 
-            if result.returncode != 0:
-                stderr = (result.stderr or "").strip()
-                stdout = (result.stdout or "").strip()
+        # Шаг 2: Создание коммита
+        try:
+            self.statusBar().showMessage("Git: создаю коммит…")
+            commit_result = subprocess.run(
+                ["git", "commit", "-m", message],
+                cwd=str(repo_root),
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='replace',
+            )
+            
+            if commit_result.returncode != 0:
+                stderr = (commit_result.stderr or "").strip()
+                stdout = (commit_result.stdout or "").strip()
                 combined_output = stderr or stdout or "Неизвестная ошибка."
+                
                 # Если git commit сообщает об отсутствии изменений
-                if "nothing to commit" in combined_output.lower():
+                if "nothing to commit" in combined_output.lower() or "no changes" in combined_output.lower():
                     QMessageBox.information(
                         self,
                         "Git",
                         "Нет изменений для коммита.",
                     )
+                    self.statusBar().showMessage("Git: нет изменений для коммита")
+                    return
+                
+                # Проверяем, не исправил ли pre-commit хук файлы автоматически
+                if "files were modified by this hook" in combined_output.lower() or "fixing" in combined_output.lower():
+                    # Pre-commit хук исправил файлы, нужно добавить их и повторить коммит
+                    self.statusBar().showMessage("Git: pre-commit хук исправил файлы, добавляю изменения…")
+                    
+                    # Добавляем исправленные файлы
+                    try:
+                        add_result = subprocess.run(
+                            ["git", "add", git_path],
+                            cwd=str(repo_root),
+                            capture_output=True,
+                            text=True,
+                            encoding='utf-8',
+                            errors='replace',
+                        )
+                        
+                        if add_result.returncode == 0:
+                            # Повторяем коммит
+                            self.statusBar().showMessage("Git: повторяю коммит после исправлений…")
+                            retry_commit_result = subprocess.run(
+                                ["git", "commit", "-m", message],
+                                cwd=str(repo_root),
+                                capture_output=True,
+                                text=True,
+                                encoding='utf-8',
+                                errors='replace',
+                            )
+                            
+                            if retry_commit_result.returncode == 0:
+                                # Коммит успешно создан после исправлений
+                                QMessageBox.information(
+                                    self,
+                                    "Git",
+                                    "Коммит успешно создан.\n\n"
+                                    "Pre-commit хук автоматически исправил некоторые файлы (например, добавил символ новой строки в конец файла).",
+                                )
+                                self.statusBar().showMessage("Git: коммит успешно создан")
+                                # Обновляем индикаторы статуса Git
+                                self._update_git_status_indicators()
+                                return
+                            else:
+                                # Повторный коммит тоже не удался
+                                retry_stderr = (retry_commit_result.stderr or "").strip()
+                                retry_stdout = (retry_commit_result.stdout or "").strip()
+                                retry_output = retry_stderr or retry_stdout or "Неизвестная ошибка."
+                                QMessageBox.critical(
+                                    self,
+                                    "Git",
+                                    f"Не удалось создать коммит после исправлений:\n{retry_output}",
+                                )
+                                self.statusBar().showMessage("Git: ошибка при создании коммита")
+                                return
+                        else:
+                            # Не удалось добавить исправленные файлы
+                            QMessageBox.critical(
+                                self,
+                                "Git",
+                                f"Не удалось добавить исправленные файлы:\n{add_result.stderr or add_result.stdout}",
+                            )
+                            self.statusBar().showMessage("Git: ошибка при добавлении файлов")
+                            return
+                    except FileNotFoundError:
+                        QMessageBox.critical(
+                            self,
+                            "Git",
+                            "Команда git не найдена. Установите Git и убедитесь, что он доступен в PATH.",
+                        )
+                        self.statusBar().showMessage("Git: ошибка выполнения")
+                        return
                 else:
+                    # Другая ошибка коммита
                     QMessageBox.critical(
                         self,
                         "Git",
-                        f"Команда {' '.join(cmd)} завершилась с ошибкой:\n{combined_output}",
+                        f"Не удалось создать коммит:\n{combined_output}",
                     )
-                self.statusBar().showMessage("Git: ошибка выполнения")
+                    self.statusBar().showMessage("Git: ошибка при создании коммита")
                 return
+            else:
+                # Коммит успешно создан
+                QMessageBox.information(
+                    self,
+                    "Git",
+                    "Коммит успешно создан.",
+                )
+                self.statusBar().showMessage("Git: коммит успешно создан")
+                # Обновляем индикаторы статуса Git
+                self._update_git_status_indicators()
+        except FileNotFoundError:
+            QMessageBox.critical(
+                self,
+                "Git",
+                "Команда git не найдена. Установите Git и убедитесь, что он доступен в PATH.",
+            )
+            self.statusBar().showMessage("Git: ошибка выполнения")
+            return
 
-        QMessageBox.information(
-            self,
-            "Git",
-            "Изменения успешно отправлены в удалённый репозиторий.",
-        )
-        self.statusBar().showMessage("Git: изменения отправлены")
+    def _perform_git_push(self):
+        """Выполнить git push только файлов из директории тест-кейсов."""
+        repo_root, git_path = self._get_git_repo_info()
+        if repo_root is None or git_path is None:
+            return
+
+        # Проверяем, есть ли коммиты для отправки
+        try:
+            status_proc = subprocess.run(
+                ["git", "status", "--porcelain", "-b"],
+                cwd=str(repo_root),
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='replace',
+                check=True,
+            )
+            
+            # Проверяем, есть ли локальные коммиты, которые не отправлены
+            ahead_proc = subprocess.run(
+                ["git", "rev-list", "--count", "@{u}..HEAD"],
+                cwd=str(repo_root),
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='replace',
+            )
+            
+            # Если команда не удалась, возможно нет upstream ветки
+            if ahead_proc.returncode != 0:
+                # Проверяем наличие коммитов другим способом
+                log_proc = subprocess.run(
+                    ["git", "log", "--oneline", "-1"],
+                    cwd=str(repo_root),
+                    capture_output=True,
+                    text=True,
+                    encoding='utf-8',
+                    errors='replace',
+                )
+                if not log_proc.stdout.strip():
+                    QMessageBox.information(
+                        self,
+                        "Git",
+                        "Нет коммитов для отправки.",
+                    )
+                    return
+        except subprocess.CalledProcessError as exc:
+            error_message = exc.stderr or exc.stdout or str(exc)
+            QMessageBox.critical(
+                self,
+                "Git",
+                f"Не удалось проверить статус репозитория:\n{error_message}",
+            )
+            return
+
+        # Отправка изменений (push)
+        try:
+            self.statusBar().showMessage("Git: отправляю изменения…")
+            push_result = subprocess.run(
+                ["git", "push"],
+                cwd=str(repo_root),
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='replace',
+                timeout=60,  # Таймаут 60 секунд для push
+            )
+            
+            if push_result.returncode != 0:
+                stderr = (push_result.stderr or "").strip()
+                stdout = (push_result.stdout or "").strip()
+                combined_output = stderr or stdout or "Неизвестная ошибка."
+                
+                # Определяем тип ошибки для более понятного сообщения
+                error_lower = combined_output.lower()
+                if any(keyword in error_lower for keyword in ["could not resolve", "failed to connect", "connection refused", "network", "unreachable", "timeout"]):
+                    error_message = (
+                        "Не удалось отправить изменения в удалённый репозиторий.\n\n"
+                        "Возможные причины:\n"
+                        "• GitLab недоступен или перегружен\n"
+                        "• Проблемы с сетевым подключением\n"
+                        "• Неверный URL удалённого репозитория\n\n"
+                        f"Детали ошибки:\n{combined_output}"
+                    )
+                elif "authentication" in error_lower or "permission" in error_lower or "denied" in error_lower:
+                    error_message = (
+                        "Не удалось отправить изменения: проблема с аутентификацией.\n\n"
+                        "Проверьте:\n"
+                        "• Настройки доступа к репозиторию\n"
+                        "• Учётные данные Git\n\n"
+                        f"Детали ошибки:\n{combined_output}"
+                    )
+                elif "rejected" in error_lower or "non-fast-forward" in error_lower:
+                    error_message = (
+                        "Не удалось отправить изменения: удалённый репозиторий содержит новые коммиты.\n\n"
+                        "Выполните 'git pull' перед push или используйте 'git push --force' (осторожно!).\n\n"
+                        f"Детали ошибки:\n{combined_output}"
+                    )
+                elif "no upstream" in error_lower or "no tracking" in error_lower or "has no upstream branch" in error_lower:
+                    # Автоматически настраиваем upstream ветку
+                    self.statusBar().showMessage("Git: настраиваю upstream ветку…")
+                    
+                    # Получаем имя текущей ветки
+                    try:
+                        branch_proc = subprocess.run(
+                            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+                            cwd=str(repo_root),
+                            capture_output=True,
+                            text=True,
+                            encoding='utf-8',
+                            errors='replace',
+                            check=True,
+                        )
+                        branch_name = branch_proc.stdout.strip()
+                    except subprocess.CalledProcessError:
+                        QMessageBox.warning(
+                            self,
+                            "Git Push - Ошибка",
+                            "Не удалось определить имя текущей ветки.",
+                        )
+                        self.statusBar().showMessage("Git: ошибка определения ветки")
+                        return
+                    
+                    # Получаем имя удалённого репозитория (по умолчанию "origin")
+                    try:
+                        remote_proc = subprocess.run(
+                            ["git", "remote"],
+                            cwd=str(repo_root),
+                            capture_output=True,
+                            text=True,
+                            encoding='utf-8',
+                            errors='replace',
+                            check=True,
+                        )
+                        remotes = remote_proc.stdout.strip().split('\n')
+                        remote_name = remotes[0] if remotes and remotes[0] else "origin"
+                    except subprocess.CalledProcessError:
+                        # Если не удалось получить список удалённых репозиториев, используем "origin"
+                        remote_name = "origin"
+                    
+                    # Выполняем push с настройкой upstream
+                    try:
+                        self.statusBar().showMessage(f"Git: отправляю изменения в {remote_name}/{branch_name}…")
+                        push_setup_result = subprocess.run(
+                            ["git", "push", "-u", remote_name, branch_name],
+                            cwd=str(repo_root),
+                            capture_output=True,
+                            text=True,
+                            encoding='utf-8',
+                            errors='replace',
+                            timeout=60,
+                        )
+                        
+                        if push_setup_result.returncode != 0:
+                            stderr = (push_setup_result.stderr or "").strip()
+                            stdout = (push_setup_result.stdout or "").strip()
+                            combined_output = stderr or stdout or "Неизвестная ошибка."
+                            
+                            # Определяем тип ошибки
+                            error_lower_setup = combined_output.lower()
+                            if any(keyword in error_lower_setup for keyword in ["could not resolve", "failed to connect", "connection refused", "network", "unreachable", "timeout"]):
+                                error_message = (
+                                    "Не удалось отправить изменения в удалённый репозиторий.\n\n"
+                                    "Возможные причины:\n"
+                                    "• GitLab недоступен или перегружен\n"
+                                    "• Проблемы с сетевым подключением\n"
+                                    "• Неверный URL удалённого репозитория\n\n"
+                                    f"Детали ошибки:\n{combined_output}"
+                                )
+                            elif "authentication" in error_lower_setup or "permission" in error_lower_setup or "denied" in error_lower_setup:
+                                error_message = (
+                                    "Не удалось отправить изменения: проблема с аутентификацией.\n\n"
+                                    "Проверьте:\n"
+                                    "• Настройки доступа к репозиторию\n"
+                                    "• Учётные данные Git\n\n"
+                                    f"Детали ошибки:\n{combined_output}"
+                                )
+                            else:
+                                error_message = (
+                                    "Не удалось отправить изменения в удалённый репозиторий.\n\n"
+                                    f"Детали ошибки:\n{combined_output}"
+                                )
+                            
+                            QMessageBox.warning(
+                                self,
+                                "Git Push - Ошибка",
+                                error_message,
+                            )
+                            self.statusBar().showMessage("Git: не удалось отправить изменения")
+                            return
+                        else:
+                            # Push успешно выполнен с настройкой upstream
+                            QMessageBox.information(
+                                self,
+                                "Git",
+                                f"Изменения успешно отправлены в {remote_name}/{branch_name}.\n\n"
+                                "Upstream ветка настроена автоматически.",
+                            )
+                            self.statusBar().showMessage("Git: изменения успешно отправлены")
+                            # Обновляем индикаторы статуса Git
+                            self._update_git_status_indicators()
+                            return
+                            
+                    except subprocess.TimeoutExpired:
+                        QMessageBox.warning(
+                            self,
+                            "Git Push - Таймаут",
+                            (
+                                "Превышено время ожидания при отправке изменений.\n\n"
+                                "Возможные причины:\n"
+                                "• GitLab недоступен или перегружен\n"
+                                "• Медленное сетевое подключение\n"
+                                "• Слишком большой объём данных для отправки\n\n"
+                                "Попробуйте выполнить push позже или проверьте подключение к сети."
+                            ),
+                        )
+                        self.statusBar().showMessage("Git: таймаут при отправке изменений")
+                        return
+                    except FileNotFoundError:
+                        QMessageBox.critical(
+                            self,
+                            "Git",
+                            "Команда git не найдена. Установите Git и убедитесь, что он доступен в PATH.",
+                        )
+                        self.statusBar().showMessage("Git: ошибка выполнения")
+                        return
+                else:
+                    error_message = (
+                        "Не удалось отправить изменения в удалённый репозиторий.\n\n"
+                        f"Детали ошибки:\n{combined_output}"
+                    )
+                
+                QMessageBox.warning(
+                    self,
+                    "Git Push - Ошибка",
+                    error_message,
+                )
+                self.statusBar().showMessage("Git: не удалось отправить изменения")
+                return
+            else:
+                # Push успешно выполнен
+                QMessageBox.information(
+                    self,
+                    "Git",
+                    "Изменения успешно отправлены в удалённый репозиторий.",
+                )
+                self.statusBar().showMessage("Git: изменения успешно отправлены")
+                # Обновляем индикаторы статуса Git
+                self._update_git_status_indicators()
+                
+        except subprocess.TimeoutExpired:
+            QMessageBox.warning(
+                self,
+                "Git Push - Таймаут",
+                (
+                    "Превышено время ожидания при отправке изменений.\n\n"
+                    "Возможные причины:\n"
+                    "• GitLab недоступен или перегружен\n"
+                    "• Медленное сетевое подключение\n"
+                    "• Слишком большой объём данных для отправки\n\n"
+                    "Попробуйте выполнить push позже или проверьте подключение к сети."
+                ),
+            )
+            self.statusBar().showMessage("Git: таймаут при отправке изменений")
+            return
+        except FileNotFoundError:
+            QMessageBox.critical(
+                self,
+                "Git",
+                "Команда git не найдена. Установите Git и убедитесь, что он доступен в PATH.",
+            )
+            self.statusBar().showMessage("Git: ошибка выполнения")
+            return
+    
+    def _check_git_status(self):
+        """Проверить статус Git: есть ли незакоммиченные изменения и незапушенные коммиты."""
+        repo_root, git_path = self._get_git_repo_info()
+        if repo_root is None or git_path is None:
+            return False, False
+        
+        has_uncommitted = False
+        has_unpushed = False
+        
+        try:
+            # Проверяем наличие незакоммиченных изменений
+            status_proc = subprocess.run(
+                ["git", "status", "--porcelain", git_path],
+                cwd=str(repo_root),
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='replace',
+                check=True,
+            )
+            has_uncommitted = bool(status_proc.stdout.strip())
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            # Если не удалось проверить, считаем что изменений нет
+            pass
+        
+        try:
+            # Проверяем наличие незапушенных коммитов
+            # Сначала проверяем, есть ли upstream ветка
+            ahead_proc = subprocess.run(
+                ["git", "rev-list", "--count", "@{u}..HEAD"],
+                cwd=str(repo_root),
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='replace',
+            )
+            
+            if ahead_proc.returncode == 0:
+                ahead_count = ahead_proc.stdout.strip()
+                has_unpushed = bool(ahead_count and int(ahead_count) > 0)
+            else:
+                # Если нет upstream, проверяем наличие локальных коммитов
+                # и наличие удалённого репозитория
+                remote_check = subprocess.run(
+                    ["git", "remote"],
+                    cwd=str(repo_root),
+                    capture_output=True,
+                    text=True,
+                    encoding='utf-8',
+                    errors='replace',
+                )
+                if remote_check.returncode == 0 and remote_check.stdout.strip():
+                    # Есть удалённый репозиторий, но нет upstream - возможно есть коммиты для push
+                    log_proc = subprocess.run(
+                        ["git", "log", "--oneline", "-1"],
+                        cwd=str(repo_root),
+                        capture_output=True,
+                        text=True,
+                        encoding='utf-8',
+                        errors='replace',
+                    )
+                    has_unpushed = bool(log_proc.stdout.strip())
+        except (subprocess.CalledProcessError, FileNotFoundError, ValueError):
+            # Если не удалось проверить, считаем что коммитов для push нет
+            pass
+        
+        return has_uncommitted, has_unpushed
+    
+    def _update_git_status_indicators(self):
+        """Обновить визуальные индикаторы статуса Git в меню."""
+        if not hasattr(self, 'git_commit_action') or not hasattr(self, 'git_push_action'):
+            return
+        
+        has_uncommitted, has_unpushed = self._check_git_status()
+        
+        # Обновляем индикатор для Commit
+        if has_uncommitted:
+            # Есть незакоммиченные изменения - добавляем индикатор
+            self.git_commit_action.setText('● Commit…')
+        else:
+            # Нет незакоммиченных изменений - обычный текст
+            self.git_commit_action.setText('Commit…')
+        
+        # Обновляем индикатор для Push
+        if has_unpushed:
+            # Есть незапушенные коммиты - добавляем индикатор
+            self.git_push_action.setText('● Push')
+        else:
+            # Нет незапушенных коммитов - обычный текст
+            self.git_push_action.setText('Push')
+        
+        # Обновляем иконку меню Git (используем git_menu_action чтобы иконка отображалась рядом с текстом)
+        if hasattr(self, 'git_menu_action'):
+            if has_uncommitted:
+                # Приоритет: незакоммиченные изменения - желтая иконка
+                icon = self._load_svg_icon('arrow-up-right.svg', size=16, color='#f39c12')
+                if icon:
+                    self.git_menu_action.setIcon(icon)
+                else:
+                    self.git_menu_action.setIcon(QIcon())
+            elif has_unpushed:
+                # Есть незапушенные коммиты - синяя иконка
+                icon = self._load_svg_icon('arrow-up-right.svg', size=16, color='#3498db')
+                if icon:
+                    self.git_menu_action.setIcon(icon)
+                else:
+                    self.git_menu_action.setIcon(QIcon())
+            else:
+                # Нет изменений - убираем иконку
+                self.git_menu_action.setIcon(QIcon())
     
     def select_test_cases_folder(self):
         """Обработчик выбора папки с тест-кейсами"""
@@ -1859,16 +2406,9 @@ class MainWindow(QMainWindow):
     
     def prompt_select_folder(self) -> Path:
         """Диалог выбора папки"""
-        msg_box = QMessageBox()
-        msg_box.setIcon(QMessageBox.Information)
-        msg_box.setWindowTitle("Выбор папки с тест-кейсами")
-        msg_box.setText("Папка с тест-кейсами не найдена.\n\nПожалуйста, выберите папку.")
-        msg_box.setStandardButtons(QMessageBox.Ok)
-        msg_box.exec_()
-        
         folder = QFileDialog.getExistingDirectory(
             None,
-            "Выберите папку с тест-кейсами",
+            "Выберите папку с тест-кейсами вашего репозитория",
             str(Path.cwd()),
             QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks
         )
@@ -1879,12 +2419,11 @@ class MainWindow(QMainWindow):
             self.save_settings(self.settings)
             return selected_path
         
-        # По умолчанию
-        default = Path("testcases")
-        default.mkdir(exist_ok=True)
-        self.settings['test_cases_dir'] = str(default)
+        # Если пользователь отменил выбор, сохраняем пустое значение
+        # Это приведет к пустому дереву и диалог будет показан при следующем запуске
+        self.settings['test_cases_dir'] = ""
         self.save_settings(self.settings)
-        return default
+        return Path("")
     
     def load_all_test_cases(self):
         """
@@ -1893,6 +2432,20 @@ class MainWindow(QMainWindow):
         Демонстрирует Dependency Inversion:
         не работаем напрямую с файлами, используем сервис
         """
+        # Если test_cases_dir пустое, не загружаем тест-кейсы и оставляем дерево пустым
+        test_cases_dir_str = str(self.test_cases_dir).strip() if self.test_cases_dir else ""
+        if not self.test_cases_dir or test_cases_dir_str == "":
+            self.test_cases = []
+            if hasattr(self, "tree_widget"):
+                self.tree_widget.load_tree(Path(""), [])
+            if hasattr(self, 'filter_panel'):
+                self.filter_panel.update_test_cases([])
+            if hasattr(self, "placeholder"):
+                self.placeholder.update_count(0)
+            if hasattr(self, "aux_panel"):
+                self.aux_panel.update_reports_panel()
+            return
+        
         expanded_state = set()
         selected_filepath = None
         # Сохраняем размеры панелей перед обновлением
@@ -2062,6 +2615,8 @@ class MainWindow(QMainWindow):
             # Обновляем панель "Файлы" для отображения прикрепленных файлов
             self.aux_panel.set_files_test_case(self.current_test_case)
         self.load_all_test_cases()
+        # Обновляем индикаторы статуса Git после сохранения
+        self._update_git_status_indicators()
         self._update_json_preview()
         # Обновляем статистику в statusbar (всегда)
         self._update_statusbar_statistics()
@@ -3458,4 +4013,5 @@ def create_main_window() -> MainWindow:
     Использует паттерн Factory для централизованного создания окна
     """
     return MainWindow()
+
 

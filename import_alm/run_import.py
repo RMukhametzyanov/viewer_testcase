@@ -8,7 +8,83 @@
 
 import os
 import sys
+import subprocess
 from pathlib import Path
+
+
+def check_and_install_dependencies():
+    """Проверяет наличие необходимых библиотек и устанавливает их при необходимости."""
+    script_dir = Path(__file__).parent
+    requirements_file = script_dir / "requirements.txt"
+    
+    if not requirements_file.exists():
+        print("⚠️  Файл requirements.txt не найден. Пропуск проверки зависимостей.")
+        return
+    
+    # Маппинг имен пакетов к именам модулей для импорта
+    # (некоторые пакеты имеют другое имя при импорте)
+    package_to_module = {
+        'requests': 'requests',
+        'urllib3': 'urllib3',
+    }
+    
+    # Читаем список зависимостей
+    required_packages = []
+    with open(requirements_file, 'r', encoding='utf-8') as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith('#'):
+                # Извлекаем имя пакета (до >= или ==)
+                package_name = line.split('>=')[0].split('==')[0].split('>')[0].split('<')[0].strip()
+                if package_name:
+                    required_packages.append(package_name)
+    
+    # Проверяем наличие пакетов
+    missing_packages = []
+    for package in required_packages:
+        module_name = package_to_module.get(package, package)
+        try:
+            __import__(module_name)
+        except ImportError:
+            missing_packages.append(package)
+    
+    # Устанавливаем недостающие пакеты
+    if missing_packages:
+        print("=" * 70)
+        print("Обнаружены отсутствующие зависимости")
+        print("=" * 70)
+        print(f"Не найдены пакеты: {', '.join(missing_packages)}")
+        print("Начинаю автоматическую установку...")
+        print()
+        
+        try:
+            # Устанавливаем через pip
+            subprocess.check_call([
+                sys.executable, "-m", "pip", "install", "-r", str(requirements_file)
+            ])
+            print()
+            print("✓ Зависимости успешно установлены!")
+            print()
+        except subprocess.CalledProcessError as e:
+            print()
+            print("✗ ОШИБКА при установке зависимостей!")
+            print()
+            print("Попробуйте установить вручную:")
+            print(f"  pip install -r {requirements_file}")
+            print()
+            sys.exit(1)
+        except Exception as e:
+            print()
+            print(f"✗ ОШИБКА при установке зависимостей: {e}")
+            print()
+            print("Попробуйте установить вручную:")
+            print(f"  pip install -r {requirements_file}")
+            print()
+            sys.exit(1)
+
+
+# Проверяем и устанавливаем зависимости перед импортом модулей
+check_and_install_dependencies()
 
 # Добавляем текущую директорию в путь для импорта
 script_dir = Path(__file__).parent
