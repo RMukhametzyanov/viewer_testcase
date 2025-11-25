@@ -1,0 +1,462 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 479899,
+        "name": "Вкладка Дашборд"
+      },
+      "workItem": {
+        "id": 320756,
+        "name": "[Мониторинг] Дашборд.  Кол- во выполненных ГТМ",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2024-12-17T06:54:11.543Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2024-12-17T06:54:11.543Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "pointAssignments": [
+        {
+          "id": 40001,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Лобанов Сергей Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+              }
+            },
+            "id": "cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "uniqueName": "GAZPROM-NEFT\\Lobanov.SI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/479899/TestPoint/40001"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/479899/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/479899"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 479899,
+        "name": "Вкладка Дашборд"
+      },
+      "workItem": {
+        "id": 320761,
+        "name": "[Мониторинг] Дашборд. График \"Индикаторы состояния риска\"",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2024-12-17T06:59:57.66Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2024-12-17T06:59:57.66Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 5
+          }
+        ]
+      },
+      "order": 1,
+      "pointAssignments": [
+        {
+          "id": 40002,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Лобанов Сергей Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+              }
+            },
+            "id": "cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "uniqueName": "GAZPROM-NEFT\\Lobanov.SI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/479899/TestPoint/40002"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/479899/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/479899"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 479899,
+        "name": "Вкладка Дашборд"
+      },
+      "workItem": {
+        "id": 432152,
+        "name": "[Мониторинг] Дашборд. График \"Индикаторы состояния риска\". Переход в реестр Мониторинга",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"12\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открыть UAT \\ Мониторинг&lt;BR/&gt;Перейти на вкладку Дашборд&lt;BR/&gt;&lt;BR/&gt;График Индикаторы состояния риска&lt;BR/&gt;&lt;BR/&gt;Выбрать Уровень 2&lt;BR/&gt;Выбрать За период&lt;BR/&gt;&lt;BR/&gt;Последовательно прокликать сектора:&lt;BR/&gt;- Эффективный&lt;BR/&gt;- Неэффективный&lt;BR/&gt;- Мониторинготносятся только мероприятия с OilRateProfit = 1 ИЛИ (OilRateProfit = 0 И ActualPI &amp;gt;= 1.15)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Открывается таблица мониторинга, количество записей совпадает с количеством в секторе.&lt;BR/&gt;Согласно условия:&lt;BR/&gt;&lt;BR/&gt;- Эффективный, в столбце \"По мин.рент.добыче\" зеленая иконка Qн &lt;BR/&gt;&lt;B&gt;ИЛИ&lt;/B&gt; &lt;BR/&gt;серая иконка Qн и Тек.параметры/PI &amp;gt;= 1.15&lt;BR/&gt;&lt;BR/&gt;-&amp;nbsp;Неэффективный, в столбце \"По мин.рент.добыче\" красная иконка Qн &lt;BR/&gt;&lt;B&gt;ИЛИ&lt;/B&gt;&lt;BR/&gt;серая иконка Qн и Тек.параметры/PI  &amp;lt; 1.15&lt;BR/&gt;&lt;BR/&gt;- Мониторинг, в столбце \"По мин.рент.добыче\" красная иконка Qн  и Зап.параметры/Дата запуска менее 60 суток&lt;BR/&gt;&lt;B&gt;ИЛИ&lt;/B&gt;&lt;BR/&gt;серая иконка Qн и Тек.параметры/PI  &amp;lt; 1.15 и Зап.параметры/Дата запуска менее 60 суток&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать По месяцам&lt;BR/&gt;&lt;BR/&gt;Последовательно прокликать сектора:&lt;BR/&gt;- Эффективный&lt;BR/&gt;- Неэффективный&lt;BR/&gt;- Мониторинг&lt;BR/&gt;&lt;BR/&gt;Навести курсор на линию&lt;BR/&gt;- Порог неэффективности&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Открывается таблица мониторинга, количество записей совпадает с количеством в секторе.&lt;BR/&gt;Согласно условия:&lt;BR/&gt;&lt;BR/&gt;- Эффективный, в столбце \"По мин.рент.добыче\" зеленая иконка Qн &lt;BR/&gt;&lt;B&gt;ИЛИ&lt;/B&gt; &lt;BR/&gt;серая иконка Qн и Тек.параметры/PI &amp;gt;= 1.15&lt;BR/&gt;&lt;BR/&gt;-&amp;nbsp;Неэффективный, в столбце \"По мин.рент.добыче\" красная иконка Qн &lt;BR/&gt;&lt;B&gt;ИЛИ&lt;/B&gt;&lt;BR/&gt;серая иконка Qн и Тек.параметры/PI  &amp;lt; 1.15&lt;BR/&gt;&lt;BR/&gt;- Мониторинг, в столбце \"По мин.рент.добыче\" красная иконка Qн  и Зап.параметры/Дата запуска менее 60 суток&lt;BR/&gt;&lt;B&gt;ИЛИ&lt;/B&gt;&lt;BR/&gt;серая иконка Qн и Тек.параметры/PI  &amp;lt; 1.15 и Зап.параметры/Дата запуска менее 60 суток&lt;BR/&gt;&lt;BR/&gt;- Порог неэффективности, кол-во в Абс. и Отн.порог. значение учитываются только меоприятия где&lt;B&gt; &lt;/B&gt;в столбце \"По мин.рент.добыче\" красная иконка Qн и Тек.параметры/PI  &amp;lt; 1.15&lt;BR/&gt;&lt;B&gt;ИЛИ&lt;/B&gt;&lt;BR/&gt;серая иконка Qн и Тек.параметры/PI  &amp;lt; 1.15&lt;/P&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать Уровень 3&lt;BR/&gt;Выбрать За период&lt;BR/&gt;&lt;BR/&gt;Последовательно прокликать сектора:&lt;BR/&gt;- Неэффективный&lt;BR/&gt;- Неэффективный по геологии&lt;BR/&gt;- Неэффективный по технологии&lt;BR/&gt;- Неэффективный по организации&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открывается таблица мониторинга, количество записей совпадает с количеством в секторе.&lt;BR/&gt;Согласно условия:&lt;BR/&gt;&lt;BR/&gt;-&amp;nbsp;Неэффективный, в столбце \"По мин.рент.добыче\" красная иконка Qн &lt;BR/&gt;&lt;B&gt;ИЛИ&lt;/B&gt;&lt;BR/&gt;серая иконка Qн и Тек.параметры/PI  &amp;lt; 1.15 &lt;BR/&gt;&lt;BR/&gt;- Неэффективный по геологии, в столбце \"По мин.рент.добыче\" красная иконка Qн &lt;BR/&gt;&lt;B&gt;ИЛИ&lt;/B&gt;&lt;BR/&gt;серая иконка Qн и Тек.параметры/PI  &amp;lt; 1.15 и Причина неэффективности группа Геологическая&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;- Неэффективный по технологии, в столбце \"По мин.рент.добыче\" красная иконка Qн &lt;BR/&gt;&lt;B&gt;ИЛИ&lt;/B&gt;&lt;BR/&gt;серая иконка Qн и Тек.параметры/PI  &amp;lt; 1.15 и Причина неэффективности группа Технологическая&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;- Неэффективный по организации, в столбце \"По мин.рент.добыче\" красная иконка Qн &lt;BR/&gt;&lt;B&gt;ИЛИ&lt;/B&gt;&lt;BR/&gt;серая иконка Qн и Тек.параметры/PI  &amp;lt; 1.15 и Причина неэффективности группа Организационная&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"12\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать По месяцам&lt;BR/&gt;&lt;BR/&gt;Последовательно прокликать сектора:&lt;BR/&gt;- Неэффективный&lt;BR/&gt;- Неэффективный по геологии&lt;BR/&gt;- Неэффективный по технологии&lt;BR/&gt;- Неэффективный по организации&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Навести курсор на линию&lt;BR/&gt;- Порог неэффективности&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открывается таблица мониторинга, количество записей совпадает с количеством в секторе.&lt;BR/&gt;Согласно условия:&lt;BR/&gt;&lt;BR/&gt;-&amp;nbsp;Неэффективный, в столбце \"По мин.рент.добыче\" красная иконка Qн &lt;BR/&gt;&lt;B&gt;ИЛИ&lt;/B&gt;&lt;BR/&gt;серая иконка Qн и Тек.параметры/PI  &amp;lt; 1.15 &lt;BR/&gt;&lt;BR/&gt;- Неэффективный по геологии, в столбце \"По мин.рент.добыче\" красная иконка Qн &lt;BR/&gt;&lt;B&gt;ИЛИ&lt;/B&gt;&lt;BR/&gt;серая иконка Qн и Тек.параметры/PI  &amp;lt; 1.15 и Причина неэффективности группа Геологическая&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;- Неэффективный по технологии, в столбце \"По мин.рент.добыче\" красная иконка Qн &lt;BR/&gt;&lt;B&gt;ИЛИ&lt;/B&gt;&lt;BR/&gt;серая иконка Qн и Тек.параметры/PI  &amp;lt; 1.15 и Причина неэффективности группа Технологическая&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;- Неэффективный по организации, в столбце \"По мин.рент.добыче\" красная иконка Qн &lt;BR/&gt;&lt;B&gt;ИЛИ&lt;/B&gt;&lt;BR/&gt;серая иконка Qн и Тек.параметры/PI  &amp;lt; 1.15 и Причина неэффективности группа Организационная&lt;BR/&gt;&lt;BR/&gt;- Порог неэффективности, кол-во в Абс. и Отн.порог. значение учитываются только меоприятия где&lt;B&gt; &lt;/B&gt;в столбце \"По мин.рент.добыче\" красная иконка Qн и Тек.параметры/PI  &amp;lt; 1.15&lt;BR/&gt;&lt;B&gt;ИЛИ&lt;/B&gt;&lt;BR/&gt;серая иконка Qн и Тек.параметры/PI  &amp;lt; 1.15&amp;nbsp;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-08-13T13:57:38.64Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Ревью"
+          },
+          {
+            "System.AssignedTo": "Багаутдинова Анна Валерьевна <GAZPROM-NEFT\\Bagautdinova.AV>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-09-11T14:00:45.543Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 28
+          }
+        ]
+      },
+      "order": 2,
+      "pointAssignments": [
+        {
+          "id": 40007,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Лобанов Сергей Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+              }
+            },
+            "id": "cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "uniqueName": "GAZPROM-NEFT\\Lobanov.SI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/479899/TestPoint/40007"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/479899/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/479899"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 479899,
+        "name": "Вкладка Дашборд"
+      },
+      "workItem": {
+        "id": 320763,
+        "name": "[Мониторинг] Дашборд. График \"Технологическая эффективность мероприятий\"",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2024-12-17T07:00:23.187Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2024-12-17T07:00:23.187Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "order": 3,
+      "pointAssignments": [
+        {
+          "id": 40003,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Лобанов Сергей Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+              }
+            },
+            "id": "cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "uniqueName": "GAZPROM-NEFT\\Lobanov.SI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/479899/TestPoint/40003"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/479899/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/479899"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 479899,
+        "name": "Вкладка Дашборд"
+      },
+      "workItem": {
+        "id": 320765,
+        "name": "[Мониторинг] Дашборд. График \"Суммарный прирост нефти\"",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2024-12-17T07:00:50.733Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2024-12-17T07:00:50.733Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "order": 4,
+      "pointAssignments": [
+        {
+          "id": 40005,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Лобанов Сергей Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+              }
+            },
+            "id": "cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "uniqueName": "GAZPROM-NEFT\\Lobanov.SI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/479899/TestPoint/40005"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/479899/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/479899"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 5
+}

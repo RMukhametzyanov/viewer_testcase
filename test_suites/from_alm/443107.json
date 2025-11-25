@@ -1,0 +1,286 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 443107,
+        "name": "Панель меню"
+      },
+      "workItem": {
+        "id": 286575,
+        "name": "Панель меню. Меню в левой части экрана",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"25\"><step id=\"25\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Авторизоваться под Пользователем / Гостем&lt;BR/&gt;Нажать на меню (слева наверху)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отсутствуют:&lt;BR/&gt; Загрузка данных для расчёт&lt;BR/&gt;&amp;nbsp;Отчет по пользователям&lt;BR/&gt; Инструменты сервиса&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"24\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Авторизоваться под Экспертом&lt;BR/&gt;Нажать на меню (слева наверху)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отсутствуют:&lt;BR/&gt;&amp;nbsp;Отчет по пользователям&lt;BR/&gt; Инструменты сервиса&lt;BR/&gt;&amp;nbsp;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"14\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;FONT color=\"#000000\"&gt;&lt;SPAN style=\"font-size: 14px;background-color: rgb(255, 255, 255)\"&gt;Авторизоваться под Специалистом сервиса&lt;BR/&gt;&lt;BR/&gt;&lt;/SPAN&gt;&lt;/FONT&gt;Нажать на меню (слева наверху)&lt;BR style=\"color: rgba(255, 255, 255, 0.95);background-color: rgb(34, 59, 89)\"/&gt;&lt;BR style=\"color: rgba(255, 255, 255, 0.95);background-color: rgb(34, 59, 89)\"/&gt;&lt;IMG src=\"data:image/png;base64,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\" alt=\"\"/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображаются блоки&lt;BR/&gt;&amp;nbsp;Ручная загрузка\n\tЗагрузка данных для расчёта\n\t\nЭкспертиза потенциала\n\tДобывающий\n\tНагнетательный\n\tДашборд потенциала\n\tОтчет о действиях пользователей\n\tОтчет по пользователям\n\t\nМониторинг\n\tНастройка\n\tДашборд\n\tДашборд ППД\n\tГТМ на добывающем фонде\n\tГТМ на нагнетательном фонде\n\tАнализ BБД\n\tАнализ Кпрод\n\tСводка ОПЗ\n\t\nИнструменты сервиса\nИнструкция пользователя&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"12\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Меню / Клик на раздел &lt;/SPAN&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;\"Программы и бизнес-кейсы\"&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;По клику открывается таблица программ по выбранному ДО&lt;BR/&gt;&lt;BR/&gt;*по умолчанию первое в окне выбора ДО&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"22\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меню / клик на раздел \"Загрузка данных для расчёта\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;По клику открывается страница \"СПекТР - Создание проекта\" по выбранному ДО&lt;BR/&gt;https://spektr-u210001901.apps.test.paas.gazprom-neft.local/project-creation/create&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;*по умолчанию первое в окне выбора ДО&amp;nbsp;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меню / клик на раздел &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Добывающий                                                                                                         &lt;/SPAN&gt;Меню / клик на раздел Нагнетательный&lt;BR/&gt;&lt;BR/&gt;Повторно развернуть меню после выбора ДО&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;По клику открывается окно для выбора проекта.&lt;BR/&gt;Месяцы разворачиваются. Отображаются организации&lt;BR/&gt;&lt;BR/&gt;Организации выбираются, прогружается состояние расчета.&lt;BR/&gt;&lt;BR/&gt;Проект открывается по двойному клику на организацию или по кнопке \"Открыть\"&lt;BR/&gt;&lt;BR/&gt;После открытия проекта сверху написано \"Добывающий фонд\"&amp;nbsp;или \"Нагнетательный фонд\" в зависимости от выбора&lt;BR/&gt;&lt;BR/&gt;После повторного вызова меню отображается ранее выбранный проект по ДОБ и НАГ фонду&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меню / клик на раздел \"Дашборд потенциала\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;По клику открывается Дашборд с графиками, диаграммами (темная тема)&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Пункт меню в Дашборде отсутствует.&lt;BR/&gt;Отображаются графики только по ДО, у которых есть созданный проект за тек месяц&lt;/P&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меню / клик на раздел  \"Отчет о действиях пользователей\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;По клику открывается форма, где нужно выбрать ДО и период с какого по какое число нужна выгрузка отчета.&lt;BR/&gt;&lt;BR/&gt;По кнопке \"Выгрузить\" скачивается отчет о действиях пользователей.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меню / клик на раздел  \"Отчет по пользователям\"&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;I&gt; (Доступен только пользователям с ролью \"Специалист поддержки\"!)&lt;/I&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;По клику c&lt;SPAN style=\"background-color: var(--background-color,rgba(255, 255, 255, 1));color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;качивается файл формата xls.&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"15\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меню / клик на раздел  Мониторинга: \"Настройка\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;По клику открывается страница Настроек&lt;BR/&gt;&lt;BR/&gt;https://spektr-u210001901.apps.test.paas.gazprom-neft.local/monitoring/settings&lt;BR/&gt;&lt;BR/&gt;Вкладка Настройка выбрана автоматически&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"19\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меню / клик на раздел  Мониторинга: \"Дашборд\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;По клику открывается страница Дашборда (относится к мониторингу)&lt;BR/&gt;&lt;BR/&gt;https://spektr-u210001901.apps.test.paas.gazprom-neft.local/monitoring/dashboard&lt;BR/&gt;&lt;BR/&gt;Вкладка Дашборд &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;выбрана&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt; автоматчески&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"21\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меню / клик на раздел  Мониторинга: \"Дашборд ППД\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;По клику открывается страница Дашборда ППД (относится к мониторингу)&lt;BR/&gt;&lt;BR/&gt;https://spektr-u210001901.apps.test.paas.gazprom-neft.local/monitoring/dashboard-ppd&lt;BR/&gt;&lt;BR/&gt;Вкладка Дашборд ППД &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;выбрана &lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;автоматчески&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меню / клик на раздел  Мониторинга: \"ГТМ на добывающем фонде\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;По клику открывается страница Мониторинга.&lt;BR/&gt;&lt;BR/&gt;https://spektr-u210001901.apps.test.paas.gazprom-neft.local/monitoring/monitoring&lt;BR/&gt;&lt;BR/&gt;Вкладка Мониторинг &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;выбрана&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt; автоматически&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"18\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меню / клик на раздел  Мониторинга: \"ГТМ на нагнетательном фонде\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;По клику открывается страница Мониторинга.&lt;BR/&gt;&lt;BR/&gt;https://spektr-u210001901.apps.test.paas.gazprom-neft.local/monitoring/monitoring-ppd&lt;BR/&gt;&lt;BR/&gt;Вкладка Мониторинг ППД выбрана автоматически&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"16\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меню / клик на раздел  Мониторинга: \"Анализ ВБД\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;По клику открывается страница Анализ ВБД                                (относится к мониторингу)&lt;BR/&gt;&lt;BR/&gt;https://spektr-u210001901.apps.test.paas.gazprom-neft.local/monitoring/dashboard-vbd&lt;BR/&gt;&lt;BR/&gt;Вкладка Анализ ВБД выбрана автоматически&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"20\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меню / клик на раздел  Мониторинга: \"Анализ Кпрод\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;По клику открывается страница Анализ Кпрод  (относится к мониторингу)             &lt;BR/&gt;&lt;BR/&gt;https://spektr-u210001901.apps.test.paas.gazprom-neft.local/monitoring/dashboard-kprod&lt;BR/&gt;&lt;BR/&gt;Вкладка Анализ Кпрод выбрана автоматически&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"17\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меню / клик на раздел  Мониторинга: \"Сводка ОПЗ\"&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&lt;B&gt;*! Не БАГ! раздел не реализован полностью, заглушка на экране!&lt;/B&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;I&gt;(Только для UAT, для PRE-PROD пропустить шаг)&lt;/I&gt;\nПо клику открывается страница Сводка ОПЗ (https://spektr-u210001901.apps.test.paas.gazprom-neft.local/monitoring-opz?tab=dashboard), которая состоит из двух вкладок:&lt;BR/&gt;    Дашборд&lt;BR/&gt;    Сводка ОПЗ&lt;BR/&gt;&lt;BR/&gt;В шапке должны быть фильтры по:&lt;BR/&gt;    ДО&lt;BR/&gt;    Месторождению&lt;BR/&gt;&lt;BR/&gt;В шапке вместо \"ГТМ на добывающем фонде\" должно быть написано \"Сводка ОПЗ\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"23\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меню / клик на раздел  \"Инструменты сервиса\" &lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;По клику открывается страница \"СПекТР / Инструменты сервиса\"&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;https://spektr-u210001901.apps.test.paas.gazprom-neft.local/service-tools&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"11\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Меню / клик на раздел  \"Инструкция пользователя\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;По клику открывается страница  в Confluence &lt;BR/&gt;&lt;BR/&gt;https://kb.gazprom-neft.local/pages/viewpage.action?pageId=222085109&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"13\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;I&gt;(Только для UAT, для PRE-PROD пропустить шаг)&lt;/I&gt;&lt;BR/&gt;Выбрать в Главном меню  фонд/последний месяц/любое ДО                                       Нажать на с&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;сылку \"Переход на продуктовый сервер\" на верхней панели&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;                    &lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;По клику открывается страница https://spektr.apps.paas.gazprom-neft.local/home&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-04-11T08:28:33.823Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-08-25T06:02:23.977Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 28
+          }
+        ]
+      },
+      "pointAssignments": [
+        {
+          "id": 40290,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Лобанов Сергей Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+              }
+            },
+            "id": "cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "uniqueName": "GAZPROM-NEFT\\Lobanov.SI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/443107/TestPoint/40290"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/443107/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/443107"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 443107,
+        "name": "Панель меню"
+      },
+      "workItem": {
+        "id": 286571,
+        "name": "Панель меню. Страница home",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"9\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Перейти: https://spektr-u210001901.apps.test.paas.gazprom-neft.local/home&lt;BR/&gt;                                                                                                     &lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открывается Главное Меню     &lt;BR/&gt;В окне есть след элементы:&lt;BR/&gt;- кнопка \"Меню\" в левой верхней части                                     - УЗ (учетная запись)                                                             &lt;BR/&gt;- Блоки: &lt;BR/&gt;&amp;nbsp;            Добывающий фонд &lt;BR/&gt;             Нагнетательный фонд&lt;BR/&gt;             Мониторинг&lt;BR/&gt;В каждом блоке есть кнопка \"Перейти\"                                                                                                             &lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Нажать на кнопку \"Меню\" в левой верхней части&lt;BR/&gt;&lt;BR/&gt;Нажать крестик&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Откроется боковое меню&lt;BR/&gt;&lt;BR/&gt;Боковое меню закрывается&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Нажать на учетную запись в правой верхней части&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В дропдауне доступна кнопка \"Выход\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Нажать на кнопку \"Перейти\" в блоке \"Добывающий фонд\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открывается  окно выбора проекта&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Месяцы разворачиваются. Отображаются организации&lt;BR/&gt;&lt;BR/&gt;Организации выбираются, прогружается состояние расчета.&lt;BR/&gt;&lt;BR/&gt;Проект открывается по двойному клику на организацию или по кнопке \"Открыть\"&lt;BR/&gt;&lt;BR/&gt;После открытия проекта сверху написано \"Добывающий фонд\"&amp;nbsp;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;* после реализации ТТ 457924&lt;BR/&gt;В окне выбора проекта проскроллить в конец списка&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;Нажать на кнопку \"Загрузить предыдущие проекты\"\n\n* метод Доб фонд - api/spektr/Project/GetByDate\ndtFrom = '2020-01-01' и dtTo = &amp;lt;текущая дата - 1 год&amp;gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображается кнопка \"Загрузить предыдущие проекты\" в конце списка&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;В окне выбора проекта отображаются данные по всем доступным пользователю проектам начиная с 2020 года (проекты в Спектр начинаются с сентября 2020 года)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Нажать на кнопку \"Перейти\" в блоке \"&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Нагнетательный фонд\"&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открывается  окно выбора проекта&lt;BR/&gt;&lt;BR/&gt;Месяцы разворачиваются. Отображаются организации&lt;BR/&gt;&lt;BR/&gt;Организации выбираются, прогружается состояние расчета.&lt;BR/&gt;&lt;BR/&gt;Проект открывается по двойному клику на организацию или по кнопке \"Открыть\"&lt;BR/&gt;&lt;BR/&gt;После открытия проекта сверху написано \"Нагнетательный фонд\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;* после реализации ТТ 457924\nВ окне выбора проекта проскроллить в конец списка&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;Нажать на кнопку \"Загрузить предыдущие проекты\"\n\n* метод Доб фонд - api/spektr/Project/GetByDate\ndtFrom = '2020-01-01' и dtTo = &amp;lt;текущая дата - 1 год&amp;gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Отображается кнопка \"Загрузить предыдущие проекты\" в конце списка&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;В окне выбора проекта отображаются данные по всем доступным пользователю проектам начиная с 2020 года (проекты в Спектр начинаются с сентября 2020 года)&lt;/P&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Нажать на кнопку \"Перейти\" в блоке \"&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Мониторинг\"&lt;BR/&gt;&lt;BR/&gt;&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;В верхней панели навести курсор на кнопку \"Уведомления\" &lt;BR/&gt;&amp;nbsp;&lt;/P&gt;&lt;P&gt;&amp;nbsp;&lt;BR/&gt;Клик на кнопку \"Уведомления\"&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Откроется \"Мониторинг\" вкладка \"Дашборд\"&lt;BR/&gt;&lt;BR/&gt;Отображается подсказка \"Уведомления о достижении пороговых значений\"&lt;BR/&gt;&lt;BR/&gt;Отображается окно со списком всех уведомлений о достижении пороговых значений неуспешных/неоконченных/неэффективных ремонтов по выбранным ДО&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Багаутдинова Анна Валерьевна <GAZPROM-NEFT\\Bagautdinova.AV>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2024-10-03T05:34:01.407Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-10-22T08:48:45.737Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 30
+          }
+        ]
+      },
+      "order": 1,
+      "pointAssignments": [
+        {
+          "id": 39997,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Лобанов Сергей Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+              }
+            },
+            "id": "cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "uniqueName": "GAZPROM-NEFT\\Lobanov.SI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/443107/TestPoint/39997"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/443107/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/443107"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 443107,
+        "name": "Панель меню"
+      },
+      "workItem": {
+        "id": 466799,
+        "name": "Панель меню. Страница home. Переход в актуальный проект для пользователей с доступом к 1 ДО",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"7\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Авторизоваться под пользователей с доступом к 1 ДО (см. предусловия)&lt;BR/&gt;&lt;BR/&gt;Перейти: https://spektr-u210001901.apps.test.paas.gazprom-neft.local/home&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Нажать на кнопку \"Перейти\" в блоке \"Добывающий фонд\"&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Нажать на кнопку \"Перейти\" в блоке \"Нагнетательный фонд\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Открывается самый актуальный на данный момент проект (вкладка Дашборд)&lt;BR/&gt;&lt;BR/&gt;Открывается самый актуальный на данный момент проект (вкладка Дашборд)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Шаги ниже проверить на проекте ДОБ / НАГ фондов&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Нажать на поле \"Проект\" в хэдере страницы актуального проекта&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открывается окно выбора проекта&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Месяцы разворачиваются. Отображаются организации&lt;BR/&gt;&lt;BR/&gt;Организации выбираются, прогружается состояние расчета.&lt;BR/&gt;&lt;BR/&gt;Проект открывается по двойному клику на организацию или по кнопке \"Открыть\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;В окне выбора проекта проскроллить в конец списка&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображается кнопка \"Загрузить предыдущие проекты\" в конце списка&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Нажать на кнопку \"Загрузить предыдущие проекты\"&lt;BR/&gt;&lt;BR/&gt;* метод Доб фонд - api/spektr/Project/GetByDate&lt;BR/&gt;dtFrom = '2020-01-01' и dtTo = &amp;lt;текущая дата - 1 год&amp;gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В окне выбора проекта отображаются данные по всем доступным пользователю проектам начиная с 2020 года (проекты в Спектр начинаются с сентября 2020 года)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Закрыть окно выбора проекта&lt;BR/&gt;&lt;BR/&gt;Открыть окно выбора проекта&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;В окне выбора проекта отображаются только проекты за скользящий год&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-10-21T13:16:47.13Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Ревью"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-10-21T13:46:51.91Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 12
+          }
+        ]
+      },
+      "order": 2,
+      "pointAssignments": [
+        {
+          "id": 43590,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Лобанов Сергей Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+              }
+            },
+            "id": "cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "uniqueName": "GAZPROM-NEFT\\Lobanov.SI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/443107/TestPoint/43590"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/443107/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/443107"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 3
+}

@@ -54,11 +54,40 @@ class TestCaseStep:
         attachments = data.get("attachments")
         attachments_list = _to_list(attachments)
 
+        # Получаем значения полей
+        name_raw = str(data.get("name") or "").strip()
+        description_raw = str(data.get("description") or "").strip()
+        action_raw = str(data.get("action") or "").strip()
+        expected_result_raw = str(data.get("expectedResult") or data.get("expected") or "").strip()
+
+        # Определяем, что является действием (description)
+        # Приоритет: action > description > name (если description пусто)
+        if action_raw:
+            # Если есть поле action, оно идет в description
+            description = action_raw
+            # name остается как есть, если указан, иначе генерируем короткое название
+            name = name_raw if name_raw else (action_raw.splitlines()[0][:50] if action_raw else "")
+        elif description_raw:
+            # Если есть description, используем его
+            description = description_raw
+            # name остается как есть, если указан
+            name = name_raw
+        elif name_raw:
+            # Если description пусто, но есть name, то name содержит действие
+            # Переносим его в description
+            description = name_raw
+            # name оставляем пустым (будет сгенерировано автоматически при сохранении)
+            name = ""
+        else:
+            # Все пусто
+            name = ""
+            description = ""
+
         return cls(
             id=str(data.get("id") or uuid.uuid4()),
-            name=str(data.get("name") or "").strip(),
-            description=str(data.get("description") or "").strip(),
-            expected_result=str(data.get("expectedResult") or "").strip(),
+            name=name,
+            description=description,
+            expected_result=expected_result_raw,
             status=str(data.get("status") or "pending").strip(),
             bug_link=str(data.get("bugLink") or "").strip(),
             skip_reason=str(data.get("skipReason") or "").strip(),

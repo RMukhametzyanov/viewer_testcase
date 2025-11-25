@@ -1,0 +1,574 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442710,
+        "name": "Корректировка и перенос"
+      },
+      "workItem": {
+        "id": 124224,
+        "name": "[НАГ] Отправка корректировок и переносов в ЭРА",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"5\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Скорректировать и перенести по 1 скважине на каждый ГТМ:&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Перевод в ППД (одно- и многопластовая)&lt;BR/&gt;ВБД (основной и прочий фонд)&lt;BR/&gt;Увеличение Dшт&lt;BR/&gt;Уменьшение Dшт&lt;B&gt;&lt;BR/&gt;&lt;/B&gt;ГТМы Ручных Переносов&lt;BR/&gt;&lt;BR/&gt;По всем скважинам выбрать отправку в ЭРА Ремонты&lt;BR/&gt;Указать значение в поле \"База/ГТМ\" (произвольно)&lt;BR/&gt;&lt;BR/&gt;Скорректировать 1 скважину без отправки в ЭРА&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Результат корректировки/переноса сохранен&lt;BR/&gt;Есть запись в истории корректировок&lt;BR/&gt;Срок сохранения записи соответствует выбранному значению&lt;BR/&gt;&lt;BR/&gt;Статус отправки в ЭРА - &lt;B&gt;\"В резерве\"&lt;BR/&gt;&lt;/B&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Дождаться отправки скважины в ЭРА (мониторить в логах, отправка каждые 15 минут)&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Скважина попадает в ЭРА с первого раза&lt;/B&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;После отправки - Перейти в ЭРА UAT/ Кандидаты&lt;BR/&gt;Найти скорректированную скважину &lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Значения фактических и целевых параметров в ЭРА и СПекТР совпадают &lt;BR/&gt;&lt;BR/&gt;База/ГТМ совпадают с выбранными значениями при корректировке&lt;BR/&gt;&lt;BR/&gt;В СПекТРе статус отправки &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt; в ЭРА&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt; (колонка \"График/Резерв\") в -&lt;/SPAN&gt;&lt;B style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt; \"В графике\" &lt;/B&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;(иконка календаря)&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&lt;B&gt;&lt;BR/&gt;&lt;/B&gt;По неотправленной скважине статус - \"В резерве\"&lt;/P&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Выполнить повторную корректировку&lt;/B&gt; (изменить целевые значения) у части скважин, по которым выполнены корректировки&lt;BR/&gt;&lt;B&gt;&lt;BR/&gt;&lt;/B&gt;После отправки в ЭРА - вернуться в Кандидаты ЭРА&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Новых записей в ЭРА по скорректированным скважинам &lt;/B&gt;&lt;B&gt;не появилось&lt;/B&gt;&lt;B&gt;&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Старые записи обновлены новыми целевыми значениями&lt;/B&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-04-19T09:51:38.19Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Багаутдинова Анна Валерьевна <GAZPROM-NEFT\\Bagautdinova.AV>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-09-30T11:00:37.66Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 17
+          }
+        ]
+      },
+      "pointAssignments": [
+        {
+          "id": 40180,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442710/TestPoint/40180"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442710/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442710"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442710,
+        "name": "Корректировка и перенос"
+      },
+      "workItem": {
+        "id": 124199,
+        "name": "[НАГ] Сохранение корректировок",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"10\"><step id=\"5\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Перенос корректировки между проектами&lt;/B&gt;&lt;BR/&gt;&lt;BR/&gt;Удалить проект текущего месяца&lt;BR/&gt;Пересчитать проект проект предыдущего месяца&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;После пересчета - скорректировать и перенести по 1 скважине на каждый ГТМ:&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Перевод в ППД (одно- и многопластовая)&lt;BR/&gt;ВБД (основной и прочий фонд)&lt;BR/&gt;Уменьшение Dшт&lt;BR/&gt;Увеличение Dшт&lt;BR/&gt;ГТМы Ручных Переносов&lt;BR/&gt;&lt;BR/&gt;В сроке сохранения по части произвольно указывать 1 мес., 2 мес., 3 мес.&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Результат корректировки/переноса сохранен&lt;BR/&gt;Есть запись в истории корректировок&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Срок сохранения записи соответствует выбранному значению&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Создать проект текущего месяца&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Корректировка по скважинам, у которых срок сохранения = 1 месяц:&lt;BR/&gt;Целевые значения в гриде и экспертизе не равны скорректированным&lt;BR/&gt;&lt;BR/&gt;В истории экспертизы нет записи о сбросе корректировки (но есть запись о самой корректировки)&lt;BR/&gt;&lt;BR/&gt;&lt;B&gt;Корректировка &lt;/B&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"&gt;&lt;B&gt;по скважинам, у которых срок сохранения больше 1 месяца сохранилась&lt;BR/&gt;&lt;/B&gt;&lt;/SPAN&gt;Целевые значения в гриде и экспертизе равны скорректированным&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"&gt;&lt;BR/&gt;&amp;nbsp;&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Сброс корректировки по смене состояний&lt;/B&gt;&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Найти запись в InjectionFund запись по 1 из скорректированных скважин на &lt;B&gt;Уменьшение Dшт&lt;/B&gt;, и изменить WellStated Id с &lt;BR/&gt;&lt;BR/&gt; где статус \"В работе\" изменяется на \"Остановлена\":&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&amp;nbsp;Пересчитать ГТМ по пласту кандидата&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;После пересчета - по остановленным скважинам корректировка сброшена&lt;BR/&gt;&lt;BR/&gt;В истории корректировок запись:&lt;BR/&gt;«Корректировка сброшена из-за смены состояния по скважине»&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Изменить в InjFund запись по 1 из скорректированных скважин на ВБД, где статус \"В Б/Д\" изменяется на \"В пьезометре\"&lt;BR/&gt;&lt;BR/&gt;&lt;B&gt;[СДЕЛАТЬ ЗАПРОС]&lt;BR/&gt;&lt;/B&gt;&lt;BR/&gt;Пересчитать ВБД по пласту кандидата&lt;BR/&gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Корректировка не сброшена&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Сброс корректировки по смене окружения&lt;BR/&gt;&lt;BR/&gt;&lt;/B&gt;Вручную корректируем окружение &lt;I style=\"font-weight: bold\"&gt;&lt;BR/&gt;&lt;/I&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;После смены окружения:&lt;BR/&gt;&lt;BR/&gt;Корректировка не сброшена&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Изменить радиус поиска окружения по объекту  (задать радиус поиска меньше расстояния 1 из скважин) и пересчитать&lt;BR/&gt;&lt;I&gt;&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;&lt;/I&gt;&lt;/B&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Корректировка сброшена&lt;BR/&gt;&lt;BR/&gt;В истории корректировок запись:&lt;BR/&gt;«Корректировка сброшена из-за изменения реагирующего окружения»&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Изменить время в работе одной из скважин в окружении на 0 и пересчитать &lt;BR/&gt;&lt;I&gt;&amp;nbsp;&lt;/I&gt;&lt;I&gt;&lt;BR/&gt;&lt;/I&gt;&lt;/B&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Корректировка сброшена&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать скважину Средне-Итурского М/Р объекта __&lt;BR/&gt;&lt;BR/&gt;Удалить проекты ННГ (апрель, март, февраль)&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;В январском проекте:&lt;BR/&gt;Добавить в окружение &lt;B&gt;скважину __ Средне-Итурское, либо найти скважину, которая уходит в Б/Д на маленьком ДО&lt;/B&gt;&lt;BR/&gt;Выполнить корректировку целевого режима&amp;nbsp;(сохранить на период 6 месяцев)&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Создать проекты вплоть до марта&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Корректировка окружения сброшена (запись о сбросе есть)&lt;BR/&gt;&lt;BR/&gt;В истории корректировок запись:&lt;BR/&gt;«Корректировка сброшена из-за изменения реагирующего окружения»&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-04-19T09:03:21.65Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Багаутдинова Анна Валерьевна <GAZPROM-NEFT\\Bagautdinova.AV>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-09-30T11:00:45.203Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 49
+          }
+        ]
+      },
+      "order": 1,
+      "pointAssignments": [
+        {
+          "id": 40179,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442710/TestPoint/40179"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442710/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442710"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442710,
+        "name": "Корректировка и перенос"
+      },
+      "workItem": {
+        "id": 124043,
+        "name": "[НАГ] Корректировка кандидатов",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"10\"><step id=\"2\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Перейти в Кандидаты&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Нажать на кандидата на П&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"&gt;еревод в ППД&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Для всех скважин кнопка корректировки доступна&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Нажать на кнопку корректировки&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображается окно корректировки скважины согласно макету (&lt;B&gt;вложение&lt;/B&gt;)&lt;BR/&gt;&lt;BR/&gt;В окне - 3 блока:&lt;BR/&gt;1) Фактический режим:&lt;BR/&gt;Qж, м3/сут\nQн, т/сут\nPзаб, атм\nКпрод, м3/сут/атм\n&lt;BR/&gt;2) &amp;nbsp;Целевой режим:&lt;BR/&gt;Все параметры заполнены:&lt;BR/&gt;Qприём, м3/сут\nРзаб, атм\nРуст, атм\nКприём, м3/сут/атм\n&lt;BR/&gt;3) Дополнительно:&lt;BR/&gt;Привязка к бизнес кейсу \nДополнительное мероприятие (пустое)\nЦелевой пласт\nПериод сохранения (от 1 до 6 месяцев)\nОтправить в ЭРА: Ремонты (чекбокс)\nВид мероприятия БАЗА/ГТМ\nДобавить обоснование/причину корректировки\n&amp;nbsp;\n&lt;/P&gt;&lt;DIV&gt;&lt;BR/&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Заполнить целевые значения и поля блока  \"дополнительно\"&lt;BR/&gt;Зафиксировать окно корректировок&lt;BR/&gt;Нажать \"сохранить и согласовать\"&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Строка заблокирована&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;После пересчета:&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Строка активна&lt;BR/&gt;Кнопки согласования, отклонения и корректировки доступны&lt;BR/&gt;&lt;BR/&gt;Скважина согласована&lt;BR/&gt;В панели Экспертиза:&lt;BR/&gt;запись в статусе согласования и  информер &lt;B&gt;\"Автоматизированный подбор системой СПекТР\"&lt;BR/&gt;&lt;/B&gt;Изменились значения на графиках Добычи/Закачки по кандидату и окружению &lt;BR/&gt;Появилась запись в истории корректировок &lt;B&gt;(согласно макету)&lt;BR/&gt;&lt;/B&gt;В истории корректировки отображаются значения до и после корректировки&lt;BR/&gt;Статус отправки в ЭРА -  при отправке в ЭРА проверить успешность&lt;BR/&gt;&lt;BR/&gt;Значения целевых параметров в гриде, в панели экспертиза и &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"&gt;в истории корректировок &lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"&gt;совпадают со значениями окна корректировок&lt;BR/&gt;&lt;BR/&gt;Боковые панели отображают информацию, ошибок нет&amp;nbsp;&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Выполнить следующие шаги для каждого ГТМ НАГ скважин (ВБД, Увеличение Dшт, Уменьшение Dшт и ручные переносы + ВБД прочего фонда):&lt;BR/&gt;&lt;/B&gt;&lt;BR/&gt;&amp;nbsp;Нажать на \"Корректировка\" для ГТМ НАГ скважин&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображается окно корректировки скважины согласно макету (вложение)&lt;BR/&gt;&lt;BR/&gt;В 1 блоке (Факт. режим) - есть выбор корректируемых параметров:&lt;BR/&gt;Qприем (кроме ВБД)&lt;BR/&gt;&lt;BR/&gt;В блоке \"Дополнительно\" поле \"Целевой пласт\" недоступно &lt;B&gt;?&lt;/B&gt;&lt;BR/&gt;&lt;BR/&gt;Остальные поля - по аналогии с Переводом в ППД&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Заполнить значение Q прием, целевые значение &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"&gt;и поля блока  \"дополнительно\"&lt;BR/&gt;&lt;/SPAN&gt;Зафиксировать окно корректировок&lt;BR/&gt;&lt;/P&gt;Нажать \"сохранить и согласовать\"&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Заполнение строки и панелей - по аналогии с переводом в ППД&lt;BR/&gt;&lt;BR/&gt;В истории корректировок отображается запись согласно макету (вложение)&lt;BR/&gt;&lt;BR/&gt;Значения факт. Qприем и целевых параметров в гриде, в панели экспертиза и &lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, 0.9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;в истории корректировок &lt;/SPAN&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, 0.9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;совпадают со значениями окна корректировок&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-04-19T05:23:14.467Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Багаутдинова Анна Валерьевна <GAZPROM-NEFT\\Bagautdinova.AV>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-09-30T11:00:53.1Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 70
+          }
+        ]
+      },
+      "order": 2,
+      "pointAssignments": [
+        {
+          "id": 39958,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442710/TestPoint/39958"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442710/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442710"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442710,
+        "name": "Корректировка и перенос"
+      },
+      "workItem": {
+        "id": 124261,
+        "name": "[НАГ] Корректировка. Проверка расчётных значений",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"14\"><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Окно корректировок&lt;BR/&gt;&lt;/B&gt;&lt;BR/&gt;Изменить значения Qприем факт&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Pзаб факт меняется&lt;BR/&gt;Целевые параметры не меняются&lt;BR/&gt;Приросты меняются&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Изменить целевой параметр (проверить все)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Все остальные целевые параметры изменяются&lt;BR/&gt;&lt;BR/&gt;Значения факт не меняются&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Увеличить/уменьшить приемистость &lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Pзаб растет/падает&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать сценарий изменения Pуст и Kприем&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;Увеличить/уменьшить Кприем&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Рзаб падает/растет&lt;BR/&gt;&lt;BR/&gt;Qприем растет/падает&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"11\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать сценарий изменения Qприем и Kприем&lt;BR/&gt;&amp;nbsp;Увеличить/уменьшить Кприем&lt;B&gt;?&lt;/B&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Рзаб падает/растет&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"12\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Сценарий Руст и Кприем&lt;BR/&gt;&lt;BR/&gt;Увеличить/уменьшить Руст&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"&gt;Qприем растет/падает&lt;BR/&gt;&lt;BR/&gt;&lt;/SPAN&gt;Рзаб растет/падает&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"14\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Сценарий Pзаб Кприем &lt;BR/&gt;&lt;BR/&gt;Увеличить/уменьшить Pзаб&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Qприем растет/падает&lt;BR/&gt;Pуст растет&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"&gt;/падает&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Скорректировать скважину, увеличив/уменьшив Qприём&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;После корректировки:&lt;BR/&gt;Ктек план в гриде растёт/падает&lt;BR/&gt;Доп. добыча растёт/падает&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Провести корректировку многопластовой скважины&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;После корректировки -&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Для общей записи значения (в гриде и в панели экспертиза) = сумме по пластам:&lt;BR/&gt;Qприем &lt;BR/&gt;Доп. добыча&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать пласты с ненулевой Qприем&lt;BR/&gt;Находим среди них пласт с мин Нвдп&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Pзаб найденного пласта = Pзаб общей записи&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-04-19T10:41:51.63Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Багаутдинова Анна Валерьевна <GAZPROM-NEFT\\Bagautdinova.AV>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-09-30T11:01:00Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 39
+          }
+        ]
+      },
+      "order": 3,
+      "pointAssignments": [
+        {
+          "id": 39961,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442710/TestPoint/39961"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442710/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442710"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442710,
+        "name": "Корректировка и перенос"
+      },
+      "workItem": {
+        "id": 124129,
+        "name": "[НАГ] Перенос в кандидаты",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"20\"><step id=\"2\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Перейти в Не кандидаты&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Найти не кандидата на Перевод в ППД, ВБД, ОПТ с критерием:&lt;BR/&gt;Нет скважин окружения&lt;BR/&gt;&amp;nbsp;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Кнопка \"В кандидаты\" недоступна. При наведении - «Перенос недоступен. Добавьте скважины окружения»&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"18\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Найти многопластового не кандидата на Перевод в ППД  со сработавшим критерием \"нет скважин окружения\" у которого по одному из пластов есть доб скважины окружения&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Кнопка \"В кандидаты\" доступна. &lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"20\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Найти многопластового не кандидата на Перевод в ППД  со сработавшим критерием \"нет скважин окружения\" у которого ни по одному из пластов нет доб скважины окружения&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Кнопка \"В кандидаты\" не доступна. &lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Найти не кандидата на Увеличение Dшт, Уменьшение Dшт с критерием:&lt;BR/&gt;Скважина в бездействии &lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Кнопка \"В кандидаты\" недоступна. При наведении - &amp;nbsp;«Перенос недоступен. Скважина в бездействии»&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"19\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Найти не кандидата на Уменьшение Dшт с критерием:&lt;BR/&gt;Плановая приёмистость выше остановочной&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Кнопка \"В кандидаты\" &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;доступна&lt;/SPAN&gt;&lt;/P&gt;&lt;DIV&gt;&lt;BR/&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Найти не кандидата на ВБД с критерием:&lt;BR/&gt;Скважина в действующем фонде&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Кнопка \"В кандидаты\" недоступна. При наведении - &amp;nbsp;«Перенос недоступен. Скважина в работе »&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Найти скважину на &lt;B&gt;Перевод в ППД&lt;/B&gt; (проверить однопластовую и многопластовую скважину)&lt;BR/&gt;&lt;BR/&gt;без сработавшего критерия \"Нет скважин окружения\"&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Кнопка \"В кандидаты\" доступна&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Нажать \"В кандидаты\"&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображается окно переноса скважины согласно макету (вложение)&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Ввести все параметры&lt;BR/&gt;Зафиксировать окно переноса&lt;BR/&gt;перенести скважину в Кандидаты&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Строка заблокирована&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;После пересчета - Строка удалена &lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Перейти в Кандидаты и найти перенесенного Кандидата &lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Строка активна &lt;BR/&gt;Кнопки согласования, отклонения и корректировки доступны&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Скважина согласована &lt;BR/&gt;В панели Экспертиза:&lt;BR/&gt;запись согласования и  информер &lt;B&gt;\"Ручной перенос из Не кандидатов&lt;/B&gt;&lt;I&gt;\"&lt;BR/&gt;&lt;BR/&gt;&lt;/I&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"&gt;Изменились значения на графиках Добычи/Закачки по кандидату и окружению &lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;Появилась запись в истории корректировок &lt;B&gt;(согласно макету)&lt;BR/&gt;&lt;/B&gt;Статус отправки в ЭРА - при отправке в ЭРА проверить успешность- не актуально?&lt;BR/&gt;&lt;B&gt;&lt;BR/&gt;&lt;/B&gt;Значения целевых параметров в гриде, в панели экспертиза и &lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, 0.9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;в истории корректировок &lt;/SPAN&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, 0.9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;совпадают со значениями окна переноса&lt;BR/&gt;&lt;BR/&gt;&lt;/SPAN&gt;Боковые панели отображают информацию, ошибок нет&amp;nbsp;&lt;B&gt;&lt;BR/&gt;&amp;nbsp;&lt;/B&gt;</parameterizedString><description/></step><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Найти скважину на &lt;B&gt;Увеличение Dшт &lt;/B&gt;без сработавших критериев:&lt;BR/&gt;&lt;BR/&gt;Нет скважин окружения&lt;BR/&gt;Скважина в бездействии &lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Кнопка \"В кандидаты\" доступна&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"11\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Нажать \"В кандидаты\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображается окно переноса скважины согласно макету (вложение)&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"13\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Ввести все параметры&lt;BR/&gt;Зафиксировать окно переноса&lt;BR/&gt;Перенести скважину в Кандидаты&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Строка заблокирована&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;После пересчета - Строка удалена &lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"12\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Перейти в Кандидаты и найти перенесенного Кандидата &lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;По аналогии с Переводом в ППД&amp;nbsp;&lt;BR/&gt;&lt;BR/&gt;В истории корректировок отображается запись согласно макету (вложение)&lt;BR/&gt;&lt;BR/&gt;Значения факт. Qприем и целевых параметров в гриде, в панели экспертиза и &lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, 0.9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;в истории корректировок &lt;/SPAN&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, 0.9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;совпадают со значениями окна корректировок&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"14\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Найти скважину на &lt;B&gt;ВБД &lt;/B&gt;(проверить нагнетательный и пьезометрический фонд)&lt;BR/&gt;без сработавших критериев:&lt;BR/&gt;&lt;BR/&gt;Нет скважин окружения&lt;BR/&gt;Скважина в действующем фонде&lt;BR/&gt;&lt;BR/&gt;Нажать \"В кандидаты\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображается окно переноса скважины согласно макету (по аналогии с ОПТ)&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"16\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Ввести параметры и перенести скважину&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Строка заблокирована&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;После пересчета - Строка удалена из не кандидатов&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"17\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Перейти в Кандидаты и найти перенесенного Кандидата &lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Заполнение строки и панелей - по аналогии с ОПТ&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-04-19T07:34:32.343Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Багаутдинова Анна Валерьевна <GAZPROM-NEFT\\Bagautdinova.AV>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-09-30T11:01:08.607Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 38
+          }
+        ]
+      },
+      "order": 4,
+      "pointAssignments": [
+        {
+          "id": 39959,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442710/TestPoint/39959"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442710/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442710"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442710,
+        "name": "Корректировка и перенос"
+      },
+      "workItem": {
+        "id": 124181,
+        "name": "[НАГ] Функционал окна корректировки",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"13\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открыть окно корректировки &lt;B&gt;однопластовой&lt;/B&gt; скважины на Перевод в ППД&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Фактические параметры доступны для редактирования&lt;BR/&gt;&lt;BR/&gt;Поле \"Целевой пласт\" заблокировано&lt;/P&gt;</parameterizedString><description/></step><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать каждый вариант вводимых целевых параметров:&lt;BR/&gt;Ввести целевые Qприём и Кприём\nВвести целевые Pзаб и Кприём\nВвести целевые Pуст и Кприём&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Указанные в выбранном варианте &lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, 0.9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;поля становятся активными для ввода&lt;BR/&gt;&lt;BR/&gt;Остальные поля целевого режима неактивны&lt;BR/&gt;&lt;BR/&gt;При изменении активных полей выполняется пересчет неактивных параметров&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Ввести 0 для первого параметра (для каждого сценария)&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Все целевые параметры = 0&lt;BR/&gt;&amp;nbsp;(кроме Кприём - он не меняется)&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Ввести отрицательное значение&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Невозможно ввести отрицательное значение?&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Ввести символьные значения&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Невозможно ввести символьное значение&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"11\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Открыть окно корректировки скважины &lt;B&gt; Увеличение Dшт и Ручные переносы &lt;/B&gt;&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В окне отображается сценарий \"&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, 0.9));text-align: justify;text-indent: -18pt;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Ввести фактическую &lt;/SPAN&gt;&lt;SPAN lang=\"EN-US\" style=\"color: var(--text-primary-color,rgba(0, 0, 0, 0.9));text-align: justify;text-indent: -18pt;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Q&lt;/SPAN&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, 0.9));text-align: justify;text-indent: -18pt;background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;приём&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"&gt;\"&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"12\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать сценарий и заполнить Qприем факт&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выполняется пересчет фактических параметров и приростов&lt;/P&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открыть окно корректировки &lt;B&gt;многопластовой &lt;/B&gt;скважины на Перевод  в ППД&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Поле \"Целевой пласт\" доступно&lt;BR/&gt;В доступен выбор всех пластов, кроме общей записи&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Изменить значения на пласте и переключиться на другой пласт&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Целевые и фактические значения изменились, все значения в блоке \"Дополнительно\" (кроме целевого пласта) не изменились&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Вернуться обратно на измененный пласт&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Введенные и пересчитанные &lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, 0.9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;значения для начального пласта сохранились&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Изменить значения по нескольким пластам и зафиксировать изменения&lt;BR/&gt;Сохранить и пересчитать &lt;BR/&gt;&lt;BR/&gt;После пересчета - проверить целевые значения по пластам (панель \"Экспертиза\")&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Целевые значения в панели Экспертиза по каждому пласту совпадают с окном корректировок&lt;BR/&gt;&lt;BR/&gt;&lt;B&gt;Отдельные записи в истории корректировки по каждому пласту (если выбрана общая запись)&lt;BR/&gt;&lt;BR/&gt;Если пласт не скорректирован - значения до совпадают со значением после&lt;/B&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"13\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-04-19T08:33:54.01Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Багаутдинова Анна Валерьевна <GAZPROM-NEFT\\Bagautdinova.AV>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-09-30T11:01:16.823Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 35
+          }
+        ]
+      },
+      "order": 5,
+      "pointAssignments": [
+        {
+          "id": 39960,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442710/TestPoint/39960"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442710/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442710"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 6
+}

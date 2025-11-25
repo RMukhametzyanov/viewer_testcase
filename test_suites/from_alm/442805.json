@@ -1,0 +1,1239 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442805,
+        "name": "Нагнетательный фонд"
+      },
+      "workItem": {
+        "id": 141486,
+        "name": "НАГ Уменьшение Dшт",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"18\"><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открыть Выбор проекта / последний месяц &lt;BR/&gt;Нажать на ДО&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В списке ГТМ после ВБД отображаются: Увеличение Dшт&lt;BR/&gt;Уменьшение &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Dшт&lt;BR/&gt;&lt;BR/&gt;\"Итого\" по данным ГТМ совпадает&lt;BR/&gt;&lt;BR/&gt;Итого = ТРы НАГ фонда&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Перейти в проект НАГ фонда (последний месяц)&lt;BR/&gt;Открыть раздел \"Настройки\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;1) ГТМ &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;\"Увеличение Dшт\" и &lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;\"Уменьшение Dшт\" &lt;/SPAN&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;отображаются &lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;после ВБД&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;:&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;- в бабликах выбора ГТМ для пересчёта&lt;BR/&gt;- в списке настроек расчёта&lt;BR/&gt;- в окне статуса расчёта&lt;BR/&gt;&lt;BR/&gt;2) ГТМ \"ОПТ\" не отображается&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Изменить значения, отключить/включить параметры&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Значения и активность параметров изменяется&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"16\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Включить опцию расчёта «Ограничение под целевую текущую компенсацию»&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Запустить расчёт по ДО&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;1) Изменения настроек сохранены&lt;BR/&gt;2) Статус расчёта - \"В процессе\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;После пересчёта - перейти в Кандидаты&lt;BR/&gt;В сайдбаре \"Столбцы\" выбрать \"Целевой диаметр штуцера\" / Кандидат, Целевой режим&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;1) Поле отображается в гриде&lt;BR/&gt;2) Поле заполнено для ГТМ:&lt;BR/&gt;Увеличение Dшт&lt;BR/&gt;Уменьшение &lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Dшт&lt;BR/&gt;3) В поле отображаются только целые значения&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"13\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Сравнить Dшт (Фактический режим) с Целевым Dшт&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;1) Значения целевого и фактического Dшт &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;отличаются &lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;для кандидатов&lt;/SPAN&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt; на увеличение/уменьшение Dшт&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;2) Для Увеличения Dшт целевое больше фактического&lt;BR/&gt;3) Для Уменьшения Dшт целевое меньше фактического&lt;BR/&gt;&lt;BR/&gt;* При условии, если включен критерий доп. добычи (&amp;gt;0)&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"18\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отфильтровать по кандидатам на уменьшение Dшт&lt;BR/&gt;Сравнить целевые &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;параметры с фактическими в гриде:&lt;BR/&gt;&amp;nbsp;&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;Qприем &lt;BR/&gt;Руст &lt;BR/&gt;Рзаб&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Целевые меньше фактических&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"17\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открыть все панели кандидата на Уменьшение Dшт&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Панели открываются, ошибок нет&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"11\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Открыть панель \"Статус экспертизы\" (у кандидатов на Увеличение и Уменьшение Dшт)&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;1) В таблице \"Кандидат\" боковой панели отображается строка Dшт&lt;BR/&gt;2) Значения до и после ГТМ заполнены&lt;BR/&gt;3) Значение \"до ГТМ\" совпадает с фактическим Dшт&lt;BR/&gt;4) Значение \"после ГТМ\" совпадает с целевым Dшт&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;5) Для других ГТМ строка не отображается&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"14\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Проверить заполнение данных в гриде для Увеличения и Уменьшения Dшт&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;&lt;U&gt;Кандидат, Фактический режим&lt;BR/&gt;&lt;/U&gt;&lt;I&gt;Qж, Pуст &lt;/I&gt;заполнено&lt;BR/&gt;&lt;I&gt;Обв, Qн &lt;/I&gt;- не заполнены&lt;BR/&gt;&lt;BR/&gt;&lt;U&gt;Окружение, Фактический режим&lt;BR/&gt;&lt;/U&gt;&lt;I&gt;Qж, Обв, Qн&lt;/I&gt; - заполнены&lt;U&gt;&lt;BR/&gt;&lt;/U&gt;&lt;I&gt;ΔQж, ΔQн(&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"&gt;ΔQж), &lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"&gt;ΔQн (&lt;/SPAN&gt;&lt;/I&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, 0.9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;&lt;I&gt;Δобв) &lt;/I&gt;- заполнены на 90% строк&lt;BR/&gt;&lt;/SPAN&gt;&lt;I&gt;Ктек, К нак &lt;/I&gt;- заполнены, есть ненулевые значения (если К нак= 0, то &lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, 0.9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;К тек = 0)&lt;/SPAN&gt;&lt;BR/&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, 0.9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;&lt;BR/&gt;&lt;U&gt;Кандидат, Целевой режим&lt;/U&gt;&lt;BR/&gt;&lt;I&gt;Qприем(расч), &lt;/I&gt;&lt;/SPAN&gt;&lt;I&gt;Рзаб&lt;/I&gt; - заполнены &lt;BR/&gt;&lt;I&gt;Qприём(цел) &lt;/I&gt;- заполнена (т.к. опция включена)&lt;BR/&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, 0.9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;&lt;BR/&gt;База, ГТМ  - все поля заполнены&lt;BR/&gt;Дополнительная добыча/закачка - все поля заполнены (Кроме потери от перевода)&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&lt;U&gt;Экономическая эффективность&lt;BR/&gt;&lt;/U&gt;&lt;I&gt;Прирост NPV, PI &lt;/I&gt;- заполнены&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-07-12T05:41:59.617Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Ревью"
+          },
+          {
+            "System.AssignedTo": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2023-07-12T12:56:26.623Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 29
+          }
+        ]
+      },
+      "pointAssignments": [
+        {
+          "id": 40249,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestPoint/40249"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442805,
+        "name": "Нагнетательный фонд"
+      },
+      "workItem": {
+        "id": 141676,
+        "name": "НАГ Уменьшение Dшт Опции расчёта",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"9\"><step id=\"2\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Перейти в проект НАГ фонда / Последний месяц / Настройки / Опции расчёта&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Сравнить опции расчёта поиска окружения и расчёта доп. добычи Уменьшения Dшт с Переводом в ППД&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Опции расчёта cовпадают&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Раскрыть опции расчёта &lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Уменьшения Dшт / Расчёт целевой приёмистости&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Параметры соответствуют списку:&lt;BR/&gt;&lt;BR/&gt;Минимальная приёмистость (ЗНАЧ)\nМинимальное устьевое давление (ЗНАЧ)\nКоэффициент истечения (ЗНАЧ)\nОграничение под целевую текущую компенсацию (ВКЛ / ВЫКЛ) \nЦелевая текущая компенсация (ЗНАЧ)\n(ВЗАИМ) Через корректирующие коэффициенты\n(ВЗАИМ) Через целевую компенсацию&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;&amp;nbsp;&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выставить значения параметров:&lt;BR/&gt;Минимальная приёмистость (ЗНАЧ)\n&lt;/P&gt;&lt;/DIV&gt;&lt;DIV&gt;Минимальное устьевое давление (ЗНАЧ)&lt;BR/&gt;&lt;BR/&gt;Пересчитать проект&lt;BR/&gt;После пересчёта - перейти в Кандидаты &lt;BR/&gt;Отфильтровать по Уменьшению Dшт&lt;BR/&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;У всех кандидатов целевые Qприём расч и Руст больше выставленных значений&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В ГЗ отключить параметры:&lt;BR/&gt;Минимальная текущая компенсация&lt;BR/&gt;Минимальная накопленная компенсация&lt;BR/&gt;&lt;BR/&gt;В Опциях расчёта - выбрать опцию \"&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Через корректирующие коэффициенты&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;\"&lt;BR/&gt;&lt;BR/&gt;&lt;/SPAN&gt;Пересчитать проект&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;&lt;BR/&gt;&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;После пересчёта - &lt;BR/&gt;&lt;BR/&gt;&lt;I&gt;&lt;B&gt;У кандидатов, у которых текущая компенсация меньше единицы, Q приём расч = &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Q приём факт (не было примеров) - Хантос&lt;/SPAN&gt;&lt;/B&gt;&lt;/I&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В Опциях расчёта - выбрать опцию \"Через целевую компенсацию&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;&amp;nbsp;&lt;/SPAN&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;\"&lt;BR/&gt;Включить опцию \"&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Ограничение под целевую текущую компенсацию&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;\"&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&lt;BR/&gt;Пересчитать проект&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;После пересчёта - &lt;BR/&gt;&lt;BR/&gt;1) Qцел &amp;lt;= Q расч&lt;BR/&gt;2) У кандидатов, где &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Qцел = Q расч&lt;BR/&gt;К &lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;план тек комп (грид) = &lt;/SPAN&gt;Целевая текущая компенсация (опции расчёта)&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;&lt;BR/&gt;3) &lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;У кандидатов, где &lt;/SPAN&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Qцел &amp;lt; Q расч&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt; &lt;BR/&gt;&lt;/SPAN&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;К &lt;/SPAN&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;план тек комп (грид) &lt;B&gt;&amp;gt;&lt;/B&gt; &lt;/SPAN&gt;Целевая текущая компенсация (опции расчёта)&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;&lt;BR/&gt;&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выставить идентичные ГЗ по Уменьшению и Увеличению Dшт&lt;BR/&gt;(Настройки, которые только у 1 ГТМ - отключить)&lt;BR/&gt;&lt;BR/&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Пересчитать проект&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Одна скважина+пласт не является кандидатом на &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Уменьшение Dшт и &lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Увеличение Dшт одновременно&lt;/SPAN&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-07-12T12:10:33.463Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Ревью"
+          },
+          {
+            "System.AssignedTo": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2023-07-12T12:40:19.773Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 24
+          }
+        ]
+      },
+      "order": 1,
+      "pointAssignments": [
+        {
+          "id": 40251,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestPoint/40251"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442805,
+        "name": "Нагнетательный фонд"
+      },
+      "workItem": {
+        "id": 141660,
+        "name": "НАГ Уменьшение Dшт Критерии отклонения",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"12\"><step id=\"4\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Перейти в проект НАГ фонда / Последний месяц / Настройки / Граничные значения&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Раскрыть граничные значения Уменьшения Dшт&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Список граничных значений соответствует опциональным критериям отбора в ТЗ (вложение шага)&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отключить все ГЗ &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Уменьшения Dшт (кроме \"Предлагать остановленные скважины\")&lt;BR/&gt;&lt;BR/&gt;&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Нажать \"Сохранить и пересчитать\"&lt;BR/&gt;&lt;BR/&gt;После пересчёта - перейти в Кандидаты&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;У всех кандидатов на Уменьшение Dшт:&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&lt;/SPAN&gt;- поле \"Окружение\" &amp;gt; 0&lt;BR/&gt;-&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt; Qприем (цел) &amp;lt; &lt;/SPAN&gt;Qприем (факт)&lt;BR/&gt;- Состояние на конец месяца не равно &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;«В бездействии текущего года», «В бездействии прошлых лет», «Пьезометрическая» (панель \"Информация о скважине\")&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Перейти в Не кандидаты&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;1) У не кандидатов на Уменьшение Dшт сработали &lt;B&gt;только &lt;/B&gt;критерии:&lt;BR/&gt;&amp;nbsp;- Нет скважин в окружении&lt;BR/&gt;- Плановая приёмистость выше остановочной&lt;BR/&gt;- Скважина в бездействии&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;2) У не кандидатов с критерием &lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;\"&lt;/SPAN&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Скважина в бездействии&lt;/SPAN&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;\"&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;:&lt;BR/&gt;&amp;nbsp;&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;- Состояние на конец месяца (панель \"Информация о скважине\")= «В бездействии текущего года», «В бездействии прошлых лет», «Пьезометрическая»&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;- Кнопка \"В кандидаты\" заблокирована, есть всплывающая подсказка&lt;BR/&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;&lt;FONT color=\"rgba(0, 0, 0, 0)\"&gt;&lt;BR/&gt;&lt;/FONT&gt;&lt;/SPAN&gt;3) &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;У не кандидатов с критерием &lt;/SPAN&gt;\"Нет скважин в окружении\":&lt;BR/&gt;&amp;nbsp;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;- В таблице \"&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Добывающие скважины&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;\" (панель Скважины окружения) нет скважин&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;- Кнопка \"В кандидаты\" заблокирована&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;&lt;BR/&gt;&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;&lt;BR/&gt;&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;4) &lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;У не кандидатов с критерием \"&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Плановая приёмистость выше остановочной&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;\":&lt;BR/&gt;&amp;nbsp;- Расчётное значение критерия больше граничного (Критерии отбора / панель \"Статус экспертиза\"&lt;/SPAN&gt;)&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;&lt;BR/&gt;- К&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;нопка \"В кандидаты\" доступна&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"&gt;Включить критерии и выставить граничные значения:&lt;BR/&gt;&lt;BR/&gt;1) &lt;/SPAN&gt;Минимальный диаметр штуцера&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, 0.9))\"&gt;&lt;BR/&gt;2) &lt;/SPAN&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, 0.9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Минимальная текущая компенсация&lt;FONT color=\"rgba(0, 0, 0, 0)\"&gt;&amp;nbsp;&lt;BR/&gt;&lt;/FONT&gt;&lt;/SPAN&gt;3) Минимальная накопленная компенсация&lt;BR/&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, 0.9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;4) &lt;/SPAN&gt;Минимальная дополнительная добыча нефти&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, 0.9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;&lt;BR/&gt;5) &lt;/SPAN&gt;Минимальная остановочная приёмистость&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, 0.9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;&lt;FONT color=\"rgba(0, 0, 0, 0)\"&gt;&lt;BR/&gt;&lt;/FONT&gt;&lt;/SPAN&gt;6) Минимальное остановочное устьевое давление&lt;BR/&gt;&lt;BR/&gt;7) Минимальный срок после последнего ГТМ&lt;BR/&gt;&lt;BR/&gt;8) Отключить критерий \"Предлагать остановленные скважины\" &lt;BR/&gt;\n&lt;/P&gt;&lt;/DIV&gt;&lt;DIV&gt;Пересчитать проект&lt;BR/&gt;После пересчёта - перейти в Кандидаты&lt;BR/&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;У всех кандидатов на Уменьшение Dшт данные параметры &lt;B&gt;больше &lt;/B&gt;граничных значений:&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;1) Ктек (Окружение, Фактический режим)\n&lt;BR/&gt;2) Кнак (Окружение, Фактический режим) &lt;BR/&gt;&amp;nbsp;&amp;nbsp;&lt;BR/&gt;3) Dшт (Кандидат, Фактический режим)&lt;BR/&gt;&lt;BR/&gt;4) &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Доп. добыча нефти&lt;BR/&gt;&lt;BR/&gt;5) &lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Qприем &lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;(Кандидат, Фактический режим)&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;BR/&gt;6) Pуст (Кандидат, Фактический режим)&lt;BR/&gt;&lt;BR/&gt;Состояние на конец месяца не равно \"&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Остановлена\" (панель \"Информация о скважине\")&lt;/SPAN&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Перейти в Не кандидаты&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;У не кандидатов со данными сработавшими критериями расчётное значение &lt;B&gt;меньше &lt;/B&gt;граничного (в Критериях отнесения в Не кандидаты / панель \"Статус экспертизы\"):&lt;BR/&gt;&lt;BR/&gt;1) &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Установлен минимальный диаметр штуцера&lt;/SPAN&gt;&lt;BR/&gt;&lt;BR/&gt;2) Минимальная текущая компенсация&lt;BR/&gt;&lt;BR/&gt;3) Минимальная накопленная компенсация&lt;BR/&gt;&lt;BR/&gt;4) &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Низкая дополнительная добыча&lt;BR/&gt;&lt;BR/&gt;5) &lt;/SPAN&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Достигнуто минимальное устьевое давление&lt;BR/&gt;&lt;BR/&gt;6) &lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Достигнута минимальная приёмистость&lt;BR/&gt;&lt;BR/&gt;&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;7) Повторный ГТМ&lt;BR/&gt;&lt;BR/&gt;У не кандидатов со сработавшим критерием \"&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Скважина остановлена&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;\" &lt;BR/&gt;Состояние на конец месяца = \"Остановлена\" (Информация о скважине)&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Включить критерии:&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Минимальный угол наклона линии тренда по динамике среднего дебита жидкости окружения&lt;BR/&gt;Минимальный угол наклона линии тренда по динамике среднего дебита нефти окружения&lt;BR/&gt;Минимальный угол наклона линии тренда по динамике средней обводненности окружения&lt;BR/&gt;&lt;BR/&gt;Пересчитать проект&lt;BR/&gt;После пересчёта - перейти в Кандидаты&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;На графике \"Динамика добычи и закачки\" / Окружение у кандидатов не растёт динамика по: &lt;BR/&gt;&lt;BR/&gt;- дебиту жидкости&lt;BR/&gt;- дебиту нефти&lt;BR/&gt;- обводнённости&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"11\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Перейти в Не кандидаты&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;У не кандидатов со сработавшими критериями:&lt;BR/&gt;&lt;BR/&gt;Падающая динамика среднего дебита жидкости окружения&lt;BR/&gt;Падающая динамика среднего нефти окружения&lt;BR/&gt;Падающая динамика обводненности по окружению&lt;BR/&gt;&lt;BR/&gt;1) Расчётное значение меньше граничного в критериях отбора&lt;BR/&gt;2) На графике &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;\"Динамика добычи и закачки\" / Окружение&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt; растёт динамика по критерию&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"12\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Проверка повторного ГТМ&lt;BR/&gt;&amp;nbsp;GraphQL-скрипт\n\nquery MyQuery {\n  bdpi_well_event_h(where: {facility_id: {_eq: \"2560670500\"}}, order_by: {start_date: desc}) {\n    end_date\n    start_date\n    lnk_well_event {\n      full_name\n      ois_id\n    }\n  }\n}&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Для не кандидата со сработавшим критерием \"Повторный ГТМ\" - \nу последнего ГТМ из списка (end_date+кол-во мес. из ГЗ)&lt;B&gt; &amp;gt; &lt;/B&gt;дата создания проекта&lt;BR/&gt;&lt;BR/&gt;Для кандидата - у последнего ГТМ из списка (end_date+кол-во мес. из ГЗ) &lt;B&gt;&amp;lt;&lt;/B&gt; дата создания проекта&lt;BR/&gt;&lt;BR/&gt;Список ГТМ:&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Перевод в ППД - VR000132  &lt;BR/&gt;Ревизия ППД - VR000168&lt;BR/&gt;ОПЗ - VR000038&lt;BR/&gt;ВПП - VR000023&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-07-12T11:15:18.09Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Ревью"
+          },
+          {
+            "System.AssignedTo": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2023-07-17T06:44:09.807Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 60
+          }
+        ]
+      },
+      "order": 2,
+      "pointAssignments": [
+        {
+          "id": 40250,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestPoint/40250"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442805,
+        "name": "Нагнетательный фонд"
+      },
+      "workItem": {
+        "id": 142714,
+        "name": "НАГ Уменьшение Dшт Корректировка",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"12\"><step id=\"2\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Перейти в проект НАГ фонда / последний месяц / Кандидаты&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Найти кандидата на Уменьшение Dшт&lt;BR/&gt;&lt;BR/&gt;Нажать \"Корректировка\"&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В окне корректировок отображаются:&lt;BR/&gt;&lt;BR/&gt;параметр \"Целевой Dшт, мм\"&lt;BR/&gt;сценарий \"Ввести целевые Dшт, Руст и Кприём\"&lt;BR/&gt;В блоке «Фактические параметры» отображается параметр \"Рпл, атм\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Скорректировать показатели на каждом из сценариев&lt;BR/&gt;&lt;BR/&gt;•\t«Ввести целевые Qприём и Кприём»;\n•\t«Ввести целевые Рзаб и Кприём»;\n•\t&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;\"Ввести целевые Руст и Кприём\"&lt;/SPAN&gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Целевой Dшт &lt;/SPAN&gt;заблокирован для ввода на сценариях корректировки&lt;BR/&gt;&lt;BR/&gt;Целевой Dшт меняет значение при изменении вводимых параметров&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать сценарий \"Ввести целевой Dшт, Руст и Кприём\"&lt;BR/&gt;&amp;nbsp;Скорректировать показатели&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Пересчёт выполняется, заблокированные для ввода значения изменяются\nВ поле Dшт можно ввести только положительные целые значения&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;На всех сценариях корректировки &lt;B&gt;целевых &lt;/B&gt;параметров &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;ввести целевую Qприём//Pзаб//Pуст (в зависимости от сценария) больше фактической-1&lt;BR/&gt;&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Введённое значение автоматически заменяется на фактическое-1&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Выбрать сценарий \"Ввести фактическую Qприём\" (Уменьшение Dшт)&lt;BR/&gt;Ввести фактическую Qприём меньше целевой+1&lt;BR/&gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Введённое значение автоматически заменяется на целевое+1&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Открыть корректировку &lt;B&gt;Увеличения Dшт&lt;/B&gt; &lt;BR/&gt;На всех сценариях &lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;ввести целевую Qприём//Pзаб//Pуст (в зависимости от сценария) меньше фактической+1&lt;BR/&gt;&lt;/SPAN&gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Введённое значение автоматически заменяется на фактическое+1&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать сценарий \"Ввести фактическую Qприём\" (Увеличение Dшт)&lt;BR/&gt;Ввести фактическую Qприём больше целевой-1&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Введённое значение автоматически заменяется на целевое-1&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"11\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выполнить корректировку Уменьшения Dшт и Увеличения Dшт (на всех сценариях)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;В истории корректировок отображаются параметры:&lt;BR/&gt;&lt;BR/&gt;Фактическое Рпл (после фактической приёмистости)\nЦелевой Dшт (после целевого коэффициента приёмистости)&lt;BR/&gt;&lt;BR/&gt;Параметры в панели экспертизы, истории корректировок и гриде равны значениям из окна корректировки&lt;BR/&gt;Все боковые панели отображаются, данные заполнены\n &lt;/P&gt;</parameterizedString><description/></step><step id=\"12\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Перейти в Не кандидаты&lt;BR/&gt;Перенести скважины на &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Уменьшение Dшт и Увеличение Dшт в кандидаты&lt;/SPAN&gt;&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Скважины в кандидатах, согласованы&lt;BR/&gt;Все панели отображаются&lt;BR/&gt;В панели \"Статус экспертизы\" - информер о ручном переносе&lt;BR/&gt;Параметры в панели экспертизы, истории корректировок и гриде равны значениям из окна корректировки&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-07-18T05:39:09.463Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Ревью"
+          },
+          {
+            "System.AssignedTo": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2023-07-18T08:28:37.733Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 35
+          }
+        ]
+      },
+      "order": 3,
+      "pointAssignments": [
+        {
+          "id": 40252,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestPoint/40252"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442805,
+        "name": "Нагнетательный фонд"
+      },
+      "workItem": {
+        "id": 149041,
+        "name": "НАГ ОПЗ ПУР и расчёт приёмистости",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"14\"><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Отображение ПУР&lt;BR/&gt;&lt;BR/&gt;&lt;/B&gt;Проверить кандидатов на ОПЗ&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;У всех кандидатов на ОПЗ отображается ПУР &lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;(три зелёные полоски)&lt;BR/&gt;&lt;BR/&gt;При наведении на каждую полоску отображается дата начала и конца&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"14\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Сравнить дату ПУР на графике с таблицей в Информации о скважине (не реализовано)&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Дата ПУР на графике совпадает со значением ПУР-1 месяц в таблице \"Даты ПУР\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"13\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Переключить графики с горизонтального на вертикального отображения, поменять графики местами, изменить размер&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Столбцы ПУР и тяжелых ГТМ не съезжают&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"12\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Сравнить значения на Кприём на графике кандидата: &lt;BR/&gt;&lt;BR/&gt;Кприём на ПУР и Кприём остановочное&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Если Kприём на ПУР меньше чем Кприём ост, то скважина - не кандидат&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Если больше - кандидат (вложение)&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"11\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Проверка расчёта ПУР по шаблону&lt;BR/&gt;&lt;BR/&gt;&lt;/B&gt;Скачать шаблон (вложение)&lt;B&gt;&lt;BR/&gt;&amp;nbsp;&lt;/B&gt;&lt;B&gt;&lt;BR/&gt;&lt;/B&gt;&lt;I&gt;Найти кандидата на ОПЗ, получить его id&lt;BR/&gt;Сделать запрос в Datastore:&lt;BR/&gt;select  \"ReportingMonth\",\"IntakeFactor\",  \"WellState\" from \"InjectionFund\" where \"OrgId\" = 6 and \"WellId\" = 19060\norder by \"ReportingMonth\" asc&lt;/I&gt;&lt;B&gt;&lt;BR/&gt;&amp;nbsp;&lt;/B&gt;&lt;B&gt;&lt;BR/&gt;&lt;/B&gt;Заполнить колонки I,J,K данными из datastore&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В столбце N слово \"стабилизация\" отображается у одного из окон &lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Сравнить начало окна (у которого отображается \"стабилизация\") &lt;BR/&gt;и конец окна с началом и концом ПУР в СПекТР&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Даты совпадают&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Найти Кприём план:&lt;BR/&gt;&lt;BR/&gt;Рассчитать средний Kприём по найденному окну в шаблоне&lt;BR/&gt;&lt;BR/&gt;Сравнить Кприём план и К приём факт&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Средний Кприём по шаблону совпадает с Кприём ПОСЛЕ в панели экспертизы&lt;/P&gt;&lt;P&gt;\nKприем план &amp;gt; К прием факт&lt;BR/&gt;Qприем план &amp;gt; Q факт&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Найти &lt;B&gt;не кандидата&lt;/B&gt; на ОПЗ с критерием \"Плановая приёмистость ниже остановочной\"&lt;BR/&gt;&lt;BR/&gt;Расчитать Кприём план и ПУР &lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Kприем план &amp;lt; К прием факт&lt;BR/&gt;Qприем план &amp;lt; Q факт &lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-08-10T06:45:59.087Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Ревью"
+          },
+          {
+            "System.AssignedTo": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2023-08-15T13:46:11.25Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 13
+          }
+        ]
+      },
+      "order": 4,
+      "pointAssignments": [
+        {
+          "id": 40253,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestPoint/40253"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442805,
+        "name": "Нагнетательный фонд"
+      },
+      "workItem": {
+        "id": 149042,
+        "name": "НАГ Графики отображение тяжелых ГТМ",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"11\"><step id=\"2\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;После пересчёта ОПЗ НАГ - перейти в Кандидаты&lt;BR/&gt;Открыть графики&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"11\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Найти кандидата на &lt;B&gt;Перевод в ППД / ОПЗ (проверить оба ГТМ)&lt;/B&gt;&lt;BR/&gt;&lt;BR/&gt;Получить facility_id по запросу в GQL (предусловие)&lt;BR/&gt;&amp;nbsp;\nЗапрос для ОПЗ:&lt;BR/&gt;query MyQuery {\n  bdpi_well_event_h(where: {facility_id: {_eq: \"FACILITY ID СКВАЖИНЫ\"}, lnk_well_event: {ois_id: {_in: [\"VR000132\", \"VR000168\", \"VR000051\", \"VR000126\", \"VR000038\", \"VR000073\", \"VR000023\"]}}}, order_by: {start_date: asc}) {\n    id\n    end_date\n    start_date\n    lnk_well_event {\n      full_name\n      ois_id\n    }\n  }\n}\n\nЗапрос для Перевода в ППД:\n\nquery MyQuery {\n  bdpi_well_event_h(where: {facility_id: {_eq: \"FACILITY ID СКВАЖИНЫ\"}, lnk_well_event: {ois_id: {_in: [\"VR000084\",\"VR106106\",\"VR161161\",\"VR170517\",\"VR500006\",\"VR500009\",\"VR500012\",\"VR500014\",\"VR840085\",\"VR840086\",\"VR840087\",\"VR840089\"]}}}, order_by: {start_date: asc}) {\n    id\n    end_date\n    start_date\n    lnk_well_event {\n      full_name\n      ois_id\n    }\n  }\n}\n\nСравнить ГТМы из well_event_h с ГТМ на графиках кандидата&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;На графиках в виде столбцов розового цвета отображаются &lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;тяжелые &lt;/SPAN&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;ГТМ &lt;/SPAN&gt;&lt;I&gt;из списка (вложение)&lt;/I&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;&lt;BR/&gt;(Для Переводов в ППД - ГТМ &lt;B&gt;ДОБ &lt;/B&gt;фонда&lt;BR/&gt;Для ОПЗ - ГТМ &lt;B&gt;НАГ &lt;/B&gt;фонда)&lt;BR/&gt;&lt;I&gt;&lt;BR/&gt;&lt;/I&gt;&lt;/SPAN&gt;При наведению на столбец отображаются даты начала и конца ГТМ&lt;BR/&gt;&lt;BR/&gt;Даты совпадают с датами в GQL&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Навести на последний тяжелый ГТМ&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображается дата начала ГТМ во всплывашке&lt;BR/&gt;&lt;BR/&gt;Дата совпадает с Датой последнего ГТМ в информации о скважине&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Сравнить дату ПУР на графике с таблицей в Информации о скважине (не реализовано)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Дата ПУР на графике совпадает со значением ПУР-1 месяц в таблице \"Даты ПУР\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Переключить графики с горизонтального на вертикального отображения, поменять графики местами, изменить размер&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Столбцы ПУР и тяжелых ГТМ не съезжают&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-08-10T06:46:10.083Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Ревью"
+          },
+          {
+            "System.AssignedTo": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2023-08-15T13:45:58.543Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 36
+          }
+        ]
+      },
+      "order": 5,
+      "pointAssignments": [
+        {
+          "id": 40254,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestPoint/40254"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442805,
+        "name": "Нагнетательный фонд"
+      },
+      "workItem": {
+        "id": 149043,
+        "name": "НАГ ОПЗ Критериальный отбор",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"19\"><step id=\"2\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Зайти в СПекТР / Перейти в проект НАГ фонда / Последний месяц / Настройка / Граничные значения по ОПЗ&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;У всех критериев включить тумблер. &lt;BR/&gt;У критериев со словом \"Предлагать\" отключить тумблер.&lt;BR/&gt;&lt;BR/&gt;Нажать \"Сохранить и пересчитать\"&lt;BR/&gt;&lt;BR/&gt;После пересчёта - &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Перейти на вкладку НЕ кандидаты. &lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Отсутствуют скважины окружения&lt;BR/&gt;&lt;/B&gt;&lt;BR/&gt;Найти скважину с данным сработавшим критерием&lt;BR/&gt;Нажать на скважину&lt;BR/&gt;Выбрать боковую панель \"Скважины окружения\"&amp;nbsp;&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;На боковой панели \"Скважины окружения\" нет реагирующих скважин.&lt;BR/&gt;&lt;BR/&gt;Кнопка \"В кандидаты\" заблокирована&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Минимальный диаметр штуцера&lt;BR/&gt;&lt;/B&gt;&lt;BR/&gt;Найти скважину с данным сработавшим критерием&lt;BR/&gt;Нажать на скважину&lt;BR/&gt;Выбрать боковую панель \"Статус экспертизы\"&amp;nbsp;&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Расчётное значение меньше граничного.&lt;BR/&gt;&lt;BR/&gt;Расчётное значение в блоке \"Критерии отбора\" совпадает со значениями ДО и ПОСЛЕ в блоке Кандидат.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Скважина в бездействии&lt;/B&gt;&lt;BR/&gt;Найти скважину с данным сработавшим критерием&lt;BR/&gt;Нажать на скважину&lt;BR/&gt;Выбрать боковую панель \"Статус экспертизы\"&amp;nbsp;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Состояние по скважине : \"В бездействии текущего года\", \"В бездействии прошлых лет\", \"Пьезометрическая\"&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Кнопка \"В кандидаты\" заблокирована&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Скважина остановлена&lt;/B&gt;&lt;/P&gt;&lt;P&gt;Найти скважину с данным сработавшим критерием&lt;BR/&gt;Нажать на скважину&lt;BR/&gt;Выбрать боковую панель \"Статус экспертизы\"&amp;nbsp;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Состояние по скважине - \"Остановлена\".&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;На НУР&lt;BR/&gt;&lt;/B&gt;Найти скважину с данным сработавшим критерием&lt;BR/&gt;Нажать на скважину&lt;BR/&gt;Выбрать боковую панель \"Графики\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;На графиках по не кандидату нет ПУР. (зелёных столбцов)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Короткая история по скважине&lt;BR/&gt;&lt;/B&gt;Найти скважину с данным сработавшим критерием&lt;BR/&gt;Нажать на скважину&lt;BR/&gt;Выбрать боковую панель \"Статус экспертизы\" и \"Графики\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В боковой панели \"Статус экспертизы\" в критериях отбора расчётное значение меньше \"7\", граничное всегда равно \"7\".&lt;BR/&gt;&lt;BR/&gt;Расчётное количество месяцев из критериев отбора равно количеству месяцев от последнего нагнетательного ГТМ // от начала истории закачки до текущей даты на графиках.&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;На графиках нет ПУР.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"11\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Высокая &lt;/B&gt;&lt;B style=\"background-color: var(--background-color,rgba(255, 255, 255, 1));color: rgba(var(--palette-neutral-100,0, 0, 0),1)\"&gt;текущая приёмистость&lt;/B&gt;&lt;/P&gt;&lt;P&gt;Найти скважину с данным сработавшим критерием&lt;BR/&gt;Нажать на скважину&lt;BR/&gt;Выбрать боковую панель \"Статус экспертизы\".&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Расчётное значение больше &lt;SPAN style=\"background-color: var(--background-color,rgba(255, 255, 255, 1));color: rgba(var(--palette-neutral-100,0, 0, 0),1)\"&gt;граничного.&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&lt;BR/&gt;Расчётное значение в блоке \"Критерии отбора\" совпадает со значениями ДО в блоке Кандидат.&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"12\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Низкая&lt;/B&gt;&lt;B style=\"background-color: var(--background-color,rgba(255, 255, 255, 1));color: rgba(var(--palette-neutral-100,0, 0, 0),1)\"&gt; перфорированная толщина&lt;/B&gt;&lt;/P&gt;&lt;P&gt;Найти скважину с данным сработавшим критерием&lt;BR/&gt;Нажать на скважину&lt;BR/&gt;Выбрать боковую панель \"Статус экспертизы\".&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Расчётное значение меньше граничного.&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"13\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;&lt;SPAN style=\"background-color: var(--background-color,rgba(255, 255, 255, 1))\"&gt;&lt;B&gt;Перекрытый интервал перфорации\n&lt;/B&gt;&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Найти скважину с данным сработавшим критерием&lt;/SPAN&gt;&lt;/P&gt;Нажать на скважину&lt;BR/&gt;Выбрать боковую панель \"Статус экспертизы\".</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Расчётное значение - глубина текущего забоя.&lt;BR/&gt;Граничное значение - глубина верхних дыр перфорации.&lt;BR/&gt;&lt;BR/&gt;Расчётное меньше граничного.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"14\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Повторный ГТМ&lt;/B&gt;&lt;BR/&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Найти скважину с данным сработавшим критерием&lt;/SPAN&gt;&lt;/P&gt;Нажать на скважину&lt;BR/&gt;Выбрать боковую панель \"Статус экспертизы\".&lt;BR/&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Расчётное значение меньше граничного&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"15\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Растущая динамика суммарного дебита нефти по окружению&lt;BR/&gt;Растущая динамика суммарного дебита жидкости по окружению&lt;/B&gt;&lt;BR/&gt;&lt;BR/&gt;Найти не кандидатов со сработавшими критериями&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;На графике \"Динамика добычи и закачки\" / Окружение у кандидатов растёт динамика по: &lt;BR/&gt;&lt;BR/&gt;- дебиту жидкости&lt;BR/&gt;- дебиту нефти&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"16\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Высокая накопленная компенсация&lt;BR/&gt;Высокая накопленная компенсация&lt;/B&gt;&lt;BR/&gt;&lt;BR/&gt;Найти не кандидатов со сработавшими критериями&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Расчётное значение больше граничного.&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"17\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Низкая дополнительная добыча нефти&lt;BR/&gt;&lt;/B&gt;&lt;BR/&gt;Найти не кандидатов со сработавшими критериями&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Расчётное значение меньше граничного.&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"18\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Плановая приёмистость ниже остановочной&lt;BR/&gt;&lt;BR/&gt;&lt;/B&gt;Найти не кандидатов со сработавшими критериями&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;&lt;U&gt;Граничное &amp;gt; Расчётное\n\n&lt;/U&gt;Граничное = Qприем (расч) ДО в блоке Кандидат.\nРасчётное = Qприем &lt;SPAN style=\"background-color: var(--background-color,rgba(255, 255, 255, 1));color: rgba(var(--palette-neutral-100,0, 0, 0),1)\"&gt;(расч) &lt;/SPAN&gt;&lt;SPAN style=\"background-color: var(--background-color,rgba(255, 255, 255, 1));color: rgba(var(--palette-neutral-100,0, 0, 0),1)\"&gt;ПОСЛЕ в блоке Кандидат.&lt;/SPAN&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"19\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Перейти в Кандидаты&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;/B&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;У всех кандидатов на ОПЗ:&lt;BR/&gt;&lt;BR/&gt;1) параметры &lt;B&gt;меньше &lt;/B&gt;граничных значений:&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Ктек (Окружение, Фактический режим)\nКнак (Окружение, Фактический режим) &lt;BR/&gt;&lt;SPAN style=\"color: rgba(0, 0, 0, 0.9);background-color: rgb(239, 246, 252)\"&gt;Qприём факт&lt;/SPAN&gt;&lt;BR style=\"color: rgba(0, 0, 0, 0.9)\"/&gt;&lt;BR/&gt;&lt;B&gt;2) &lt;/B&gt;параметры &lt;B&gt;больше &lt;/B&gt;граничных значений:&lt;BR/&gt;&amp;nbsp;&amp;nbsp;&lt;BR/&gt;Dшт (Кандидат, Фактический режим)&lt;BR/&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Доп. добыча нефти&lt;BR/&gt;&lt;BR/&gt;&lt;B&gt;3) поле \"Окружение\" &amp;gt; 0&lt;/B&gt;&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;&lt;BR/&gt;&lt;B&gt;4) состояние на конец месяца не равно &lt;/B&gt;\"&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Остановлена\", &lt;/SPAN&gt;\"В бездействии текущего года\", \"В бездействии прошлых лет\", \"Пьезометрическая\" &lt;BR/&gt;&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;(панель \"Информация о скважине\")&lt;BR/&gt;&lt;BR/&gt;&lt;B&gt;5) на графиках кандидата:&lt;BR/&gt;&lt;/B&gt;есть ПУР (зелёный столбец)&lt;BR/&gt;кол-во месяцев после последнего ГТМ &amp;gt; ГЗ&lt;BR/&gt;нет растущей динамики Qн и Qж по окружению&lt;BR/&gt;&lt;BR/&gt;&lt;/SPAN&gt;6) Qприем целевое (расчётное) &amp;gt; Qприем фактическое&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;&lt;BR/&gt;&amp;nbsp;&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-08-10T06:46:24.86Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Ревью"
+          },
+          {
+            "System.AssignedTo": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2023-08-15T08:41:36.363Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 39
+          }
+        ]
+      },
+      "order": 6,
+      "pointAssignments": [
+        {
+          "id": 40255,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestPoint/40255"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442805,
+        "name": "Нагнетательный фонд"
+      },
+      "workItem": {
+        "id": 149045,
+        "name": "НАГ Автоподбор на ОПЗ",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"11\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;СПекТР UAT / Проект НАГ фонда текущего месяца (Хантос/ННГ)&lt;BR/&gt;&lt;BR/&gt;Перейти в Настройки&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;1) ГТМ ОПЗ отображается в :&lt;BR/&gt;&lt;BR/&gt;- бабликах в верхней части экрана&lt;BR/&gt;- статусе расчёта&lt;BR/&gt;- пунктах настроек&lt;BR/&gt;&lt;BR/&gt;2) ОПЗ отображается после ВБД&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;3)&amp;nbsp;В настройках отображаются граничные значения и опции расчёта по ОПЗ согласно вложению &lt;BR/&gt;&lt;BR/&gt;4) Изменение настроек и запуск пересчёта доступен по ДО, месторождению, объекту&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выбрать ОПЗ и запустить расчёт&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Статус расчёта становится \"В процессе\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;После завершения - открыть статистику проекта&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;1) В статистике отображается пункт \"ОПЗ\" (после ВБД)&lt;BR/&gt;&lt;BR/&gt;2) Скважины на ОПЗ распределены по реестрам&lt;BR/&gt;&lt;BR/&gt;3) Есть кандидаты//не кандидаты&lt;BR/&gt;&lt;BR/&gt;4) Итого = ТР НАГ фонда&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Перейти в Кандидаты, отфильтровать по ОПЗ&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Поля заполнены&lt;BR/&gt;&lt;BR/&gt;При нажатии на строку отображаются боковые панели, ошибок нет, данные заполнены&lt;BR/&gt;&lt;BR/&gt;В статусе экспертизы отображается информер \"Автоподбор СПекТР\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"11\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Проверка Dшт&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;В гриде заполнены Dшт (фактический и целевой)&lt;BR/&gt;&lt;BR/&gt;Значения равны&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открыть панель \"Информация о скважине\" &lt;B&gt;(пока не реализовано)&lt;/B&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В панели отображается блок \"Информация о предыдущих ОПЗ\" (после фрак-листов)&lt;BR/&gt;&lt;BR/&gt;В блоке отображается таблица с полями \"Дата ОПЗ\" и \"Объем закачки\"&lt;BR/&gt;&lt;BR/&gt;Поля заполнены&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Перейти в Не кандидаты&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;, отфильтровать по ОПЗ&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Поля заполнены &lt;BR/&gt;Панели отображаются&lt;BR/&gt;&lt;BR/&gt;У каждого не кандидата хотя бы 1 сработавший критерий&lt;BR/&gt;&lt;/P&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Перейти в Ошибки&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;, отфильтровать по ОПЗ&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;У каждой ошибки хотя бы 1 иконка в поле \"Тип ошибки\"&lt;BR/&gt;&lt;BR/&gt;Нет ошибок типа&lt;BR/&gt;\"Pбг куста: нет значения в ШТР, расчет невозможен\"&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Нажать на иконку ошибки&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отображается окно с описанием ошибки&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Создать новый проект&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;1) После расчётов - ОПЗ рассчитан, реестры заполнены&lt;BR/&gt;&lt;BR/&gt;2) Нет не кандидатов на ОПЗ с критерием отклонения \"Без критериального отбора\"&lt;BR/&gt;&lt;BR/&gt;3) На ВПП, Ревизию ППД, перевод под шурф, перевод под закачку не кандидаты есть&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-08-10T06:47:58.93Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Ревью"
+          },
+          {
+            "System.AssignedTo": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2023-08-15T13:45:53.003Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 18
+          }
+        ]
+      },
+      "order": 7,
+      "pointAssignments": [
+        {
+          "id": 40256,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestPoint/40256"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442805,
+        "name": "Нагнетательный фонд"
+      },
+      "workItem": {
+        "id": 149046,
+        "name": "НАГ Отображение статуса корректировок",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"13\"><step id=\"2\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;СПекТР UAT / Проект НАГ фонда текущего месяца (Хантос/ННГ)&lt;BR/&gt;&lt;BR/&gt;Перейти в Кандидаты&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Открыть сайдбар \"Столбцы\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;1) В списке столбцов отображаются столбцы:&lt;BR/&gt;&lt;BR/&gt;Корректировка режима&lt;BR/&gt;Корректировка окружения&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Отобразить столбцы&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Столбцы отображаются в гриде&lt;BR/&gt;&lt;BR/&gt;При наведении на шапки столбцов отображаются всплывашки с таблицей расшифровки возможных аббревиатур (вложение)&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Корректировки окружения&lt;/B&gt;&lt;BR/&gt;&lt;BR/&gt;Выполнить корректировку окружения кандидата (в панели &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;\"Скважины окружения\" добавить скважину и нажать \"Пересчитать\")&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;После пересчёта -&lt;BR/&gt;В столбце \"&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Корректировка окружения&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;\" отображается \"КО\"&lt;BR/&gt;&lt;BR/&gt;В панели окружения - кнопка \"Сбросить\" активна&lt;/SPAN&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Перейти в Настройки /объект скорректированной скважины&lt;BR/&gt;&lt;BR/&gt;Задать диаметр поиска окружения меньше, чем расстояние до одной скважин в окружении скорректированного кандидата &lt;I&gt;(поле \"S\" в таблице \"Добывающие скважины\" / панель \"Скважины окружения\")&lt;BR/&gt;&lt;/I&gt;&lt;BR/&gt;Пересчитать объект&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;После пересчёта -&lt;BR/&gt;В столбце \"&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Корректировка окружения&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;&lt;FONT color=\"rgba(0, 0, 0, 0)\"&gt;\" отображается \"&lt;/FONT&gt;КОПП&lt;FONT color=\"rgba(0, 0, 0, 0)\"&gt;\"&lt;BR/&gt;&lt;BR/&gt;&lt;/FONT&gt;&lt;/SPAN&gt;В панели окружения - кнопка \"Сбросить\" неактивна&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Выполнить корректировку окружения и пересчитать&lt;BR/&gt;&lt;BR/&gt;Сбросить корректировку и пересчитать&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;После пересчёта -&lt;BR/&gt;В столбце \"&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Корректировка окружения&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;&lt;FONT color=\"rgba(0, 0, 0, 0)\"&gt;\" отображается \"&lt;/FONT&gt;КОРС&lt;FONT color=\"rgba(0, 0, 0, 0)\"&gt;\"&lt;BR/&gt;&lt;BR/&gt;&lt;/FONT&gt;&lt;/SPAN&gt;В панели окружения - кнопка \"Сбросить\" неактивна&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выполнить корректировку скважины на ОПЗ&lt;BR/&gt;&lt;BR/&gt;После корректировки:&lt;BR/&gt;&lt;BR/&gt;Изменить статус скважины в БД на \"Остановлена\"&lt;BR/&gt;&lt;I&gt;(DataStore / &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;InjectionFund&lt;BR/&gt;Найти запись по wellid  &lt;BR/&gt;&lt;/SPAN&gt;&lt;/I&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;&lt;I&gt;Изменить&lt;BR/&gt;WellStateId = '14ed73b3-9648-7046-a827-a27280932fae'&lt;BR/&gt;WellState = 'ост.')&lt;/I&gt;&lt;BR/&gt;&amp;nbsp;&lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;Пересчитать ОПЗ по объекту&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;После пересчёта - &lt;BR/&gt;&lt;BR/&gt;В столбце \"&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Корректировка окружения&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;&lt;FONT color=\"rgba(0, 0, 0, 0)\"&gt;\" отображается \"&lt;/FONT&gt;КОСС&lt;FONT color=\"rgba(0, 0, 0, 0)\"&gt;\"&lt;/FONT&gt;&lt;/SPAN&gt;&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;В панели окружения - кнопка \"Сбросить\" неактивна&lt;BR/&gt;&amp;nbsp;&lt;/P&gt;</parameterizedString><description/></step><step id=\"13\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;&lt;U&gt;? Как менять характер работы скважины для сброса корректировки окружения ?&lt;BR/&gt;&lt;BR/&gt;&lt;/U&gt;&lt;/B&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Скважина исчезает из TechMode и попадает в InjectionFund - найти такую скважину/сделать инъекцию (уточнить у Тимура, влияет ли что-то, кроме wellid)&lt;/B&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Корректировка режима&lt;BR/&gt;&lt;/B&gt;&lt;B&gt;&lt;BR/&gt;&lt;/B&gt;Скорректировать целевые параметры кандидата на ОПЗ&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;После пересчёта -&lt;BR/&gt;В столбце \"&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Корректировка &lt;/SPAN&gt;режима&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;\" отображается \"КР\"&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Изменить статус скважины в БД на \"В бездействии текущего года\"&lt;BR/&gt;&lt;BR/&gt;Пересчитать ОПЗ по объекту&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;После пересчёта -&lt;BR/&gt;В столбце \"&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Корректировка &lt;/SPAN&gt;режима&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;\" отображается \"КРСС\"&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"11\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Скорректировать целевые параметры кандидата&lt;BR/&gt;&lt;BR/&gt;В настройках изменить радиус поиска окружения так, чтобы 1 из скважин не попала в окружение&lt;BR/&gt;&lt;BR/&gt;Пересчитать ГТМ&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;После пересчёта -&lt;BR/&gt;В столбце \"&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Корректировка &lt;/SPAN&gt;режима&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;\" отображается \"КРИО\"&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"12\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Найти скважину, которая кандидат на ГТМ в текущем и прошлом месяце с одинаковыми настройками&lt;BR/&gt;Удалить проект текущего месяца&lt;BR/&gt;Скорректировать скважину со сроком хранения корректировки '1 месяц'&lt;BR/&gt;Создать новый проект&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В новом проекте -&lt;BR/&gt;В столбце \"&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;Корректировка &lt;/SPAN&gt;режима&lt;SPAN style=\"color: var(--text-primary-color,rgba(0, 0, 0, .9));background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;\" отображается \"КРСД\"&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-08-10T06:48:24.733Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2023-08-10T06:48:24.733Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 28
+          }
+        ]
+      },
+      "order": 8,
+      "pointAssignments": [
+        {
+          "id": 40257,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestPoint/40257"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442805,
+        "name": "Нагнетательный фонд"
+      },
+      "workItem": {
+        "id": 156566,
+        "name": "НАГ Дата планового ГТМ в окне согласования и окне ручных переносов",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"12\"><step id=\"2\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ПРЕДУСЛОВИЕ&lt;BR/&gt;&lt;BR/&gt;&lt;A href=\"https://spektr-u210001901.apps.test.gazprom-neft.local/home\" tabindex=\"-1\"&gt;СПекТР (gazprom-neft.local)&lt;BR/&gt;М&lt;/A&gt;еню / нагнетательный фонд&lt;BR/&gt;Развернуть верхний месяц / выбрать любое ДО&lt;BR/&gt;Открыть / перейти на вкладку Кандидаты&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Окно согласования&lt;/B&gt;&lt;BR/&gt;&lt;BR/&gt;Нажать \"Согласовать\" в панели справа&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Форма согласования соответствует макету&lt;BR/&gt;&lt;BR/&gt;По умолчанию дата пустая&lt;BR/&gt;&lt;BR/&gt;При развороте окна выбора даты по умолчанию выделение на сегодняшней дате&amp;nbsp;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Согласовать без даты&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Согласование проходит&lt;BR/&gt;В таблице в колонке \"Плановая дата ГТМ\" пусто&lt;BR/&gt;&lt;BR/&gt;В панели экспертиз лейбл Плановая дата ГТМ отсутствует.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Согласовать с датой&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Согласование проходит&lt;BR/&gt;В таблице в колонке \"Плановая дата ГТМ\" указанная дата при согласовании&lt;BR/&gt;&lt;BR/&gt;В панели экспертиз справа в графе Плановая дата ГТМ указана выбранная дата&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Согласовать с датой&lt;BR/&gt;Согласовать еще раз с другой датой&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В окне согласования уже указана ранее выбранная дата&lt;BR/&gt;&lt;BR/&gt;В таблице в колонке \"Плановая дата ГТМ\" указана последняя дата, с которой согласовали скважину&lt;BR/&gt;&lt;BR/&gt;В панелях истории экспертиз и статусе экспертиз соответствующие выбранные даты.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открыть проект с РСЭ &lt;BR/&gt;(см. предусловие)&lt;BR/&gt;(Значок РСЭ должен быть зеленым наверху рядом с ФИО)&lt;BR/&gt;&lt;BR/&gt;Выбрать скважину&lt;BR/&gt; - согласовать под ролью ГЕОЛОГ;&lt;BR/&gt; - согласовать под ролью ИНФРАСТРУКТУРА;&lt;BR/&gt; - согласовать под ролью ГНО.&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В окне согласования возможность выбора плановой даты ГТМ есть:&lt;BR/&gt; - у ГЕОЛОГА&lt;BR/&gt; - у ГНО&lt;BR/&gt;&lt;BR/&gt;У ИНФРы окна выбора даты нет&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;Согласовать скважину, указать дату СЕГОДНЯ&lt;BR/&gt;Получить id записи в гриде (отобразить скрытый столбец \"ИД\")&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Выполнить запрос в БД SPEKTR:&lt;BR/&gt;&lt;I&gt;update expertise_injection ei \nset plan_gtm_date = date_trunc('day', (NOW() - interval '1 day')::date) \nwhere id = 'ID строки кандидата' &lt;BR/&gt;&lt;/I&gt;&amp;nbsp;&lt;BR/&gt;Пересчитать проект по данному ГТМ&lt;/P&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;У скважин с датой планового ГТМ &amp;lt; текущей даты:&lt;BR/&gt;- cтатус согласования не сбрасывается&lt;BR/&gt;- в колонке \"Плановая дата ГТМ\" пусто после пересчета&lt;BR/&gt;&lt;BR/&gt;У скважин с датой планового ГТМ &amp;gt;= текущей даты:&lt;BR/&gt;- cтатус согласования не сбрасывается&lt;BR/&gt;- в колонке \"Плановая дата ГТМ\" не сброшена после пересчета&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"11\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Согласовать с датой&lt;BR/&gt;Отклонить ту же скважину после&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Плановая дата ГТМ пропадает из таблицы Кандидатов после отклонения&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Окно переноса&lt;/B&gt;&lt;BR/&gt;&lt;BR/&gt;Не кандидаты / выбрать скважину&lt;BR/&gt;Нажать справа в панели \"В кандидаты\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Сценарии с выбором даты описанные выше применимы и к окну Переноса из Не кандидатов&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"12\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Окно корректировок&lt;/B&gt;&lt;BR/&gt;&lt;BR/&gt;Кандидаты / выбрать скважину &lt;BR/&gt;Нажать &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;справа в панели &lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;\"Корректировка\"&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Сценарии с выбором даты описанные выше применимы и к окну Корректировок (только для НАГ фонда)&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-09-12T07:14:35.45Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Ревью"
+          },
+          {
+            "System.AssignedTo": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2023-09-13T05:48:25.48Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 9
+          }
+        ]
+      },
+      "order": 9,
+      "pointAssignments": [
+        {
+          "id": 40258,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestPoint/40258"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442805,
+        "name": "Нагнетательный фонд"
+      },
+      "workItem": {
+        "id": 176134,
+        "name": "НАГ Dшт Критерии динамики дебита окружения",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"13\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;СПекТР UAT &lt;A href=\"https://spektr-u210001901.apps.test.paas.gazprom-neft.local/home\" style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\" tabindex=\"-1\"&gt;СПекТР (gazprom-neft.local)&lt;BR/&gt;&lt;/A&gt;Меню / НАГ фонд / ноябрь / Хантос&lt;BR/&gt;Вкладка \"Настройки\"&lt;BR/&gt;Выбрать ДО / Месторождение / объект (проверить на всех уровнях)&lt;BR/&gt;Раскрыть Уменьшение Dшт / Граничные значения&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В списке критериев Уменьшения Dшт есть (отключаемые):&lt;BR/&gt;&lt;BR/&gt;Предлагать скважины без снижения по дебиту нефти окружения\nПредлагать скважины с преобладающими потерями нефти в окружении по снижению жидкости&lt;BR/&gt;&lt;BR/&gt;Чекбоксы критериев по умолчанию отключены &lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Раскрыть Увеличение Dшт / Граничные значения&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В списке критериев Увеличения Dшт есть (отключаемые):&lt;BR/&gt;&lt;BR/&gt;Предлагать скважины без снижения по дебиту нефти окружения\nПредлагать скважины с преобладающими потерями нефти в окружении по росту обводнённости\n&lt;BR/&gt;Чекбоксы критериев по умолчанию отключены &lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Выставить настройки:&lt;BR/&gt;&lt;BR/&gt;Увеличение Dшт:\n\tГраничные значения:\n&lt;/B&gt;\t\tПредлагать скважины без снижения по дебиту нефти окружения - выкл\n\t\tПредлагать скважины с преобладающими потерями нефти в окружении по росту обводнённости - выкл&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&amp;nbsp;&lt;B&gt;Уменьшение Dшт:\n\tГраничные значения: \n&lt;/B&gt;\t\tПредлагать скважины без снижения по дебиту нефти окружения - выкл\n\t\tПредлагать скважины с преобладающими потерями нефти в окружении по снижению жидкости - выкл&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&lt;B&gt;Опции расчёта - одинаковые для обоих ГТМ&lt;BR/&gt;&lt;/B&gt;Сохранить и пересчитать &lt;BR/&gt;После пересчёта - перейти в кандидаты&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;В гриде и в боковой панели «Статус экспертизы»:&lt;BR/&gt;&lt;BR/&gt;- нет полей Qприём (Цел), м3/сут,  &lt;BR/&gt;- есть поля ΔQн(ΔQж), ΔQн(ΔОбв) / Окружение, Qприем (план), м3/сут&lt;BR/&gt;&lt;BR/&gt;В боковой панели «Статус экспертизы» отображается «Qприем (план), м3/сут»&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;ΔQн(ΔQж), ΔQн(ΔОбв) в гриде и в боковой панели \"Статус экспертизы\" совпадают&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Отфильтровать кандидатов по Типу ГТМ = \"Увеличение Dшт\" или \"Уменьшение Dшт\"&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;У кандидатов в панели:&lt;BR/&gt;ΔQн(ΔQж) + ΔQн(ΔОбв) &amp;lt; 0 &lt;BR/&gt;&lt;BR/&gt;Нет кандидатов по 1 скважине+пласту и на Уменьшение, и на Увеличение Dшт&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Отфильтровать по Типу ГТМ = \"Увеличение Dшт\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;У кандидатов в панели:&lt;BR/&gt;ΔQн(ΔQж) &amp;lt; ΔQн(ΔОбв)&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Отфильтровать по Типу ГТМ = \"Уменьшение Dшт\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;У кандидатов в панели:&lt;BR/&gt;ΔQн(ΔQж) &amp;gt; ΔQн(ΔОбв)&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Перейти в Не кандидаты &lt;BR/&gt;Отфильтровать по Типу ГТМ = \"Увеличение Dшт\" или \"Уменьшение Dшт\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;У не кандидатов со сработавшим критерием \"Без потерь нефти по окружению\":&lt;BR/&gt;&lt;BR/&gt;ΔQн(ΔQж) + ΔQн(ΔОбв) &amp;gt;= 0 &amp;nbsp;&lt;BR/&gt;&lt;BR/&gt;Если критерий сработал по Увеличению Dшт, то сработал и по Уменьшению Dшт (и наоборот)&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Отфильтровать по Типу ГТМ = \"Увеличение Dшт\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;У не кандидатов со сработавшим критерием \"Преобладающие потери нефти в окружении по росту обводненности\":&lt;BR/&gt;&lt;BR/&gt;1) ΔQн(ΔQж) &amp;gt; ΔQн(ΔОбв)&lt;BR/&gt;    ΔQн(ΔQж) + ΔQн(ΔОбв) &amp;lt; 0 &lt;BR/&gt;&lt;BR/&gt;2) Не сработал критерий \"Без потерь нефти по окружению\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"10\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Отфильтровать по Типу ГТМ = \"Уменьшение Dшт\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;У не кандидатов со сработавшим критерием \"Преобладающие потери нефти в окружении по снижению жидкости\":&lt;BR/&gt;&lt;BR/&gt;1) ΔQн(ΔQж) &amp;gt; ΔQн(ΔОбв)\n    ΔQн(ΔQж) + ΔQн(ΔОбв) &amp;lt; 0 &lt;BR/&gt;2) &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Не сработал критерий \"Без потерь нефти по окружению\"&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"11\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Отфильтровать по сработавшим критериям &lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;- &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;\"Без потерь нефти по окружению\"&lt;BR/&gt;- &lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;\"Преобладающие потери нефти в окружении по росту обводненности\"&lt;BR/&gt;- &lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;\"Преобладающие потери нефти в окружении по снижению жидкости\"&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Для не кандидатов, у которых сработали данные критерии и не сработали критерии \"Скважина в бездействии\" и \"Нет скважин в окружении\" кнопка \"В кандидаты\" активна при нажатии на строку (перенос доступен)&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"12\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Перейти в настройки &lt;BR/&gt;Выставить: &lt;BR/&gt;&lt;B&gt;Увеличение Dшт:\n\tГраничные значения:\n&lt;/B&gt;\t\tПредлагать скважины без снижения по дебиту нефти окружения - вкл\n\t\tПредлагать скважины с преобладающими потерями нефти в окружении по росту обводнённости - вкл\n&lt;B&gt;Уменьшение Dшт:\n\tГраничные значения: \n&lt;/B&gt;\t\tПредлагать скважины без снижения по дебиту нефти окружения - вкл\n\t\tПредлагать скважины с преобладающими потерями нефти в окружении по снижению жидкости - вкл&lt;BR/&gt;&lt;BR/&gt;Сохранить и пересчитать&amp;nbsp;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"13\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;После пересчёта - перейти в Не кандидаты &lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Нет ни одного сработавшего критерия из списка:&lt;BR/&gt;&lt;BR/&gt;Без потерь нефти по окружению&lt;BR/&gt;Преобладающие потери нефти в окружении по снижению жидкости&lt;BR/&gt;Преобладающие потери нефти в окружении по росту обводненности&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-11-15T12:15:46.033Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Ревью"
+          },
+          {
+            "System.AssignedTo": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2023-11-17T08:57:44.33Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 17
+          }
+        ]
+      },
+      "order": 10,
+      "pointAssignments": [
+        {
+          "id": 40259,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestPoint/40259"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442805,
+        "name": "Нагнетательный фонд"
+      },
+      "workItem": {
+        "id": 177037,
+        "name": "НАГ Опция учёта прибывших/выбывших скважин в окружении",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"9\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;СПекТР UAT &lt;A href=\"https://spektr-u210001901.apps.test.paas.gazprom-neft.local/home\" tabindex=\"-1\" style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;СПекТР (gazprom-neft.local)&lt;BR/&gt;&lt;/A&gt;Меню / НАГ фонд / ноябрь / Хантос&lt;BR/&gt;Вкладка \"Настройки\"&lt;BR/&gt;Выбрать ДО/Месторождение/Объект (проверить каждый уровень)&lt;BR/&gt;Раскрыть каждый ГТМ (кроме Ревизии ППД)  / Опции расчёта &lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В списке опций отображается «Учитывать в анализе выбывающие / прибывающие скважины» (после «Период анализа фактических данных»)&lt;BR/&gt;&lt;BR/&gt;По умолчанию - отключена&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Скачать отчёт ошибок по Хантосу&lt;BR/&gt;Зафиксировать скважины в ошибках с ошибками типа  «Недостаточно истории Qн/Qж(ист) по кандидату/окружению» &lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выставить настройки:&lt;BR/&gt;&lt;B&gt;Все ГТМ:&lt;BR/&gt;&amp;nbsp;\tГраничные значения:\n&lt;/B&gt;\t\tКритерии \"Предлагать\" - вкл&lt;BR/&gt;                Остальные ГЗ - откл\n&lt;B&gt;\tОпции расчёта:\n&lt;/B&gt;\t\tУчитывать в анализе выбывающие / прибывающие скважины - выкл&lt;BR/&gt;Сохранить и пересчитать&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;После расчёта - перейти в Кандидаты &lt;BR/&gt;Скачать отчёт кандидатов по Хантосу&lt;BR/&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;Зафиксировать скважины, по которым не заполнены &lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt; ΔQн(ΔQж), ΔQн(ΔОбв) / Окружение&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"9\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Выставить настройки:&lt;BR/&gt;&lt;BR/&gt;&lt;B&gt;Все ГТМ:&lt;BR/&gt;&amp;nbsp;\tГраничные значения:\n&lt;/B&gt;        Включены:&lt;BR/&gt;&amp;nbsp;•\tМинимальный угол наклона линии тренда по динамике средней обводненности окружения;\n•\tМаксимальный угол наклона линии тренда по динамике дебита нефти кандидата;\n•\tМаксимальный угол наклона линии тренда по динамике среднего дебита жидкости окружения;\n•\tМаксимальный угол наклона линии тренда по динамике среднего дебита нефти окружения;&lt;BR/&gt;&amp;nbsp;       Отключены:\n•\tПредлагать скважины с преобладающими потерями нефти в окружении по росту обводненности;\n•\tПредлагать скважины с преобладающими потерями нефти в окружении по снижению жидкости;\n•\tПредлагать скважины без снижения по дебиту нефти окружения\n\n&lt;/P&gt;&lt;DIV&gt;Сохранить и пересчитать&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;После расчёта - перейти в Кандидаты &lt;BR/&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;После пересчёта:&lt;BR/&gt;&lt;BR/&gt;1) ΔQн(ΔQж), ΔQн(ΔОбв) / Окружение по всем кандидатам заполнены&lt;BR/&gt;2) нет скважин с ошибками по недостаточной истории &lt;BR/&gt;3) зафиксированные скважины, по которым ошибка была раннее по недостаточной истории // кандидаты, у которых не было значений &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;ΔQн(ΔQж), ΔQн(ΔОбв) &lt;BR/&gt;&lt;/SPAN&gt;&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;- в не кандидатах по 1 из критериев: &lt;/SPAN&gt;&lt;/P&gt;&lt;P&gt;•\tМинимальный угол наклона линии тренда по динамике средней обводненности окружения;\n•\tМаксимальный угол наклона линии тренда по динамике дебита нефти кандидата;\n•\tМаксимальный угол наклона линии тренда по динамике среднего дебита жидкости окружения;\n•\tМаксимальный угол наклона линии тренда по динамике среднего дебита нефти окружения;\n•\tПредлагать скважины с преобладающими потерями нефти в окружении по росту обводненности;\n•\tПредлагать скважины с преобладающими потерями нефти в окружении по снижению жидкости;\n•\tПредлагать скважины без снижения по дебиту нефти окружения.\n&lt;BR/&gt;в панели Статус экспертизы / сработавшие критерии - по критерию в поле \"Расчётное\" - \"Нет постоянно действующего фонда\"&amp;nbsp;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Включить опцию учёта скважин в окружении на &lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;ДО/Месторождении/Объекте &lt;/SPAN&gt;(проверить каждый уровень) на разных ГТМ&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Нажать \"сохранить и пересчитать\"&lt;SPAN style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1);color: var(--text-primary-color,rgba(0, 0, 0, .9))\"&gt;&lt;BR/&gt;&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;После запуска расчёта изменении опции сохранены по ГТМ на выбранном уровне и его дочерних элементах&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Проверить, что доп. добыча считается не по окружению, по которому проверяются потери жидкости (при отключенной опции учёта выбывших / прибывших) скважин&lt;BR/&gt;&lt;BR/&gt;&lt;B&gt;&lt;I&gt;* с Айдаром&lt;/I&gt;&lt;/B&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-11-17T09:55:45.233Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Ревью"
+          },
+          {
+            "System.AssignedTo": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2023-11-17T10:12:48.39Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 10
+          }
+        ]
+      },
+      "order": 11,
+      "pointAssignments": [
+        {
+          "id": 40260,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestPoint/40260"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442805,
+        "name": "Нагнетательный фонд"
+      },
+      "workItem": {
+        "id": 177050,
+        "name": "НАГ Dшт Срабатывание критериев динамики дебита окружения (шаблон)",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"8\"><step id=\"2\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;&lt;U&gt;1) Проверка с отключенным учётом&lt;/U&gt;&lt;/B&gt;&lt;BR/&gt;&lt;BR/&gt;СПекТР UAT &lt;A href=\"https://spektr-u210001901.apps.test.paas.gazprom-neft.local/home\" tabindex=\"-1\" style=\"background-color: rgba(var(--palette-primary-tint-40,239, 246, 252),1)\"&gt;СПекТР (gazprom-neft.local)&lt;BR/&gt;&lt;/A&gt;Меню / НАГ фонд / ноябрь / Хантос&lt;BR/&gt;Вкладка \"Настройки\"&lt;BR/&gt;Выбрать ДО&lt;BR/&gt;Выставить настройки:&lt;BR/&gt;&lt;BR/&gt;&lt;B&gt;Увеличение Dшт:\n\tГраничные значения:\n&lt;/B&gt;\t\tПредлагать скважины без снижения по дебиту нефти окружения - выкл\n\t\tПредлагать скважины с преобладающими потерями нефти в окружении по росту обводнённости - выкл\n&lt;B&gt;\tОпции расчёта:\n&lt;/B&gt;\t\tУчитывать в анализе выбывающие / прибывающие скважины - выкл&lt;BR/&gt;&amp;nbsp;               Период анализа фактических данных - 4 месяца&lt;BR/&gt;                Настройки окружения - из панели \"Скважины окружения\" по кандидатам на Увеличение Dшт из июльского проекта Хантоса\n\n&lt;B&gt;Уменьшение Dшт:\n\tГраничные значения: \n&lt;/B&gt;\t\tПредлагать скважины без снижения по дебиту нефти окружения - выкл\n\t\tПредлагать скважины с преобладающими потерями нефти в окружении по снижению жидкости - выкл\n&lt;B&gt;\tОпции расчёта:&lt;/B&gt; \n\t\tУчитывать в анализе выбывающие / прибывающие скважины - выкл&lt;BR/&gt;                 Период анализа фактических данных - 4 месяца&lt;BR/&gt;                Настройки окружения - из панели \"Скважины окружения\" по кандидатам на Уменьшение Dшт из июльского проекта Хантоса\n&lt;BR/&gt;Сохранить и пересчитать&amp;nbsp;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;После пересчёта - перейти в Кандидаты &lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Найти скважину, которая есть в Не кандидатах или в Кандидатах в июльском и ноябрьском проекте Хантоса (проверить несколько скважин на Увеличение и Уменьшение Dшт)&lt;BR/&gt;&lt;BR/&gt;&lt;B&gt;Составить список скважин, которые находятся в панели окружения И в ноябре, И в июле&lt;/B&gt;&lt;BR/&gt;&lt;BR/&gt;Рассчитать сумму дебитов жидкости и нефти по данным скважинам за ноябрь и июль&lt;BR/&gt;&lt;BR/&gt;Рассчитать среднюю плотность нефти (взять из кандидата&lt;B&gt;?&lt;/B&gt;)&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Подставить рассчитанные значения в шаблон (во вложении шага)&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Проверить, сработали ли выбранные критерии по скважине согласно шаблону &lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Критерии по скважине+ГТМ совпадают значению в шаблоне&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;B&gt;Проверить, что скважины, добавленные в окружение при корректировке, учитываются в критериальном отборе&lt;BR/&gt;&lt;BR/&gt;&lt;/B&gt;Найти скважину, которая есть в Не кандидатах или в Кандидатах в июльском и ноябрьском проекте Хантоса  и у которой есть скважины в окружении на июль, которых нет в окружении на ноябрь&lt;BR/&gt;&lt;BR/&gt;Добавить в окружение на ноябрь 1 скважину из июльского окружения &lt;BR/&gt;Сохранить корректировку&lt;BR/&gt;После пересчёта скважины - выполнить проверку критериев по шаблону &lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;&lt;B&gt;&lt;I&gt;* Уточнить у Айдара, корректна ли проверка&lt;/I&gt;&lt;/B&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;U style=\"font-weight: bold\"&gt;2) Проверка со включенным учётом&lt;BR/&gt;&lt;/U&gt;&lt;U style=\"font-weight: bold\"&gt;&lt;BR/&gt;&lt;/U&gt;Настройки / выставить по ДО:&lt;BR/&gt;&lt;BR/&gt;&lt;B&gt;Увеличение Dшт и Уменьшение Dшт:&lt;BR/&gt;&lt;/B&gt;&lt;B&gt;Опции расчёта:\n&lt;/B&gt;\t\tУчитывать в анализе выбывающие / прибывающие скважины - выкл&lt;BR/&gt;&lt;BR/&gt;Сохранить и пересчитать&lt;BR/&gt;&lt;BR/&gt;После пересчёта - перейти в Кандидаты &lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;DIV&gt;Найти скважину, которая есть в Не кандидатах или в Кандидатах в июльском и ноябрьском проекте Хантоса (проверить несколько скважин на Увеличение и Уменьшение Dшт)&lt;BR/&gt;&lt;BR/&gt;&lt;B&gt;Составить список скважин, которые находятся в панели окружения в ноябре ИЛИ в июле&lt;BR/&gt;&lt;BR/&gt;&lt;/B&gt;Рассчитать сумму дебитов жидкости и нефти по данным скважинам за ноябрь и июль&lt;BR/&gt;&lt;BR/&gt;Рассчитать среднюю плотность нефти (взять из кандидата&lt;B&gt;?&lt;/B&gt;)&lt;BR/&gt;&lt;BR/&gt;Подставить рассчитанные значения в шаблон (во вложении шага)&lt;BR/&gt;&lt;BR/&gt;Проверить, сработали ли выбранные критерии по скважине согласно шаблону &lt;BR/&gt;&lt;/DIV&gt;&lt;P&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Критерии по скважине+ГТМ совпадают значению в шаблоне&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2023-11-17T10:14:52.72Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Ревью"
+          },
+          {
+            "System.AssignedTo": "Гадельшин Инсар Равилевич <GAZPROM-NEFT\\Gadelshin.IR>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2023-11-17T12:01:24.59Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 16
+          }
+        ]
+      },
+      "order": 12,
+      "pointAssignments": [
+        {
+          "id": 40261,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Гадельшин Инсар Равилевич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+              }
+            },
+            "id": "f35ddcd7-b6b0-4ecd-adab-ccc3a95aca01",
+            "uniqueName": "GAZPROM-NEFT\\Gadelshin.IR",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA",
+            "inactive": true,
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03OTQwMzA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestPoint/40261"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442805"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 13
+}

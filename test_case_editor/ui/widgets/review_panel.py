@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
-from typing import Iterable, List
+from typing import Iterable, List, Optional, Dict
 
 from PyQt5.QtWidgets import (
     QWidget,
@@ -11,6 +12,7 @@ from PyQt5.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QPushButton,
+    QToolButton,
     QTextEdit,
     QListWidget,
     QListWidgetItem,
@@ -24,8 +26,59 @@ from PyQt5.QtCore import (
     pyqtSignal,
     Qt,
     QEvent,
+    QSize,
 )
-from PyQt5.QtGui import QTextCursor, QTextOption
+from PyQt5.QtGui import QTextCursor, QTextOption, QIcon, QPixmap, QPainter
+from PyQt5.QtSvg import QSvgRenderer
+
+
+class AttachmentItemWidget(QWidget):
+    """Виджет элемента списка прикрепленных файлов с кнопкой удаления."""
+
+    def __init__(self, file_path: Path, parent=None):
+        super().__init__(parent)
+        self.file_path = file_path
+        self._setup_ui()
+
+    def _setup_ui(self):
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(5, 2, 5, 2)
+        layout.setSpacing(5)
+
+        file_label = QLabel(self.file_path.name)
+        file_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        layout.addWidget(file_label)
+
+        # Минималистичная кнопка удаления, как в шагах
+        delete_button = QToolButton()
+        delete_button.setText("×")
+        delete_button.setToolTip("Удалить файл")
+        delete_button.setCursor(Qt.PointingHandCursor)
+        delete_button.setAutoRaise(True)
+        delete_button.setFixedSize(24, 24)
+        delete_button.setStyleSheet("""
+            QToolButton {
+                border: 1px solid transparent;
+                border-radius: 4px;
+                padding: 0px;
+                min-width: 24px;
+                max-width: 24px;
+                min-height: 24px;
+                max-height: 24px;
+                font-size: 12px;
+            }
+            QToolButton:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                border-color: rgba(255, 255, 255, 0.2);
+            }
+        """)
+        delete_button.clicked.connect(self._on_delete_clicked)
+        layout.addWidget(delete_button, 0, Qt.AlignRight)
+
+    def _on_delete_clicked(self):
+        self.delete_requested.emit(self.file_path)
+
+    delete_requested = pyqtSignal(Path)
 
 
 class ReviewPanel(QWidget):
@@ -38,7 +91,98 @@ class ReviewPanel(QWidget):
         super().__init__(parent)
         self._attachments: List[Path] = []
         self._title_text = title_text
+        
+        # Загружаем маппинг иконок
+        self._icon_mapping = self._load_icon_mapping()
+        
         self._setup_ui()
+
+    def _load_icon_mapping(self) -> Dict[str, Dict[str, str]]:
+        """Загрузить маппинг иконок из JSON файла."""
+        # Определяем путь к файлу маппинга относительно корня проекта
+        project_root = Path(__file__).parent.parent.parent.parent
+        mapping_file = project_root / "icons" / "icon_mapping.json"
+        
+        if mapping_file.exists():
+            try:
+                with open(mapping_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    # Поддерживаем как старый формат (плоский), так и новый (с секциями)
+                    if isinstance(data, dict) and any(key in data for key in ['panels', 'context_menu', 'panel_buttons']):
+                        return data
+                    else:
+                        # Старый формат - возвращаем с секциями
+                        return {
+                            'panels': data if isinstance(data, dict) else {},
+                            'context_menu': {},
+                            'panel_buttons': {}
+                        }
+            except (json.JSONDecodeError, IOError) as e:
+                print(f"Ошибка загрузки маппинга иконок: {e}")
+        
+        # Возвращаем значения по умолчанию, если файл не найден
+        return {
+            'panels': {},
+            'context_menu': {},
+            'panel_buttons': {
+                "attach_files": "file-plus.svg"
+            }
+        }
+
+    def _get_panel_button_icon(self, icon_key: str) -> Optional[str]:
+        """Получить имя файла иконки для кнопки панели по ключу."""
+        panel_buttons_mapping = self._icon_mapping.get('panel_buttons', {})
+        return panel_buttons_mapping.get(icon_key)
+
+    def _load_svg_icon(self, icon_name: str, size: int = 20, color: Optional[str] = None) -> Optional[QIcon]:
+        """Загрузить SVG иконку из файла и вернуть QIcon.
+        
+        Args:
+            icon_name: Имя файла иконки (например, "info.svg")
+            size: Размер иконки в пикселях
+            color: Цвет иконки в формате "#RRGGBB" или None для использования цвета по умолчанию
+        """
+        # Определяем путь к папке с иконками относительно корня проекта
+        project_root = Path(__file__).parent.parent.parent.parent
+        icon_path = project_root / "icons" / icon_name
+        
+        if not icon_path.exists():
+            print(f"Иконка не найдена: {icon_path}")
+            return None
+        
+        try:
+            # Читаем содержимое SVG файла
+            with open(icon_path, 'r', encoding='utf-8') as f:
+                svg_content = f.read()
+            
+            # Если указан цвет, заменяем currentColor на конкретный цвет
+            if color:
+                svg_content = svg_content.replace('currentColor', color)
+                svg_content = svg_content.replace('stroke="currentColor"', f'stroke="{color}"')
+                svg_content = svg_content.replace('fill="currentColor"', f'fill="{color}"')
+            
+            # Создаем рендерер SVG из модифицированного содержимого
+            renderer = QSvgRenderer(svg_content.encode('utf-8'))
+            if not renderer.isValid():
+                print(f"Невалидный SVG файл: {icon_path}")
+                return None
+            
+            # Создаем пиксмап нужного размера
+            pixmap = QPixmap(size, size)
+            pixmap.fill(Qt.transparent)
+            
+            # Рендерим SVG на пиксмап
+            painter = QPainter(pixmap)
+            painter.setRenderHint(QPainter.Antialiasing)
+            renderer.render(painter)
+            painter.end()
+            
+            # Создаем иконку из пиксмапа
+            icon = QIcon(pixmap)
+            return icon
+        except Exception as e:
+            print(f"Ошибка загрузки иконки {icon_name}: {e}")
+            return None
 
     def _setup_ui(self):
         main_layout = QVBoxLayout(self)
@@ -65,7 +209,19 @@ class ReviewPanel(QWidget):
         header_row = QHBoxLayout()
         header_row.setSpacing(10)
 
-        self.attach_button = QPushButton("📎")
+        self.attach_button = QPushButton()
+        # Загружаем иконку из маппинга
+        icon_name = self._get_panel_button_icon("attach_files")
+        if icon_name:
+            icon = self._load_svg_icon(icon_name, size=20, color="#ffffff")
+            if icon:
+                self.attach_button.setIcon(icon)
+                self.attach_button.setIconSize(QSize(20, 20))
+            else:
+                self.attach_button.setText("📎")
+        else:
+            self.attach_button.setText("📎")
+        
         self.attach_button.setToolTip("Прикрепить файлы")
         self.attach_button.setFixedSize(40, 40)
         self.attach_button.clicked.connect(self._choose_files)
@@ -260,8 +416,19 @@ class ReviewPanel(QWidget):
             self._update_attachments_height()
             return
         for path in self._attachments:
-            QListWidgetItem(str(path), self.attachments_list)
+            item_widget = AttachmentItemWidget(path)
+            item_widget.delete_requested.connect(self._remove_attachment)
+            item = QListWidgetItem()
+            item.setSizeHint(item_widget.sizeHint())
+            self.attachments_list.addItem(item)
+            self.attachments_list.setItemWidget(item, item_widget)
         self._update_attachments_height()
+
+    def _remove_attachment(self, path: Path):
+        """Удалить файл из списка прикрепленных."""
+        if path in self._attachments:
+            self._attachments.remove(path)
+            self._refresh_attachments()
 
     # --- Qt события -------------------------------------------------------
 

@@ -5,13 +5,10 @@ from __future__ import annotations
 from typing import Iterable, List, Optional
 from pathlib import Path
 
-from PyQt5.QtCore import Qt, pyqtSignal, QMargins
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import (
     QWidget,
     QVBoxLayout,
-    QHBoxLayout,
-    QPushButton,
-    QButtonGroup,
     QStackedLayout,
     QLabel,
     QSizePolicy,
@@ -20,7 +17,9 @@ from PyQt5.QtWidgets import (
 
 from .review_panel import ReviewPanel
 from .json_preview_widget import JsonPreviewWidget
-from .stats_panel import StatsPanel
+from .information_panel import InformationPanel
+from .files_panel import FilesPanel
+from .reports_panel import ReportsPanel
 from ...models import TestCase
 from ..styles.ui_metrics import UI_METRICS
 
@@ -34,6 +33,11 @@ class AuxiliaryPanel(QWidget):
     creation_prompt_saved = pyqtSignal(str)
     creation_enter_clicked = pyqtSignal(str, list)
 
+    information_data_changed = pyqtSignal()
+    generate_report_requested = pyqtSignal()  # Сигнал для запроса генерации отчета
+    generate_summary_report_requested = pyqtSignal()  # Сигнал для запроса генерации суммарного отчета
+    tab_changed = pyqtSignal(str)  # Сигнал об изменении активной вкладки
+
     def __init__(
         self,
         parent: Optional[QWidget] = None,
@@ -43,9 +47,7 @@ class AuxiliaryPanel(QWidget):
         creation_default_files: Optional[List[Path]] = None,
     ):
         super().__init__(parent)
-        self._tabs_order = ["review", "creation", "json", "stats"]
-        self._buttons: dict[str, QPushButton] = {}
-        self._last_non_stats_tab = "review"
+        self._tabs_order = ["information", "review", "creation", "json", "files", "reports"]
         self._methodic_path = methodic_path
         self._review_default_prompt = default_review_prompt
         self._creation_default_prompt = default_creation_prompt or "Создай ТТ"
@@ -55,6 +57,11 @@ class AuxiliaryPanel(QWidget):
         self._setup_ui()
 
     def _setup_ui(self):
+        # Устанавливаем правильную политику размера для панели
+        # Preferred по горизонтали - не расширяется автоматически
+        self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        
+        # Теперь только контентная область без вертикальной панели с кнопками
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(
             UI_METRICS.container_padding,
@@ -64,11 +71,13 @@ class AuxiliaryPanel(QWidget):
         )
         main_layout.setSpacing(UI_METRICS.section_spacing)
 
-        button_row = self._create_button_row()
-        main_layout.addLayout(button_row)
-
         self._stack = QStackedLayout()
         self._stack.setStackingMode(QStackedLayout.StackOne)
+
+        # Вкладка информации
+        self.information_panel = InformationPanel()
+        self.information_panel.data_changed.connect(self.information_data_changed.emit)
+        self._stack.addWidget(self.information_panel)
 
         # Вкладка ревью
         self.review_panel = ReviewPanel(title_text="Панель ревью")
@@ -86,52 +95,20 @@ class AuxiliaryPanel(QWidget):
         self.json_panel = JsonPreviewWidget()
         self._stack.addWidget(self.json_panel)
 
-        # Вкладка статистики
-        self.stats_panel = StatsPanel()
-        self._stack.addWidget(self.stats_panel)
+        # Вкладка файлов
+        self.files_panel = FilesPanel()
+        self._stack.addWidget(self.files_panel)
+        
+        # Вкладка отчетности
+        self.reports_panel = ReportsPanel()
+        self.reports_panel.generate_report_requested.connect(self.generate_report_requested.emit)
+        self.reports_panel.generate_summary_report_requested.connect(self.generate_summary_report_requested.emit)
+        self._stack.addWidget(self.reports_panel)
 
         main_layout.addLayout(self._stack, stretch=1)
 
         self.ensure_creation_defaults()
-        self.select_tab("review")
-
-    def _create_button_row(self) -> QHBoxLayout:
-        layout = QHBoxLayout()
-        layout.setContentsMargins(
-            QMargins(
-                UI_METRICS.base_spacing,
-                0,
-                UI_METRICS.base_spacing,
-                0,
-            )
-        )
-        layout.setSpacing(UI_METRICS.base_spacing)
-        layout.setAlignment(Qt.AlignLeft)
-
-        button_group = QButtonGroup(self)
-        button_group.setExclusive(True)
-
-        tabs = [
-            ("review", "Ревью", "Панель ревью"),
-            ("creation", "Создать ТК", "Создать ТК"),
-            ("json", "JSON", "JSON превью"),
-            ("stats", "Статистика", "Статистика"),
-        ]
-
-        for index, (tab_id, text, tooltip) in enumerate(tabs):
-            button = QPushButton(text)
-            button.setToolTip(tooltip)
-            button.setCheckable(True)
-            button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-            button.setMinimumHeight(UI_METRICS.control_min_height)
-            button.setMinimumWidth(UI_METRICS.control_min_width)
-            button.setCursor(Qt.PointingHandCursor)
-            button_group.addButton(button, index)
-            button.clicked.connect(lambda checked, idx=index: checked and self._stack.setCurrentIndex(idx))
-            layout.addWidget(button)
-            self._buttons[tab_id] = button
-
-        return layout
+        self.select_tab("information")
 
     @staticmethod
     def _build_placeholder(title: str) -> QWidget:
@@ -156,25 +133,49 @@ class AuxiliaryPanel(QWidget):
     def select_tab(self, tab_id: str):
         """Активировать вкладку по идентификатору."""
         if tab_id not in self._tabs_order:
-            tab_id = "review"
+            tab_id = "information"
 
         index = self._tabs_order.index(tab_id)
         self._stack.setCurrentIndex(index)
 
-        button = self._buttons.get(tab_id)
-        if button and not button.isChecked():
-            button.setChecked(True)
+        # Отправляем сигнал об изменении вкладки (для обновления кнопок в toolbar)
+        self.tab_changed.emit(tab_id)
 
         if tab_id == "creation":
             self.ensure_creation_defaults()
-        if tab_id != "stats":
-            self._last_non_stats_tab = tab_id
 
-    def show_stats_tab(self):
-        self.select_tab("stats")
+    # ------------------------------------------------------------------ information
 
-    def restore_last_tab(self):
-        self.select_tab(self._last_non_stats_tab or "review")
+    def set_information_test_case(self, test_case: Optional[TestCase]):
+        """Установить тест-кейс для панели информации"""
+        if hasattr(self, "information_panel"):
+            self.information_panel.load_test_case(test_case)
+
+    def update_information_test_case(self, test_case: TestCase):
+        """Обновить тест-кейс данными из панели информации"""
+        if hasattr(self, "information_panel") and test_case:
+            self.information_panel.update_test_case(test_case)
+
+    def set_information_edit_mode(self, enabled: bool):
+        """Установить режим редактирования для панели информации"""
+        if hasattr(self, "information_panel"):
+            self.information_panel.set_edit_mode(enabled)
+
+    # ------------------------------------------------------------------ files
+
+    def set_files_test_case(self, test_case: Optional[TestCase]):
+        """Установить тест-кейс для панели файлов"""
+        if hasattr(self, "files_panel"):
+            self.files_panel.load_test_case(test_case)
+    
+    # ------------------------------------------------------------------ reports
+
+    def update_reports_panel(self):
+        """Обновить панель отчетности"""
+        if hasattr(self, "reports_panel"):
+            self.reports_panel.refresh_reports()
+
+    # ------------------------------------------------------------------ review
 
     def set_review_attachments(self, attachments: Iterable[Path]):
         self.review_panel.set_attachments(attachments)
@@ -243,16 +244,29 @@ class AuxiliaryPanel(QWidget):
         else:
             self.json_panel.clear()
 
-    def update_statistics(self, test_cases: List[TestCase]):
-        if hasattr(self, "stats_panel"):
-            self.stats_panel.update_statistics(test_cases)
 
     def set_panels_enabled(self, review_enabled: bool, creation_enabled: bool):
+        """Установить доступность панелей Ревью и Создать ТК.
+        
+        Примечание: Доступность кнопок теперь управляется из main_window через toolbar.
+        """
         self.review_panel.setEnabled(review_enabled)
         self.creation_panel.setEnabled(creation_enabled)
-        if button := self._buttons.get("review"):
-            button.setEnabled(review_enabled)
-        if button := self._buttons.get("creation"):
-            button.setEnabled(creation_enabled)
+
+    def set_panels_visible(self, review_visible: bool, creation_visible: bool):
+        """Установить видимость панелей Ревью и Создать ТК.
+        
+        Args:
+            review_visible: True для показа панели Ревью, False для скрытия
+            creation_visible: True для показа панели Создать ТК, False для скрытия
+        
+        Примечание: Видимость кнопок теперь управляется из main_window через toolbar.
+        """
+        # Если скрываем панели и текущая активная панель - одна из скрываемых, переключаемся на information
+        current_index = self._stack.currentIndex()
+        if not review_visible and current_index == self._tabs_order.index("review"):
+            self.select_tab("information")
+        if not creation_visible and current_index == self._tabs_order.index("creation"):
+            self.select_tab("information")
 
 

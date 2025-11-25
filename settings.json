@@ -1,23 +1,60 @@
 {
-    "test_cases_dir": "C:\\test-cases-example\\testcases",
+    "test_cases_dir": "C:/all_testcases_spektr",
     "DEFAULT_PROMT": "",
     "panel_sizes": {
-        "left": 301,
-        "form_area": 1487,
-        "review": 689
+        "left": 515,
+        "form_area": 1630,
+        "review": 561
     },
     "LLM_MODEL": "deepseek-v3.1:latest",
     "LLM_HOST": "http://spb99-vkc-dhwgpu06.devzone.local:11434",
     "LLM_METHODIC_PATH": "C:\\viewer_testcase\\test_case_editor\\docs\\test-cases-guidelines.md",
     "window_geometry": {
-        "x": 187,
-        "y": 52,
-        "width": 1839,
-        "height": 955,
+        "x": 104,
+        "y": 56,
+        "width": 2094,
+        "height": 934,
         "is_fullscreen": false
     },
     "DEFAULT_PROMT_CREATE_TC": "Создай тест-кейсы с акцентом на аспекты указанные в методике и ЧТЗ. Поверхностное описание шагов не приемлемо. Необходимы детальные шаги.",
-    "theme": "light",
-    "font_family": "Segoe UI Semilight",
-    "font_size": 11
+    "theme": "dark",
+    "font_family": "Segoe UI",
+    "font_size": 13,
+    "text_input_vertical_padding": 3,
+    "base_spacing": 10,
+    "section_spacing": 4,
+    "container_padding": 4,
+    "group_title_spacing": 11,
+    "information_panel_visibility": {
+        "id": true,
+        "created": true,
+        "updated": true,
+        "author": true,
+        "owner": true,
+        "reviewer": true,
+        "status": true,
+        "test_layer": true,
+        "test_type": true,
+        "severity": true,
+        "priority": true,
+        "environment": false,
+        "browser": false,
+        "test_case_id": true,
+        "issue_links": false,
+        "test_case_links": false,
+        "tags": true,
+        "epic": true,
+        "feature": true,
+        "story": true,
+        "component": true,
+        "description": true,
+        "expected_result": false
+    },
+    "last_test_plan_name": "Регина",
+    "skip_reasons": [
+        "Автотесты",
+        "Нагрузочное тестирование",
+        "Test-first",
+        "Другое"
+    ]
 }

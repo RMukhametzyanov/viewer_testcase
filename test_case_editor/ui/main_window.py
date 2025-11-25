@@ -4,7 +4,7 @@ import json
 import re
 import subprocess
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from PyQt5.QtWidgets import (
     QApplication,
@@ -28,10 +28,23 @@ from PyQt5.QtWidgets import (
     QActionGroup,
     QMenu,
     QToolButton,
+    QToolBar,
     QComboBox,
+    QSpinBox,
+    QGroupBox,
+    QScrollArea,
+    QTabWidget,
+    QFontComboBox,
+    QListWidget,
+    QListWidgetItem,
+    QStackedWidget,
+    QCheckBox,
+    QButtonGroup,
+    QSizePolicy,
 )
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject, QStringListModel, QSortFilterProxyModel, QRegularExpression
-from PyQt5.QtGui import QFont
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject, QStringListModel, QSortFilterProxyModel, QRegularExpression, QTimer, QEvent, QSize
+from PyQt5.QtGui import QFont, QIcon, QPixmap, QPainter
+from PyQt5.QtSvg import QSvgRenderer
 
 from ..models.test_case import TestCase
 from ..services.test_case_service import TestCaseService
@@ -41,12 +54,15 @@ from .widgets.tree_widget import TestCaseTreeWidget
 from .widgets.form_widget import TestCaseFormWidget
 from .widgets.auxiliary_panel import AuxiliaryPanel
 from .widgets.toggle_switch import ToggleSwitch
+from .widgets.filter_panel import FilterPanel
 from ..utils import llm
 from ..utils.prompt_builder import build_review_prompt, build_creation_prompt
 from ..utils.list_models import fetch_models as fetch_llm_models
 from ..utils.allure_generator import generate_allure_report
+from ..utils.html_report_generator import generate_html_report
 from .styles.ui_metrics import UI_METRICS
 from .styles.app_theme import build_app_style_sheet
+from .styles.theme_provider import THEME_PROVIDER, ThemeProvider
 
 
 class GitCommitDialog(QDialog):
@@ -85,6 +101,868 @@ class GitCommitDialog(QDialog):
 
     def get_comment(self) -> str:
         return self.comment_edit.toPlainText()
+
+
+class SettingsDialog(QDialog):
+    """Диалог настроек приложения."""
+
+    def __init__(self, settings: dict, parent: Optional[QWidget] = None):
+        super().__init__(parent)
+        self.settings = settings.copy()
+        self.setWindowTitle("Настройки")
+        self.setModal(True)
+        self.setMinimumSize(700, 600)
+        self.parent_window = parent  # Сохраняем ссылку на главное окно для доступа к методам загрузки моделей
+        
+        self._setup_ui()
+        self._load_settings()
+
+    def _setup_ui(self):
+        """Настройка UI с горизонтальной навигацией (список слева, контент справа)"""
+        main_layout = QVBoxLayout(self)
+        main_layout.setSpacing(UI_METRICS.base_spacing)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+
+        # Горизонтальный layout: список слева, контент справа
+        content_layout = QHBoxLayout()
+        content_layout.setSpacing(0)
+        content_layout.setContentsMargins(0, 0, 0, 0)
+
+        # Список навигации слева
+        self.nav_list = QListWidget()
+        self.nav_list.setMaximumWidth(200)
+        self.nav_list.setMinimumWidth(180)
+        self.nav_list.setSpacing(4)
+        
+        # StackedWidget для контента справа
+        self.content_stack = QStackedWidget()
+        
+        # Добавляем разделы
+        sections = [
+            ("Общие", "general"),
+            ("LLM", "llm"),
+            ("Промпты", "prompts"),
+            ("Панели", "panels"),
+            ("Внешний вид", "appearance"),
+            ("Панель Информация", "information_panel"),
+        ]
+        
+        self.section_widgets = {}
+        for name, key in sections:
+            # Добавляем в список навигации
+            item = QListWidgetItem(name)
+            self.nav_list.addItem(item)
+            
+            # Создаем и добавляем контент
+            if key == "general":
+                widget = self._create_general_tab()
+            elif key == "llm":
+                widget = self._create_llm_tab()
+            elif key == "prompts":
+                widget = self._create_prompts_tab()
+            elif key == "panels":
+                widget = self._create_panels_tab()
+            elif key == "appearance":
+                widget = self._create_appearance_tab()
+            elif key == "information_panel":
+                widget = self._create_information_panel_tab()
+            else:
+                widget = QWidget()
+            
+            index = self.content_stack.addWidget(widget)
+            self.section_widgets[key] = index
+        
+        # Подключаем переключение
+        self.nav_list.currentRowChanged.connect(self.content_stack.setCurrentIndex)
+        self.nav_list.setCurrentRow(0)
+        
+        content_layout.addWidget(self.nav_list)
+        content_layout.addWidget(self.content_stack, 1)  # Контент растягивается
+        
+        main_layout.addLayout(content_layout)
+
+        # Кнопки внизу
+        button_layout = QHBoxLayout()
+        button_layout.addStretch()
+        button_box = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
+            Qt.Horizontal,
+            self,
+        )
+        button_box.accepted.connect(self._save_and_accept)
+        button_box.rejected.connect(self.reject)
+        button_layout.addWidget(button_box)
+        main_layout.addLayout(button_layout)
+
+    def _create_general_tab(self) -> QWidget:
+        """Создать вкладку общих настроек"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        layout.setSpacing(UI_METRICS.base_spacing)
+        
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.NoFrame)
+        
+        content = QWidget()
+        content_layout = QVBoxLayout(content)
+        content_layout.setSpacing(UI_METRICS.section_spacing)
+        
+        # Папка с тест-кейсами
+        test_cases_group = QGroupBox("Папка с тест-кейсами")
+        test_cases_layout = QHBoxLayout()
+        self.test_cases_dir_edit = QLineEdit()
+        self.test_cases_dir_edit.setPlaceholderText("Путь к папке с тест-кейсами")
+        test_cases_dir_btn = QPushButton("Обзор...")
+        test_cases_dir_btn.clicked.connect(self._browse_test_cases_dir)
+        test_cases_layout.addWidget(self.test_cases_dir_edit)
+        test_cases_layout.addWidget(test_cases_dir_btn)
+        test_cases_group.setLayout(test_cases_layout)
+        content_layout.addWidget(test_cases_group)
+        
+        # Путь к методике
+        methodic_group = QGroupBox("Путь к методике")
+        methodic_layout = QHBoxLayout()
+        self.methodic_path_edit = QLineEdit()
+        self.methodic_path_edit.setPlaceholderText("Путь к файлу методики")
+        methodic_path_btn = QPushButton("Обзор...")
+        methodic_path_btn.clicked.connect(self._browse_methodic_path)
+        methodic_layout.addWidget(self.methodic_path_edit)
+        methodic_layout.addWidget(methodic_path_btn)
+        methodic_group.setLayout(methodic_layout)
+        content_layout.addWidget(methodic_group)
+        
+        content_layout.addStretch()
+        scroll.setWidget(content)
+        layout.addWidget(scroll)
+        
+        return widget
+
+    def _create_llm_tab(self) -> QWidget:
+        """Создать вкладку настроек LLM"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        layout.setSpacing(UI_METRICS.base_spacing)
+        
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.NoFrame)
+        
+        content = QWidget()
+        content_layout = QVBoxLayout(content)
+        content_layout.setSpacing(UI_METRICS.section_spacing)
+        
+        # LLM Host
+        host_group = QGroupBox("LLM Host")
+        host_layout = QVBoxLayout()
+        self.llm_host_edit = QLineEdit()
+        self.llm_host_edit.setPlaceholderText("http://localhost:11434")
+        self.llm_host_edit.textChanged.connect(self._on_llm_host_changed)
+        host_layout.addWidget(self.llm_host_edit)
+        host_group.setLayout(host_layout)
+        content_layout.addWidget(host_group)
+        
+        # LLM Model - комбобокс для выбора модели
+        model_group = QGroupBox("LLM Model")
+        model_layout = QVBoxLayout()
+        
+        # Создаем модель для комбобокса
+        self.llm_model_list_model = QStringListModel(self)
+        self.llm_model_proxy_model = QSortFilterProxyModel(self)
+        self.llm_model_proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        self.llm_model_proxy_model.setFilterKeyColumn(0)
+        self.llm_model_proxy_model.setSourceModel(self.llm_model_list_model)
+        
+        self.llm_model_edit = QComboBox()
+        self.llm_model_edit.setModel(self.llm_model_proxy_model)
+        self.llm_model_edit.setEditable(True)
+        self.llm_model_edit.setInsertPolicy(QComboBox.NoInsert)
+        self.llm_model_edit.setMinimumWidth(200)
+        self.llm_model_edit.currentTextChanged.connect(self._on_llm_model_changed)
+        line_edit = self.llm_model_edit.lineEdit()
+        if line_edit:
+            line_edit.setPlaceholderText("Выберите модель…")
+            line_edit.textEdited.connect(self._on_llm_model_text_edited)
+            line_edit.editingFinished.connect(self._on_llm_model_editing_finished)
+        
+        # Кнопка обновления списка моделей
+        refresh_btn = QPushButton("Обновить список")
+        refresh_btn.clicked.connect(self._refresh_llm_models)
+        
+        model_btn_layout = QHBoxLayout()
+        model_btn_layout.addWidget(self.llm_model_edit)
+        model_btn_layout.addWidget(refresh_btn)
+        
+        model_layout.addLayout(model_btn_layout)
+        model_group.setLayout(model_layout)
+        content_layout.addWidget(model_group)
+        
+        content_layout.addStretch()
+        scroll.setWidget(content)
+        layout.addWidget(scroll)
+        
+        return widget
+
+    def _create_prompts_tab(self) -> QWidget:
+        """Создать вкладку настроек промптов"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        layout.setSpacing(UI_METRICS.base_spacing)
+        
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.NoFrame)
+        
+        content = QWidget()
+        content_layout = QVBoxLayout(content)
+        content_layout.setSpacing(UI_METRICS.section_spacing)
+        
+        # Промпт для ревью
+        review_group = QGroupBox("Промпт для ревью")
+        review_layout = QVBoxLayout()
+        self.review_prompt_edit = QTextEdit()
+        self.review_prompt_edit.setPlaceholderText("Опиши, на что обратить внимание при ревью тест-кейсов.")
+        self.review_prompt_edit.setMinimumHeight(100)
+        review_layout.addWidget(self.review_prompt_edit)
+        review_group.setLayout(review_layout)
+        content_layout.addWidget(review_group)
+        
+        # Промпт для создания ТК
+        create_group = QGroupBox("Промпт для создания тест-кейсов")
+        create_layout = QVBoxLayout()
+        self.create_prompt_edit = QTextEdit()
+        self.create_prompt_edit.setPlaceholderText("Создай тест-кейсы...")
+        self.create_prompt_edit.setMinimumHeight(100)
+        create_layout.addWidget(self.create_prompt_edit)
+        create_group.setLayout(create_layout)
+        content_layout.addWidget(create_group)
+        
+        content_layout.addStretch()
+        scroll.setWidget(content)
+        layout.addWidget(scroll)
+        
+        return widget
+
+    def _create_panels_tab(self) -> QWidget:
+        """Создать вкладку настроек панелей"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        layout.setSpacing(UI_METRICS.base_spacing)
+        
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.NoFrame)
+        
+        content = QWidget()
+        content_layout = QVBoxLayout(content)
+        content_layout.setSpacing(UI_METRICS.section_spacing)
+        
+        # Размеры панелей
+        panels_group = QGroupBox("Размеры панелей (в пикселях)")
+        panels_layout = QVBoxLayout()
+        panels_layout.setSpacing(UI_METRICS.base_spacing)
+        
+        # Левая панель
+        left_layout = QHBoxLayout()
+        left_layout.addWidget(QLabel("Левая панель (дерево):"))
+        self.left_panel_spin = QSpinBox()
+        self.left_panel_spin.setMinimum(150)
+        self.left_panel_spin.setMaximum(2000)
+        self.left_panel_spin.setSuffix(" px")
+        left_layout.addWidget(self.left_panel_spin)
+        left_layout.addStretch()
+        panels_layout.addLayout(left_layout)
+        
+        # Панель редактирования
+        form_layout = QHBoxLayout()
+        form_layout.addWidget(QLabel("Панель редактирования:"))
+        self.form_area_spin = QSpinBox()
+        self.form_area_spin.setMinimum(300)
+        self.form_area_spin.setMaximum(5000)
+        self.form_area_spin.setSuffix(" px")
+        form_layout.addWidget(self.form_area_spin)
+        form_layout.addStretch()
+        panels_layout.addLayout(form_layout)
+        
+        # Панель ревью
+        review_layout = QHBoxLayout()
+        review_layout.addWidget(QLabel("Панель ревью:"))
+        self.review_panel_spin = QSpinBox()
+        self.review_panel_spin.setMinimum(200)
+        self.review_panel_spin.setMaximum(2000)
+        self.review_panel_spin.setSuffix(" px")
+        review_layout.addWidget(self.review_panel_spin)
+        review_layout.addStretch()
+        panels_layout.addLayout(review_layout)
+        
+        panels_group.setLayout(panels_layout)
+        content_layout.addWidget(panels_group)
+        
+        content_layout.addStretch()
+        scroll.setWidget(content)
+        layout.addWidget(scroll)
+        
+        return widget
+
+    def _create_appearance_tab(self) -> QWidget:
+        """Создать вкладку настроек внешнего вида"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        layout.setSpacing(UI_METRICS.base_spacing)
+        
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.NoFrame)
+        
+        content = QWidget()
+        content_layout = QVBoxLayout(content)
+        content_layout.setSpacing(UI_METRICS.section_spacing)
+        
+        # Тема
+        theme_group = QGroupBox("Тема")
+        theme_layout = QVBoxLayout()
+        self.theme_combo = QComboBox()
+        self.theme_combo.setEditable(True)
+        self.theme_combo.addItems(["light", "dark"])
+        theme_layout.addWidget(self.theme_combo)
+        theme_group.setLayout(theme_layout)
+        content_layout.addWidget(theme_group)
+        
+        # Шрифт
+        font_group = QGroupBox("Шрифт")
+        font_layout = QVBoxLayout()
+        font_layout.setSpacing(UI_METRICS.base_spacing)
+        
+        font_family_layout = QHBoxLayout()
+        font_family_layout.addWidget(QLabel("Семейство шрифтов:"))
+        self.font_family_combo = QFontComboBox()
+        self.font_family_combo.setEditable(False)
+        self.font_family_combo.setFontFilters(QFontComboBox.AllFonts)
+        font_family_layout.addWidget(self.font_family_combo)
+        font_layout.addLayout(font_family_layout)
+        
+        font_size_layout = QHBoxLayout()
+        font_size_layout.addWidget(QLabel("Размер шрифта:"))
+        self.font_size_spin = QSpinBox()
+        self.font_size_spin.setMinimum(8)
+        self.font_size_spin.setMaximum(24)
+        self.font_size_spin.setSuffix(" pt")
+        font_size_layout.addWidget(self.font_size_spin)
+        font_size_layout.addStretch()
+        font_layout.addLayout(font_size_layout)
+        
+        font_group.setLayout(font_layout)
+        content_layout.addWidget(font_group)
+        
+        # Отступы
+        padding_group = QGroupBox("Отступы и пробелы")
+        padding_layout = QVBoxLayout()
+        padding_layout.setSpacing(UI_METRICS.base_spacing)
+        
+        # Базовый отступ между элементами
+        base_spacing_layout = QHBoxLayout()
+        base_spacing_layout.addWidget(QLabel("Базовый отступ между элементами:"))
+        self.base_spacing_spin = QSpinBox()
+        self.base_spacing_spin.setMinimum(4)
+        self.base_spacing_spin.setMaximum(32)
+        self.base_spacing_spin.setSuffix(" px")
+        self.base_spacing_spin.setToolTip("Стандартный промежуток между элементами интерфейса")
+        base_spacing_layout.addWidget(self.base_spacing_spin)
+        base_spacing_layout.addStretch()
+        padding_layout.addLayout(base_spacing_layout)
+        
+        # Отступ между секциями
+        section_spacing_layout = QHBoxLayout()
+        section_spacing_layout.addWidget(QLabel("Отступ между секциями:"))
+        self.section_spacing_spin = QSpinBox()
+        self.section_spacing_spin.setMinimum(4)
+        self.section_spacing_spin.setMaximum(32)
+        self.section_spacing_spin.setSuffix(" px")
+        self.section_spacing_spin.setToolTip("Вертикальные интервалы между большими секциями")
+        section_spacing_layout.addWidget(self.section_spacing_spin)
+        section_spacing_layout.addStretch()
+        padding_layout.addLayout(section_spacing_layout)
+        
+        # Отступ контейнеров
+        container_padding_layout = QHBoxLayout()
+        container_padding_layout.addWidget(QLabel("Отступ контейнеров (панелей, групп):"))
+        self.container_padding_spin = QSpinBox()
+        self.container_padding_spin.setMinimum(4)
+        self.container_padding_spin.setMaximum(32)
+        self.container_padding_spin.setSuffix(" px")
+        self.container_padding_spin.setToolTip("Внутренние отступы контейнеров (панелей, групп)")
+        container_padding_layout.addWidget(self.container_padding_spin)
+        container_padding_layout.addStretch()
+        padding_layout.addLayout(container_padding_layout)
+        
+        # Отступы текстовых полей
+        padding_text_layout = QHBoxLayout()
+        padding_text_layout.addWidget(QLabel("Вертикальные отступы текстовых полей:"))
+        self.text_padding_spin = QSpinBox()
+        self.text_padding_spin.setMinimum(0)
+        self.text_padding_spin.setMaximum(20)
+        self.text_padding_spin.setSuffix(" px")
+        self.text_padding_spin.setToolTip("Отступы сверху и снизу до текста в редактируемых полях (QLineEdit, QTextEdit)")
+        padding_text_layout.addWidget(self.text_padding_spin)
+        padding_text_layout.addStretch()
+        padding_layout.addLayout(padding_text_layout)
+        
+        # Отступ заголовка QGroupBox
+        group_title_spacing_layout = QHBoxLayout()
+        group_title_spacing_layout.addWidget(QLabel("Отступ заголовка QGroupBox до содержимого:"))
+        self.group_title_spacing_spin = QSpinBox()
+        self.group_title_spacing_spin.setMinimum(0)
+        self.group_title_spacing_spin.setMaximum(20)
+        self.group_title_spacing_spin.setSuffix(" px")
+        self.group_title_spacing_spin.setToolTip("Отступ от заголовка группы до внутренних элементов")
+        group_title_spacing_layout.addWidget(self.group_title_spacing_spin)
+        group_title_spacing_layout.addStretch()
+        padding_layout.addLayout(group_title_spacing_layout)
+        
+        padding_group.setLayout(padding_layout)
+        content_layout.addWidget(padding_group)
+        
+        content_layout.addStretch()
+        scroll.setWidget(content)
+        layout.addWidget(scroll)
+        
+        return widget
+
+    def _create_information_panel_tab(self) -> QWidget:
+        """Создать вкладку настроек панели Информация"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        layout.setSpacing(UI_METRICS.base_spacing)
+        layout.setContentsMargins(
+            UI_METRICS.container_padding,
+            UI_METRICS.container_padding,
+            UI_METRICS.container_padding,
+            UI_METRICS.container_padding,
+        )
+        
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.NoFrame)
+        
+        content = QWidget()
+        content_layout = QVBoxLayout(content)
+        content_layout.setSpacing(UI_METRICS.section_spacing)
+        
+        # Описание
+        info_label = QLabel("Управление видимостью элементов в боковой панели 'Информация'")
+        info_label.setWordWrap(True)
+        content_layout.addWidget(info_label)
+        
+        # Основная информация
+        main_info_group = QGroupBox("Основная информация")
+        main_info_layout = QVBoxLayout()
+        main_info_layout.setSpacing(UI_METRICS.base_spacing)
+        
+        # Метаданные - отдельные элементы
+        self.info_id_check = QCheckBox("ID")
+        main_info_layout.addWidget(self.info_id_check)
+        self.info_created_check = QCheckBox("Создан")
+        main_info_layout.addWidget(self.info_created_check)
+        self.info_updated_check = QCheckBox("Обновлён")
+        main_info_layout.addWidget(self.info_updated_check)
+        
+        main_info_layout.addSpacing(UI_METRICS.base_spacing // 2)
+        
+        # Люди - отдельные элементы
+        self.info_author_check = QCheckBox("Автор")
+        main_info_layout.addWidget(self.info_author_check)
+        self.info_owner_check = QCheckBox("Владелец")
+        main_info_layout.addWidget(self.info_owner_check)
+        self.info_reviewer_check = QCheckBox("Ревьюер")
+        main_info_layout.addWidget(self.info_reviewer_check)
+        
+        main_info_layout.addSpacing(UI_METRICS.base_spacing // 2)
+        
+        # Статус и тип - отдельные элементы
+        self.info_status_check = QCheckBox("Статус")
+        main_info_layout.addWidget(self.info_status_check)
+        self.info_test_layer_check = QCheckBox("Test Layer")
+        main_info_layout.addWidget(self.info_test_layer_check)
+        self.info_test_type_check = QCheckBox("Тип теста")
+        main_info_layout.addWidget(self.info_test_type_check)
+        
+        main_info_layout.addSpacing(UI_METRICS.base_spacing // 2)
+        
+        # Severity и Priority - отдельные элементы
+        self.info_severity_check = QCheckBox("Severity")
+        main_info_layout.addWidget(self.info_severity_check)
+        self.info_priority_check = QCheckBox("Priority")
+        main_info_layout.addWidget(self.info_priority_check)
+        
+        main_info_layout.addSpacing(UI_METRICS.base_spacing // 2)
+        
+        # Окружение и Браузер - отдельные элементы
+        self.info_environment_check = QCheckBox("Окружение")
+        main_info_layout.addWidget(self.info_environment_check)
+        self.info_browser_check = QCheckBox("Браузер")
+        main_info_layout.addWidget(self.info_browser_check)
+        
+        main_info_layout.addSpacing(UI_METRICS.base_spacing // 2)
+        
+        # Ссылки - отдельные элементы
+        self.info_test_case_id_check = QCheckBox("Test Case ID")
+        main_info_layout.addWidget(self.info_test_case_id_check)
+        self.info_issue_links_check = QCheckBox("Issue Links")
+        main_info_layout.addWidget(self.info_issue_links_check)
+        self.info_test_case_links_check = QCheckBox("TC Links")
+        main_info_layout.addWidget(self.info_test_case_links_check)
+        
+        main_info_group.setLayout(main_info_layout)
+        content_layout.addWidget(main_info_group)
+        
+        # Теги
+        self.info_tags_check = QCheckBox("Теги")
+        content_layout.addWidget(self.info_tags_check)
+        
+        # Контекст - отдельные элементы
+        context_group = QGroupBox("Контекст")
+        context_layout = QVBoxLayout()
+        self.info_epic_check = QCheckBox("Epic")
+        context_layout.addWidget(self.info_epic_check)
+        self.info_feature_check = QCheckBox("Feature")
+        context_layout.addWidget(self.info_feature_check)
+        self.info_story_check = QCheckBox("Story")
+        context_layout.addWidget(self.info_story_check)
+        self.info_component_check = QCheckBox("Component")
+        context_layout.addWidget(self.info_component_check)
+        context_group.setLayout(context_layout)
+        content_layout.addWidget(context_group)
+        
+        # Описание
+        self.info_description_check = QCheckBox("Описание")
+        content_layout.addWidget(self.info_description_check)
+        
+        # Общий ожидаемый результат
+        self.info_expected_result_check = QCheckBox("Общий ожидаемый результат")
+        content_layout.addWidget(self.info_expected_result_check)
+        
+        content_layout.addStretch()
+        scroll.setWidget(content)
+        layout.addWidget(scroll)
+        
+        return widget
+
+    def _browse_test_cases_dir(self):
+        """Выбрать папку с тест-кейсами"""
+        current_path = self.test_cases_dir_edit.text() or str(Path.cwd())
+        folder = QFileDialog.getExistingDirectory(
+            self,
+            "Выберите папку с тест-кейсами",
+            current_path,
+            QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks
+        )
+        if folder:
+            self.test_cases_dir_edit.setText(folder)
+
+    def _browse_methodic_path(self):
+        """Выбрать файл методики"""
+        current_path = self.methodic_path_edit.text() or str(Path.cwd())
+        file_path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Выберите файл методики",
+            current_path,
+            "Markdown файлы (*.md);;Текстовые файлы (*.txt);;Все файлы (*.*)"
+        )
+        if file_path:
+            self.methodic_path_edit.setText(file_path)
+
+    def _load_settings(self):
+        """Загрузить настройки в поля формы"""
+        # Общие
+        self.test_cases_dir_edit.setText(self.settings.get('test_cases_dir', ''))
+        self.methodic_path_edit.setText(self.settings.get('LLM_METHODIC_PATH', ''))
+        
+        # LLM
+        self.llm_host_edit.setText(self.settings.get('LLM_HOST', ''))
+        # Загружаем модели для комбобокса
+        self._load_llm_models()
+        # Устанавливаем текущую модель
+        current_model = self.settings.get('LLM_MODEL', '')
+        if current_model:
+            self.llm_model_edit.setEditText(current_model)
+        
+        # Промпты
+        self.review_prompt_edit.setPlainText(self.settings.get('DEFAULT_PROMT', ''))
+        self.create_prompt_edit.setPlainText(self.settings.get('DEFAULT_PROMT_CREATE_TC', ''))
+        
+        # Панели
+        panel_sizes = self.settings.get('panel_sizes', {})
+        self.left_panel_spin.setValue(panel_sizes.get('left', 350))
+        self.form_area_spin.setValue(panel_sizes.get('form_area', 900))
+        self.review_panel_spin.setValue(panel_sizes.get('review', 360))
+        
+        # Внешний вид
+        self.theme_combo.setCurrentText(self.settings.get('theme', 'dark'))
+        font_family = self.settings.get('font_family', 'Segoe UI')
+        # Устанавливаем шрифт в QFontComboBox
+        font_index = self.font_family_combo.findText(font_family, Qt.MatchFixedString)
+        if font_index >= 0:
+            self.font_family_combo.setCurrentIndex(font_index)
+        else:
+            # Если шрифт не найден, используем первый доступный или Segoe UI
+            segoe_index = self.font_family_combo.findText('Segoe UI', Qt.MatchFixedString)
+            if segoe_index >= 0:
+                self.font_family_combo.setCurrentIndex(segoe_index)
+            elif self.font_family_combo.count() > 0:
+                self.font_family_combo.setCurrentIndex(0)
+        self.font_size_spin.setValue(self.settings.get('font_size', 13))
+        self.base_spacing_spin.setValue(self.settings.get('base_spacing', 12))
+        self.section_spacing_spin.setValue(self.settings.get('section_spacing', 8))
+        self.container_padding_spin.setValue(self.settings.get('container_padding', 12))
+        self.text_padding_spin.setValue(self.settings.get('text_input_vertical_padding', 2))
+        self.group_title_spacing_spin.setValue(self.settings.get('group_title_spacing', 1))
+        
+        # Панель Информация - видимость элементов (отдельно для каждого элемента)
+        info_visibility = self.settings.get('information_panel_visibility', {})
+        # Значения по умолчанию: все элементы видимы (True)
+        # Метаданные
+        if hasattr(self, 'info_id_check'):
+            self.info_id_check.setChecked(info_visibility.get('id', True))
+        if hasattr(self, 'info_created_check'):
+            self.info_created_check.setChecked(info_visibility.get('created', True))
+        if hasattr(self, 'info_updated_check'):
+            self.info_updated_check.setChecked(info_visibility.get('updated', True))
+        # Люди
+        if hasattr(self, 'info_author_check'):
+            self.info_author_check.setChecked(info_visibility.get('author', True))
+        if hasattr(self, 'info_owner_check'):
+            self.info_owner_check.setChecked(info_visibility.get('owner', True))
+        if hasattr(self, 'info_reviewer_check'):
+            self.info_reviewer_check.setChecked(info_visibility.get('reviewer', True))
+        # Статус и тип
+        if hasattr(self, 'info_status_check'):
+            self.info_status_check.setChecked(info_visibility.get('status', True))
+        if hasattr(self, 'info_test_layer_check'):
+            self.info_test_layer_check.setChecked(info_visibility.get('test_layer', True))
+        if hasattr(self, 'info_test_type_check'):
+            self.info_test_type_check.setChecked(info_visibility.get('test_type', True))
+        # Severity и Priority
+        if hasattr(self, 'info_severity_check'):
+            self.info_severity_check.setChecked(info_visibility.get('severity', True))
+        if hasattr(self, 'info_priority_check'):
+            self.info_priority_check.setChecked(info_visibility.get('priority', True))
+        # Окружение и Браузер
+        if hasattr(self, 'info_environment_check'):
+            self.info_environment_check.setChecked(info_visibility.get('environment', True))
+        if hasattr(self, 'info_browser_check'):
+            self.info_browser_check.setChecked(info_visibility.get('browser', True))
+        # Ссылки
+        if hasattr(self, 'info_test_case_id_check'):
+            self.info_test_case_id_check.setChecked(info_visibility.get('test_case_id', True))
+        if hasattr(self, 'info_issue_links_check'):
+            self.info_issue_links_check.setChecked(info_visibility.get('issue_links', True))
+        if hasattr(self, 'info_test_case_links_check'):
+            self.info_test_case_links_check.setChecked(info_visibility.get('test_case_links', True))
+        # Группы
+        if hasattr(self, 'info_tags_check'):
+            self.info_tags_check.setChecked(info_visibility.get('tags', True))
+        # Контекст
+        if hasattr(self, 'info_epic_check'):
+            self.info_epic_check.setChecked(info_visibility.get('epic', True))
+        if hasattr(self, 'info_feature_check'):
+            self.info_feature_check.setChecked(info_visibility.get('feature', True))
+        if hasattr(self, 'info_story_check'):
+            self.info_story_check.setChecked(info_visibility.get('story', True))
+        if hasattr(self, 'info_component_check'):
+            self.info_component_check.setChecked(info_visibility.get('component', True))
+        if hasattr(self, 'info_description_check'):
+            self.info_description_check.setChecked(info_visibility.get('description', True))
+        if hasattr(self, 'info_expected_result_check'):
+            self.info_expected_result_check.setChecked(info_visibility.get('expected_result', True))
+
+    def _save_and_accept(self):
+        """Сохранить настройки и закрыть диалог"""
+        # Общие
+        self.settings['test_cases_dir'] = self.test_cases_dir_edit.text().strip()
+        self.settings['LLM_METHODIC_PATH'] = self.methodic_path_edit.text().strip()
+        
+        # LLM
+        self.settings['LLM_HOST'] = self.llm_host_edit.text().strip()
+        self.settings['LLM_MODEL'] = self.llm_model_edit.currentText().strip()
+        
+        # Промпты
+        self.settings['DEFAULT_PROMT'] = self.review_prompt_edit.toPlainText().strip()
+        self.settings['DEFAULT_PROMT_CREATE_TC'] = self.create_prompt_edit.toPlainText().strip()
+        
+        # Панели
+        if 'panel_sizes' not in self.settings:
+            self.settings['panel_sizes'] = {}
+        self.settings['panel_sizes']['left'] = self.left_panel_spin.value()
+        self.settings['panel_sizes']['form_area'] = self.form_area_spin.value()
+        self.settings['panel_sizes']['review'] = self.review_panel_spin.value()
+        
+        # Внешний вид
+        self.settings['theme'] = self.theme_combo.currentText().strip()
+        self.settings['font_family'] = self.font_family_combo.currentText()
+        self.settings['font_size'] = self.font_size_spin.value()
+        self.settings['base_spacing'] = self.base_spacing_spin.value()
+        self.settings['section_spacing'] = self.section_spacing_spin.value()
+        self.settings['container_padding'] = self.container_padding_spin.value()
+        self.settings['text_input_vertical_padding'] = self.text_padding_spin.value()
+        self.settings['group_title_spacing'] = self.group_title_spacing_spin.value()
+        
+        # Панель Информация - видимость элементов (отдельно для каждого элемента)
+        if 'information_panel_visibility' not in self.settings:
+            self.settings['information_panel_visibility'] = {}
+        info_visibility = self.settings['information_panel_visibility']
+        # Метаданные
+        if hasattr(self, 'info_id_check'):
+            info_visibility['id'] = self.info_id_check.isChecked()
+        if hasattr(self, 'info_created_check'):
+            info_visibility['created'] = self.info_created_check.isChecked()
+        if hasattr(self, 'info_updated_check'):
+            info_visibility['updated'] = self.info_updated_check.isChecked()
+        # Люди
+        if hasattr(self, 'info_author_check'):
+            info_visibility['author'] = self.info_author_check.isChecked()
+        if hasattr(self, 'info_owner_check'):
+            info_visibility['owner'] = self.info_owner_check.isChecked()
+        if hasattr(self, 'info_reviewer_check'):
+            info_visibility['reviewer'] = self.info_reviewer_check.isChecked()
+        # Статус и тип
+        if hasattr(self, 'info_status_check'):
+            info_visibility['status'] = self.info_status_check.isChecked()
+        if hasattr(self, 'info_test_layer_check'):
+            info_visibility['test_layer'] = self.info_test_layer_check.isChecked()
+        if hasattr(self, 'info_test_type_check'):
+            info_visibility['test_type'] = self.info_test_type_check.isChecked()
+        # Severity и Priority
+        if hasattr(self, 'info_severity_check'):
+            info_visibility['severity'] = self.info_severity_check.isChecked()
+        if hasattr(self, 'info_priority_check'):
+            info_visibility['priority'] = self.info_priority_check.isChecked()
+        # Окружение и Браузер
+        if hasattr(self, 'info_environment_check'):
+            info_visibility['environment'] = self.info_environment_check.isChecked()
+        if hasattr(self, 'info_browser_check'):
+            info_visibility['browser'] = self.info_browser_check.isChecked()
+        # Ссылки
+        if hasattr(self, 'info_test_case_id_check'):
+            info_visibility['test_case_id'] = self.info_test_case_id_check.isChecked()
+        if hasattr(self, 'info_issue_links_check'):
+            info_visibility['issue_links'] = self.info_issue_links_check.isChecked()
+        if hasattr(self, 'info_test_case_links_check'):
+            info_visibility['test_case_links'] = self.info_test_case_links_check.isChecked()
+        # Группы
+        if hasattr(self, 'info_tags_check'):
+            info_visibility['tags'] = self.info_tags_check.isChecked()
+        # Контекст
+        if hasattr(self, 'info_epic_check'):
+            info_visibility['epic'] = self.info_epic_check.isChecked()
+        if hasattr(self, 'info_feature_check'):
+            info_visibility['feature'] = self.info_feature_check.isChecked()
+        if hasattr(self, 'info_story_check'):
+            info_visibility['story'] = self.info_story_check.isChecked()
+        if hasattr(self, 'info_component_check'):
+            info_visibility['component'] = self.info_component_check.isChecked()
+        if hasattr(self, 'info_description_check'):
+            info_visibility['description'] = self.info_description_check.isChecked()
+        if hasattr(self, 'info_expected_result_check'):
+            info_visibility['expected_result'] = self.info_expected_result_check.isChecked()
+        self.settings['information_panel_visibility'] = info_visibility
+        
+        self.accept()
+
+    def get_settings(self) -> dict:
+        """Получить сохраненные настройки"""
+        return self.settings
+    
+    def _load_llm_models(self):
+        """Загрузить список доступных LLM моделей"""
+        if not self.parent_window:
+            return
+        
+        # Получаем список моделей из главного окна
+        host = self.llm_host_edit.text().strip() or self.settings.get('LLM_HOST', '')
+        if not host:
+            # Если host не указан, используем модели из главного окна
+            if hasattr(self.parent_window, 'available_llm_models'):
+                models = self.parent_window.available_llm_models
+            else:
+                models = []
+        else:
+            # Загружаем модели с указанного хоста
+            try:
+                from ..utils.list_models import fetch_models as fetch_llm_models
+                models = fetch_llm_models(host)
+                models = [str(m).strip() for m in (models or []) if str(m or "").strip()]
+            except Exception:
+                models = []
+        
+        # Добавляем текущую модель, если её нет в списке
+        current_model = self.settings.get('LLM_MODEL', '')
+        if current_model and current_model not in models:
+            models.insert(0, current_model)
+        
+        # Обновляем модель комбобокса
+        self.llm_model_list_model.setStringList(models)
+        self._reset_llm_model_filter()
+    
+    def _refresh_llm_models(self):
+        """Обновить список LLM моделей"""
+        self._load_llm_models()
+        QMessageBox.information(self, "Обновление", "Список моделей обновлен")
+    
+    def _on_llm_host_changed(self, text: str):
+        """Обработчик изменения LLM Host"""
+        # При изменении хоста обновляем список моделей
+        if text.strip():
+            QTimer.singleShot(500, self._load_llm_models)  # Задержка для завершения ввода
+    
+    def _on_llm_model_changed(self, text: str):
+        """Обработчик изменения выбранной модели"""
+        pass  # Модель сохранится при нажатии OK
+    
+    def _on_llm_model_text_edited(self, text: str):
+        """Обработчик редактирования текста в комбобоксе модели"""
+        if text:
+            pattern = f".*{QRegularExpression.escape(text)}.*"
+            regex = QRegularExpression(pattern, QRegularExpression.CaseInsensitiveOption)
+        else:
+            regex = QRegularExpression(".*", QRegularExpression.CaseInsensitiveOption)
+        self.llm_model_proxy_model.setFilterRegularExpression(regex)
+        self.llm_model_edit.showPopup()
+        line_edit = self.llm_model_edit.lineEdit()
+        if line_edit:
+            line_edit.setFocus()
+            line_edit.setCursorPosition(len(text))
+    
+    def _on_llm_model_editing_finished(self):
+        """Обработчик завершения редактирования модели"""
+        line_edit = self.llm_model_edit.lineEdit()
+        if not line_edit:
+            return
+        value = line_edit.text().strip()
+        if not value:
+            self._reset_llm_model_filter()
+            return
+        
+        # Добавляем модель в список, если её нет
+        current_models = self.llm_model_list_model.stringList()
+        if value not in current_models:
+            current_models.append(value)
+            self.llm_model_list_model.setStringList(current_models)
+        
+        self._reset_llm_model_filter()
+        # Устанавливаем выбранную модель
+        source_index = self.llm_model_list_model.index(current_models.index(value), 0)
+        proxy_index = self.llm_model_proxy_model.mapFromSource(source_index)
+        if proxy_index.isValid():
+            self.llm_model_edit.setCurrentIndex(proxy_index.row())
+        else:
+            self.llm_model_edit.setCurrentIndex(-1)
+        self.llm_model_edit.setEditText(value)
+    
+    def _reset_llm_model_filter(self):
+        """Сбросить фильтр комбобокса моделей"""
+        self.llm_model_proxy_model.setFilterRegularExpression(
+            QRegularExpression(".*", QRegularExpression.CaseInsensitiveOption)
+        )
 
 
 class _LLMWorker(QObject):
@@ -145,6 +1023,18 @@ class MainWindow(QMainWindow):
         self.create_tc_prompt = self.settings.get('DEFAULT_PROMT_CREATE_TC', "Создай ТТ")
         self.llm_model = self.settings.get('LLM_MODEL', "").strip()
         self.llm_host = self.settings.get('LLM_HOST', "").strip()
+        
+        # Применяем настройки шрифта и темы к UI_METRICS и THEME_PROVIDER
+        self._apply_font_settings()
+        # Применяем тему из настроек
+        theme_name = self.settings.get('theme', 'dark').strip().lower()
+        if theme_name not in ['dark', 'light']:
+            theme_name = 'dark'  # По умолчанию темная тема
+        try:
+            THEME_PROVIDER.set_theme(theme_name)
+        except (ValueError, AttributeError):
+            # Если что-то пошло не так, используем темную тему
+            THEME_PROVIDER.set_theme('dark')
         self._model_list_model = QStringListModel(self)
         self._model_proxy_model = QSortFilterProxyModel(self)
         self._model_proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
@@ -168,8 +1058,10 @@ class MainWindow(QMainWindow):
         self._llm_thread: Optional[QThread] = None
         self._llm_worker: Optional[_LLMWorker] = None
         self._current_test_case_path: Optional[Path] = None
+        self._current_filters: Dict = {}
         self._current_mode: str = "edit"
         self._geometry_initialized = False
+        self._preserve_panel_sizes = False  # Флаг для предотвращения автоматического изменения размеров панелей
         
         self.setup_ui()
         self._apply_model_options()
@@ -179,12 +1071,16 @@ class MainWindow(QMainWindow):
     
     def setup_ui(self):
         """Настройка пользовательского интерфейса"""
-        self.menuBar().clear()
         self.setWindowTitle("Test Case Editor")
         if not self._geometry_initialized:
             self._apply_initial_geometry()
             self._geometry_initialized = True
+        
+        # Инициализируем меню и добавляем в стандартный menuBar
         self._init_menus()
+        
+        # Создаем панель инструментов
+        self._create_toolbar()
         
         # Центральный виджет
         central_widget = QWidget()
@@ -198,9 +1094,6 @@ class MainWindow(QMainWindow):
             UI_METRICS.window_margin,
         )
         main_layout.setSpacing(UI_METRICS.base_spacing)
-
-        header = self._create_mode_header()
-        main_layout.addWidget(header)
         
         # Splitter для разделения
         self.main_splitter = QSplitter(Qt.Horizontal)
@@ -223,7 +1116,7 @@ class MainWindow(QMainWindow):
         
         self._apply_initial_panel_sizes()
         
-        self.statusBar().showMessage("Готов к работе")
+        # Статусбар будет обновлен в _apply_mode_state()
     
     def _create_left_panel(self) -> QWidget:
         """Создать левую панель с деревом"""
@@ -238,97 +1131,73 @@ class MainWindow(QMainWindow):
         layout.setSpacing(UI_METRICS.section_spacing)
         
         # Поиск
-        search_frame = QFrame()
-        search_frame.setMaximumHeight(48)
-        search_layout = QHBoxLayout(search_frame)
+        self.search_frame = QFrame()  # Сохраняем как атрибут класса
+        search_layout = QHBoxLayout(self.search_frame)
         search_layout.setContentsMargins(
-            UI_METRICS.base_spacing,
-            0,
-            UI_METRICS.base_spacing,
-            UI_METRICS.base_spacing // 2,
+            UI_METRICS.container_padding,
+            UI_METRICS.container_padding,
+            UI_METRICS.container_padding,
+            UI_METRICS.container_padding,
         )
+        search_layout.setSpacing(UI_METRICS.base_spacing // 2)
         
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("🔍 Поиск...")
-        self.search_input.setMinimumHeight(30)
         self.search_input.textChanged.connect(self._filter_tree)
-        search_layout.addWidget(self.search_input)
+        search_layout.addWidget(self.search_input, 1)
         
-        layout.addWidget(search_frame)
+        # Иконка фильтра
+        self.filter_button = QToolButton()
+        # Загружаем иконку фильтра из icon_mapping.json
+        project_root = Path(__file__).parent.parent.parent
+        mapping_file = project_root / "icons" / "icon_mapping.json"
+        filter_icon_name = "filter.svg"
+        if mapping_file.exists():
+            try:
+                with open(mapping_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    filter_icon_name = data.get("search", {}).get("filter", "filter.svg")
+            except:
+                pass
+        
+        filter_icon = self._load_svg_icon(filter_icon_name, size=28, color="#ffffff")
+        if filter_icon:
+            self.filter_button.setIcon(filter_icon)
+            self.filter_button.setIconSize(QSize(28, 28))
+        self.filter_button.setToolTip("Фильтры")
+        self.filter_button.setCursor(Qt.PointingHandCursor)
+        self.filter_button.setAutoRaise(True)
+        self.filter_button.setFixedSize(36, 36)
+        self.filter_button.setStyleSheet("""
+            QToolButton {
+                background-color: transparent;
+                border: none;
+                border-radius: 4px;
+            }
+            QToolButton:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+        """)
+        self.filter_button.clicked.connect(self._on_filter_button_clicked)
+        search_layout.addWidget(self.filter_button)
+        
+        layout.addWidget(self.search_frame)
+        
+        # Панель фильтров будет добавлена в detail_stack
         
         # Дерево
         self.tree_widget = TestCaseTreeWidget(self.service)
+        # Передаем настройки для списка причин пропуска
+        skip_reasons = self.settings.get('skip_reasons', ['Автотесты', 'Нагрузочное тестирование', 'Другое'])
+        self.tree_widget.set_skip_reasons(skip_reasons)
         self.tree_widget.test_case_selected.connect(self._on_test_case_selected)
         self.tree_widget.tree_updated.connect(self._on_tree_updated)
         self.tree_widget.review_requested.connect(self._on_review_requested)
+        self.tree_widget.test_cases_updated.connect(self._on_test_cases_updated)
         layout.addWidget(self.tree_widget, 1)
         
         return panel
 
-    def _create_mode_header(self) -> QWidget:
-        header = QFrame()
-        header.setMaximumHeight(64)
-        layout = QHBoxLayout(header)
-        layout.setContentsMargins(
-            UI_METRICS.header_padding,
-            UI_METRICS.header_padding,
-            UI_METRICS.header_padding,
-            UI_METRICS.header_padding,
-        )
-        layout.setSpacing(UI_METRICS.base_spacing)
-
-        menu_row = QHBoxLayout()
-        menu_row.setSpacing(UI_METRICS.base_spacing)
-        for menu in (self.file_menu, self.view_menu, self.git_menu):
-            btn = QToolButton()
-            btn.setText(menu.title())
-            btn.setPopupMode(QToolButton.InstantPopup)
-            btn.setMenu(menu)
-            btn.setCursor(Qt.PointingHandCursor)
-            btn.setMinimumHeight(UI_METRICS.control_min_height)
-            btn.setMinimumWidth(UI_METRICS.control_min_width * 2)
-            menu_row.addWidget(btn)
-
-        layout.addLayout(menu_row)
-
-        title = QLabel("Test Case Editor")
-        title.setFont(QFont("Segoe UI", 12, QFont.Bold))
-        layout.addWidget(title, 1, Qt.AlignLeft)
-
-        layout.addStretch(1)
-
-        model_layout = QHBoxLayout()
-        model_layout.setSpacing(UI_METRICS.base_spacing // 2)
-        model_label = QLabel("LLM:")
-        self.model_selector = QComboBox()
-        self.model_selector.setModel(self._model_proxy_model)
-        self.model_selector.setEditable(True)
-        self.model_selector.setInsertPolicy(QComboBox.NoInsert)
-        self.model_selector.setMinimumWidth(200)
-        self.model_selector.currentTextChanged.connect(self._on_model_selector_changed)
-        line_edit = self.model_selector.lineEdit()
-        if line_edit:
-            line_edit.setPlaceholderText("Выберите модель…")
-            line_edit.textEdited.connect(self._on_model_selector_text_edited)
-            line_edit.editingFinished.connect(self._on_model_editing_finished)
-        model_layout.addWidget(model_label)
-        model_layout.addWidget(self.model_selector)
-        layout.addLayout(model_layout)
-
-        switch_row = QHBoxLayout()
-        switch_row.setSpacing(UI_METRICS.base_spacing // 2)
-        self.mode_edit_label = QLabel("Редактирование")
-        self.mode_run_label = QLabel("Запуск тестов")
-        self.mode_switch = ToggleSwitch()
-        self.mode_switch.toggled.connect(self._on_mode_switch_changed)
-        switch_row.addWidget(self.mode_edit_label)
-        switch_row.addWidget(self.mode_switch)
-        switch_row.addWidget(self.mode_run_label)
-        layout.addLayout(switch_row)
-        self._update_mode_indicator()
-
-        return header
-    
     def _create_right_panel(self) -> QWidget:
         """Создать правую панель с формой"""
         panel = QWidget()
@@ -349,9 +1218,21 @@ class MainWindow(QMainWindow):
         self.detail_stack.addWidget(self.placeholder)
         
         self.form_widget = TestCaseFormWidget(self.service)
+        # Передаем настройки для списка причин пропуска
+        skip_reasons = self.settings.get('skip_reasons', ['Автотесты', 'Нагрузочное тестирование', 'Другое'])
+        self.form_widget.set_skip_reasons(skip_reasons)
         self.form_widget.test_case_saved.connect(self._on_test_case_saved)
+        self.form_widget.status_changed.connect(self._on_status_changed)
         self.form_widget.unsaved_changes_state.connect(self._on_form_unsaved_state)
+        self.form_widget.before_save.connect(self._on_form_before_save)
         self.detail_stack.addWidget(self.form_widget)
+        
+        # Панель фильтров
+        self.filter_panel = FilterPanel(test_cases=[])
+        self.filter_panel.filters_applied.connect(self._on_filters_applied)
+        self.filter_panel.filters_reset.connect(self._on_filters_reset)
+        self.detail_stack.addWidget(self.filter_panel)
+        
         self.detail_stack.setCurrentWidget(self.placeholder)
 
         self.detail_splitter.addWidget(self.detail_stack_container)
@@ -362,24 +1243,41 @@ class MainWindow(QMainWindow):
             default_review_prompt=self.default_prompt,
             default_creation_prompt=self.create_tc_prompt,
         )
+        # Устанавливаем минимальную и максимальную ширину для aux_panel
+        # чтобы предотвратить автоматическое расширение
+        self.aux_panel.setMinimumWidth(220)
+        self.aux_panel.setMaximumWidth(2000)
         self.aux_panel.review_prompt_saved.connect(self._on_prompt_saved)
         self.aux_panel.review_enter_clicked.connect(self._on_review_enter_clicked)
         self.aux_panel.creation_prompt_saved.connect(self._on_creation_prompt_saved)
         self.aux_panel.creation_enter_clicked.connect(self._on_creation_enter_clicked)
-        self.aux_panel.stats_panel.reset_all_statuses.connect(self._reset_all_step_statuses)
-        self.aux_panel.stats_panel.mark_current_passed.connect(self._mark_current_case_passed)
-        self.aux_panel.stats_panel.reset_current_case.connect(self._reset_current_case_statuses)
-        self.aux_panel.stats_panel.generate_allure.connect(self._generate_allure_report)
+        self.aux_panel.information_data_changed.connect(self._on_information_data_changed)
+        self.aux_panel.generate_report_requested.connect(self._generate_html_report)
+        self.aux_panel.generate_summary_report_requested.connect(self._generate_summary_report)
+        self.aux_panel.tab_changed.connect(self._on_aux_panel_tab_changed)
         self.detail_splitter.addWidget(self.aux_panel)
+        
+        # Создаем кнопки панелей в toolbar после создания aux_panel
+        self._create_panel_buttons()
+        
+        # Применяем настройки видимости панели Информация при инициализации
+        info_visibility = self.settings.get('information_panel_visibility', {})
+        if hasattr(self.aux_panel, 'information_panel'):
+            self.aux_panel.information_panel.set_visibility_settings(info_visibility)
 
         self.detail_splitter.setCollapsible(0, False)
-        self.detail_splitter.setCollapsible(1, False)
+        self.detail_splitter.setCollapsible(1, True)  # Разрешаем скрывать aux_panel
         layout.addWidget(self.detail_splitter)
         
         return panel
     
     def _init_menus(self):
-        self.file_menu = QMenu('Файл', self)
+        """Инициализация меню и добавление в стандартный menuBar"""
+        menubar = self.menuBar()
+        menubar.clear()
+        
+        # Меню "Файл"
+        self.file_menu = menubar.addMenu('Файл')
         select_folder_action = self.file_menu.addAction('📁 Выбрать папку с тест-кейсами')
         select_folder_action.triggered.connect(self.select_test_cases_folder)
         select_folder_action.setShortcut('Ctrl+O')
@@ -392,12 +1290,14 @@ class MainWindow(QMainWindow):
         exit_action.triggered.connect(self.close)
         exit_action.setShortcut('Ctrl+Q')
 
-        self.view_menu = QMenu('Вид', self)
+        # Меню "Вид"
+        self.view_menu = menubar.addMenu('Вид')
         width_action = self.view_menu.addAction('Настроить ширины панелей…')
         width_action.triggered.connect(self._configure_panel_widths)
         statistics_action = self.view_menu.addAction('Показать статистику')
         statistics_action.triggered.connect(self._show_statistics_panel)
-
+        
+        # Подменю "Режим" в меню "Вид"
         mode_menu = self.view_menu.addMenu('Режим')
         self._mode_action_group = QActionGroup(self)
         self._mode_action_group.setExclusive(True)
@@ -413,10 +1313,387 @@ class MainWindow(QMainWindow):
         edit_action.triggered.connect(lambda checked: checked and self._set_mode("edit"))
         run_action.triggered.connect(lambda checked: checked and self._set_mode("run"))
         edit_action.setChecked(True)
+        
+        # Кнопка настроек в меню "Вид"
+        settings_action = self.view_menu.addAction('Настройки…')
+        settings_action.triggered.connect(self._open_settings_dialog)
+        
+        # Меню "Runner"
+        self.runner_menu = menubar.addMenu('Runner')
+        reset_all_statuses_action = self.runner_menu.addAction('Сброс статусов тест-кейсов')
+        reset_all_statuses_action.triggered.connect(self._confirm_and_reset_all_statuses)
+        
+        generate_allure_action = self.runner_menu.addAction('Сгенерировать отчет Allure')
+        generate_allure_action.triggered.connect(self._generate_allure_report)
+        
+        generate_report_action = self.runner_menu.addAction('Сгенерировать отчет')
+        generate_report_action.triggered.connect(self._generate_html_report)
+        settings_action.setShortcut('Ctrl+,')
 
-        self.git_menu = QMenu('git', self)
+        # Меню "Git"
+        self.git_menu = menubar.addMenu('Git')
         git_commit_action = self.git_menu.addAction('Выполнить commit и push…')
         git_commit_action.triggered.connect(self._open_git_commit_dialog)
+    
+    def _create_toolbar(self):
+        """Создать панель инструментов с быстрыми действиями"""
+        self.toolbar = QToolBar("Основная панель", self)
+        self.toolbar.setMovable(False)  # Не позволяем перемещать панель
+        self.addToolBar(self.toolbar)
+        
+        # Переключатель режима
+        self.mode_edit_label = QLabel("Редактирование")
+        self.toolbar.addWidget(self.mode_edit_label)
+        
+        self.mode_switch = ToggleSwitch()
+        self.mode_switch.toggled.connect(self._on_mode_switch_changed)
+        self.toolbar.addWidget(self.mode_switch)
+        
+        self.mode_run_label = QLabel("Запуск тестов")
+        self.toolbar.addWidget(self.mode_run_label)
+        
+        # Добавляем растягивающийся разделитель, чтобы кнопки панелей были справа
+        self.toolbar.addSeparator()
+        spacer = QWidget()
+        spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.toolbar.addWidget(spacer)
+        
+        # Кнопки панелей (будут добавлены после создания aux_panel)
+        self._panel_buttons: dict[str, QToolButton] = {}
+        self._panel_button_group = QButtonGroup(self)
+        self._panel_button_group.setExclusive(True)
+        self._current_active_panel: Optional[str] = None  # Текущая активная панель
+        
+        self._update_mode_indicator()
+        
+        # Создаем label для статистики в статус-баре
+        self._create_statusbar_statistics_label()
+        
+        # Создаем кнопку "Сохранить" в статус-баре
+        self._create_statusbar_save_button()
+    
+    def _load_icon_mapping(self) -> dict:
+        """Загрузить маппинг панелей на иконки из JSON файла."""
+        project_root = Path(__file__).parent.parent.parent
+        mapping_file = project_root / "icons" / "icon_mapping.json"
+        
+        if mapping_file.exists():
+            try:
+                with open(mapping_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    if isinstance(data, dict) and 'panels' in data:
+                        return data.get('panels', {})
+                    else:
+                        return data
+            except (json.JSONDecodeError, IOError) as e:
+                print(f"Ошибка загрузки маппинга иконок: {e}")
+        
+        return {
+            "information": "info.svg",
+            "review": "eye.svg",
+            "creation": "file-plus.svg",
+            "json": "code.svg",
+            "files": "file.svg",
+            "reports": "book.svg"
+        }
+    
+    def _load_svg_icon(self, icon_name: str, size: int = 24, color: Optional[str] = None) -> Optional[QIcon]:
+        """Загрузить SVG иконку из файла и вернуть QIcon."""
+        project_root = Path(__file__).parent.parent.parent
+        icon_path = project_root / "icons" / icon_name
+        
+        if not icon_path.exists():
+            print(f"Иконка не найдена: {icon_path}")
+            return None
+        
+        try:
+            with open(icon_path, 'r', encoding='utf-8') as f:
+                svg_content = f.read()
+            
+            if color:
+                svg_content = svg_content.replace('currentColor', color)
+                svg_content = svg_content.replace('stroke="currentColor"', f'stroke="{color}"')
+                svg_content = svg_content.replace('fill="currentColor"', f'fill="{color}"')
+            
+            renderer = QSvgRenderer(svg_content.encode('utf-8'))
+            if not renderer.isValid():
+                print(f"Невалидный SVG файл: {icon_path}")
+                return None
+            
+            pixmap = QPixmap(size, size)
+            pixmap.fill(Qt.transparent)
+            
+            painter = QPainter(pixmap)
+            painter.setRenderHint(QPainter.Antialiasing)
+            renderer.render(painter)
+            painter.end()
+            
+            icon = QIcon(pixmap)
+            return icon
+        except Exception as e:
+            print(f"Ошибка загрузки иконки {icon_name}: {e}")
+            return None
+    
+    def _create_panel_buttons(self):
+        """Создать кнопки панелей в toolbar."""
+        # Проверяем, что toolbar существует
+        if not hasattr(self, 'toolbar') or not self.toolbar:
+            return
+        
+        # Загружаем маппинг иконок
+        icon_mapping = self._load_icon_mapping()
+        
+        # Порядок панелей
+        tabs_order = ["information", "review", "creation", "json", "files", "reports"]
+        
+        # Маппинг панелей на подсказки
+        tooltips = {
+            "information": "Информация",
+            "review": "Ревью",
+            "creation": "Создать ТК",
+            "json": "JSON превью",
+            "files": "Файлы",
+            "reports": "Отчетность",
+        }
+        
+        for index, tab_id in enumerate(tabs_order):
+            button = QToolButton()
+            
+            # Загружаем иконку из SVG файла
+            icon_name = icon_mapping.get(tab_id)
+            if icon_name:
+                icon = self._load_svg_icon(icon_name, size=20, color="#ffffff")
+                if icon and not icon.isNull():
+                    button.setIcon(icon)
+                    button.setIconSize(QSize(20, 20))
+                else:
+                    print(f"Предупреждение: не удалось загрузить иконку {icon_name} для панели {tab_id}")
+                    button.setText("?")
+            else:
+                print(f"Предупреждение: иконка не найдена в маппинге для панели {tab_id}")
+                button.setText("?")
+            
+            button.setToolTip(tooltips.get(tab_id, tab_id))
+            button.setCheckable(True)
+            button.setCursor(Qt.PointingHandCursor)
+            button.setAutoRaise(True)
+            button.setFixedSize(32, 32)
+            button.setProperty("tab_id", tab_id)
+            
+            # Стиль кнопки
+            button.setStyleSheet(self._get_panel_button_style(False))
+            
+            self._panel_button_group.addButton(button, index)
+            
+            # Подключаем обработчик клика
+            button.clicked.connect(
+                lambda checked, tab=tab_id: 
+                self._on_panel_button_clicked(tab, checked) if hasattr(self, 'aux_panel') else None
+            )
+            
+            # Обновляем стиль при изменении состояния
+            button.toggled.connect(
+                lambda checked, btn=button: 
+                self._update_panel_button_style(btn, checked)
+            )
+            
+            self.toolbar.addWidget(button)
+            self._panel_buttons[tab_id] = button
+        
+        # Устанавливаем первую кнопку как активную
+        if "information" in self._panel_buttons:
+            self._current_active_panel = "information"
+            self._panel_buttons["information"].setChecked(True)
+            self._update_panel_button_style(self._panel_buttons["information"], True)
+            if hasattr(self, 'aux_panel'):
+                self.aux_panel.setVisible(True)
+                self.aux_panel.select_tab("information")
+    
+    def _on_panel_button_clicked(self, tab_id: str, checked: bool):
+        """Обработчик клика на кнопку панели."""
+        if not hasattr(self, 'aux_panel'):
+            return
+        
+        # Если нажата уже активная панель - скрываем её
+        if checked and self._current_active_panel == tab_id:
+            # Скрываем панель
+            self.aux_panel.setVisible(False)
+            # Снимаем выделение с кнопки
+            button = self._panel_buttons.get(tab_id)
+            if button:
+                button.setChecked(False)
+                self._update_panel_button_style(button, False)
+            self._current_active_panel = None
+        elif checked:
+            # Показываем панель и переключаемся на выбранную вкладку
+            self.aux_panel.setVisible(True)
+            self.aux_panel.select_tab(tab_id)
+            self._current_active_panel = tab_id
+        else:
+            # Если кнопка была отжата (не должно происходить при обычном клике)
+            # но на всякий случай обрабатываем
+            if self._current_active_panel == tab_id:
+                self.aux_panel.setVisible(False)
+                self._current_active_panel = None
+    
+    @staticmethod
+    def _get_panel_button_style(is_active: bool) -> str:
+        """Получить стиль для кнопки панели в toolbar."""
+        if is_active:
+            return """
+                QToolButton {
+                    background-color: rgba(255, 255, 255, 0.1);
+                    border: 1px solid rgba(255, 255, 255, 0.4);
+                    border-radius: 4px;
+                    padding: 0px;
+                    min-width: 32px;
+                    max-width: 32px;
+                    min-height: 32px;
+                    max-height: 32px;
+                }
+                QToolButton:hover {
+                    background-color: rgba(255, 255, 255, 0.15);
+                    border-color: rgba(255, 255, 255, 0.5);
+                }
+            """
+        else:
+            return """
+                QToolButton {
+                    background-color: transparent;
+                    border: 1px solid transparent;
+                    border-radius: 4px;
+                    padding: 0px;
+                    min-width: 32px;
+                    max-width: 32px;
+                    min-height: 32px;
+                    max-height: 32px;
+                }
+                QToolButton:hover {
+                    background-color: rgba(255, 255, 255, 0.05);
+                    border-color: rgba(255, 255, 255, 0.15);
+                }
+            """
+    
+    @staticmethod
+    def _update_panel_button_style(button: QToolButton, is_active: bool):
+        """Обновить стиль кнопки панели в зависимости от состояния."""
+        button.setStyleSheet(MainWindow._get_panel_button_style(is_active))
+    
+    def _on_aux_panel_tab_changed(self, tab_id: str):
+        """Обработчик изменения активной вкладки в aux_panel."""
+        # Обновляем состояние всех кнопок в toolbar
+        # Только если панель видима
+        if hasattr(self, 'aux_panel') and self.aux_panel.isVisible():
+            self._current_active_panel = tab_id
+            for btn_tab_id, button in self._panel_buttons.items():
+                if btn_tab_id == tab_id:
+                    button.setChecked(True)
+                    self._update_panel_button_style(button, True)
+                else:
+                    button.setChecked(False)
+                    self._update_panel_button_style(button, False)
+    
+    def _set_panels_visible(self, review_visible: bool, creation_visible: bool):
+        """Установить видимость кнопок панелей Ревью и Создать ТК в toolbar.
+        
+        Args:
+            review_visible: True для показа кнопки Ревью, False для скрытия
+            creation_visible: True для показа кнопки Создать ТК, False для скрытия
+        """
+        if button := self._panel_buttons.get("review"):
+            button.setVisible(review_visible)
+        if button := self._panel_buttons.get("creation"):
+            button.setVisible(creation_visible)
+        
+        # Если скрываем панели и текущая активная панель - одна из скрываемых, переключаемся на information
+        if hasattr(self, 'aux_panel'):
+            current_index = self.aux_panel._stack.currentIndex()
+            tabs_order = self.aux_panel._tabs_order
+            if not review_visible and current_index == tabs_order.index("review"):
+                self.aux_panel.select_tab("information")
+            if not creation_visible and current_index == tabs_order.index("creation"):
+                self.aux_panel.select_tab("information")
+    
+    def _create_statusbar_statistics_label(self):
+        """Создать QLabel для отображения статистики в statusbar"""
+        self.statusbar_stats_label = QLabel("")
+        self.statusbar_stats_label.setVisible(False)
+        self.statusBar().addPermanentWidget(self.statusbar_stats_label)
+    
+    def _create_statusbar_save_button(self):
+        """Создать кнопку 'Сохранить' в статус-баре"""
+        statusbar = self.statusBar()
+        
+        # Создаем кнопку
+        self.statusbar_save_button = QPushButton("Сохранить")
+        self.statusbar_save_button.setMinimumHeight(28)
+        self.statusbar_save_button.setMinimumWidth(100)
+        self.statusbar_save_button.setCursor(Qt.PointingHandCursor)
+        self.statusbar_save_button.setVisible(False)  # Скрыта по умолчанию
+        self.statusbar_save_button.clicked.connect(self._on_save_button_clicked)
+        
+        # Добавляем кнопку в статус-бар (справа)
+        statusbar.addPermanentWidget(self.statusbar_save_button)
+    
+    def _highlight_save_button(self):
+        """Подсветить кнопку 'Сохранить' для привлечения внимания"""
+        if hasattr(self, "statusbar_save_button"):
+            # Получаем цвета из текущей темы
+            theme = THEME_PROVIDER.colors
+            success_color = theme.success  # Зеленый цвет для успеха
+            
+            # Применяем стиль с подсветкой (яркий зеленый фон для привлечения внимания)
+            self.statusbar_save_button.setStyleSheet(f"""
+                QPushButton {{
+                    background-color: {success_color};
+                    color: white;
+                    border: 2px solid {success_color};
+                    border-radius: 6px;
+                    padding: 6px 16px;
+                    font-weight: bold;
+                    font-size: 13px;
+                }}
+                QPushButton:hover {{
+                    background-color: {success_color};
+                    border-color: {success_color};
+                    opacity: 0.9;
+                }}
+                QPushButton:pressed {{
+                    background-color: {success_color};
+                    border-color: {success_color};
+                    opacity: 0.8;
+                }}
+            """)
+    
+    def _unhighlight_save_button(self):
+        """Убрать подсветку с кнопки 'Сохранить'"""
+        if hasattr(self, "statusbar_save_button"):
+            # Получаем цвета из текущей темы
+            theme = THEME_PROVIDER.colors
+            button_bg = theme.button_background
+            button_hover = theme.button_hover
+            button_pressed = theme.button_pressed
+            text_color = theme.text_primary
+            border_color = theme.border_primary
+            
+            # Возвращаем обычный стиль (кнопка будет скрыта, но стиль нужен для плавного перехода)
+            self.statusbar_save_button.setStyleSheet(f"""
+                QPushButton {{
+                    background-color: {button_bg};
+                    color: {text_color};
+                    border: 1px solid {border_color};
+                    border-radius: 6px;
+                    padding: 6px 16px;
+                    font-size: 13px;
+                }}
+                QPushButton:hover {{
+                    background-color: {button_hover};
+                    border-color: {theme.border_hover};
+                }}
+                QPushButton:pressed {{
+                    background-color: {button_pressed};
+                }}
+            """)
     
     def _open_git_commit_dialog(self):
         """Открыть диалог с комментарием git-коммита."""
@@ -549,6 +1826,7 @@ class MainWindow(QMainWindow):
             'LLM_HOST': llm.DEFAULT_HOST,
             'LLM_METHODIC_PATH': str(self._default_methodic_path()),
             'panel_sizes': {'left': 350, 'form_area': 900, 'review': 0},
+            'skip_reasons': ['Автотесты', 'Нагрузочное тестирование', 'Другое'],
         }
         
         if self.settings_file.exists():
@@ -616,41 +1894,101 @@ class MainWindow(QMainWindow):
         не работаем напрямую с файлами, используем сервис
         """
         expanded_state = set()
+        selected_filepath = None
+        # Сохраняем размеры панелей перед обновлением
+        saved_detail_sizes = None
+        if hasattr(self, "detail_splitter"):
+            saved_detail_sizes = self.detail_splitter.sizes()
+        
         if hasattr(self, "tree_widget"):
             expanded_state = self.tree_widget.capture_expanded_state()
+            # Сохраняем путь к выбранному элементу для восстановления фокуса
+            selected_filepath = self.tree_widget.capture_selected_item()
 
         self.test_cases = self.service.load_all_test_cases(self.test_cases_dir)
+        
+        # Обновляем панель фильтров с новыми тест-кейсами
+        if hasattr(self, 'filter_panel'):
+            self.filter_panel.update_test_cases(self.test_cases)
         
         # Обновляем дерево
         self.tree_widget.load_tree(self.test_cases_dir, self.test_cases)
         self.tree_widget.restore_expanded_state(expanded_state)
+        # Восстанавливаем выбранный элемент
+        if selected_filepath:
+            self.tree_widget.restore_selected_item(selected_filepath)
+        
+        # Восстанавливаем размеры панелей после обновления
+        if saved_detail_sizes and hasattr(self, "detail_splitter"):
+            self.detail_splitter.setSizes(saved_detail_sizes)
         
         # Обновляем счетчики
         self.placeholder.update_count(len(self.test_cases))
         
-        self.statusBar().showMessage(f"Загружено тест-кейсов: {len(self.test_cases)}")
         self._update_json_preview()
+        # Обновляем статусбар (покажет статистику в режиме запуска или обычное сообщение в режиме редактирования)
+        self._update_statusbar_statistics()
+        # Обновляем панель отчетности
         if hasattr(self, "aux_panel"):
-            self.aux_panel.update_statistics(self.test_cases)
+            self.aux_panel.update_reports_panel()
 
     def _update_statistics_panel(self):
-        if hasattr(self, "aux_panel"):
-            self.aux_panel.update_statistics(self.test_cases)
+        # Панель статистики удалена, метод оставлен для совместимости
+        # Обновляем только статусбар
+        self._update_statusbar_statistics()
 
     def _on_test_case_selected(self, test_case: TestCase):
         """Обработка выбора тест-кейса"""
+        # Устанавливаем флаг для предотвращения автоматического изменения размеров панелей
+        self._preserve_panel_sizes = True
+        
+        # Проверяем наличие несохраненных изменений перед переключением
+        if hasattr(self, "form_widget") and self.form_widget.has_unsaved_changes:
+            # Подсвечиваем кнопку "Сохранить" и показываем предупреждение
+            if hasattr(self, "statusbar_save_button"):
+                self.statusbar_save_button.setVisible(True)
+                self._highlight_save_button()
+            self.statusBar().showMessage(
+                "Есть несохраненные изменения. Сохраните изменения перед переключением на другой тест-кейс.",
+                5000
+            )
+            # Переключаемся на новый тест-кейс, но предупреждаем пользователя
+            # (изменения будут потеряны, но пользователь видит подсвеченную кнопку)
+        
         self.current_test_case = test_case
         self.detail_stack.setCurrentWidget(self.form_widget)
         self.form_widget.load_test_case(test_case)
-        self._update_json_preview()
+        # Обновляем панель информации
+        if hasattr(self, "aux_panel"):
+            self.aux_panel.set_information_test_case(test_case)
+            self.aux_panel.set_files_test_case(test_case)
+            # Подключаем сигнал изменения attachments в панели файлов
+            if hasattr(self.aux_panel, "files_panel"):
+                try:
+                    self.aux_panel.files_panel.attachment_changed.disconnect()
+                except TypeError:
+                    pass
+                self.aux_panel.files_panel.attachment_changed.connect(self._on_files_attachment_changed)
         self._update_json_preview()
         
-        # Показываем форму
+        # Сбрасываем флаг после завершения операции
+        QTimer.singleShot(200, lambda: setattr(self, '_preserve_panel_sizes', False))
         
-        self.statusBar().showMessage(f"Открыт: {test_case.name}")
+        # Обновляем статусбар (покажет статистику в режиме запуска или сообщение в режиме редактирования)
+        if self._current_mode == "run":
+            self._update_statusbar_statistics()
+        else:
+            self.statusBar().showMessage(f"Открыт: {test_case.name}")
     
     def _on_form_unsaved_state(self, has_changes: bool):
         """Обновление статуса при изменениях в форме"""
+        # Управляем видимостью и подсветкой кнопки сохранения в статус-баре
+        if hasattr(self, "statusbar_save_button"):
+            self.statusbar_save_button.setVisible(has_changes)
+            if has_changes:
+                self._highlight_save_button()
+            else:
+                self._unhighlight_save_button()
         if has_changes:
             self.statusBar().showMessage("Есть несохраненные изменения. Нажмите «Сохранить».")
         else:
@@ -660,20 +1998,169 @@ class MainWindow(QMainWindow):
                 self.statusBar().showMessage("Готов к работе")
         self._update_mode_indicator()
     
+    def _on_save_button_clicked(self):
+        """Обработка нажатия кнопки сохранения"""
+        if hasattr(self, "form_widget"):
+            self.form_widget.save()
+    
     def _on_tree_updated(self):
         """Обработка обновления дерева"""
         self.load_all_test_cases()
         self.statusBar().showMessage("Дерево тест-кейсов обновлено.")
     
+    def _on_test_cases_updated(self):
+        """Обработка обновления тест-кейсов после изменения статусов"""
+        try:
+            # Сохраняем состояние дерева
+            expanded_state = self.tree_widget.capture_expanded_state()
+            selected_filepath = self.tree_widget.capture_selected_item()
+            
+            # Перезагружаем тест-кейсы
+            self.load_all_test_cases()
+            
+            # Восстанавливаем состояние дерева
+            self.tree_widget.restore_expanded_state(expanded_state)
+            if selected_filepath:
+                self.tree_widget.restore_selected_item(selected_filepath)
+            
+            # Обновляем статистику в statusbar
+            self._update_statusbar_statistics()
+            
+            # Обновляем панель отчетности
+            if hasattr(self, "aux_panel"):
+                self.aux_panel.update_reports_panel()
+            
+            # Обновляем форму, если открыт текущий тест-кейс
+            if self.current_test_case:
+                # Находим обновленный тест-кейс
+                current_filepath = getattr(self.current_test_case, "_filepath", None)
+                if current_filepath:
+                    updated_case = next(
+                        (tc for tc in self.test_cases if getattr(tc, "_filepath", None) == current_filepath),
+                        None
+                    )
+                    if updated_case:
+                        self.current_test_case = updated_case
+                        self.form_widget.load_test_case(updated_case)
+        except Exception as e:
+            # Логируем ошибку, но не показываем пользователю, чтобы не прерывать работу
+            print(f"Ошибка при обновлении тест-кейсов: {e}")
+    
+    def _on_status_changed(self):
+        """Обработка изменения статуса шага"""
+        # Обновляем статистику в statusbar при изменении статуса
+        self._update_statusbar_statistics()
+        # Обновляем панель отчетности
+        if hasattr(self, "aux_panel"):
+            self.aux_panel.update_reports_panel()
+    
     def _on_test_case_saved(self):
         """Обработка сохранения тест-кейса"""
+        # Обновляем панель информации после сохранения
+        if hasattr(self, "aux_panel") and self.current_test_case:
+            self.aux_panel.set_information_test_case(self.current_test_case)
+            # Обновляем панель "Файлы" для отображения прикрепленных файлов
+            self.aux_panel.set_files_test_case(self.current_test_case)
         self.load_all_test_cases()
         self._update_json_preview()
-        self.statusBar().showMessage("Тест-кейс сохранен")
+        # Обновляем статистику в statusbar (всегда)
+        self._update_statusbar_statistics()
+    
+    def _on_information_data_changed(self):
+        """Обработка изменения данных в панели информации"""
+        if not self.current_test_case:
+            return
+        # Обновляем тест-кейс данными из панели информации
+        self.aux_panel.update_information_test_case(self.current_test_case)
+        # Помечаем изменения в форме (чтобы появилась кнопка сохранения)
+        self.form_widget.has_unsaved_changes = True
+        self.form_widget.unsaved_changes_state.emit(True)
+    
+    def _on_files_attachment_changed(self):
+        """Обработка изменения attachments в панели файлов"""
+        if not self.current_test_case:
+            return
+        # Помечаем изменения в форме (чтобы появилась кнопка сохранения)
+        self.form_widget.has_unsaved_changes = True
+        self.form_widget.unsaved_changes_state.emit(True)
+    
+    def _on_form_before_save(self, test_case: TestCase):
+        """Обновить данные тест-кейса из панели информации перед сохранением"""
+        if hasattr(self, "aux_panel") and test_case:
+            self.aux_panel.update_information_test_case(test_case)
     
     def _filter_tree(self):
         query = self.search_input.text()
-        self.tree_widget.filter_items(query)
+        # Получаем текущие фильтры
+        filters = getattr(self, '_current_filters', {})
+        self.tree_widget.filter_items(query, filters)
+    
+    def _on_filter_button_clicked(self):
+        """Обработчик клика на кнопку фильтра."""
+        if not hasattr(self, 'filter_panel'):
+            return
+        
+        # Переключаемся на панель фильтров
+        if self.detail_stack.currentWidget() == self.filter_panel:
+            # Если уже открыта панель фильтров, возвращаемся к форме
+            if self._current_test_case_path:
+                self.detail_stack.setCurrentWidget(self.form_widget)
+            else:
+                self.detail_stack.setCurrentWidget(self.placeholder)
+        else:
+            # Показываем панель фильтров
+            self.detail_stack.setCurrentWidget(self.filter_panel)
+    
+    def _on_filters_applied(self, filters: dict):
+        """Обработчик применения фильтров."""
+        # Обновляем цвет иконки фильтра на зеленый
+        if hasattr(self, 'filter_button'):
+            filter_icon_name = "filter.svg"
+            project_root = Path(__file__).parent.parent.parent
+            mapping_file = project_root / "icons" / "icon_mapping.json"
+            if mapping_file.exists():
+                try:
+                    with open(mapping_file, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                        filter_icon_name = data.get("search", {}).get("filter", "filter.svg")
+                except:
+                    pass
+            
+            filter_icon = self._load_svg_icon(filter_icon_name, size=20, color="#4CAF50")  # Зеленый цвет
+            if filter_icon:
+                self.filter_button.setIcon(filter_icon)
+        
+        # Применяем фильтры к дереву
+        query = self.search_input.text() if hasattr(self, 'search_input') else ""
+        if hasattr(self, 'tree_widget'):
+            self.tree_widget.filter_items(query, filters)
+    
+    def _on_filters_reset(self):
+        """Обработчик сброса фильтров."""
+        # Возвращаем белый цвет иконки фильтра
+        if hasattr(self, 'filter_button'):
+            filter_icon_name = "filter.svg"
+            project_root = Path(__file__).parent.parent.parent
+            mapping_file = project_root / "icons" / "icon_mapping.json"
+            if mapping_file.exists():
+                try:
+                    with open(mapping_file, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                        filter_icon_name = data.get("search", {}).get("filter", "filter.svg")
+                except:
+                    pass
+            
+            filter_icon = self._load_svg_icon(filter_icon_name, size=20, color="#ffffff")  # Белый цвет
+            if filter_icon:
+                self.filter_button.setIcon(filter_icon)
+        
+        # Сбрасываем фильтры
+        self._current_filters = {}
+        
+        # Сбрасываем фильтры в дереве
+        query = self.search_input.text() if hasattr(self, 'search_input') else ""
+        if hasattr(self, 'tree_widget'):
+            self.tree_widget.filter_items(query, {})
 
     def _on_review_requested(self, data):
         """Показ панели ревью."""
@@ -843,7 +2330,22 @@ class MainWindow(QMainWindow):
             self._model_proxy_model.setFilterRegularExpression(
                 QRegularExpression(".*", QRegularExpression.CaseInsensitiveOption)
             )
+    
 
+    def _confirm_and_reset_all_statuses(self):
+        """Показать диалог подтверждения и сбросить статусы всех тест-кейсов"""
+        reply = QMessageBox.question(
+            self,
+            "Подтверждение действия",
+            "Вы уверены, что хотите сбросить статусы всех шагов во всех тест-кейсах?\n\n"
+            "Это действие нельзя отменить.",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+        
+        if reply == QMessageBox.Yes:
+            self._reset_all_step_statuses()
+    
     def _reset_all_step_statuses(self):
         if not self.test_cases:
             return
@@ -853,22 +2355,27 @@ class MainWindow(QMainWindow):
                 continue
             for step in case.steps:
                 step.status = ""
+                step.skip_reason = ""  # Очищаем skipReason при сбросе статуса
             self.service.save_test_case(case)
             count += 1
         self.load_all_test_cases()
         if self.current_test_case:
             self.form_widget.load_test_case(self.current_test_case)
-        self.statusBar().showMessage(f"Статусы шагов сброшены: {count} тест-кейсов")
+        # Обновляем статистику в statusbar (всегда)
+        self._update_statusbar_statistics()
+        QMessageBox.information(self, "Готово", f"Статусы сброшены для {count} тест-кейсов")
 
     def _mark_current_case_passed(self):
         if not self.current_test_case or not self.current_test_case.steps:
             return
         for step in self.current_test_case.steps:
             step.status = "passed"
+            step.skip_reason = ""  # Очищаем skipReason при пометке как passed
         self.service.save_test_case(self.current_test_case)
         self.form_widget.load_test_case(self.current_test_case)
         self.load_all_test_cases()
-        self.statusBar().showMessage("Все шаги текущего тест-кейса помечены как passed")
+        # Обновляем статистику в statusbar (всегда)
+        self._update_statusbar_statistics()
         self._update_statistics_panel()
 
     def _reset_current_case_statuses(self):
@@ -879,7 +2386,11 @@ class MainWindow(QMainWindow):
         self.service.save_test_case(self.current_test_case)
         self.form_widget.load_test_case(self.current_test_case)
         self.load_all_test_cases()
-        self.statusBar().showMessage("Статусы текущего тест-кейса сброшены")
+        # Обновляем статусбар (покажет статистику в режиме запуска или сообщение в режиме редактирования)
+        if self._current_mode == "run":
+            self._update_statusbar_statistics()
+        else:
+            self.statusBar().showMessage("Статусы текущего тест-кейса сброшены")
         self._update_statistics_panel()
 
     def _show_statistics_panel(self):
@@ -1262,12 +2773,87 @@ class MainWindow(QMainWindow):
         if hasattr(self, "form_widget"):
             self.form_widget.set_edit_mode(is_edit)
             self.form_widget.set_run_mode(not is_edit)
+        if hasattr(self, "tree_widget"):
+            # Устанавливаем режим редактирования для дерева (скрыть/показать иконки)
+            self.tree_widget.set_edit_mode(is_edit)
         if hasattr(self, "aux_panel"):
             self.aux_panel.set_panels_enabled(is_edit, is_edit)
-            if is_edit:
-                self.aux_panel.restore_last_tab()
-            else:
-                self.aux_panel.show_stats_tab()
+            # В режиме редактирования показываем кнопки панелей Ревью и Создать ТК в toolbar
+            # В режиме запуска тестов скрываем их
+            # is_edit = True (режим редактирования) -> показать кнопки (True)
+            # is_edit = False (режим запуска) -> скрыть кнопки (False)
+            self._set_panels_visible(is_edit, is_edit)
+            # Устанавливаем режим редактирования для панели информации
+            self.aux_panel.set_information_edit_mode(is_edit)
+        
+        # Обновляем статистику в statusbar
+        self._update_statusbar_statistics()
+
+    def _update_statusbar_statistics(self):
+        """Обновить статистику в statusbar (всегда видна)"""
+        if not hasattr(self, "statusbar_stats_label"):
+            return
+        
+        if not self.test_cases:
+            self.statusbar_stats_label.setVisible(False)
+            self.statusBar().showMessage("Тест-кейсы не загружены")
+            return
+        
+        cases = list(self.test_cases or [])
+        total = len(cases)
+        if not total:
+            self.statusbar_stats_label.setVisible(False)
+            self.statusBar().showMessage("Тест-кейсы не загружены")
+            return
+        
+        pending_cases = 0
+        passed_cases = 0
+        failed_cases = 0
+        skipped_cases = 0
+        
+        for case in cases:
+            steps = case.steps or []
+            statuses = [s.status or "" for s in steps]
+            if not statuses:
+                pending_cases += 1
+                continue
+            
+            normalized = [status.strip().lower() for status in statuses]
+            if all(status in ("", "pending") for status in normalized):
+                pending_cases += 1
+                continue
+            if all(status == "passed" for status in normalized):
+                passed_cases += 1
+                continue
+            if any(status == "failed" for status in normalized):
+                failed_cases += 1
+            if any(status == "skipped" for status in normalized):
+                skipped_cases += 1
+        
+        # Вычисляем проценты
+        passed_percent = (passed_cases / total * 100) if total > 0 else 0
+        pending_percent = (pending_cases / total * 100) if total > 0 else 0
+        
+        # Формируем текст статистики с HTML-форматированием и цветами (как в массовых операциях)
+        stats_text = (
+            f"Всего тест-кейсов: {total} | "
+            f"Успешно: <span style='color: #6CC24A;'>{passed_cases}</span> "
+            f"(<span style='color: #6CC24A;'>{passed_percent:.1f}%</span>) | "
+            f"Осталось: <span style='color: #FFA931;'>{pending_cases}</span> "
+            f"(<span style='color: #FFA931;'>{pending_percent:.1f}%</span>) | "
+            f"Есть failed: <span style='color: #F5555D;'>{failed_cases}</span> | "
+            f"Есть skipped: <span style='color: #95a5a6;'>{skipped_cases}</span>"
+        )
+        
+        # Используем QLabel с HTML вместо showMessage для поддержки цветов
+        if hasattr(self, "statusbar_stats_label"):
+            self.statusbar_stats_label.setText(stats_text)
+            self.statusbar_stats_label.setVisible(True)
+            # Очищаем обычное сообщение, чтобы показывалась только статистика
+            self.statusBar().showMessage("")
+        else:
+            # Fallback на обычный текст, если label не создан
+            self.statusBar().showMessage(stats_text.replace("<span style='color: #6CC24A;'>", "").replace("</span>", "").replace("<span style='color: #FFA931;'>", "").replace("<span style='color: #F5555D;'>", "").replace("<span style='color: #95a5a6;'>", ""))
 
     def _apply_initial_panel_sizes(self):
         left_width = max(self.panel_sizes.get('left', 350), 150)
@@ -1370,6 +2956,245 @@ class MainWindow(QMainWindow):
         else:
             self.setGeometry(default_x, default_y, default_width, default_height)
 
+    def changeEvent(self, event):
+        """Обработка изменения состояния окна (maximize/restore и т.д.)"""
+        if event.type() == QEvent.WindowStateChange:
+            # При изменении состояния окна (maximize/restore) обновляем панели
+            QTimer.singleShot(100, self._update_panels_after_resize)
+        super().changeEvent(event)
+    
+    def resizeEvent(self, event):
+        """Обработка изменения размера окна"""
+        # При изменении размера окна обновляем панели
+        QTimer.singleShot(100, self._update_panels_after_resize)
+        super().resizeEvent(event)
+    
+    def _update_panels_after_resize(self):
+        """Обновить панели после изменения размера окна"""
+        if not hasattr(self, "detail_splitter") or not hasattr(self, "form_widget"):
+            return
+        
+        # Если флаг установлен, не изменяем размеры панелей
+        # (это предотвращает автоматическое изменение при выборе тест-кейса)
+        if hasattr(self, "_preserve_panel_sizes") and self._preserve_panel_sizes:
+            return
+        
+        # Сохраняем текущие размеры splitter'ов перед обновлением
+        current_detail_sizes = self.detail_splitter.sizes()
+        current_main_sizes = self.main_splitter.sizes() if hasattr(self, "main_splitter") else None
+        
+        # Обновляем геометрию формы для корректного пересчета размеров
+        self.form_widget.updateGeometry()
+        
+        # Если есть сохраненные размеры, применяем их пропорционально
+        # ТОЛЬКО если размер окна действительно изменился (не при выборе тест-кейса)
+        if hasattr(self, "panel_sizes") and current_main_sizes and len(current_main_sizes) > 1:
+            # Вычисляем пропорции на основе сохраненных размеров
+            total_saved = self.panel_sizes.get('form_area', 900)
+            if total_saved > 0:
+                # Текущая доступная ширина для правой панели
+                current_total = current_main_sizes[1]
+                
+                # Вычисляем пропорции для detail_splitter
+                saved_review = self.panel_sizes.get('review', 360)
+                saved_form = total_saved - saved_review
+                
+                if saved_form > 0 and saved_review > 0:
+                    # Сохраняем пропорции
+                    form_ratio = saved_form / total_saved
+                    review_ratio = saved_review / total_saved
+                    
+                    # Применяем пропорции к текущему размеру
+                    new_form_width = int(current_total * form_ratio)
+                    new_review_width = int(current_total * review_ratio)
+                    
+                    # Убеждаемся, что размеры не слишком малы
+                    new_form_width = max(new_form_width, 300)
+                    new_review_width = max(new_review_width, 220)
+                    
+                    # Если сумма превышает доступное пространство, корректируем
+                    if new_form_width + new_review_width > current_total:
+                        total_needed = new_form_width + new_review_width
+                        new_form_width = int(new_form_width * current_total / total_needed)
+                        new_review_width = current_total - new_form_width
+                    
+                    # Применяем новые размеры только если они отличаются от текущих
+                    # (это предотвращает ненужные изменения)
+                    current_form = current_detail_sizes[0] if len(current_detail_sizes) > 0 else 0
+                    current_review = current_detail_sizes[1] if len(current_detail_sizes) > 1 else 0
+                    
+                    # Если разница больше 5 пикселей, применяем новые размеры
+                    if abs(current_form - new_form_width) > 5 or abs(current_review - new_review_width) > 5:
+                        self.detail_splitter.setSizes([new_form_width, new_review_width])
+                else:
+                    # Если пропорции не определены, используем текущие размеры
+                    if len(current_detail_sizes) >= 2:
+                        self.detail_splitter.setSizes(current_detail_sizes)
+            else:
+                # Если сохраненных размеров нет, используем текущие
+                if len(current_detail_sizes) >= 2:
+                    self.detail_splitter.setSizes(current_detail_sizes)
+        else:
+            # Если нет сохраненных размеров, используем текущие
+            if len(current_detail_sizes) >= 2:
+                self.detail_splitter.setSizes(current_detail_sizes)
+        
+        # Принудительно обновляем форму для пересчета размеров шагов
+        QTimer.singleShot(50, self._refresh_form_layout)
+    
+    def _refresh_form_layout(self):
+        """Обновить layout формы для корректного отображения после изменения размера"""
+        if not hasattr(self, "form_widget"):
+            return
+        
+        # Обновляем геометрию формы
+        self.form_widget.updateGeometry()
+        
+        # Обновляем размеры шагов, если они есть
+        if hasattr(self.form_widget, "steps_list"):
+            # Обновляем размеры всех шагов для корректного переноса текста
+            for row in range(self.form_widget.steps_list.count()):
+                widget = self.form_widget._get_step_widget(row)
+                if widget:
+                    # Обновляем ширину текста в документах для правильного переноса
+                    if hasattr(widget, "action_edit"):
+                        viewport_width = widget.action_edit.viewport().width()
+                        if viewport_width > 0:
+                            widget.action_edit.document().setTextWidth(viewport_width)
+                    if hasattr(widget, "expected_edit"):
+                        viewport_width = widget.expected_edit.viewport().width()
+                        if viewport_width > 0:
+                            widget.expected_edit.document().setTextWidth(viewport_width)
+                    # Синхронизируем высоту полей после обновления ширины
+                    widget._sync_text_edits_height()
+            
+            # Обновляем общую высоту списка шагов
+            self.form_widget._update_steps_list_height()
+    
+    def _open_settings_dialog(self):
+        """Открыть диалог настроек"""
+        dialog = SettingsDialog(self.settings, self)
+        if dialog.exec_() == QDialog.Accepted:
+            new_settings = dialog.get_settings()
+            
+            # Сохраняем существующие настройки, которые не редактируются в диалоге
+            # (например, window_geometry)
+            for key, value in self.settings.items():
+                if key not in new_settings:
+                    new_settings[key] = value
+            
+            # Сохраняем настройки
+            self.save_settings(new_settings)
+            self.settings = new_settings
+            
+            # Применяем изменения
+            self._apply_settings_changes(new_settings)
+            
+            QMessageBox.information(
+                self,
+                "Настройки сохранены",
+                "Настройки успешно сохранены. Некоторые изменения могут потребовать перезапуска приложения."
+            )
+    
+    def _apply_settings_changes(self, new_settings: dict):
+        """Применить изменения настроек к приложению"""
+        # Обновляем пути
+        if 'test_cases_dir' in new_settings:
+            old_dir = self.test_cases_dir
+            self.test_cases_dir = Path(new_settings['test_cases_dir'])
+            if old_dir != self.test_cases_dir:
+                # Перезагружаем дерево тест-кейсов, если изменилась папка
+                self.load_all_test_cases()
+        
+        # Обновляем LLM настройки
+        if 'LLM_HOST' in new_settings:
+            self.llm_host = new_settings['LLM_HOST'].strip()
+        if 'LLM_MODEL' in new_settings:
+            self.llm_model = new_settings['LLM_MODEL'].strip()
+            # Обновляем модель в селекторе
+            if hasattr(self, 'model_selector'):
+                current_text = self.model_selector.currentText()
+                if current_text != self.llm_model:
+                    self.model_selector.setCurrentText(self.llm_model)
+        
+        # Обновляем промпты
+        if 'DEFAULT_PROMT' in new_settings:
+            self.default_prompt = new_settings['DEFAULT_PROMT']
+        if 'DEFAULT_PROMT_CREATE_TC' in new_settings:
+            self.create_tc_prompt = new_settings['DEFAULT_PROMT_CREATE_TC']
+        
+        # Обновляем размеры панелей
+        if 'panel_sizes' in new_settings:
+            self.panel_sizes.update(new_settings['panel_sizes'])
+            # Применяем новые размеры
+            if hasattr(self, 'main_splitter') and hasattr(self, 'detail_splitter'):
+                self._apply_initial_panel_sizes()
+        
+        # Обновляем путь к методике
+        if 'LLM_METHODIC_PATH' in new_settings:
+            methodic_path = new_settings['LLM_METHODIC_PATH']
+            if methodic_path:
+                self.settings['LLM_METHODIC_PATH'] = methodic_path
+        
+        # Внешний вид (тема, шрифт, отступы) - применяем сразу
+        needs_style_refresh = (
+            'theme' in new_settings or 
+            'font_family' in new_settings or 
+            'font_size' in new_settings or 
+            'base_spacing' in new_settings or
+            'section_spacing' in new_settings or
+            'container_padding' in new_settings or
+            'text_input_vertical_padding' in new_settings or
+            'group_title_spacing' in new_settings
+        )
+        
+        if needs_style_refresh:
+            self._apply_font_settings()
+            # Применяем настройки отступов
+            if 'base_spacing' in new_settings:
+                UI_METRICS.base_spacing = new_settings['base_spacing']
+            if 'section_spacing' in new_settings:
+                UI_METRICS.section_spacing = new_settings['section_spacing']
+            if 'container_padding' in new_settings:
+                UI_METRICS.container_padding = new_settings['container_padding']
+            if 'text_input_vertical_padding' in new_settings:
+                UI_METRICS.text_input_vertical_padding = new_settings['text_input_vertical_padding']
+            if 'group_title_spacing' in new_settings:
+                UI_METRICS.group_title_spacing = new_settings['group_title_spacing']
+                # Обновляем отступы в существующих QGroupBox
+                if hasattr(self, 'form_widget'):
+                    self._update_group_title_spacings(self.form_widget)
+                if hasattr(self, 'aux_panel') and hasattr(self.aux_panel, 'information_panel'):
+                    self._update_group_title_spacings(self.aux_panel.information_panel)
+            
+            # Применяем тему
+            if 'theme' in new_settings:
+                theme_name = new_settings['theme'].strip().lower()
+                if theme_name in ['dark', 'light']:
+                    THEME_PROVIDER.set_theme(theme_name)
+            
+            # Переприменяем стили к приложению
+            app = QApplication.instance()
+            if app:
+                new_style_sheet = build_app_style_sheet(UI_METRICS)
+                app.setStyleSheet(new_style_sheet)
+        
+        # Панель Информация - видимость элементов
+        if 'information_panel_visibility' in new_settings:
+            visibility_settings = new_settings['information_panel_visibility']
+            if hasattr(self, 'aux_panel') and hasattr(self.aux_panel, 'information_panel'):
+                self.aux_panel.information_panel.set_visibility_settings(visibility_settings)
+    
+    @staticmethod
+    def _update_group_title_spacings(widget: QWidget):
+        """Обновить отступы заголовков во всех QGroupBox внутри виджета"""
+        for group_box in widget.findChildren(QGroupBox):
+            layout = group_box.layout()
+            if layout:
+                margins = layout.getContentsMargins()
+                # Обновляем только верхний отступ
+                layout.setContentsMargins(margins[0], UI_METRICS.group_title_spacing, margins[2], margins[3])
+    
     def closeEvent(self, event):
         if self.isMaximized():
             geom = self.normalGeometry()
@@ -1394,24 +3219,77 @@ class MainWindow(QMainWindow):
         super().closeEvent(event)
 
     def convert_from_azure(self):
-        """Импорт тест-кейсов из JSON Azure DevOps."""
-        files, _ = QFileDialog.getOpenFileNames(
-            self,
-            "Выберите JSON-файлы Azure DevOps",
-            str(self.test_cases_dir),
-            "JSON файлы (*.json)",
-        )
+        """Импорт тест-кейсов из ALM с созданием структуры папок согласно иерархии."""
+        # Определяем пути к папкам - сначала пробуем относительно корня проекта
+        # (где находится run_app.py), затем относительно test_cases_dir
+        app_dir = Path(__file__).resolve().parent.parent.parent
+        test_suites_dir = None
+        from_alm_dir = None
+        hierarchy_map_path = None
 
-        if not files:
+        # Пробуем найти относительно корня проекта
+        candidate_dir = app_dir / "test_suites"
+        if candidate_dir.exists():
+            test_suites_dir = candidate_dir
+        else:
+            # Пробуем относительно test_cases_dir
+            candidate_dir = self.test_cases_dir / "test_suites"
+            if candidate_dir.exists():
+                test_suites_dir = candidate_dir
+
+        if test_suites_dir:
+            from_alm_dir = test_suites_dir / "from_alm"
+            hierarchy_map_path = test_suites_dir / "suite_hierarchy_map.json"
+        else:
+            # Если не нашли test_suites, пробуем прямо в test_cases_dir
+            from_alm_dir = self.test_cases_dir / "test_suites" / "from_alm"
+            hierarchy_map_path = self.test_cases_dir / "test_suites" / "suite_hierarchy_map.json"
+
+        # Проверяем наличие необходимых папок и файлов
+        if not from_alm_dir.exists():
+            QMessageBox.warning(
+                self,
+                "Папка не найдена",
+                f"Папка с suite файлами не найдена:\n{from_alm_dir}\n\n"
+                "Убедитесь, что папка test_suites/from_alm существует и содержит JSON файлы.\n\n"
+                f"Искали в:\n- {app_dir / 'test_suites'}\n- {self.test_cases_dir / 'test_suites'}",
+            )
             return
 
-        total_created = 0
-        all_errors = []
+        if not hierarchy_map_path.exists():
+            QMessageBox.warning(
+                self,
+                "Файл не найден",
+                f"Файл карты иерархии не найден:\n{hierarchy_map_path}\n\n"
+                "Убедитесь, что файл test_suites/suite_hierarchy_map.json существует.\n\n"
+                f"Искали в:\n- {app_dir / 'test_suites' / 'suite_hierarchy_map.json'}\n"
+                f"- {self.test_cases_dir / 'test_suites' / 'suite_hierarchy_map.json'}",
+            )
+            return
 
-        for file_path in files:
-            created, errors = self.service.import_from_azure(Path(file_path), self.test_cases_dir)
-            total_created += created
-            all_errors.extend(errors)
+        # Подтверждение импорта
+        reply = QMessageBox.question(
+            self,
+            "Импорт из ALM",
+            f"Будет обработано всех suite из папки:\n{from_alm_dir}\n\n"
+            f"Структура папок будет создана согласно:\n{hierarchy_map_path}\n\n"
+            "Продолжить?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.Yes,
+        )
+
+        if reply != QMessageBox.Yes:
+            return
+
+        # Выполняем импорт
+        self.statusBar().showMessage("Импорт из ALM: обработка файлов...")
+        QApplication.processEvents()  # Обновляем UI
+
+        total_created, all_errors = self.service.import_from_alm_with_hierarchy(
+            from_alm_dir=from_alm_dir,
+            hierarchy_map_path=hierarchy_map_path,
+            target_root=self.test_cases_dir,
+        )
 
         self.load_all_test_cases()
 
@@ -1428,12 +3306,30 @@ class MainWindow(QMainWindow):
             QMessageBox.information(
                 self,
                 "Импорт завершен",
-                f"Создано тест-кейсов: {total_created}",
+                f"Создано тест-кейсов: {total_created}\n\n"
+                f"Структура папок создана согласно иерархии из:\n{hierarchy_map_path.name}",
             )
 
         self.statusBar().showMessage(f"Импортировано тест-кейсов: {total_created}")
 
     # ----------------------- UI Metrics ---------------------------------
+
+    def _apply_font_settings(self):
+        """Применить настройки шрифта и отступов из settings к UI_METRICS"""
+        if 'font_family' in self.settings:
+            UI_METRICS.font_family = self.settings['font_family']
+        if 'font_size' in self.settings:
+            UI_METRICS.base_font_size = self.settings['font_size']
+        if 'base_spacing' in self.settings:
+            UI_METRICS.base_spacing = self.settings['base_spacing']
+        if 'section_spacing' in self.settings:
+            UI_METRICS.section_spacing = self.settings['section_spacing']
+        if 'container_padding' in self.settings:
+            UI_METRICS.container_padding = self.settings['container_padding']
+        if 'text_input_vertical_padding' in self.settings:
+            UI_METRICS.text_input_vertical_padding = self.settings['text_input_vertical_padding']
+        if 'group_title_spacing' in self.settings:
+            UI_METRICS.group_title_spacing = self.settings['group_title_spacing']
 
     def _on_mode_switch_changed(self, checked: bool):
         self._set_mode("run" if checked else "edit")
@@ -1463,6 +3359,94 @@ class MainWindow(QMainWindow):
                 self,
                 "Ошибка генерации Allure отчета",
                 f"Не удалось сгенерировать Allure отчет:\n{e}",
+            )
+            self.statusBar().showMessage(f"Ошибка: {e}")
+    
+    def _generate_html_report(self):
+        """Генерация HTML отчета с статистикой по тест-кейсам"""
+        try:
+            # Определяем папку приложения
+            app_dir = Path(__file__).resolve().parent.parent.parent
+            
+            # Генерируем отчет
+            report_dir = generate_html_report(
+                test_cases_dir=self.test_cases_dir,
+                app_dir=app_dir,
+            )
+            
+            if report_dir:
+                # Открываем проводник с отчетом
+                from ..utils.allure_generator import _open_explorer
+                _open_explorer(report_dir)
+                
+                # Обновляем панель отчетности
+                if hasattr(self, "aux_panel"):
+                    self.aux_panel.update_reports_panel()
+                
+                self.statusBar().showMessage(
+                    f"HTML отчет сгенерирован: {report_dir.name}. "
+                    f"Проводник открыт."
+                )
+            else:
+                self.statusBar().showMessage("Ошибка при генерации HTML отчета")
+        except Exception as e:
+            QMessageBox.critical(
+                self,
+                "Ошибка генерации HTML отчета",
+                f"Не удалось сгенерировать HTML отчет:\n{e}",
+            )
+            self.statusBar().showMessage(f"Ошибка: {e}")
+
+    def _generate_summary_report(self):
+        """Генерация суммарного HTML отчета на основе всех отчетов в папке Reports"""
+        try:
+            # Определяем папку приложения
+            current_file = Path(__file__).resolve()
+            app_dir = current_file.parent.parent.parent
+            
+            # Определяем папку Reports
+            reports_dir = app_dir / "Reports"
+            
+            if not reports_dir.exists():
+                QMessageBox.warning(
+                    self,
+                    "Папка Reports не найдена",
+                    f"Папка Reports не существует:\n{reports_dir}",
+                )
+                self.statusBar().showMessage("Папка Reports не найдена")
+                return
+            
+            # Генерируем суммарный отчет
+            from ..utils.summary_report_generator import generate_summary_report
+            
+            summary_file = generate_summary_report(reports_dir, app_dir)
+            
+            if summary_file:
+                # Открываем проводник с отчетом
+                from ..utils.allure_generator import _open_explorer
+                _open_explorer(summary_file.parent)
+                
+                # Обновляем панель отчетности
+                if hasattr(self, "aux_panel"):
+                    self.aux_panel.update_reports_panel()
+                
+                self.statusBar().showMessage(
+                    f"Суммарный отчет сгенерирован: {summary_file.name}. "
+                    f"Проводник открыт."
+                )
+            else:
+                QMessageBox.warning(
+                    self,
+                    "Ошибка генерации суммарного отчета",
+                    "Не удалось сгенерировать суммарный отчет.\n"
+                    "Убедитесь, что в папке Reports есть HTML отчеты.",
+                )
+                self.statusBar().showMessage("Ошибка при генерации суммарного отчета")
+        except Exception as e:
+            QMessageBox.critical(
+                self,
+                "Ошибка генерации суммарного отчета",
+                f"Не удалось сгенерировать суммарный отчет:\n{e}",
             )
             self.statusBar().showMessage(f"Ошибка: {e}")
 

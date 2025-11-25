@@ -1,0 +1,1038 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442769,
+        "name": "3.4 Не разобрано"
+      },
+      "workItem": {
+        "id": 56351,
+        "name": "[A] Проверка запрета переноса из Не кандидатов в Кандидаты",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"6\"><step id=\"2\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ПРЕДУСЛОВИЕ&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;Открыть меню&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px;background-color: rgb(239, 246, 252)\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;Нажать \"работа с проектом\"&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px;background-color: rgb(239, 246, 252)\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;Развернуть последний актуальный месяц&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px;background-color: rgb(239, 246, 252)\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;Выбрать ДО, например, Ноябрьскнефтегаз&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px;background-color: rgb(239, 246, 252)\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;Перейти на вкладку Не кандидаты&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px;background-color: rgb(239, 246, 252)\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;Открыть фильтр по кнопке&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px;background-color: rgb(239, 246, 252)\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;В фильтре в графе&amp;nbsp;\"Критерии отбора\" выбрать (&lt;B&gt;см.шаги&lt;/B&gt;)&lt;BR/&gt;&lt;/DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;Кликнуть на первую строку&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px;background-color: rgb(239, 246, 252)\"/&gt;&lt;/DIV&gt;&lt;DIV&gt;&lt;BR/&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;/P&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;ОПТ&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;&amp;nbsp;- В Б/Д&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;&amp;nbsp;-&amp;nbsp;В текущем состоянии простоя&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;&amp;nbsp;-&amp;nbsp;В освоении&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;&amp;nbsp;-&amp;nbsp;Фонтан&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;&amp;nbsp;-&amp;nbsp;ЭЦН с пакером&lt;/DIV&gt;&lt;P&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Кнопка \"В кандидаты\" не кликабельна&lt;BR/&gt;&lt;BR/&gt;Есть тултип с понятным описанием, почему нельзя перенести&lt;/P&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;/P&gt;&lt;DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;ОПЗ&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;&amp;nbsp;- В Б/Д&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;&amp;nbsp;-&amp;nbsp;В текущем состоянии простоя&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;&amp;nbsp;-&amp;nbsp;В освоении&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;&amp;nbsp;-&amp;nbsp;Фонтан&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;&amp;nbsp;-&amp;nbsp;ЭЦН с пакером&lt;/DIV&gt;&lt;/DIV&gt;&lt;P&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Кнопка \"В кандидаты\" не кликабельна&lt;BR/&gt;&lt;BR/&gt;Есть тултип с понятным описанием, почему нельзя перенести&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;/P&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;ГРП&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;&amp;nbsp;- В Б/Д&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;&amp;nbsp;-&amp;nbsp;В текущем состоянии простоя&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;&amp;nbsp;-&amp;nbsp;В освоении&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;&amp;nbsp;-&amp;nbsp;Фонтан&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;&amp;nbsp;-&amp;nbsp;ЭЦН с пакером&lt;/DIV&gt;&lt;P&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Кнопка \"В кандидаты\" не кликабельна&lt;BR/&gt;&lt;BR/&gt;Есть тултип с понятным описанием, почему нельзя перенести&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ВБД&lt;BR/&gt; - В работе&lt;BR/&gt; - в ВСП&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Кнопка \"В кандидаты\" не кликабельна&lt;BR/&gt;&lt;BR/&gt;Есть тултип с понятным описанием, почему нельзя перенести&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-04-08T12:24:01.867Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2022-04-08T12:24:01.867Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "pointAssignments": [
+        {
+          "id": 40075,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769/TestPoint/40075"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442769,
+        "name": "3.4 Не разобрано"
+      },
+      "workItem": {
+        "id": 56352,
+        "name": "[A] Проверка источника кандидатов для скважин УВЧ",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"3\"><step id=\"2\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ПРЕДУСЛОВИЕ&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Открыть меню&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Нажать \"работа с проектом\"&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Развернуть последний актуальный месяц&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Выбрать ДО, например, Ноябрьскнефтегаз&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Перейти на вкладку Кандидаты&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Открыть фильтр по кнопке&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;В фильтре в графе Тип ГТМ или комплекс ГТМ выбрать (см.шаги)&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Кликнуть на первую строку&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;УВЧ&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;В детализации о скважине отображается сверху источник \"&lt;SPAN style=\"background-color: rgb(255, 255, 255);color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Кандидат получен из смежной системы ТР 2.0\"&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-04-08T12:24:31.413Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2022-04-08T12:24:31.413Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "order": 1,
+      "pointAssignments": [
+        {
+          "id": 40076,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769/TestPoint/40076"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442769,
+        "name": "3.4 Не разобрано"
+      },
+      "workItem": {
+        "id": 56337,
+        "name": "[A] Загрузка карт",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"4\"><step id=\"2\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ПРЕДУСЛОВИЕ&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Открыть меню&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Нажать \"работа с проектом\"&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Развернуть последний актуальный месяц&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Выбрать&amp;nbsp;&lt;SPAN style=\"color: rgb(102, 123, 141);font-family: Roboto;font-size: 12px;background-color: rgb(230, 230, 230)\"&gt;ПАО «Славнефть-Мегионнефтегаз»&lt;/SPAN&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Перейти на вкладку Настройки&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;В дереве объектов развернуть Ватинское месторождение&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Внутри Ватинского месторождения выбрать объект Б8&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Перейти справа на вкладку Карты&amp;nbsp;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;SPAN style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;Напротив карт Изобар нажать на кнопку Добавить карту&lt;/SPAN&gt;&lt;BR style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"/&gt;&lt;SPAN style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;Выбрать карту из аттача&lt;/SPAN&gt;&lt;BR style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"/&gt;&lt;SPAN style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;Подождать 30 секунд&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Напротив карт изобара появляется зеленый статус успешности загрузки.&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Временно! После загрузки карты обновить страницу&lt;BR/&gt;Развернуть объект Б8 Ватинского месторождения&lt;BR/&gt;Перейти на вкладку Карты&lt;BR/&gt;Развернуть карты Изобар&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Отображается дата загрузки&lt;BR/&gt;Источник: Вручную&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-04-08T12:09:30.367Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2022-04-08T12:09:30.367Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 3
+          }
+        ]
+      },
+      "order": 2,
+      "pointAssignments": [
+        {
+          "id": 40068,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769/TestPoint/40068"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442769,
+        "name": "3.4 Не разобрано"
+      },
+      "workItem": {
+        "id": 56338,
+        "name": "[A] История пересчета",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"3\"><step id=\"2\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;P&gt;ПРЕДУСЛОВИЕ&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Открыть меню&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Нажать \"работа с проектом\"&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Развернуть последний актуальный месяц&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Выбрать ДО АО «Мессояханефтегаз»&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Перейти на вкладку Настройки&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;/P&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Слева в&amp;nbsp;Навигация по ДО выбрать самый первый пункт&amp;nbsp;АО «Мессояханефтегаз»&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;В граничных значениях для ВБД в колонке \"Значение после\" указать новое значение&amp;nbsp; (+1 от значения, которое там есть)&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Снизу нажать Сохранить и пересчитать&lt;BR/&gt;(сохранить дату и время нажатия на кнопку \"Сохранить и пересчитать\")&lt;BR/&gt;&amp;nbsp;&lt;BR/&gt;Перейти в панель истории пересчетов (там же справа)&lt;/DIV&gt;&lt;P&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;В истории пересчетов самая первая запись имеет дату и время, равное дате и времени нажатия на кнопку \"Сохранить и пересчитать\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-04-08T12:10:16.17Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2022-04-08T12:10:16.17Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 4
+          }
+        ]
+      },
+      "order": 3,
+      "pointAssignments": [
+        {
+          "id": 40069,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769/TestPoint/40069"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442769,
+        "name": "3.4 Не разобрано"
+      },
+      "workItem": {
+        "id": 56339,
+        "name": "[A] Панель \"Комментарии к скважине\"",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"3\"><step id=\"2\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ПРЕДУСЛОВИЕ&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Открыть меню&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Нажать \"работа с проектом\"&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Развернуть последний актуальный месяц&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Выбрать ДО, например, Ноябрьскнефтегаз&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Перейти на вкладку Кандидаты&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Выбрать первую скважину&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Справа выбрать отображение \"Комментарии к скважине\"&amp;nbsp;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Указать двухстрочный текст (уникальный)&lt;BR/&gt;Нажать \"Добавить\"&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;В панели истории комментариев в самом верху&lt;BR/&gt;Указан введенный комментарий, указана дата&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-04-08T12:10:48.383Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2022-04-08T12:10:48.383Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 3
+          }
+        ]
+      },
+      "order": 4,
+      "pointAssignments": [
+        {
+          "id": 40070,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769/TestPoint/40070"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442769,
+        "name": "3.4 Не разобрано"
+      },
+      "workItem": {
+        "id": 56340,
+        "name": "[A] Целевой Qг для ОПЗ / ГРП",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"4\"><step id=\"2\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ПРЕДУСЛОВИЕ&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Открыть меню&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Нажать \"работа с проектом\"&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Развернуть последний актуальный месяц&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Выбрать ДО, например, Ноябрьскнефтегаз&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Перейти на вкладку Кандидаты&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Открыть фильтр по кнопке&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;В фильтре в графе Тип ГТМ или комплекс ГТМ выбрать (&lt;I&gt;см.шаги&lt;/I&gt;)&lt;BR/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Кликнуть на первую строку&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Найти значение целевого&amp;nbsp;&amp;nbsp;&lt;I&gt;Целевой Qг, тыс.м3/сут&lt;/I&gt;&amp;nbsp;и запомнить его&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Найти значение&amp;nbsp;&lt;I&gt;&amp;nbsp;Целевой Qн, т/сут&lt;/I&gt;&amp;nbsp;и запомнить его&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;В панели информации о скважине в&amp;nbsp;&lt;I&gt;PVT свойствах&amp;nbsp;&lt;/I&gt;найти значение&amp;nbsp;&lt;I&gt;ГФ&lt;/I&gt;&amp;nbsp;и запомнить его&lt;/DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Проверить, что&amp;nbsp;&lt;B&gt;&lt;I&gt;Целевой&amp;nbsp;Qг = целевой&amp;nbsp;Qн * ГФ / 1000&lt;/I&gt;&lt;/B&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;ОПЗ&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;&lt;B style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;&lt;I&gt;Целевой&amp;nbsp;Qг = целевой&amp;nbsp;Qн * ГФ / 1000&lt;/I&gt;&lt;/B&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ГРП&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;&lt;B style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;&lt;I&gt;Целевой&amp;nbsp;Qг = целевой&amp;nbsp;Qн * ГФ / 1000&lt;/I&gt;&lt;/B&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-04-08T12:11:30.007Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2022-04-08T12:11:30.007Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 13
+          }
+        ]
+      },
+      "order": 5,
+      "pointAssignments": [
+        {
+          "id": 40071,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769/TestPoint/40071"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442769,
+        "name": "3.4 Не разобрано"
+      },
+      "workItem": {
+        "id": 56341,
+        "name": "[A] Отчет по пользователям",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"4\"><step id=\"2\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;ПРЕДУСЛОВИЕ&lt;BR/&gt;&lt;BR/&gt;&amp;nbsp;Открыть меню&lt;BR/&gt;Скачать \"Отчет по пользователям\"&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Скачать xls&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Файл скачивается. Данные внутри файла читаются.&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Скачать csv&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Файл скачивается. Данные внутри файла читаются.&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-04-08T12:12:52.38Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2022-04-08T12:12:52.38Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 3
+          }
+        ]
+      },
+      "order": 6,
+      "pointAssignments": [
+        {
+          "id": 40072,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769/TestPoint/40072"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442769,
+        "name": "3.4 Не разобрано"
+      },
+      "workItem": {
+        "id": 56342,
+        "name": "[A] Не доступность экспертизы/корректировок в старых проектах",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"2\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открыть проект за прошлый месяц у ДО, у которого уже есть проект в новом месяце&lt;BR/&gt;&lt;BR/&gt;Пример:&lt;BR/&gt;Есть проект у ННГ за Ноябрь&lt;BR/&gt;Значит надо открыть проект за октябрь, сентябрь и т.д.&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Не доступно:&lt;BR/&gt; - Согласование&lt;BR/&gt; - Отклонение&lt;BR/&gt; - Корректировки&lt;BR/&gt; - Перенос из Не кандидатов&lt;BR/&gt; - Исправление ошибок&lt;BR/&gt;&lt;BR/&gt;По тултипу: Для *действие* перейдите в последний проект&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-04-08T12:13:39.77Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2022-04-08T12:13:39.77Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 3
+          }
+        ]
+      },
+      "order": 7,
+      "pointAssignments": [
+        {
+          "id": 40073,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769/TestPoint/40073"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442769,
+        "name": "3.4 Не разобрано"
+      },
+      "workItem": {
+        "id": 56343,
+        "name": "[A] Фактические параметры для ВБД",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"5\"><step id=\"2\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ПРЕДУСЛОВИЕ&lt;BR/&gt;&lt;BR/&gt;&lt;SPAN style=\"white-space: normal\"&gt;Открыть меню&lt;/SPAN&gt;&lt;BR style=\"white-space: normal\"/&gt;&lt;SPAN style=\"white-space: normal\"&gt;Нажать \"работа с проектом\"&lt;/SPAN&gt;&lt;BR style=\"white-space: normal\"/&gt;&lt;SPAN style=\"white-space: normal\"&gt;Развернуть последний актуальный месяц&lt;/SPAN&gt;&lt;BR style=\"white-space: normal\"/&gt;&lt;SPAN style=\"white-space: normal\"&gt;Выбрать ДО, например, Ноябрьскнефтегаз&lt;/SPAN&gt;&lt;BR style=\"white-space: normal\"/&gt;&lt;SPAN style=\"white-space: normal\"&gt;Перейти на вкладку Кандидаты&lt;/SPAN&gt;&lt;BR style=\"white-space: normal\"/&gt;&lt;SPAN style=\"white-space: normal\"&gt;Открыть фильтр по кнопке&lt;/SPAN&gt;&lt;BR style=\"white-space: normal\"/&gt;&lt;SPAN style=\"white-space: normal\"&gt;В фильтре в графе&amp;nbsp;&lt;/SPAN&gt;&lt;SPAN style=\"white-space: normal;color: rgb(102, 123, 141);font-family: Roboto;font-size: 12px;font-weight: 700;background-color: rgb(237, 245, 250)\"&gt;Тип ГТМ или комплекс ГТМ выбрать ВБД&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Кликнуть 2 раза на ячейку &lt;SPAN style=\"color: rgb(32, 33, 36);font-size: 12px;background-color: rgb(255, 255, 255)\"&gt; Qж, м³/сут &lt;/SPAN&gt;  в фактическом режиме&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Убедится, что первая строка со скважиной ВБД имеет значение 0 в &lt;SPAN style=\"color: rgb(32, 33, 36);font-size: 12px;background-color: rgb(255, 255, 255)\"&gt;Qж, м³/сут &lt;/SPAN&gt; фактического режима&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;Кликнуть 2 раза на ячейку &lt;SPAN style=\"color: rgb(32, 33, 36);font-size: 12px;background-color: rgb(255, 255, 255)\"&gt; Qн, м³/сут &lt;/SPAN&gt;  в фактическом режиме&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Убедится, что первая строка со скважиной ВБД имеет значение 0 в &lt;SPAN style=\"color: rgb(32, 33, 36);font-size: 12px;background-color: rgb(255, 255, 255)\"&gt;Qн, м³/сут &lt;/SPAN&gt; фактического режима&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Кликнуть 2 раза на ячейку &lt;SPAN style=\"color: rgb(32, 33, 36);font-size: 12px;background-color: rgb(255, 255, 255)\"&gt; Обводненность, % &lt;/SPAN&gt; в фактическом режиме&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Убедится, что первая строка со скважиной ВБД имеет значение 0 в &lt;SPAN style=\"color: rgb(32, 33, 36);font-size: 12px;background-color: rgb(255, 255, 255)\"&gt;Обводненность, %&lt;/SPAN&gt; фактического режима&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-04-08T12:14:34.78Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2022-04-08T12:14:34.78Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 3
+          }
+        ]
+      },
+      "order": 8,
+      "pointAssignments": [
+        {
+          "id": 40074,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769/TestPoint/40074"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442769,
+        "name": "3.4 Не разобрано"
+      },
+      "workItem": {
+        "id": 56967,
+        "name": "[A] Проверка запрета переноса из Не кандидатов в Кандидаты",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"5\"><step id=\"2\" type=\"ActionStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;ПРЕДУСЛОВИЕ&lt;BR/&gt;&lt;BR/&gt;&lt;/P&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;Открыть меню&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px;background-color: rgb(239, 246, 252)\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;Нажать \"работа с проектом\"&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px;background-color: rgb(239, 246, 252)\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;Развернуть последний актуальный месяц&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px;background-color: rgb(239, 246, 252)\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;Выбрать ДО, например, Ноябрьскнефтегаз&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px;background-color: rgb(239, 246, 252)\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;Перейти на вкладку Не кандидаты&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px;background-color: rgb(239, 246, 252)\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;Открыть фильтр по кнопке&lt;BR style=\"color: rgba(0, 0, 0, 0.9);font-size: 13px;background-color: rgb(239, 246, 252)\"/&gt;&lt;/DIV&gt;&lt;DIV style=\"color: rgb(0, 0, 0);font-size: 14px;white-space: normal;background-color: rgb(255, 255, 255)\"&gt;В фильтре в графе&amp;nbsp;\"Критерии отбора\" выбрать (&lt;B&gt;см.шаги&lt;/B&gt;)&lt;BR/&gt;&lt;/DIV&gt;&lt;P&gt;&lt;SPAN style=\"background-color: rgb(255, 255, 255);color: rgb(0, 0, 0);font-size: 14px;white-space: normal\"&gt;Кликнуть на первую строку&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;DIV&gt;&lt;BR/&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;В Б/Д&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Кнопка \"В кандидаты\" не кликабельна&lt;BR/&gt;&lt;BR/&gt;Есть тултип: &lt;SPAN style=\"background-color: rgb(255, 255, 255);color: rgb(32, 33, 36);font-size: 12px\"&gt;Скважина в бездействии, не может быть перенесена в Кандидаты&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;В работе&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Кнопка \"В кандидаты\" не кликабельна&lt;BR/&gt;&lt;BR/&gt;Есть тултип: &lt;SPAN style=\"background-color: rgb(255, 255, 255);color: rgb(32, 33, 36);font-size: 12px\"&gt;Скважина в работе не может быть перенесена в Кандидаты&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;На фонтане&lt;BR/&gt; - для ОПТ, ГРП, МГРП&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Кнопка \"В кандидаты\" не кликабельна&lt;BR/&gt;&lt;BR/&gt;Есть тултип: &lt;SPAN style=\"background-color: rgb(255, 255, 255);color: rgb(32, 33, 36);font-size: 12px\"&gt;Скважина с СЭ фонтан/газлифт не может быть перенесена в Кандидаты&lt;/SPAN&gt;&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-04-13T11:19:26.123Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2022-04-13T11:19:26.123Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 3
+          }
+        ]
+      },
+      "order": 9,
+      "pointAssignments": [
+        {
+          "id": 40077,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769/TestPoint/40077"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    },
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442769,
+        "name": "3.4 Не разобрано"
+      },
+      "workItem": {
+        "id": 74754,
+        "name": "[A] Проверка правильности значения Целевого Qн в таблице для ОПЗ/ОПТ+ОПЗ",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"2\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открыть любой проект&lt;BR/&gt;Фильтр по ОПЗ или ОПТ+ОПЗ&lt;BR/&gt;Выбрать первую строку&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;P&gt;Целевая Qн = (100 - целевая обв) / 100 * Целевой Qж * плотность нефти из PVT свойств в детализации&lt;BR/&gt;&lt;/P&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2022-08-30T13:33:08.773Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Дизайн"
+          },
+          {
+            "System.AssignedTo": "Мухаметзянов Рустэм Игоревич <GAZPROM-NEFT\\Mukhametzyanov.RI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2022-08-30T13:33:08.773Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 3
+          }
+        ]
+      },
+      "order": 10,
+      "pointAssignments": [
+        {
+          "id": 40078,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Мухаметзянов Рустэм Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+              }
+            },
+            "id": "fb75fd12-0469-47ad-a0d3-a7f8f6bd12c7",
+            "uniqueName": "GAZPROM-NEFT\\Mukhametzyanov.RI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS03NDIxODA"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769/TestPoint/40078"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442769"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 11
+}

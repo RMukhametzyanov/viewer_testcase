@@ -1,0 +1,98 @@
+{
+  "value": [
+    {
+      "testPlan": {
+        "id": 442604,
+        "name": "СПекТР.Базовый тест-план"
+      },
+      "project": {
+        "id": "d614db65-499b-44b2-908e-4781ef825d3f",
+        "name": "U210001901_spektr",
+        "state": "unchanged",
+        "visibility": "unchanged",
+        "lastUpdateTime": "0001-01-01T00:00:00"
+      },
+      "testSuite": {
+        "id": 442844,
+        "name": "Настройка"
+      },
+      "workItem": {
+        "id": 386145,
+        "name": "Мониторинг. Настройки",
+        "workItemFields": [
+          {
+            "Microsoft.VSTS.TCM.Steps": "<steps id=\"0\" last=\"8\"><step id=\"2\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Мониторинг -&amp;gt; Настройки:&lt;BR/&gt;&lt;A href=\"https://spektr-u210001901.apps.test.paas.gazprom-neft.local/monitoring/settings\" style=\"font-size: 14px;background-color: rgb(255, 255, 255)\" tabindex=\"-1\"&gt;https://spektr-u210001901.apps.test.paas.gazprom-neft.local/monitoring/settings&lt;BR/&gt;&lt;BR/&gt;&lt;/A&gt;&lt;BR/&gt;Открыть вкладку \"Мин рент прирост\":&lt;BR/&gt;&lt;BR/&gt;- Получить данные для таблицы&lt;BR/&gt;GET https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/monitoring/v1/Profitability/GetMinProductionLevel?orgIds=6\n&lt;BR/&gt;- Получить историю корректировок&lt;BR/&gt;GET https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/monitoring/v1/Profitability/GetAdjustingHistory?orgId=6&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&amp;lt; 5 сек.&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"3\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Клик по \"История загрузок\"&lt;BR/&gt;&lt;BR/&gt;- Получить историю загрузок\nGET https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/monitoring/v1/Profitability/GetUploadHistory?orgId=6&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&amp;lt; 5 сек.&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"4\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открыть вкладку \"Мин рент приемистость\"&lt;BR/&gt;&lt;BR/&gt;- Получить данные для таблицы&lt;BR/&gt;GET https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/monitoring/v1/MinIntake/Get?orgIds=6\n&lt;BR/&gt;- Получить историю корректировок&lt;BR/&gt;GET https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/monitoring/v1/MinIntake/GetAdjustingHistory?orgId=6&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&amp;lt; 5 сек.&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"5\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Клик по \"История загрузок\"&lt;BR/&gt;&lt;BR/&gt;- Получить историю загрузок&lt;BR/&gt;GET https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/monitoring/v1/MinIntake/GetUploadHistory?orgId=6&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&amp;lt; 5 сек.&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"6\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открыть вкладку \"Граничные значения\"&lt;BR/&gt;&lt;BR/&gt;- Получить настройки &lt;BR/&gt;GET&amp;nbsp;https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/monitoring/v1/ExpertiseCondition/GetExpertiseConditions?orgId=6\n&lt;BR/&gt;- Получить историю корректировок&lt;BR/&gt;GET https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/monitoring/v1/ExpertiseCondition/GetChangeHistory?orgId=6&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&amp;lt; 5 сек.&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"7\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Открыть вкладку \"Опции расчета\" -&amp;gt; \"Пороговое значение\"&lt;BR/&gt;&lt;BR/&gt;- Получить данные &lt;BR/&gt;GET&amp;nbsp;https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/monitoring/v1/RiskLimit/Options?orgId=6\n&lt;BR/&gt;- Получить историю корректировок&lt;BR/&gt;GET https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/monitoring/v1/RiskLimit/ChangeHistory?orgId=6&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&amp;lt; 5 сек.&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step><step id=\"8\" type=\"ValidateStep\"><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;Клик по \"Анализ Кпрод\"&lt;BR/&gt;&lt;BR/&gt;- Получить данные&lt;BR/&gt;GET https://spektr-u210001901.apps.test.paas.gazprom-neft.local/api/monitoring/v1/ProductivityFactorOption/GetOptions?orgId=6&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><parameterizedString isformatted=\"true\">&lt;DIV&gt;&lt;P&gt;&amp;lt; 5 сек.&lt;BR/&gt;&lt;/P&gt;&lt;/DIV&gt;</parameterizedString><description/></step></steps>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedBy": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.ActivatedDate": "2025-05-13T14:10:50.207Z"
+          },
+          {
+            "Microsoft.VSTS.TCM.AutomationStatus": "Не автоматизирован"
+          },
+          {
+            "System.State": "Готов"
+          },
+          {
+            "System.AssignedTo": "Лобанов Сергей Игоревич <GAZPROM-NEFT\\Lobanov.SI>"
+          },
+          {
+            "Microsoft.VSTS.Common.Priority": 2
+          },
+          {
+            "Microsoft.VSTS.Common.StateChangeDate": "2025-05-13T14:25:47.797Z"
+          },
+          {
+            "System.WorkItemType": "Тестовый случай"
+          },
+          {
+            "System.Rev": 14
+          }
+        ]
+      },
+      "pointAssignments": [
+        {
+          "id": 40339,
+          "configurationName": "Windows 10",
+          "tester": {
+            "displayName": "Лобанов Сергей Игоревич",
+            "url": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/Identities/cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "_links": {
+              "avatar": {
+                "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+              }
+            },
+            "id": "cad33f1c-82eb-4893-a97a-d676b737c52e",
+            "uniqueName": "GAZPROM-NEFT\\Lobanov.SI",
+            "imageUrl": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1",
+            "descriptor": "win.Uy0xLTUtMjEtMTAwNzcwNjc5Ny0zNDk4MDgwNTY0LTEzMzU4NzEzMS0xMTI1Mjg1"
+          },
+          "configurationId": 348
+        }
+      ],
+      "links": {
+        "testPoints": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442844/TestPoint/40339"
+        },
+        "configuration": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Configurations/348"
+        },
+        "_self": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442844/TestCase"
+        },
+        "sourcePlan": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604"
+        },
+        "sourceSuite": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/U210001901_spektr/_apis/testplan/Plans/442604/Suites/442844"
+        },
+        "sourceProject": {
+          "href": "https://alm-itsk.gazprom-neft.local:8080/TFS/GPN/_apis/projects/U210001901_spektr"
+        }
+      }
+    }
+  ],
+  "count": 1
+}
