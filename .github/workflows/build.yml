@@ -1,0 +1,114 @@
+name: Build Application
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:  # Позволяет запускать вручную из GitHub UI
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  build-windows:
+    name: Build for Windows
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+      
+      - name: Build Windows executable
+        run: |
+          python build_all.py
+      
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: TestCaseEditor-Windows
+          path: dist/TestCaseEditor.exe
+          retention-days: 30
+
+  build-macos:
+    name: Build for macOS
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+      
+      - name: Build macOS app
+        run: |
+          python build_all.py
+      
+      - name: Fix macOS app permissions
+        run: |
+          chmod -R +x dist/TestCaseEditor.app/Contents/MacOS/TestCaseEditor || true
+          xattr -cr dist/TestCaseEditor.app || true
+      
+      - name: Create macOS zip archive
+        run: |
+          cd dist
+          zip -r TestCaseEditor-macOS.zip TestCaseEditor.app
+          cd ..
+      
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: TestCaseEditor-macOS
+          path: dist/TestCaseEditor-macOS.zip
+          retention-days: 30
+
+  create-release:
+    name: Create Release
+    needs: [build-windows, build-macos]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    
+    steps:
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: TestCaseEditor-Windows
+          path: release/windows
+      
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: TestCaseEditor-macOS
+          path: release/macos
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            release/windows/TestCaseEditor.exe
+            release/macos/TestCaseEditor-macOS.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
