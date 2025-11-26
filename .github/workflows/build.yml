@@ -35,7 +35,7 @@ jobs:
           python build_all.py
       
       - name: Upload Windows artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: TestCaseEditor-Windows
           path: dist/TestCaseEditor.exe
@@ -76,7 +76,7 @@ jobs:
           cd ..
       
       - name: Upload macOS artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: TestCaseEditor-macOS
           path: dist/TestCaseEditor-macOS.zip
@@ -90,13 +90,13 @@ jobs:
     
     steps:
       - name: Download Windows artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: TestCaseEditor-Windows
           path: release/windows
       
       - name: Download macOS artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: TestCaseEditor-macOS
           path: release/macos
