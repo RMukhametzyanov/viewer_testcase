@@ -5,7 +5,7 @@ from __future__ import annotations
 import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from ..utils.datetime_utils import ensure_timestamp_ms
 
@@ -129,6 +129,7 @@ class TestCase:
     steps: List[TestCaseStep] = field(default_factory=list)
     created_at: int = 0
     updated_at: int = 0
+    notes: Dict[str, Dict[str, str]] = field(default_factory=dict)  # notes[timestamp] = {"author": "...", "message": "..."}
 
     # Служебные поля (не сохраняются в JSON)
     _filename: Optional[str] = field(default=None, repr=False)
@@ -164,6 +165,7 @@ class TestCase:
             "steps": [step.to_dict() for step in self.steps],
             "createdAt": self.created_at,
             "updatedAt": self.updated_at,
+            "notes": self.notes or {},
         }
 
     @classmethod
@@ -178,6 +180,19 @@ class TestCase:
 
         created_at = ensure_timestamp_ms(data.get("createdAt"))
         updated_at = ensure_timestamp_ms(data.get("updatedAt"))
+
+        # Загружаем notes
+        notes_data = data.get("notes") or {}
+        notes = {}
+        if isinstance(notes_data, dict):
+            for key, value in notes_data.items():
+                if isinstance(value, dict):
+                    notes[str(key)] = {
+                        "author": str(value.get("author", "")),
+                        "message": str(value.get("message", "")),
+                        "resolved": str(value.get("resolved", "new")),
+                        "edited": bool(value.get("edited", False)),
+                    }
 
         return cls(
             id=str(data.get("id") or ""),
@@ -206,6 +221,7 @@ class TestCase:
             steps=steps,
             created_at=created_at,
             updated_at=updated_at,
+            notes=notes,
             _filename=filepath.name if filepath else None,
             _filepath=filepath,
         )

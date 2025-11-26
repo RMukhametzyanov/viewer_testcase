@@ -5,7 +5,8 @@
     "creation": "file-plus.svg",
     "json": "code.svg",
     "files": "file.svg",
-    "reports": "book.svg"
+    "reports": "book.svg",
+    "manual_review": "send.svg"
   },
   "context_menu": {
     "open_explorer": "external-link.svg",
@@ -42,6 +43,13 @@
   },
   "search": {
     "filter": "filter.svg"
+  },
+  "manual_review": {
+    "edit": "edit-2.svg",
+    "delete": "x.svg",
+    "resolved_new": "help-circle.svg",
+    "resolved_fixed": "arrow-right-circle.svg",
+    "resolved_closed": "check-circle.svg"
   }
 }
 

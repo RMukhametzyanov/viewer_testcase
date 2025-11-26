@@ -60,6 +60,7 @@ from ..utils.prompt_builder import build_review_prompt, build_creation_prompt
 from ..utils.list_models import fetch_models as fetch_llm_models
 from ..utils.allure_generator import generate_allure_report
 from ..utils.html_report_generator import generate_html_report
+from ..utils.resource_path import get_icon_path, get_icons_dir
 from .styles.ui_metrics import UI_METRICS
 from .styles.app_theme import build_app_style_sheet
 from .styles.theme_provider import THEME_PROVIDER, ThemeProvider
@@ -679,8 +680,8 @@ class SettingsDialog(QDialog):
         
         # LLM
         self.llm_host_edit.setText(self.settings.get('LLM_HOST', ''))
-        # Загружаем модели для комбобокса
-        self._load_llm_models()
+        # Загружаем модели для комбобокса (используем кэш, чтобы не блокировать UI)
+        self._load_llm_models(use_cached=True)
         # Устанавливаем текущую модель
         current_model = self.settings.get('LLM_MODEL', '')
         if current_model:
@@ -872,8 +873,12 @@ class SettingsDialog(QDialog):
         """Получить сохраненные настройки"""
         return self.settings
     
-    def _load_llm_models(self):
-        """Загрузить список доступных LLM моделей"""
+    def _load_llm_models(self, use_cached: bool = True):
+        """Загрузить список доступных LLM моделей
+        
+        Args:
+            use_cached: Если True, использует кэшированные модели из главного окна вместо запроса к серверу
+        """
         if not self.parent_window:
             return
         
@@ -886,13 +891,26 @@ class SettingsDialog(QDialog):
             else:
                 models = []
         else:
-            # Загружаем модели с указанного хоста
-            try:
-                from ..utils.list_models import fetch_models as fetch_llm_models
-                models = fetch_llm_models(host)
-                models = [str(m).strip() for m in (models or []) if str(m or "").strip()]
-            except Exception:
-                models = []
+            # Если use_cached=True, используем кэшированные модели из главного окна (если есть)
+            # чтобы не блокировать UI при открытии диалога
+            if use_cached:
+                # Пытаемся использовать кэш из главного окна, если хост совпадает
+                if (hasattr(self.parent_window, 'llm_host') and 
+                    self.parent_window.llm_host == host and
+                    hasattr(self.parent_window, 'available_llm_models')):
+                    models = self.parent_window.available_llm_models
+                else:
+                    # Если хост другой или кэша нет, используем пустой список
+                    # (текущая модель будет добавлена ниже)
+                    models = []
+            else:
+                # Синхронная загрузка только при явном запросе (кнопка "Обновить")
+                try:
+                    from ..utils.list_models import fetch_models as fetch_llm_models
+                    models = fetch_llm_models(host)
+                    models = [str(m).strip() for m in (models or []) if str(m or "").strip()]
+                except Exception:
+                    models = []
         
         # Добавляем текущую модель, если её нет в списке
         current_model = self.settings.get('LLM_MODEL', '')
@@ -904,15 +922,16 @@ class SettingsDialog(QDialog):
         self._reset_llm_model_filter()
     
     def _refresh_llm_models(self):
-        """Обновить список LLM моделей"""
-        self._load_llm_models()
+        """Обновить список LLM моделей (с запросом к серверу)"""
+        # При обновлении делаем реальный запрос к серверу
+        self._load_llm_models(use_cached=False)
         QMessageBox.information(self, "Обновление", "Список моделей обновлен")
     
     def _on_llm_host_changed(self, text: str):
         """Обработчик изменения LLM Host"""
-        # При изменении хоста обновляем список моделей
+        # При изменении хоста обновляем список моделей (используем кэш, чтобы не блокировать UI)
         if text.strip():
-            QTimer.singleShot(500, self._load_llm_models)  # Задержка для завершения ввода
+            QTimer.singleShot(500, lambda: self._load_llm_models(use_cached=True))  # Задержка для завершения ввода
     
     def _on_llm_model_changed(self, text: str):
         """Обработчик изменения выбранной модели"""
@@ -988,6 +1007,41 @@ class _LLMWorker(QObject):
             self.finished.emit(response)
 
 
+class _LLMAvailabilityWorker(QObject):
+    """Воркер для проверки доступности LLM в фоновом потоке"""
+    availability_checked = pyqtSignal(bool)  # True если доступен, False если нет
+
+    def __init__(self, host: Optional[str]):
+        super().__init__()
+        self.host = host
+
+    def run(self):
+        """Проверить доступность LLM"""
+        try:
+            if not self.host or not str(self.host).strip():
+                self.availability_checked.emit(False)
+                return
+            
+            # Используем короткий timeout для проверки доступности
+            try:
+                models = fetch_llm_models(str(self.host).strip(), timeout=5.0)
+                # Если получили список моделей (даже пустой), значит LLM доступен
+                is_available = True
+            except Exception:
+                # Любая ошибка означает, что LLM недоступен
+                is_available = False
+            
+            # Отправляем сигнал в любом случае
+            self.availability_checked.emit(is_available)
+        except Exception:
+            # На всякий случай, если произошла ошибка на верхнем уровне
+            try:
+                self.availability_checked.emit(False)
+            except Exception:
+                # Игнорируем ошибки при отправке сигнала
+                pass
+
+
 class MainWindow(QMainWindow):
     """
     Главное окно редактора тест-кейсов
@@ -1048,8 +1102,14 @@ class MainWindow(QMainWindow):
         self._model_proxy_model.setSourceModel(self._model_list_model)
         self._model_options: List[str] = []
         self._suppress_model_change = False
-        self.available_llm_models = self._fetch_available_llm_models()
+        # Инициализируем списком с текущей моделью, если она есть (неблокирующий запуск)
+        self.available_llm_models = [self.llm_model] if self.llm_model else []
         self.selected_llm_model = self.llm_model
+        # Статус доступности LLM: None - неизвестен, True - доступен, False - недоступен
+        self._llm_available: Optional[bool] = None
+        # Таймер для периодической проверки LLM (каждые 5 минут)
+        self._llm_check_timer = QTimer(self)
+        self._llm_check_timer.timeout.connect(self._check_llm_availability)
         methodic_setting = self.settings.get('LLM_METHODIC_PATH')
         if methodic_setting:
             self.methodic_path = Path(methodic_setting).expanduser()
@@ -1063,6 +1123,8 @@ class MainWindow(QMainWindow):
         self.test_cases = []
         self._llm_thread: Optional[QThread] = None
         self._llm_worker: Optional[_LLMWorker] = None
+        self._llm_availability_thread: Optional[QThread] = None
+        self._llm_availability_worker: Optional[_LLMAvailabilityWorker] = None
         self._current_test_case_path: Optional[Path] = None
         self._current_filters: Dict = {}
         self._current_mode: str = "edit"
@@ -1155,8 +1217,7 @@ class MainWindow(QMainWindow):
         # Иконка фильтра
         self.filter_button = QToolButton()
         # Загружаем иконку фильтра из icon_mapping.json
-        project_root = Path(__file__).parent.parent.parent
-        mapping_file = project_root / "icons" / "icon_mapping.json"
+        mapping_file = get_icons_dir() / "icon_mapping.json"
         filter_icon_name = "filter.svg"
         if mapping_file.exists():
             try:
@@ -1261,6 +1322,7 @@ class MainWindow(QMainWindow):
         self.aux_panel.generate_report_requested.connect(self._generate_html_report)
         self.aux_panel.generate_summary_report_requested.connect(self._generate_summary_report)
         self.aux_panel.tab_changed.connect(self._on_aux_panel_tab_changed)
+        self.aux_panel.manual_review_notes_changed.connect(self._on_manual_review_notes_changed)
         self.detail_splitter.addWidget(self.aux_panel)
         
         # Создаем кнопки панелей в toolbar после создания aux_panel
@@ -1380,16 +1442,21 @@ class MainWindow(QMainWindow):
         
         self._update_mode_indicator()
         
-        # Создаем label для статистики в статус-баре
+        # Создаем label для статистики в статус-баре (включая статус LLM)
         self._create_statusbar_statistics_label()
         
         # Создаем кнопку "Сохранить" в статус-баре
         self._create_statusbar_save_button()
+        
+        # Отображаем статус LLM сразу (серый, пока проверка не завершена)
+        self._update_statusbar_statistics()
+        
+        # Запускаем проверку LLM в фоне после инициализации UI (с небольшой задержкой)
+        QTimer.singleShot(500, self._start_llm_availability_check)
     
     def _load_icon_mapping(self) -> dict:
         """Загрузить маппинг панелей на иконки из JSON файла."""
-        project_root = Path(__file__).parent.parent.parent
-        mapping_file = project_root / "icons" / "icon_mapping.json"
+        mapping_file = get_icons_dir() / "icon_mapping.json"
         
         if mapping_file.exists():
             try:
@@ -1413,8 +1480,7 @@ class MainWindow(QMainWindow):
     
     def _load_svg_icon(self, icon_name: str, size: int = 24, color: Optional[str] = None) -> Optional[QIcon]:
         """Загрузить SVG иконку из файла и вернуть QIcon."""
-        project_root = Path(__file__).parent.parent.parent
-        icon_path = project_root / "icons" / icon_name
+        icon_path = get_icon_path(icon_name)
         
         if not icon_path.exists():
             print(f"Иконка не найдена: {icon_path}")
@@ -1458,7 +1524,7 @@ class MainWindow(QMainWindow):
         icon_mapping = self._load_icon_mapping()
         
         # Порядок панелей
-        tabs_order = ["information", "review", "creation", "json", "files", "reports"]
+        tabs_order = ["information", "review", "creation", "json", "files", "reports", "manual_review"]
         
         # Маппинг панелей на подсказки
         tooltips = {
@@ -1468,6 +1534,7 @@ class MainWindow(QMainWindow):
             "json": "JSON превью",
             "files": "Файлы",
             "reports": "Отчетность",
+            "manual_review": "Ручное ревью",
         }
         
         for index, tab_id in enumerate(tabs_order):
@@ -2492,21 +2559,50 @@ class MainWindow(QMainWindow):
 
     def _on_test_case_selected(self, test_case: TestCase):
         """Обработка выбора тест-кейса"""
-        # Устанавливаем флаг для предотвращения автоматического изменения размеров панелей
-        self._preserve_panel_sizes = True
-        
         # Проверяем наличие несохраненных изменений перед переключением
         if hasattr(self, "form_widget") and self.form_widget.has_unsaved_changes:
-            # Подсвечиваем кнопку "Сохранить" и показываем предупреждение
-            if hasattr(self, "statusbar_save_button"):
-                self.statusbar_save_button.setVisible(True)
-                self._highlight_save_button()
-            self.statusBar().showMessage(
-                "Есть несохраненные изменения. Сохраните изменения перед переключением на другой тест-кейс.",
-                5000
+            # Сохраняем предыдущий выбранный элемент для возможности отмены
+            # Находим элемент по текущему тест-кейсу, так как currentItem() уже указывает на новый
+            previous_test_case = self.current_test_case
+            previous_item = None
+            if previous_test_case and hasattr(previous_test_case, "_filepath"):
+                previous_item = self.tree_widget._find_item_by_filepath(
+                    self.tree_widget.invisibleRootItem(), 
+                    previous_test_case._filepath
+                )
+            
+            # Показываем диалог с вопросом о сохранении
+            reply = QMessageBox.question(
+                self,
+                "Несохраненные изменения",
+                "Есть несохраненные изменения. Сохранить?",
+                QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel,
+                QMessageBox.Yes
             )
-            # Переключаемся на новый тест-кейс, но предупреждаем пользователя
-            # (изменения будут потеряны, но пользователь видит подсвеченную кнопку)
+            
+            if reply == QMessageBox.Cancel:
+                # Отменяем переключение - возвращаем выделение на предыдущий элемент
+                if previous_item:
+                    # Временно блокируем сигнал, чтобы не вызвать рекурсию
+                    self.tree_widget.itemClicked.disconnect()
+                    self.tree_widget.setCurrentItem(previous_item)
+                    self.tree_widget.itemClicked.connect(self.tree_widget._on_item_clicked)
+                return
+            elif reply == QMessageBox.Yes:
+                # Сохраняем изменения перед переключением
+                if hasattr(self, "form_widget"):
+                    self.form_widget.save()
+                    # После сохранения проверяем, не было ли ошибки сохранения
+                    if self.form_widget.has_unsaved_changes:
+                        # Если сохранение не удалось, отменяем переключение
+                        if previous_item:
+                            self.tree_widget.itemClicked.disconnect()
+                            self.tree_widget.setCurrentItem(previous_item)
+                            self.tree_widget.itemClicked.connect(self.tree_widget._on_item_clicked)
+                        return
+        
+        # Устанавливаем флаг для предотвращения автоматического изменения размеров панелей
+        self._preserve_panel_sizes = True
         
         self.current_test_case = test_case
         self.detail_stack.setCurrentWidget(self.form_widget)
@@ -2515,6 +2611,7 @@ class MainWindow(QMainWindow):
         if hasattr(self, "aux_panel"):
             self.aux_panel.set_information_test_case(test_case)
             self.aux_panel.set_files_test_case(test_case)
+            self.aux_panel.set_manual_review_test_case(test_case)
             # Подключаем сигнал изменения attachments в панели файлов
             if hasattr(self.aux_panel, "files_panel"):
                 try:
@@ -2614,6 +2711,7 @@ class MainWindow(QMainWindow):
             self.aux_panel.set_information_test_case(self.current_test_case)
             # Обновляем панель "Файлы" для отображения прикрепленных файлов
             self.aux_panel.set_files_test_case(self.current_test_case)
+            self.aux_panel.set_manual_review_test_case(self.current_test_case)
         self.load_all_test_cases()
         # Обновляем индикаторы статуса Git после сохранения
         self._update_git_status_indicators()
@@ -2638,6 +2736,23 @@ class MainWindow(QMainWindow):
         # Помечаем изменения в форме (чтобы появилась кнопка сохранения)
         self.form_widget.has_unsaved_changes = True
         self.form_widget.unsaved_changes_state.emit(True)
+    
+    def _on_manual_review_notes_changed(self):
+        """Обработка изменения notes в панели ручного ревью"""
+        if not self.current_test_case:
+            return
+        
+        # Notes уже обновлены в current_test_case в момент вызова сигнала
+        # Автоматически сохраняем тест-кейс после изменения notes
+        if hasattr(self, "form_widget") and self.current_test_case:
+            # Убеждаемся, что form_widget использует тот же объект тест-кейса
+            if self.form_widget.current_test_case != self.current_test_case:
+                self.form_widget.current_test_case = self.current_test_case
+            # Сохраняем тест-кейс (notes уже обновлены в current_test_case)
+            self.form_widget.save()
+        
+        # Обновляем JSON preview, чтобы показать изменения
+        self._update_json_preview()
     
     def _on_form_before_save(self, test_case: TestCase):
         """Обновить данные тест-кейса из панели информации перед сохранением"""
@@ -2671,8 +2786,7 @@ class MainWindow(QMainWindow):
         # Обновляем цвет иконки фильтра на зеленый
         if hasattr(self, 'filter_button'):
             filter_icon_name = "filter.svg"
-            project_root = Path(__file__).parent.parent.parent
-            mapping_file = project_root / "icons" / "icon_mapping.json"
+            mapping_file = get_icons_dir() / "icon_mapping.json"
             if mapping_file.exists():
                 try:
                     with open(mapping_file, 'r', encoding='utf-8') as f:
@@ -2695,8 +2809,7 @@ class MainWindow(QMainWindow):
         # Возвращаем белый цвет иконки фильтра
         if hasattr(self, 'filter_button'):
             filter_icon_name = "filter.svg"
-            project_root = Path(__file__).parent.parent.parent
-            mapping_file = project_root / "icons" / "icon_mapping.json"
+            mapping_file = get_icons_dir() / "icon_mapping.json"
             if mapping_file.exists():
                 try:
                     with open(mapping_file, 'r', encoding='utf-8') as f:
@@ -2777,6 +2890,59 @@ class MainWindow(QMainWindow):
         if self.llm_model and self.llm_model not in cleaned:
             cleaned.insert(0, self.llm_model)
         return cleaned or fallback
+
+    def _start_llm_availability_check(self):
+        """Запустить первую проверку доступности LLM и настроить периодическую проверку"""
+        # Запускаем первую проверку сразу (с небольшой задержкой, чтобы UI успел инициализироваться)
+        QTimer.singleShot(100, self._check_llm_availability)
+        # Настраиваем таймер для периодической проверки каждые 5 минут (300000 мс)
+        self._llm_check_timer.start(300000)  # 5 минут
+
+    def _check_llm_availability(self):
+        """Проверить доступность LLM в фоновом потоке"""
+        # Если предыдущая проверка еще выполняется, не запускаем новую
+        if self._llm_availability_thread and self._llm_availability_thread.isRunning():
+            return
+        
+        # Если host не задан, просто устанавливаем статус как недоступный
+        if not self.llm_host or not self.llm_host.strip():
+            self._llm_available = False
+            self._update_statusbar_statistics()
+            return
+        
+        # Создаем воркер и поток для проверки доступности
+        worker = _LLMAvailabilityWorker(self.llm_host)
+        thread = QThread()
+        worker.moveToThread(thread)
+
+        # Подключаем сигналы
+        worker.availability_checked.connect(self._on_llm_availability_checked)
+        thread.started.connect(worker.run)
+
+        thread.start()
+
+        self._llm_availability_worker = worker
+        self._llm_availability_thread = thread
+
+    def _on_llm_availability_checked(self, is_available: bool):
+        """Обработчик результата проверки доступности LLM"""
+        self._llm_available = is_available
+        # Обновляем статистику, так как она теперь включает статус LLM
+        self._update_statusbar_statistics()
+        # Очищаем воркер и поток после обновления статуса
+        QTimer.singleShot(0, self._cleanup_llm_availability_worker)
+
+    def _cleanup_llm_availability_worker(self):
+        """Очистка воркера и потока проверки доступности LLM"""
+        if self._llm_availability_thread:
+            if self._llm_availability_thread.isRunning():
+                self._llm_availability_thread.quit()
+                self._llm_availability_thread.wait()
+            self._llm_availability_thread.deleteLater()
+            self._llm_availability_thread = None
+        if self._llm_availability_worker:
+            self._llm_availability_worker.deleteLater()
+            self._llm_availability_worker = None
 
     def _apply_model_options(self):
         models = self.available_llm_models or ([self.llm_model] if self.llm_model else [])
@@ -3345,20 +3511,36 @@ class MainWindow(QMainWindow):
         self._update_statusbar_statistics()
 
     def _update_statusbar_statistics(self):
-        """Обновить статистику в statusbar (всегда видна)"""
+        """Обновить статистику в statusbar (всегда видна, включает статус LLM)"""
         if not hasattr(self, "statusbar_stats_label"):
             return
         
+        # Определяем цвет и текст для статуса LLM (всегда отображается)
+        if self._llm_available is None:
+            llm_status_color = "#95a5a6"  # Серый - статус неизвестен
+        elif self._llm_available:
+            llm_status_color = "#6CC24A"  # Зеленый - доступен
+        else:
+            llm_status_color = "#F5555D"  # Красный - недоступен
+        
+        llm_status_html = f"<span style='color: {llm_status_color};'>LLM</span>"
+        
         if not self.test_cases:
-            self.statusbar_stats_label.setVisible(False)
-            self.statusBar().showMessage("Тест-кейсы не загружены")
+            # Показываем только статус LLM, если нет тест-кейсов
+            stats_text = llm_status_html
+            self.statusbar_stats_label.setText(stats_text)
+            self.statusbar_stats_label.setVisible(True)
+            self.statusBar().showMessage("")
             return
         
         cases = list(self.test_cases or [])
         total = len(cases)
         if not total:
-            self.statusbar_stats_label.setVisible(False)
-            self.statusBar().showMessage("Тест-кейсы не загружены")
+            # Показываем только статус LLM, если список пуст
+            stats_text = llm_status_html
+            self.statusbar_stats_label.setText(stats_text)
+            self.statusbar_stats_label.setVisible(True)
+            self.statusBar().showMessage("")
             return
         
         pending_cases = 0
@@ -3389,8 +3571,10 @@ class MainWindow(QMainWindow):
         passed_percent = (passed_cases / total * 100) if total > 0 else 0
         pending_percent = (pending_cases / total * 100) if total > 0 else 0
         
-        # Формируем текст статистики с HTML-форматированием и цветами (как в массовых операциях)
+        # Формируем текст статистики с HTML-форматированием и цветами
+        # Статус LLM добавляется в начало с разделителем |
         stats_text = (
+            f"{llm_status_html} | "
             f"Всего тест-кейсов: {total} | "
             f"Успешно: <span style='color: #6CC24A;'>{passed_cases}</span> "
             f"(<span style='color: #6CC24A;'>{passed_percent:.1f}%</span>) | "
@@ -3662,8 +3846,14 @@ class MainWindow(QMainWindow):
                 self.load_all_test_cases()
         
         # Обновляем LLM настройки
+        llm_host_changed = False
         if 'LLM_HOST' in new_settings:
+            old_host = self.llm_host
             self.llm_host = new_settings['LLM_HOST'].strip()
+            if old_host != self.llm_host:
+                llm_host_changed = True
+                # Сбрасываем статус доступности при изменении хоста
+                self._llm_available = None
         if 'LLM_MODEL' in new_settings:
             self.llm_model = new_settings['LLM_MODEL'].strip()
             # Обновляем модель в селекторе
@@ -3671,6 +3861,12 @@ class MainWindow(QMainWindow):
                 current_text = self.model_selector.currentText()
                 if current_text != self.llm_model:
                     self.model_selector.setCurrentText(self.llm_model)
+        
+        # Если изменился LLM_HOST, запускаем новую проверку доступности
+        if llm_host_changed:
+            self._check_llm_availability()
+            # Обновляем статистику, чтобы отобразить обновленный статус
+            self._update_statusbar_statistics()
         
         # Обновляем промпты
         if 'DEFAULT_PROMT' in new_settings:
@@ -3751,6 +3947,18 @@ class MainWindow(QMainWindow):
                 layout.setContentsMargins(margins[0], UI_METRICS.group_title_spacing, margins[2], margins[3])
     
     def closeEvent(self, event):
+        # Останавливаем таймер проверки LLM
+        if hasattr(self, '_llm_check_timer'):
+            self._llm_check_timer.stop()
+        
+        # Очищаем потоки проверки LLM
+        if hasattr(self, '_cleanup_llm_availability_worker'):
+            self._cleanup_llm_availability_worker()
+        
+        # Очищаем потоки LLM запросов
+        if hasattr(self, '_cleanup_llm_worker'):
+            self._cleanup_llm_worker()
+        
         if self.isMaximized():
             geom = self.normalGeometry()
             geometry_data = {

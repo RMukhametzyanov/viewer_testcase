@@ -1327,6 +1327,33 @@ class TestCaseTreeWidget(QTreeWidget):
                             filter_tag_lower = filter_tags.lower().strip()
                             if filter_tag_lower not in test_case_tags:
                                 filter_match = False
+                    
+                    # Фильтр по resolved (проверяем notes)
+                    if 'resolved' in filters and filters['resolved']:
+                        resolved_filter = filters['resolved']
+                        # Получаем все статусы resolved из notes тест-кейса
+                        test_case_resolved_statuses = set()
+                        if hasattr(test_case, 'notes') and test_case.notes:
+                            for note_data in test_case.notes.values():
+                                if isinstance(note_data, dict):
+                                    resolved = note_data.get("resolved", "new")
+                                    if resolved:
+                                        test_case_resolved_statuses.add(resolved.strip())
+                        
+                        # Если у тест-кейса нет notes с resolved, считаем, что у него нет resolved статусов
+                        if not test_case_resolved_statuses:
+                            test_case_resolved_statuses.add("пусто")
+                        
+                        # Проверяем, есть ли пересечение между фильтром и статусами тест-кейса
+                        if isinstance(resolved_filter, list):
+                            # Множественный выбор - проверяем пересечение
+                            filter_set = set(r.strip() for r in resolved_filter)
+                            if not filter_set.intersection(test_case_resolved_statuses):
+                                filter_match = False
+                        else:
+                            # Одиночный выбор
+                            if resolved_filter.strip() not in test_case_resolved_statuses:
+                                filter_match = False
             
             # Для файлов: проверяем текстовый поиск и фильтры
             # Для папок: проверяем текстовый поиск и наличие видимых дочерних элементов

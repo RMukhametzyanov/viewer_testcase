@@ -111,13 +111,15 @@ class FilterPanel(QWidget):
         content_layout.addWidget(people_group)
         
         # Группа: Статус и тип
-        status_group = self._create_group("Статус и тип", 3)
+        status_group = self._create_group("Статус и тип", 4)
         self.status_list = self._create_list_widget()
         self._add_filter_to_group(status_group, "Статус:", self.status_list)
         self.test_layer_list = self._create_list_widget()
         self._add_filter_to_group(status_group, "Test Layer:", self.test_layer_list)
         self.test_type_list = self._create_list_widget()
         self._add_filter_to_group(status_group, "Тип теста:", self.test_type_list)
+        self.resolved_list = self._create_list_widget()
+        self._add_filter_to_group(status_group, "Resolved:", self.resolved_list)
         content_layout.addWidget(status_group)
         
         # Группа: Приоритеты
@@ -241,6 +243,7 @@ class FilterPanel(QWidget):
         stories = set()
         components = set()
         tags = set()
+        resolved_statuses = set()
         
         for test_case in self._test_cases:
             if test_case.author:
@@ -334,6 +337,16 @@ class FilterPanel(QWidget):
                         tags.add(tag.strip())
             else:
                 tags.add("пусто")
+            
+            # Собираем значения resolved из notes
+            if hasattr(test_case, 'notes') and test_case.notes:
+                for note_data in test_case.notes.values():
+                    if isinstance(note_data, dict):
+                        resolved = note_data.get("resolved", "new")
+                        if resolved:
+                            resolved_statuses.add(resolved.strip())
+            else:
+                resolved_statuses.add("пусто")
         
         # Заполняем списки
         self._populate_list(self.author_list, sorted(authors))
@@ -354,6 +367,12 @@ class FilterPanel(QWidget):
         self._populate_list(self.story_list, sorted(stories))
         self._populate_list(self.component_list, sorted(components))
         self._populate_list(self.tags_list, sorted(tags))
+        # Для resolved всегда показываем все возможные значения
+        resolved_to_show = ["new", "fixed", "closed"]
+        # Добавляем "пусто" только если есть тест-кейсы без notes
+        if "пусто" in resolved_statuses:
+            resolved_to_show.append("пусто")
+        self._populate_list(self.resolved_list, resolved_to_show)
     
     def _populate_list(self, combo: CheckboxComboBox, values: List[str]):
         """Заполнить список значениями"""
@@ -450,6 +469,10 @@ class FilterPanel(QWidget):
         if description:
             filters["description"] = description
         
+        resolved = self._get_selected_values(self.resolved_list)
+        if resolved is not None:
+            filters["resolved"] = resolved
+        
         self._current_filters = filters
         self.filters_applied.emit(filters)
     
@@ -458,7 +481,7 @@ class FilterPanel(QWidget):
         # Сбрасываем все чекбоксы
         for combo in [
             self.author_list, self.owner_list, self.reviewer_list,
-            self.status_list, self.test_layer_list, self.test_type_list,
+            self.status_list, self.test_layer_list, self.test_type_list, self.resolved_list,
             self.severity_list, self.priority_list,
             self.environment_list, self.browser_list,
             self.test_case_id_list, self.issue_links_list, self.test_case_links_list,
