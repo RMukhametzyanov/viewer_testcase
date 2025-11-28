@@ -163,7 +163,7 @@ def build_creation_prompt(
         '      "issueLinks": "string",\n'
         '      "testCaseLinks": "string",\n'
         '      "tags": "tag1, tag2",\n'
-        '      "status": "Draft | In Progress | Done | Blocked | Deprecated",\n'
+        '      "status": "Draft | Design | Review | Done",\n'
         '      "testType": "manual | automated | hybrid",\n'
         '      "steps": [\n'
         "        {\n"

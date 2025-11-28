@@ -858,7 +858,7 @@ class TestCaseFormWidget(QWidget):
         self._add_labeled_widget(people_row, "Автор:", self.author_input)
 
         self.owner_input = self._create_line_edit()
-        self._add_labeled_widget(people_row, "Владелец:", self.owner_input)
+        self._add_labeled_widget(people_row, "Исполнитель:", self.owner_input)
 
         self.reviewer_input = self._create_line_edit()
         self._add_labeled_widget(people_row, "Ревьюер:", self.reviewer_input)
@@ -867,7 +867,7 @@ class TestCaseFormWidget(QWidget):
         status_row = QHBoxLayout()
         status_row.setSpacing(UI_METRICS.base_spacing)
         self.status_input = _NoWheelComboBox()
-        self.status_input.addItems(["Draft", "In Progress", "Done", "Blocked", "Deprecated"])
+        self.status_input.addItems(["Draft", "Design", "Review", "Done"])
         self.status_input.setEditable(True)
         self.status_input.currentTextChanged.connect(self._mark_changed)
         self._add_labeled_widget(status_row, "Статус:", self.status_input)

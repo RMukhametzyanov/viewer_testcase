@@ -1,6 +1,6 @@
 """Панель информации о тест-кейсе"""
 
-from typing import Optional
+from typing import Optional, List
 
 from PyQt5.QtWidgets import (
     QWidget,
@@ -14,6 +14,7 @@ from PyQt5.QtWidgets import (
     QScrollArea,
     QFrame,
 )
+from typing import List
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QTextOption
 
@@ -43,6 +44,7 @@ class InformationPanel(QWidget):
         super().__init__(parent)
         self.current_test_case: Optional[TestCase] = None
         self._is_loading = False
+        self._testers_list: List[str] = []  # Список тестировщиков из настроек
         # Видимость элементов (по умолчанию все видимы)
         self._visibility_settings = {
             # Метаданные
@@ -158,13 +160,13 @@ class InformationPanel(QWidget):
         # Люди: Автор, Владелец, Ревьюер - сохраняем контейнеры
         people_layout = QHBoxLayout()
         people_layout.setSpacing(UI_METRICS.base_spacing)
-        self.author_input = self._create_line_edit()
+        self.author_input = self._create_tester_combo()
         self.author_container = self._add_labeled_widget(people_layout, "Автор:", self.author_input)
 
-        self.owner_input = self._create_line_edit()
-        self.owner_container = self._add_labeled_widget(people_layout, "Владелец:", self.owner_input)
+        self.owner_input = self._create_tester_combo()
+        self.owner_container = self._add_labeled_widget(people_layout, "Исполнитель:", self.owner_input)
 
-        self.reviewer_input = self._create_line_edit()
+        self.reviewer_input = self._create_tester_combo()
         self.reviewer_container = self._add_labeled_widget(people_layout, "Ревьюер:", self.reviewer_input)
         layout.addLayout(people_layout)
 
@@ -172,7 +174,7 @@ class InformationPanel(QWidget):
         status_layout = QHBoxLayout()
         status_layout.setSpacing(UI_METRICS.base_spacing)
         self.status_input = _NoWheelComboBox()
-        self.status_input.addItems(["Draft", "In Progress", "Done", "Blocked", "Deprecated"])
+        self.status_input.addItems(["Draft", "Design", "Review", "Done"])
         self.status_input.setEditable(True)
         self.status_input.currentTextChanged.connect(self._on_changed)
         self.status_container = self._add_labeled_widget(status_layout, "Статус:", self.status_input)
@@ -306,6 +308,40 @@ class InformationPanel(QWidget):
         # Устанавливаем выравнивание по левому краю и показываем начало строки
         edit.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         return edit
+    
+    def _create_tester_combo(self) -> QComboBox:
+        """Создать ComboBox для выбора тестировщика"""
+        combo = _NoWheelComboBox()
+        combo.setEditable(True)  # Разрешаем ввод произвольного значения
+        combo.currentTextChanged.connect(self._on_changed)
+        self._update_tester_combo(combo)
+        return combo
+    
+    def _update_tester_combo(self, combo: QComboBox):
+        """Обновить список тестировщиков в ComboBox"""
+        current_text = combo.currentText()
+        combo.clear()
+        combo.addItem("")  # Пустой элемент
+        for tester in self._testers_list:
+            combo.addItem(tester)
+        # Восстанавливаем текущий текст, если он был
+        if current_text:
+            index = combo.findText(current_text, Qt.MatchFixedString)
+            if index >= 0:
+                combo.setCurrentIndex(index)
+            else:
+                combo.setEditText(current_text)
+    
+    def set_testers(self, testers: List[str]):
+        """Установить список тестировщиков из настроек"""
+        self._testers_list = testers if testers else []
+        # Обновляем все ComboBox
+        if hasattr(self, 'author_input'):
+            self._update_tester_combo(self.author_input)
+        if hasattr(self, 'owner_input'):
+            self._update_tester_combo(self.owner_input)
+        if hasattr(self, 'reviewer_input'):
+            self._update_tester_combo(self.reviewer_input)
 
     def _add_labeled_widget(self, parent_layout: QHBoxLayout, label_text: str, widget):
         """Добавить виджет с подписью и вернуть контейнер для управления видимостью"""
@@ -384,20 +420,32 @@ class InformationPanel(QWidget):
             self.created_label.setText(f"Создан: {created_text}")
             self.updated_label.setText(f"Обновлён: {updated_text}")
 
-            # Люди (устанавливаем курсор в начало, чтобы показывалось начало строки)
+            # Люди (для ComboBox используем setCurrentText или setEditText)
             self.author_input.blockSignals(True)
-            self.author_input.setText(test_case.author or "")
-            self.author_input.setCursorPosition(0)  # Показываем начало строки
+            author_text = test_case.author or ""
+            index = self.author_input.findText(author_text, Qt.MatchFixedString)
+            if index >= 0:
+                self.author_input.setCurrentIndex(index)
+            else:
+                self.author_input.setEditText(author_text)
             self.author_input.blockSignals(False)
 
             self.owner_input.blockSignals(True)
-            self.owner_input.setText(test_case.owner or "")
-            self.owner_input.setCursorPosition(0)  # Показываем начало строки
+            owner_text = test_case.owner or ""
+            index = self.owner_input.findText(owner_text, Qt.MatchFixedString)
+            if index >= 0:
+                self.owner_input.setCurrentIndex(index)
+            else:
+                self.owner_input.setEditText(owner_text)
             self.owner_input.blockSignals(False)
 
             self.reviewer_input.blockSignals(True)
-            self.reviewer_input.setText(test_case.reviewer or "")
-            self.reviewer_input.setCursorPosition(0)  # Показываем начало строки
+            reviewer_text = test_case.reviewer or ""
+            index = self.reviewer_input.findText(reviewer_text, Qt.MatchFixedString)
+            if index >= 0:
+                self.reviewer_input.setCurrentIndex(index)
+            else:
+                self.reviewer_input.setEditText(reviewer_text)
             self.reviewer_input.blockSignals(False)
 
             # Статусы
@@ -463,9 +511,9 @@ class InformationPanel(QWidget):
             self.id_label.setText("ID: -")
             self.created_label.setText("Создан: -")
             self.updated_label.setText("Обновлён: -")
-            self.author_input.clear()
-            self.owner_input.clear()
-            self.reviewer_input.clear()
+            self.author_input.setCurrentIndex(0)  # Устанавливаем пустой элемент
+            self.owner_input.setCurrentIndex(0)
+            self.reviewer_input.setCurrentIndex(0)
             self._set_combo_value(self.status_input, "")
             self._set_combo_value(self.test_layer_input, "")
             self._set_combo_value(self.test_type_input, "")
@@ -491,9 +539,9 @@ class InformationPanel(QWidget):
         if not test_case:
             return
 
-        test_case.author = self.author_input.text()
-        test_case.owner = self.owner_input.text()
-        test_case.reviewer = self.reviewer_input.text()
+        test_case.author = self.author_input.currentText()
+        test_case.owner = self.owner_input.currentText()
+        test_case.reviewer = self.reviewer_input.currentText()
         test_case.status = self.status_input.currentText()
         test_case.test_layer = self.test_layer_input.currentText()
         test_case.test_type = self.test_type_input.currentText()

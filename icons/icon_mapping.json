@@ -16,10 +16,14 @@
     "duplicate": "copy.svg",
     "delete": "x.svg",
     "create_test_case": "file-plus.svg",
-    "create_folder": "folder-plus.svg"
+    "create_folder": "folder-plus.svg",
+    "add_to_review": "file-plus.svg"
   },
   "panel_buttons": {
-    "attach_files": "file-plus.svg"
+    "attach_files": "file-plus.svg",
+    "save": "save.svg",
+    "send": "send.svg",
+    "copy": "copy.svg"
   },
   "status_icons": {
     "passed": "check-circle.svg",
@@ -50,6 +54,11 @@
     "resolved_new": "help-circle.svg",
     "resolved_fixed": "arrow-right-circle.svg",
     "resolved_closed": "check-circle.svg"
+  },
+  "filter_panel": {
+    "add_field": "plus.svg",
+    "apply": "play.svg",
+    "reset": "refresh-ccw.svg"
   }
 }
 

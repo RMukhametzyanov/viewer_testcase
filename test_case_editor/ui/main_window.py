@@ -146,6 +146,7 @@ class SettingsDialog(QDialog):
             ("Панели", "panels"),
             ("Внешний вид", "appearance"),
             ("Панель Информация", "information_panel"),
+            ("Импорт", "import"),
         ]
         
         self.section_widgets = {}
@@ -167,6 +168,8 @@ class SettingsDialog(QDialog):
                 widget = self._create_appearance_tab()
             elif key == "information_panel":
                 widget = self._create_information_panel_tab()
+            elif key == "import":
+                widget = self._create_import_tab()
             else:
                 widget = QWidget()
             
@@ -208,6 +211,27 @@ class SettingsDialog(QDialog):
         content = QWidget()
         content_layout = QVBoxLayout(content)
         content_layout.setSpacing(UI_METRICS.section_spacing)
+        
+        # Название проекта
+        project_group = QGroupBox("Название проекта")
+        project_layout = QVBoxLayout()
+        self.project_name_edit = QLineEdit()
+        self.project_name_edit.setPlaceholderText("Введите название проекта")
+        project_layout.addWidget(self.project_name_edit)
+        project_group.setLayout(project_layout)
+        content_layout.addWidget(project_group)
+        
+        # Список тестировщиков
+        testers_group = QGroupBox("Тестировщики")
+        testers_layout = QVBoxLayout()
+        testers_label = QLabel("Введите список тестировщиков (каждый с новой строки):")
+        self.testers_edit = QTextEdit()
+        self.testers_edit.setPlaceholderText("Тестировщик 1\nТестировщик 2\nТестировщик 3")
+        self.testers_edit.setMaximumHeight(150)
+        testers_layout.addWidget(testers_label)
+        testers_layout.addWidget(self.testers_edit)
+        testers_group.setLayout(testers_layout)
+        content_layout.addWidget(testers_group)
         
         # Папка с тест-кейсами
         test_cases_group = QGroupBox("Папка с тест-кейсами")
@@ -675,6 +699,13 @@ class SettingsDialog(QDialog):
     def _load_settings(self):
         """Загрузить настройки в поля формы"""
         # Общие
+        self.project_name_edit.setText(self.settings.get('project_name', ''))
+        # Список тестировщиков
+        testers_list = self.settings.get('testers', [])
+        if isinstance(testers_list, list):
+            self.testers_edit.setPlainText('\n'.join(testers_list))
+        elif isinstance(testers_list, str):
+            self.testers_edit.setPlainText(testers_list)
         self.test_cases_dir_edit.setText(self.settings.get('test_cases_dir', ''))
         self.methodic_path_edit.setText(self.settings.get('LLM_METHODIC_PATH', ''))
         
@@ -776,9 +807,59 @@ class SettingsDialog(QDialog):
         if hasattr(self, 'info_expected_result_check'):
             self.info_expected_result_check.setChecked(info_visibility.get('expected_result', True))
 
+    def _create_import_tab(self) -> QWidget:
+        """Создать вкладку настроек импорта"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        layout.setSpacing(UI_METRICS.base_spacing)
+        
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.NoFrame)
+        
+        content = QWidget()
+        content_layout = QVBoxLayout(content)
+        content_layout.setSpacing(UI_METRICS.section_spacing)
+        
+        # Импорт из ALM
+        import_group = QGroupBox("Импорт из ALM")
+        import_layout = QVBoxLayout()
+        
+        import_label = QLabel(
+            "Импорт тест-кейсов из ALM с созданием структуры папок согласно иерархии."
+        )
+        import_label.setWordWrap(True)
+        import_layout.addWidget(import_label)
+        
+        import_btn = QPushButton("Импорт из ALM")
+        import_btn.clicked.connect(self._on_import_from_alm_clicked)
+        import_layout.addWidget(import_btn)
+        
+        import_group.setLayout(import_layout)
+        content_layout.addWidget(import_group)
+        
+        content_layout.addStretch()
+        scroll.setWidget(content)
+        layout.addWidget(scroll)
+        
+        return widget
+    
+    def _on_import_from_alm_clicked(self):
+        """Обработчик нажатия кнопки импорта из ALM в настройках"""
+        if self.parent_window and hasattr(self.parent_window, 'convert_from_azure'):
+            # Закрываем диалог настроек перед импортом
+            self.accept()
+            # Вызываем метод импорта из главного окна
+            self.parent_window.convert_from_azure()
+
     def _save_and_accept(self):
         """Сохранить настройки и закрыть диалог"""
         # Общие
+        self.settings['project_name'] = self.project_name_edit.text().strip()
+        # Список тестировщиков - сохраняем как список
+        testers_text = self.testers_edit.toPlainText().strip()
+        testers_list = [t.strip() for t in testers_text.split('\n') if t.strip()]
+        self.settings['testers'] = testers_list
         self.settings['test_cases_dir'] = self.test_cases_dir_edit.text().strip()
         self.settings['LLM_METHODIC_PATH'] = self.methodic_path_edit.text().strip()
         
@@ -1261,6 +1342,7 @@ class MainWindow(QMainWindow):
         self.tree_widget.tree_updated.connect(self._on_tree_updated)
         self.tree_widget.review_requested.connect(self._on_review_requested)
         self.tree_widget.test_cases_updated.connect(self._on_test_cases_updated)
+        self.tree_widget.add_to_review_requested.connect(self._on_add_to_review_requested)
         layout.addWidget(self.tree_widget, 1)
         
         return panel
@@ -1310,6 +1392,14 @@ class MainWindow(QMainWindow):
             default_review_prompt=self.default_prompt,
             default_creation_prompt=self.create_tc_prompt,
         )
+        # Устанавливаем список тестировщиков из настроек
+        testers_list = self.settings.get('testers', [])
+        if isinstance(testers_list, list):
+            self.aux_panel.set_information_testers(testers_list)
+        elif isinstance(testers_list, str):
+            # Если сохранено как строка, разбиваем по переносам строк
+            testers_list = [t.strip() for t in testers_list.split('\n') if t.strip()]
+            self.aux_panel.set_information_testers(testers_list)
         # Устанавливаем минимальную и максимальную ширину для aux_panel
         # чтобы предотвратить автоматическое расширение
         self.aux_panel.setMinimumWidth(220)
@@ -1350,8 +1440,6 @@ class MainWindow(QMainWindow):
         select_folder_action.triggered.connect(self.select_test_cases_folder)
         select_folder_action.setShortcut('Ctrl+O')
 
-        convert_action = self.file_menu.addAction('Импорт из ALM')
-        convert_action.triggered.connect(self.convert_from_azure)
         self.file_menu.addSeparator()
 
         exit_action = self.file_menu.addAction('Выход')
@@ -2508,7 +2596,7 @@ class MainWindow(QMainWindow):
             if hasattr(self, 'filter_panel'):
                 self.filter_panel.update_test_cases([])
             if hasattr(self, "placeholder"):
-                self.placeholder.update_count(0)
+                self.placeholder.update_statistics([])
             if hasattr(self, "aux_panel"):
                 self.aux_panel.update_reports_panel()
             return
@@ -2537,13 +2625,16 @@ class MainWindow(QMainWindow):
         # Восстанавливаем выбранный элемент
         if selected_filepath:
             self.tree_widget.restore_selected_item(selected_filepath)
+        # Обновляем индикаторы статусов в дереве (в режиме запуска тестов)
+        if not self.tree_widget._edit_mode:
+            self.tree_widget._update_tree_icons(self.tree_widget.invisibleRootItem())
         
         # Восстанавливаем размеры панелей после обновления
         if saved_detail_sizes and hasattr(self, "detail_splitter"):
             self.detail_splitter.setSizes(saved_detail_sizes)
         
-        # Обновляем счетчики
-        self.placeholder.update_count(len(self.test_cases))
+        # Обновляем статистику
+        self.placeholder.update_statistics(self.test_cases)
         
         self._update_json_preview()
         # Обновляем статусбар (покажет статистику в режиме запуска или обычное сообщение в режиме редактирования)
@@ -2673,6 +2764,10 @@ class MainWindow(QMainWindow):
             if selected_filepath:
                 self.tree_widget.restore_selected_item(selected_filepath)
             
+            # Обновляем индикаторы статусов в дереве (в режиме запуска тестов)
+            if not self.tree_widget._edit_mode:
+                self.tree_widget._update_tree_icons(self.tree_widget.invisibleRootItem())
+            
             # Обновляем статистику в statusbar
             self._update_statusbar_statistics()
             
@@ -2703,6 +2798,12 @@ class MainWindow(QMainWindow):
         # Обновляем панель отчетности
         if hasattr(self, "aux_panel"):
             self.aux_panel.update_reports_panel()
+        # Обновляем индикаторы статусов в дереве (в режиме запуска тестов)
+        if hasattr(self, "tree_widget") and not self.tree_widget._edit_mode:
+            self.tree_widget._update_tree_icons(self.tree_widget.invisibleRootItem())
+        # Обновляем статистику при изменении статуса
+        if hasattr(self, "placeholder") and hasattr(self, "test_cases"):
+            self.placeholder.update_statistics(self.test_cases)
     
     def _on_test_case_saved(self):
         """Обработка сохранения тест-кейса"""
@@ -2713,6 +2814,9 @@ class MainWindow(QMainWindow):
             self.aux_panel.set_files_test_case(self.current_test_case)
             self.aux_panel.set_manual_review_test_case(self.current_test_case)
         self.load_all_test_cases()
+        # Обновляем индикаторы статусов в дереве (в режиме запуска тестов)
+        if hasattr(self, "tree_widget") and not self.tree_widget._edit_mode:
+            self.tree_widget._update_tree_icons(self.tree_widget.invisibleRootItem())
         # Обновляем индикаторы статуса Git после сохранения
         self._update_git_status_indicators()
         self._update_json_preview()
@@ -2728,6 +2832,9 @@ class MainWindow(QMainWindow):
         # Помечаем изменения в форме (чтобы появилась кнопка сохранения)
         self.form_widget.has_unsaved_changes = True
         self.form_widget.unsaved_changes_state.emit(True)
+        # Обновляем статистику при изменении данных
+        if hasattr(self, "placeholder") and hasattr(self, "test_cases"):
+            self.placeholder.update_statistics(self.test_cases)
     
     def _on_files_attachment_changed(self):
         """Обработка изменения attachments в панели файлов"""
@@ -2803,6 +2910,9 @@ class MainWindow(QMainWindow):
         query = self.search_input.text() if hasattr(self, 'search_input') else ""
         if hasattr(self, 'tree_widget'):
             self.tree_widget.filter_items(query, filters)
+            # Подсчитываем количество найденных тест-кейсов
+            count = self.tree_widget.count_visible_test_cases()
+            self.statusBar().showMessage(f"Найдено тест-кейсов: {count}")
     
     def _on_filters_reset(self):
         """Обработчик сброса фильтров."""
@@ -2841,6 +2951,16 @@ class MainWindow(QMainWindow):
         self.aux_panel.set_review_prompt_text(base_prompt)
         self.aux_panel.clear_review_response()
         self.statusBar().showMessage("Панель ревью открыта")
+    
+    def _on_add_to_review_requested(self, test_case: TestCase):
+        """Добавить файл тест-кейса в панель ревью."""
+        if hasattr(self, "aux_panel") and hasattr(self.aux_panel, "review_panel"):
+            if hasattr(test_case, "_filepath") and test_case._filepath:
+                self.aux_panel.review_panel.add_attachments([test_case._filepath])
+                # Переключаемся на панель ревью, если она не активна
+                if self.aux_panel._stack.currentIndex() != self.aux_panel._tabs_order.index("review"):
+                    self.aux_panel.select_tab("review")
+                self.statusBar().showMessage(f"Файл {test_case._filepath.name} добавлен в панель ревью")
 
     def _on_prompt_saved(self, text: str):
         """Сохранение промта в настройках."""
@@ -3082,6 +3202,9 @@ class MainWindow(QMainWindow):
         self.load_all_test_cases()
         if self.current_test_case:
             self.form_widget.load_test_case(self.current_test_case)
+        # Обновляем индикаторы статусов в дереве (в режиме запуска тестов)
+        if hasattr(self, "tree_widget") and not self.tree_widget._edit_mode:
+            self.tree_widget._update_tree_icons(self.tree_widget.invisibleRootItem())
         # Обновляем статистику в statusbar (всегда)
         self._update_statusbar_statistics()
         QMessageBox.information(self, "Готово", f"Статусы сброшены для {count} тест-кейсов")
@@ -3095,6 +3218,9 @@ class MainWindow(QMainWindow):
         self.service.save_test_case(self.current_test_case)
         self.form_widget.load_test_case(self.current_test_case)
         self.load_all_test_cases()
+        # Обновляем индикаторы статусов в дереве (в режиме запуска тестов)
+        if hasattr(self, "tree_widget") and not self.tree_widget._edit_mode:
+            self.tree_widget._update_tree_icons(self.tree_widget.invisibleRootItem())
         # Обновляем статистику в statusbar (всегда)
         self._update_statusbar_statistics()
         self._update_statistics_panel()
@@ -3107,6 +3233,9 @@ class MainWindow(QMainWindow):
         self.service.save_test_case(self.current_test_case)
         self.form_widget.load_test_case(self.current_test_case)
         self.load_all_test_cases()
+        # Обновляем индикаторы статусов в дереве (в режиме запуска тестов)
+        if hasattr(self, "tree_widget") and not self.tree_widget._edit_mode:
+            self.tree_widget._update_tree_icons(self.tree_widget.invisibleRootItem())
         # Обновляем статусбар (покажет статистику в режиме запуска или сообщение в режиме редактирования)
         if self._current_mode == "run":
             self._update_statusbar_statistics()
@@ -3868,6 +3997,18 @@ class MainWindow(QMainWindow):
             # Обновляем статистику, чтобы отобразить обновленный статус
             self._update_statusbar_statistics()
         
+        # Обновляем список тестировщиков
+        if 'testers' in new_settings:
+            testers_list = new_settings['testers']
+            if isinstance(testers_list, list):
+                if hasattr(self, 'aux_panel'):
+                    self.aux_panel.set_information_testers(testers_list)
+            elif isinstance(testers_list, str):
+                # Если сохранено как строка, разбиваем по переносам строк
+                testers_list = [t.strip() for t in testers_list.split('\n') if t.strip()]
+                if hasattr(self, 'aux_panel'):
+                    self.aux_panel.set_information_testers(testers_list)
+        
         # Обновляем промпты
         if 'DEFAULT_PROMT' in new_settings:
             self.default_prompt = new_settings['DEFAULT_PROMT']
@@ -4130,6 +4271,20 @@ class MainWindow(QMainWindow):
         try:
             # Определяем папку приложения
             app_dir = Path(__file__).resolve().parent.parent.parent
+            
+            # Проверяем и создаем папку Reports, если её нет
+            reports_dir = app_dir / "Reports"
+            if not reports_dir.exists():
+                try:
+                    reports_dir.mkdir(parents=True, exist_ok=True)
+                except Exception as e:
+                    QMessageBox.warning(
+                        self,
+                        "Ошибка создания папки",
+                        f"Не удалось создать папку Reports:\n{e}"
+                    )
+                    self.statusBar().showMessage(f"Ошибка создания папки Reports: {e}")
+                    return
             
             # Генерируем отчет
             report_dir = generate_html_report(

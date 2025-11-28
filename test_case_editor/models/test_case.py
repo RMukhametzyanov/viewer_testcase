@@ -20,6 +20,28 @@ def _to_list(value: object) -> List[str]:
     return []
 
 
+def _clean_domain_format(value: str) -> str:
+    """
+    Удалить формат <DOMAIN\\USERNAME> из строки, оставляя только имя пользователя.
+    
+    Args:
+        value: строка, которая может содержать формат <DOMAIN\\USERNAME> или DOMAIN\\USERNAME
+        
+    Returns:
+        Очищенная строка с именем пользователя
+    """
+    if not value:
+        return value
+    
+    # Удаляем угловые скобки
+    result = value.strip('<>')
+    # Если есть формат DOMAIN\USERNAME, берем только USERNAME (часть после последнего \)
+    if '\\' in result:
+        result = result.split('\\')[-1]
+    
+    return result
+
+
 @dataclass
 class TestCaseStep:
     """Шаг тестирования в новой схеме."""
@@ -161,6 +183,7 @@ class TestCase:
             "issueLinks": self.issue_links,
             "testCaseLinks": self.test_case_links,
             "tags": tags_value,
+            "status": self.status,
             "testType": self.test_type,
             "steps": [step.to_dict() for step in self.steps],
             "createdAt": self.created_at,
@@ -209,9 +232,9 @@ class TestCase:
             priority=str(data.get("priority") or "MEDIUM").strip(),
             environment=str(data.get("environment") or "").strip(),
             browser=str(data.get("browser") or "").strip(),
-            owner=str(data.get("owner") or "").strip(),
-            author=str(data.get("author") or "").strip(),
-            reviewer=str(data.get("reviewer") or "").strip(),
+            owner=_clean_domain_format(str(data.get("owner") or "").strip()),
+            author=_clean_domain_format(str(data.get("author") or "").strip()),
+            reviewer=_clean_domain_format(str(data.get("reviewer") or "").strip()),
             test_case_id=str(data.get("testCaseId") or "").strip(),
             issue_links=str(data.get("issueLinks") or "").strip(),
             test_case_links=str(data.get("testCaseLinks") or "").strip(),

@@ -61,8 +61,12 @@ def generate_html_report(
         # Генерируем HTML
         html_content = _generate_html_content(stats, owners, dt, failed_cases, skipped_cases, reasons_stats, test_cases)
         
+        # Формируем имя файла с датой
+        date_str = dt.strftime("%Y-%m-%d")
+        html_filename = f"Отчет о прохождении тестирования {date_str}.html"
+        
         # Сохраняем HTML файл
-        html_file = report_dir / "Отчет о прохождении тестирования.html"
+        html_file = report_dir / html_filename
         html_file.write_text(html_content, encoding='utf-8')
         
         return report_dir

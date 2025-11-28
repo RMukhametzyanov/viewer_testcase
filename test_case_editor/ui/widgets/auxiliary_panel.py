@@ -167,6 +167,11 @@ class AuxiliaryPanel(QWidget):
         """Установить режим редактирования для панели информации"""
         if hasattr(self, "information_panel"):
             self.information_panel.set_edit_mode(enabled)
+    
+    def set_information_testers(self, testers: List[str]):
+        """Установить список тестировщиков для панели информации"""
+        if hasattr(self, "information_panel"):
+            self.information_panel.set_testers(testers)
 
     # ------------------------------------------------------------------ files
 

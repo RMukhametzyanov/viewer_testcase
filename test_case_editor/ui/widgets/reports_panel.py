@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import (
     QTreeWidgetItem,
     QScrollArea,
     QPushButton,
+    QToolButton,
     QFrame,
 )
 from PyQt5.QtCore import Qt, pyqtSignal, QSize
@@ -60,49 +61,6 @@ class ReportsPanel(QWidget):
         scroll_area.setWidget(content_widget)
         main_layout.addWidget(scroll_area)
         
-        # Секция суммарного отчета (отдельно сверху)
-        summary_section = QFrame()
-        summary_section.setStyleSheet("""
-            QFrame {
-                background-color: rgba(108, 194, 74, 0.1);
-                border: 1px solid rgba(108, 194, 74, 0.3);
-                border-radius: 8px;
-                padding: 12px;
-                margin-bottom: 20px;
-            }
-        """)
-        summary_layout = QHBoxLayout(summary_section)
-        summary_layout.setContentsMargins(0, 0, 0, 0)
-        summary_layout.setSpacing(10)
-        
-        summary_label = QLabel("📊 Суммарный отчет")
-        summary_label.setStyleSheet("font-weight: 600; font-size: 14px; color: #6CC24A;")
-        summary_layout.addWidget(summary_label)
-        
-        summary_layout.addStretch()
-        
-        # Кнопка генерации суммарного отчета
-        self.generate_summary_btn = QPushButton("Сгенерировать")
-        self.generate_summary_btn.setToolTip("Сгенерировать суммарный отчет на основе всех отчетов")
-        self.generate_summary_btn.setStyleSheet("""
-            QPushButton {
-                border: 1px solid rgba(108, 194, 74, 0.5);
-                border-radius: 4px;
-                background-color: rgba(108, 194, 74, 0.2);
-                padding: 6px 12px;
-                color: #6CC24A;
-                font-weight: 600;
-            }
-            QPushButton:hover {
-                background-color: rgba(108, 194, 74, 0.3);
-                border-color: rgba(108, 194, 74, 0.7);
-            }
-        """)
-        self.generate_summary_btn.clicked.connect(self.generate_summary_report_requested.emit)
-        summary_layout.addWidget(self.generate_summary_btn)
-        
-        content_layout.addWidget(summary_section)
-        
         # Заголовок с кнопкой генерации отчета
         title_layout = QHBoxLayout()
         title_layout.setContentsMargins(0, 0, 0, 0)
@@ -114,26 +72,28 @@ class ReportsPanel(QWidget):
         
         title_layout.addStretch()
         
-        # Кнопка генерации отчета
-        self.generate_report_btn = QPushButton()
+        # Кнопка генерации отчета (стилистически как кнопка копирования в JSON превью)
+        self.generate_report_btn = QToolButton()
         # Загружаем иконку из маппинга
         icon_name = self._get_reports_icon("generate_report")
         if icon_name:
-            icon = self._load_svg_icon(icon_name, size=20, color="#ffffff")
+            icon = self._load_svg_icon(icon_name, size=16, color="#ffffff")
             if icon:
                 self.generate_report_btn.setIcon(icon)
-                self.generate_report_btn.setIconSize(QSize(20, 20))
+                self.generate_report_btn.setIconSize(QSize(16, 16))
         self.generate_report_btn.setToolTip("Сгенерировать отчет")
-        self.generate_report_btn.setFixedSize(32, 32)
+        self.generate_report_btn.setCursor(Qt.PointingHandCursor)
+        self.generate_report_btn.setAutoRaise(True)
+        self.generate_report_btn.setFixedSize(24, 24)
         self.generate_report_btn.setStyleSheet("""
-            QPushButton {
-                border: 1px solid rgba(255, 255, 255, 0.2);
+            QToolButton {
+                border: 1px solid transparent;
                 border-radius: 4px;
-                background-color: transparent;
+                padding: 0px;
             }
-            QPushButton:hover {
+            QToolButton:hover {
                 background-color: rgba(255, 255, 255, 0.1);
-                border-color: rgba(255, 255, 255, 0.3);
+                border-color: rgba(255, 255, 255, 0.2);
             }
         """)
         self.generate_report_btn.clicked.connect(self.generate_report_requested.emit)
@@ -168,6 +128,46 @@ class ReportsPanel(QWidget):
         """)
         self.reports_tree.itemDoubleClicked.connect(self._on_item_double_clicked)
         content_layout.addWidget(self.reports_tree, stretch=1)
+        
+        # Минималистичный блок суммарного отчета (внизу панели, всегда виден)
+        summary_layout = QHBoxLayout()
+        summary_layout.setContentsMargins(0, 0, 0, 0)
+        summary_layout.setSpacing(8)
+        
+        summary_label = QLabel("Суммарный отчет")
+        summary_label.setStyleSheet("color: rgba(255, 255, 255, 0.7); font-size: 12px;")
+        summary_layout.addWidget(summary_label)
+        
+        summary_layout.addStretch()
+        
+        # Минималистичная кнопка генерации суммарного отчета
+        self.generate_summary_btn = QToolButton()
+        # Загружаем иконку из маппинга (используем ту же, что и для обычной генерации, или можно другую)
+        icon_name = self._get_reports_icon("generate_report")
+        if icon_name:
+            icon = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+            if icon:
+                self.generate_summary_btn.setIcon(icon)
+                self.generate_summary_btn.setIconSize(QSize(16, 16))
+        self.generate_summary_btn.setToolTip("Сгенерировать суммарный отчет на основе всех отчетов")
+        self.generate_summary_btn.setCursor(Qt.PointingHandCursor)
+        self.generate_summary_btn.setAutoRaise(True)
+        self.generate_summary_btn.setFixedSize(24, 24)
+        self.generate_summary_btn.setStyleSheet("""
+            QToolButton {
+                border: 1px solid transparent;
+                border-radius: 4px;
+                padding: 0px;
+            }
+            QToolButton:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                border-color: rgba(255, 255, 255, 0.2);
+            }
+        """)
+        self.generate_summary_btn.clicked.connect(self.generate_summary_report_requested.emit)
+        summary_layout.addWidget(self.generate_summary_btn)
+        
+        content_layout.addLayout(summary_layout)
         
         # Определяем папку Reports
         self._find_reports_dir()

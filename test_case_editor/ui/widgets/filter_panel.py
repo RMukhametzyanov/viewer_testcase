@@ -1,5 +1,7 @@
 """Панель фильтров для тест-кейсов"""
 
+import json
+from pathlib import Path
 from typing import Optional, Dict, List, Set
 from PyQt5.QtWidgets import (
     QWidget,
@@ -7,19 +9,19 @@ from PyQt5.QtWidgets import (
     QHBoxLayout,
     QGridLayout,
     QLabel,
-    QLineEdit,
-    QComboBox,
     QPushButton,
-    QListWidget,
-    QListWidgetItem,
+    QToolButton,
     QScrollArea,
     QFrame,
     QGroupBox,
+    QMenu,
 )
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QColor
+from PyQt5.QtCore import Qt, pyqtSignal, QSize
+from PyQt5.QtGui import QColor, QIcon, QPixmap, QPainter
+from PyQt5.QtSvg import QSvgRenderer
 
 from ...models.test_case import TestCase
+from ...utils.resource_path import get_icon_path, get_icons_dir
 from ..styles.ui_metrics import UI_METRICS
 from ..styles.theme_provider import THEME_PROVIDER
 from .checkbox_combo import CheckboxComboBox
@@ -35,6 +37,43 @@ class FilterPanel(QWidget):
         super().__init__(parent)
         self._test_cases = test_cases or []
         self._current_filters: Dict[str, any] = {}
+        
+        # Определяем все доступные поля для фильтрации
+        self._all_fields = {
+            "author": "Автор",
+            "owner": "Владелец",
+            "reviewer": "Ревьювер",
+            "status": "Статус",
+            "resolved": "Resolved",
+            "test_layer": "Test Layer",
+            "test_type": "Тип теста",
+            "severity": "Severity",
+            "priority": "Priority",
+            "environment": "Окружение",
+            "browser": "Браузер",
+            "test_case_id": "Test Case ID",
+            "issue_links": "Issue Links",
+            "test_case_links": "TC Links",
+            "epic": "Epic",
+            "feature": "Feature",
+            "story": "Story",
+            "component": "Component",
+            "tags": "Теги",
+        }
+        
+        # Поля, которые показываются по умолчанию
+        self._default_fields = ["author", "owner", "reviewer", "status", "resolved"]
+        
+        # Отслеживаем видимые поля
+        self._visible_fields: Set[str] = set(self._default_fields)
+        
+        # Хранилище виджетов для каждого поля
+        self._field_widgets: Dict[str, CheckboxComboBox] = {}
+        
+        # Основной контейнер для полей
+        self._fields_container: Optional[QWidget] = None
+        self._fields_layout: Optional[QVBoxLayout] = None
+        
         self._setup_ui()
     
     def _setup_ui(self):
@@ -65,116 +104,107 @@ class FilterPanel(QWidget):
         header_layout.addWidget(title)
         header_layout.addStretch()
         
-        self.apply_button = QPushButton("Применить")
-        self.apply_button.setStyleSheet("""
-            QPushButton {
-                background-color: #4CAF50;
-                color: white;
-                border: none;
+        # Загружаем маппинг иконок
+        icon_mapping = self._load_icon_mapping()
+        
+        # Размер кнопок соответствует размеру заголовка (font-size: 16px обычно дает высоту ~24px)
+        button_size = 28  # Немного больше заголовка для лучшей видимости
+        icon_size = 20  # Размер иконки внутри кнопки
+        
+        # Базовый стиль для кнопок с иконками
+        base_button_style = f"""
+            QToolButton {{
+                border: 1px solid transparent;
                 border-radius: 4px;
-                padding: 6px 16px;
-                font-weight: 500;
-            }
-            QPushButton:hover {
-                background-color: #45a049;
-            }
-        """)
+                padding: 0px;
+                min-width: {button_size}px;
+                max-width: {button_size}px;
+                min-height: {button_size}px;
+                max-height: {button_size}px;
+            }}
+            QToolButton:hover {{
+                background-color: rgba(255, 255, 255, 0.1);
+                border-color: rgba(255, 255, 255, 0.2);
+            }}
+        """
+        
+        # Стиль для кнопки "Применить" с зеленой обводкой при hover
+        apply_button_style = f"""
+            QToolButton {{
+                border: 1px solid transparent;
+                border-radius: 4px;
+                padding: 0px;
+                min-width: {button_size}px;
+                max-width: {button_size}px;
+                min-height: {button_size}px;
+                max-height: {button_size}px;
+            }}
+            QToolButton:hover {{
+                background-color: rgba(255, 255, 255, 0.1);
+                border: 1px solid #4CAF50;
+            }}
+        """
+        
+        # Кнопка добавления полей
+        add_icon_name = icon_mapping.get("add_field", "plus.svg")
+        self.add_field_button = QToolButton()
+        add_icon = self._load_svg_icon(add_icon_name, size=icon_size, color="#ffffff")
+        if add_icon:
+            self.add_field_button.setIcon(add_icon)
+            self.add_field_button.setIconSize(QSize(icon_size, icon_size))
+        self.add_field_button.setToolTip("Добавить поле")
+        self.add_field_button.setCursor(Qt.PointingHandCursor)
+        self.add_field_button.setAutoRaise(True)
+        self.add_field_button.setFixedSize(button_size, button_size)
+        self.add_field_button.setStyleSheet(base_button_style)
+        self.add_field_button.clicked.connect(self._show_add_field_menu)
+        header_layout.addWidget(self.add_field_button)
+        
+        # Кнопка применения фильтров
+        apply_icon_name = icon_mapping.get("apply", "play.svg")
+        self.apply_button = QToolButton()
+        apply_icon = self._load_svg_icon(apply_icon_name, size=icon_size, color="#ffffff")
+        if apply_icon:
+            self.apply_button.setIcon(apply_icon)
+            self.apply_button.setIconSize(QSize(icon_size, icon_size))
+        self.apply_button.setToolTip("Применить")
+        self.apply_button.setCursor(Qt.PointingHandCursor)
+        self.apply_button.setAutoRaise(True)
+        self.apply_button.setFixedSize(button_size, button_size)
+        self.apply_button.setStyleSheet(apply_button_style)
         self.apply_button.clicked.connect(self._on_apply_clicked)
-        
-        self.reset_button = QPushButton("Сбросить")
-        self.reset_button.setStyleSheet("""
-            QPushButton {
-                background-color: #666;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                padding: 6px 16px;
-            }
-            QPushButton:hover {
-                background-color: #777;
-            }
-        """)
-        self.reset_button.clicked.connect(self._on_reset_clicked)
-        
         header_layout.addWidget(self.apply_button)
+        
+        # Кнопка сброса фильтров
+        reset_icon_name = icon_mapping.get("reset", "refresh-ccw.svg")
+        self.reset_button = QToolButton()
+        reset_icon = self._load_svg_icon(reset_icon_name, size=icon_size, color="#ffffff")
+        if reset_icon:
+            self.reset_button.setIcon(reset_icon)
+            self.reset_button.setIconSize(QSize(icon_size, icon_size))
+        self.reset_button.setToolTip("Сбросить")
+        self.reset_button.setCursor(Qt.PointingHandCursor)
+        self.reset_button.setAutoRaise(True)
+        self.reset_button.setFixedSize(button_size, button_size)
+        self.reset_button.setStyleSheet(base_button_style)
+        self.reset_button.clicked.connect(self._on_reset_clicked)
         header_layout.addWidget(self.reset_button)
         content_layout.addLayout(header_layout)
         
-        # Группа: Люди
-        people_group = self._create_group("Люди", 3)
-        self.author_list = self._create_list_widget()
-        self._add_filter_to_group(people_group, "Автор:", self.author_list)
-        self.owner_list = self._create_list_widget()
-        self._add_filter_to_group(people_group, "Владелец:", self.owner_list)
-        self.reviewer_list = self._create_list_widget()
-        self._add_filter_to_group(people_group, "Ревьюер:", self.reviewer_list)
-        content_layout.addWidget(people_group)
+        # Контейнер для полей фильтрации
+        self._fields_container = QWidget()
+        self._fields_layout = QVBoxLayout(self._fields_container)
+        self._fields_layout.setSpacing(UI_METRICS.section_spacing)
+        self._fields_layout.setContentsMargins(0, 0, 0, 0)
+        content_layout.addWidget(self._fields_container)
         
-        # Группа: Статус и тип
-        status_group = self._create_group("Статус и тип", 4)
-        self.status_list = self._create_list_widget()
-        self._add_filter_to_group(status_group, "Статус:", self.status_list)
-        self.test_layer_list = self._create_list_widget()
-        self._add_filter_to_group(status_group, "Test Layer:", self.test_layer_list)
-        self.test_type_list = self._create_list_widget()
-        self._add_filter_to_group(status_group, "Тип теста:", self.test_type_list)
-        self.resolved_list = self._create_list_widget()
-        self._add_filter_to_group(status_group, "Resolved:", self.resolved_list)
-        content_layout.addWidget(status_group)
+        # Создаем виджеты для всех полей (но не добавляем их в UI)
+        for field_key in self._all_fields.keys():
+            widget = self._create_list_widget()
+            self._field_widgets[field_key] = widget
         
-        # Группа: Приоритеты
-        priority_group = self._create_group("Приоритеты", 2)
-        self.severity_list = self._create_list_widget()
-        self._add_filter_to_group(priority_group, "Severity:", self.severity_list)
-        self.priority_list = self._create_list_widget()
-        self._add_filter_to_group(priority_group, "Priority:", self.priority_list)
-        content_layout.addWidget(priority_group)
-        
-        # Группа: Окружение
-        env_group = self._create_group("Окружение", 2)
-        self.environment_list = self._create_list_widget()
-        self._add_filter_to_group(env_group, "Окружение:", self.environment_list)
-        self.browser_list = self._create_list_widget()
-        self._add_filter_to_group(env_group, "Браузер:", self.browser_list)
-        content_layout.addWidget(env_group)
-        
-        # Группа: Ссылки
-        links_group = self._create_group("Ссылки", 3)
-        self.test_case_id_list = self._create_list_widget()
-        self._add_filter_to_group(links_group, "Test Case ID:", self.test_case_id_list)
-        self.issue_links_list = self._create_list_widget()
-        self._add_filter_to_group(links_group, "Issue Links:", self.issue_links_list)
-        self.test_case_links_list = self._create_list_widget()
-        self._add_filter_to_group(links_group, "TC Links:", self.test_case_links_list)
-        content_layout.addWidget(links_group)
-        
-        # Группа: Контекст
-        context_group = self._create_group("Контекст", 4)
-        self.epic_list = self._create_list_widget()
-        self._add_filter_to_group(context_group, "Epic:", self.epic_list)
-        self.feature_list = self._create_list_widget()
-        self._add_filter_to_group(context_group, "Feature:", self.feature_list)
-        self.story_list = self._create_list_widget()
-        self._add_filter_to_group(context_group, "Story:", self.story_list)
-        self.component_list = self._create_list_widget()
-        self._add_filter_to_group(context_group, "Component:", self.component_list)
-        content_layout.addWidget(context_group)
-        
-        # Группа: Теги и текст
-        text_group = self._create_group("Теги и текст", 2)
-        self.tags_list = self._create_list_widget()
-        self._add_filter_to_group(text_group, "Теги:", self.tags_list)
-        
-        description_layout = QVBoxLayout()
-        description_label = QLabel("Описание (поиск):")
-        self.description_input = QLineEdit()
-        self.description_input.setPlaceholderText("Введите слово или часть слова...")
-        description_layout.addWidget(description_label)
-        description_layout.addWidget(self.description_input)
-        description_widget = QWidget()
-        description_widget.setLayout(description_layout)
-        text_group._grid_layout.addWidget(description_widget, 0, 1)
-        content_layout.addWidget(text_group)
+        # Показываем только поля по умолчанию
+        self._update_visible_fields()
         
         content_layout.addStretch()
         
@@ -184,38 +214,199 @@ class FilterPanel(QWidget):
         # Заполняем списки
         self._populate_all_lists()
     
-    def _create_group(self, title: str, columns: int) -> QGroupBox:
-        """Создать группу с сеткой"""
-        group = QGroupBox(title)
-        grid = QGridLayout(group)
-        grid.setSpacing(UI_METRICS.base_spacing)
-        grid.setContentsMargins(
-            UI_METRICS.container_padding,
-            UI_METRICS.group_title_spacing,
-            UI_METRICS.container_padding,
-            UI_METRICS.base_spacing,
-        )
-        group._grid_layout = grid  # Сохраняем ссылку на layout
-        group._columns = columns  # Сохраняем количество колонок
-        return group
+    def _show_add_field_menu(self):
+        """Показать меню для добавления полей"""
+        menu = QMenu(self)
+        
+        # Добавляем только те поля, которые еще не видны
+        for field_key, field_label in self._all_fields.items():
+            if field_key not in self._visible_fields:
+                action = menu.addAction(field_label)
+                # Используем замыкание для правильного захвата переменной
+                def make_handler(key):
+                    return lambda checked: self._add_field(key)
+                action.triggered.connect(make_handler(field_key))
+        
+        if menu.isEmpty():
+            # Если все поля уже добавлены, показываем сообщение
+            no_action = menu.addAction("Все поля уже добавлены")
+            no_action.setEnabled(False)
+        
+        # Показываем меню под кнопкой
+        button_pos = self.add_field_button.mapToGlobal(self.add_field_button.rect().bottomLeft())
+        menu.exec_(button_pos)
     
-    def _add_filter_to_group(self, group: QGroupBox, label_text: str, widget: QWidget):
-        """Добавить фильтр в группу"""
-        layout = group._grid_layout
-        columns = group._columns
-        current_count = layout.count()
-        row = current_count // columns
-        col = current_count % columns
+    def _add_field(self, field_key: str):
+        """Добавить поле в форму"""
+        if field_key not in self._visible_fields:
+            self._visible_fields.add(field_key)
+            self._update_visible_fields()
+    
+    def _remove_field(self, field_key: str):
+        """Удалить поле из формы"""
+        if field_key in self._visible_fields and field_key not in self._default_fields:
+            self._visible_fields.remove(field_key)
+            self._update_visible_fields()
+    
+    def _update_visible_fields(self):
+        """Обновить видимые поля в UI"""
+        # Очищаем контейнер
+        while self._fields_layout.count():
+            child = self._fields_layout.takeAt(0)
+            if child.widget():
+                child.widget().deleteLater()
         
-        label = QLabel(label_text)
-        label_widget = QWidget()
-        label_layout = QVBoxLayout(label_widget)
-        label_layout.setContentsMargins(0, 0, 0, 0)
-        label_layout.setSpacing(4)
-        label_layout.addWidget(label)
-        label_layout.addWidget(widget)
+        # Группируем поля для лучшей организации
+        groups = {
+            "Люди": ["author", "owner", "reviewer"],
+            "Статус": ["status", "resolved"],
+            "Дополнительно": []
+        }
         
-        layout.addWidget(label_widget, row, col)
+        # Распределяем остальные поля в группу "Дополнительно"
+        for field_key in self._visible_fields:
+            if field_key not in groups["Люди"] and field_key not in groups["Статус"]:
+                groups["Дополнительно"].append(field_key)
+        
+        # Создаем группы и добавляем поля
+        for group_title, field_keys in groups.items():
+            if not field_keys:
+                continue
+            
+            # Создаем группу
+            group = QGroupBox(group_title)
+            grid = QGridLayout(group)
+            grid.setSpacing(UI_METRICS.base_spacing)
+            grid.setContentsMargins(
+                UI_METRICS.container_padding,
+                UI_METRICS.group_title_spacing,
+                UI_METRICS.container_padding,
+                UI_METRICS.base_spacing,
+            )
+            
+            # Добавляем поля в группу
+            for idx, field_key in enumerate(field_keys):
+                if field_key in self._field_widgets:
+                    widget = self._field_widgets[field_key]
+                    label_text = f"{self._all_fields[field_key]}:"
+                    
+                    # Создаем контейнер для поля с возможностью удаления
+                    field_container = QWidget()
+                    field_layout = QVBoxLayout(field_container)
+                    field_layout.setContentsMargins(0, 0, 0, 0)
+                    field_layout.setSpacing(4)
+                    
+                    # Заголовок с кнопкой удаления (если не поле по умолчанию)
+                    header_layout = QHBoxLayout()
+                    label = QLabel(label_text)
+                    header_layout.addWidget(label)
+                    header_layout.addStretch()
+                    
+                    # Кнопка удаления только для необязательных полей
+                    if field_key not in self._default_fields:
+                        # Минималистичный стиль, аналогичный кнопке удаления шага
+                        action_button_style = """
+                            QToolButton {
+                                border: 1px solid transparent;
+                                border-radius: 4px;
+                                padding: 0px;
+                                min-width: 24px;
+                                max-width: 24px;
+                                min-height: 24px;
+                                max-height: 24px;
+                                font-size: 12px;
+                            }
+                            QToolButton:hover {
+                                background-color: rgba(255, 255, 255, 0.1);
+                                border-color: rgba(255, 255, 255, 0.2);
+                            }
+                        """
+                        
+                        remove_button = QToolButton()
+                        remove_button.setFixedSize(24, 24)
+                        remove_button.setAutoRaise(True)
+                        remove_button.setCursor(Qt.PointingHandCursor)
+                        remove_button.setToolTip("Удалить поле")
+                        
+                        # Загружаем иконку x.svg (цвет как у текста - серый)
+                        remove_icon = self._load_svg_icon("x.svg", size=16, color="#95a5a6")
+                        if remove_icon:
+                            remove_button.setIcon(remove_icon)
+                            remove_button.setIconSize(QSize(16, 16))
+                        else:
+                            remove_button.setText("×")
+                        
+                        remove_button.setStyleSheet(action_button_style)
+                        
+                        # Используем замыкание для правильного захвата переменной
+                        def make_remove_handler(key):
+                            return lambda checked: self._remove_field(key)
+                        remove_button.clicked.connect(make_remove_handler(field_key))
+                        header_layout.addWidget(remove_button)
+                    
+                    field_layout.addLayout(header_layout)
+                    field_layout.addWidget(widget)
+                    
+                    # Добавляем в сетку (2 колонки)
+                    row = idx // 2
+                    col = idx % 2
+                    grid.addWidget(field_container, row, col)
+            
+            self._fields_layout.addWidget(group)
+        
+        self._fields_layout.addStretch()
+    
+    def _load_icon_mapping(self) -> Dict[str, str]:
+        """Загрузить маппинг иконок для панели фильтров из JSON файла."""
+        mapping_file = get_icons_dir() / "icon_mapping.json"
+        
+        if mapping_file.exists():
+            try:
+                with open(mapping_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    if isinstance(data, dict) and 'filter_panel' in data:
+                        return data.get('filter_panel', {})
+            except (json.JSONDecodeError, IOError) as e:
+                print(f"Ошибка загрузки маппинга иконок: {e}")
+        
+        # Возвращаем значения по умолчанию
+        return {
+            "add_field": "plus.svg",
+            "apply": "play.svg",
+            "reset": "refresh-ccw.svg"
+        }
+    
+    def _load_svg_icon(self, icon_name: str, size: int = 16, color: Optional[str] = None) -> Optional[QIcon]:
+        """Загрузить SVG иконку из файла и вернуть QIcon."""
+        icon_path = get_icon_path(icon_name)
+        
+        if not icon_path.exists():
+            return None
+        
+        try:
+            with open(icon_path, 'r', encoding='utf-8') as f:
+                svg_content = f.read()
+            
+            if color:
+                svg_content = svg_content.replace('currentColor', color)
+                svg_content = svg_content.replace('stroke="currentColor"', f'stroke="{color}"')
+                svg_content = svg_content.replace('fill="currentColor"', f'fill="{color}"')
+            
+            renderer = QSvgRenderer(svg_content.encode('utf-8'))
+            if not renderer.isValid():
+                return None
+            
+            pixmap = QPixmap(size, size)
+            pixmap.fill(Qt.transparent)
+            
+            painter = QPainter(pixmap)
+            painter.setRenderHint(QPainter.Antialiasing)
+            renderer.render(painter)
+            painter.end()
+            
+            return QIcon(pixmap)
+        except Exception:
+            return None
     
     def _create_list_widget(self) -> CheckboxComboBox:
         """Создать выпадающий список с чекбоксами"""
@@ -224,155 +415,140 @@ class FilterPanel(QWidget):
     
     def _populate_all_lists(self):
         """Заполнить все списки значениями из тест-кейсов"""
-        # Собираем уникальные значения для каждого поля
-        authors = set()
-        owners = set()
-        reviewers = set()
-        statuses = set()
-        test_layers = set()
-        test_types = set()
-        severities = set()
-        priorities = set()
-        environments = set()
-        browsers = set()
-        test_case_ids = set()
-        issue_links = set()
-        test_case_links = set()
-        epics = set()
-        features = set()
-        stories = set()
-        components = set()
-        tags = set()
-        resolved_statuses = set()
+        # Словарь для хранения значений каждого поля
+        field_values: Dict[str, Set[str]] = {key: set() for key in self._all_fields.keys()}
         
         for test_case in self._test_cases:
+            # Автор
             if test_case.author:
-                authors.add(test_case.author.strip())
+                field_values["author"].add(test_case.author.strip())
             else:
-                authors.add("пусто")
+                field_values["author"].add("пусто")
             
-            if hasattr(test_case, 'owner') and test_case.owner:
-                owners.add(test_case.owner.strip())
+            # Владелец
+            if test_case.owner:
+                field_values["owner"].add(test_case.owner.strip())
             else:
-                owners.add("пусто")
+                field_values["owner"].add("пусто")
             
-            if hasattr(test_case, 'reviewer') and test_case.reviewer:
-                reviewers.add(test_case.reviewer.strip())
+            # Ревьювер
+            if test_case.reviewer:
+                field_values["reviewer"].add(test_case.reviewer.strip())
             else:
-                reviewers.add("пусто")
+                field_values["reviewer"].add("пусто")
             
+            # Статус
             if test_case.status:
-                statuses.add(test_case.status.strip())
+                field_values["status"].add(test_case.status.strip())
             else:
-                statuses.add("пусто")
+                field_values["status"].add("пусто")
             
-            if hasattr(test_case, 'test_layer') and test_case.test_layer:
-                test_layers.add(test_case.test_layer.strip())
+            # Test Layer
+            if test_case.test_layer:
+                field_values["test_layer"].add(test_case.test_layer.strip())
             else:
-                test_layers.add("пусто")
+                field_values["test_layer"].add("пусто")
             
-            if hasattr(test_case, 'test_type') and test_case.test_type:
-                test_types.add(test_case.test_type.strip())
+            # Test Type
+            if test_case.test_type:
+                field_values["test_type"].add(test_case.test_type.strip())
             else:
-                test_types.add("пусто")
+                field_values["test_type"].add("пусто")
             
-            if hasattr(test_case, 'severity') and test_case.severity:
-                severities.add(test_case.severity.strip())
+            # Severity
+            if test_case.severity:
+                field_values["severity"].add(test_case.severity.strip())
             else:
-                severities.add("пусто")
+                field_values["severity"].add("пусто")
             
-            if hasattr(test_case, 'priority') and test_case.priority:
-                priorities.add(test_case.priority.strip())
+            # Priority
+            if test_case.priority:
+                field_values["priority"].add(test_case.priority.strip())
             else:
-                priorities.add("пусто")
+                field_values["priority"].add("пусто")
             
-            if hasattr(test_case, 'environment') and test_case.environment:
-                environments.add(test_case.environment.strip())
+            # Environment
+            if test_case.environment:
+                field_values["environment"].add(test_case.environment.strip())
             else:
-                environments.add("пусто")
+                field_values["environment"].add("пусто")
             
-            if hasattr(test_case, 'browser') and test_case.browser:
-                browsers.add(test_case.browser.strip())
+            # Browser
+            if test_case.browser:
+                field_values["browser"].add(test_case.browser.strip())
             else:
-                browsers.add("пусто")
+                field_values["browser"].add("пусто")
             
-            if hasattr(test_case, 'test_case_id') and test_case.test_case_id:
-                test_case_ids.add(test_case.test_case_id.strip())
+            # Test Case ID
+            if test_case.test_case_id:
+                field_values["test_case_id"].add(test_case.test_case_id.strip())
             else:
-                test_case_ids.add("пусто")
+                field_values["test_case_id"].add("пусто")
             
-            if hasattr(test_case, 'issue_links') and test_case.issue_links:
-                issue_links.add(test_case.issue_links.strip())
+            # Issue Links
+            if test_case.issue_links:
+                field_values["issue_links"].add(test_case.issue_links.strip())
             else:
-                issue_links.add("пусто")
+                field_values["issue_links"].add("пусто")
             
-            if hasattr(test_case, 'test_case_links') and test_case.test_case_links:
-                test_case_links.add(test_case.test_case_links.strip())
+            # Test Case Links
+            if test_case.test_case_links:
+                field_values["test_case_links"].add(test_case.test_case_links.strip())
             else:
-                test_case_links.add("пусто")
+                field_values["test_case_links"].add("пусто")
             
-            if hasattr(test_case, 'epic') and test_case.epic:
-                epics.add(test_case.epic.strip())
+            # Epic
+            if test_case.epic:
+                field_values["epic"].add(test_case.epic.strip())
             else:
-                epics.add("пусто")
+                field_values["epic"].add("пусто")
             
-            if hasattr(test_case, 'feature') and test_case.feature:
-                features.add(test_case.feature.strip())
+            # Feature
+            if test_case.feature:
+                field_values["feature"].add(test_case.feature.strip())
             else:
-                features.add("пусто")
+                field_values["feature"].add("пусто")
             
-            if hasattr(test_case, 'story') and test_case.story:
-                stories.add(test_case.story.strip())
+            # Story
+            if test_case.story:
+                field_values["story"].add(test_case.story.strip())
             else:
-                stories.add("пусто")
+                field_values["story"].add("пусто")
             
-            if hasattr(test_case, 'component') and test_case.component:
-                components.add(test_case.component.strip())
+            # Component
+            if test_case.component:
+                field_values["component"].add(test_case.component.strip())
             else:
-                components.add("пусто")
+                field_values["component"].add("пусто")
             
+            # Tags
             if test_case.tags:
                 for tag in test_case.tags:
                     if tag and tag.strip():
-                        tags.add(tag.strip())
+                        field_values["tags"].add(tag.strip())
             else:
-                tags.add("пусто")
+                field_values["tags"].add("пусто")
             
-            # Собираем значения resolved из notes
-            if hasattr(test_case, 'notes') and test_case.notes:
+            # Resolved - собираем из notes
+            if test_case.notes:
                 for note_data in test_case.notes.values():
                     if isinstance(note_data, dict):
                         resolved = note_data.get("resolved", "new")
                         if resolved:
-                            resolved_statuses.add(resolved.strip())
+                            field_values["resolved"].add(resolved.strip())
             else:
-                resolved_statuses.add("пусто")
+                field_values["resolved"].add("пусто")
         
-        # Заполняем списки
-        self._populate_list(self.author_list, sorted(authors))
-        self._populate_list(self.owner_list, sorted(owners))
-        self._populate_list(self.reviewer_list, sorted(reviewers))
-        self._populate_list(self.status_list, sorted(statuses))
-        self._populate_list(self.test_layer_list, sorted(test_layers))
-        self._populate_list(self.test_type_list, sorted(test_types))
-        self._populate_list(self.severity_list, sorted(severities))
-        self._populate_list(self.priority_list, sorted(priorities))
-        self._populate_list(self.environment_list, sorted(environments))
-        self._populate_list(self.browser_list, sorted(browsers))
-        self._populate_list(self.test_case_id_list, sorted(test_case_ids))
-        self._populate_list(self.issue_links_list, sorted(issue_links))
-        self._populate_list(self.test_case_links_list, sorted(test_case_links))
-        self._populate_list(self.epic_list, sorted(epics))
-        self._populate_list(self.feature_list, sorted(features))
-        self._populate_list(self.story_list, sorted(stories))
-        self._populate_list(self.component_list, sorted(components))
-        self._populate_list(self.tags_list, sorted(tags))
-        # Для resolved всегда показываем все возможные значения
-        resolved_to_show = ["new", "fixed", "closed"]
-        # Добавляем "пусто" только если есть тест-кейсы без notes
-        if "пусто" in resolved_statuses:
-            resolved_to_show.append("пусто")
-        self._populate_list(self.resolved_list, resolved_to_show)
+        # Заполняем списки для всех полей
+        for field_key, widget in self._field_widgets.items():
+            if field_key == "resolved":
+                # Для resolved всегда показываем все возможные значения
+                resolved_to_show = ["new", "fixed", "closed"]
+                if "пусто" in field_values["resolved"]:
+                    resolved_to_show.append("пусто")
+                self._populate_list(widget, resolved_to_show)
+            else:
+                self._populate_list(widget, sorted(field_values[field_key]))
     
     def _populate_list(self, combo: CheckboxComboBox, values: List[str]):
         """Заполнить список значениями"""
@@ -392,105 +568,23 @@ class FilterPanel(QWidget):
         """Обработчик нажатия Применить"""
         filters = {}
         
-        # Собираем все фильтры
-        author = self._get_selected_values(self.author_list)
-        if author is not None:
-            filters["author"] = author
-        
-        owner = self._get_selected_values(self.owner_list)
-        if owner is not None:
-            filters["owner"] = owner
-        
-        reviewer = self._get_selected_values(self.reviewer_list)
-        if reviewer is not None:
-            filters["reviewer"] = reviewer
-        
-        status = self._get_selected_values(self.status_list)
-        if status is not None:
-            filters["status"] = status
-        
-        test_layer = self._get_selected_values(self.test_layer_list)
-        if test_layer is not None:
-            filters["test_layer"] = test_layer
-        
-        test_type = self._get_selected_values(self.test_type_list)
-        if test_type is not None:
-            filters["test_type"] = test_type
-        
-        severity = self._get_selected_values(self.severity_list)
-        if severity is not None:
-            filters["severity"] = severity
-        
-        priority = self._get_selected_values(self.priority_list)
-        if priority is not None:
-            filters["priority"] = priority
-        
-        environment = self._get_selected_values(self.environment_list)
-        if environment is not None:
-            filters["environment"] = environment
-        
-        browser = self._get_selected_values(self.browser_list)
-        if browser is not None:
-            filters["browser"] = browser
-        
-        test_case_id = self._get_selected_values(self.test_case_id_list)
-        if test_case_id is not None:
-            filters["test_case_id"] = test_case_id
-        
-        issue_links = self._get_selected_values(self.issue_links_list)
-        if issue_links is not None:
-            filters["issue_links"] = issue_links
-        
-        test_case_links = self._get_selected_values(self.test_case_links_list)
-        if test_case_links is not None:
-            filters["test_case_links"] = test_case_links
-        
-        epic = self._get_selected_values(self.epic_list)
-        if epic is not None:
-            filters["epic"] = epic
-        
-        feature = self._get_selected_values(self.feature_list)
-        if feature is not None:
-            filters["feature"] = feature
-        
-        story = self._get_selected_values(self.story_list)
-        if story is not None:
-            filters["story"] = story
-        
-        component = self._get_selected_values(self.component_list)
-        if component is not None:
-            filters["component"] = component
-        
-        tags = self._get_selected_values(self.tags_list)
-        if tags is not None:
-            filters["tags"] = tags
-        
-        description = self.description_input.text().strip()
-        if description:
-            filters["description"] = description
-        
-        resolved = self._get_selected_values(self.resolved_list)
-        if resolved is not None:
-            filters["resolved"] = resolved
+        # Собираем фильтры только для видимых полей
+        for field_key in self._visible_fields:
+            if field_key in self._field_widgets:
+                widget = self._field_widgets[field_key]
+                selected = self._get_selected_values(widget)
+                if selected is not None:
+                    filters[field_key] = selected
         
         self._current_filters = filters
         self.filters_applied.emit(filters)
     
     def _on_reset_clicked(self):
         """Обработчик нажатия Сбросить"""
-        # Сбрасываем все чекбоксы
-        for combo in [
-            self.author_list, self.owner_list, self.reviewer_list,
-            self.status_list, self.test_layer_list, self.test_type_list, self.resolved_list,
-            self.severity_list, self.priority_list,
-            self.environment_list, self.browser_list,
-            self.test_case_id_list, self.issue_links_list, self.test_case_links_list,
-            self.epic_list, self.feature_list, self.story_list, self.component_list,
-            self.tags_list
-        ]:
-            combo.clearSelection()
+        # Сбрасываем все чекбоксы для всех виджетов
+        for widget in self._field_widgets.values():
+            widget.clearSelection()
         
-        self.description_input.clear()
         self._current_filters = {}
         self.filters_reset.emit()
 

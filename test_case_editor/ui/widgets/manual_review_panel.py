@@ -283,15 +283,21 @@ class ManualReviewPanel(QWidget):
             UI_METRICS.container_padding,
             UI_METRICS.container_padding,
         )
-        layout.setSpacing(UI_METRICS.base_spacing)
+        layout.setSpacing(UI_METRICS.section_spacing)
 
-        # Заголовок
+        # Заголовок (как в панели "Отчетность")
+        title_layout = QHBoxLayout()
+        title_layout.setContentsMargins(0, 0, 0, 0)
+        title_layout.setSpacing(10)
+        
         title = QLabel("Ручное ревью")
-        title_font = QFont()
-        title_font.setBold(True)
-        title_font.setPointSize(12)
-        title.setFont(title_font)
-        layout.addWidget(title)
+        # Используем тот же стиль заголовка, что и в панели "Отчетность"
+        title.setStyleSheet("font-weight: 600; font-size: 14px;")
+        title_layout.addWidget(title)
+        
+        title_layout.addStretch()
+        
+        layout.addLayout(title_layout)
 
         # Область прокрутки для сообщений
         self.scroll_area = QScrollArea()
