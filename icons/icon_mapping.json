@@ -22,7 +22,7 @@
   "panel_buttons": {
     "attach_files": "file-plus.svg",
     "save": "save.svg",
-    "send": "send.svg",
+    "send": "arrow-right-circle.svg",
     "copy": "copy.svg"
   },
   "status_icons": {

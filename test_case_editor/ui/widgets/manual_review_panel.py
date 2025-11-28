@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import subprocess
+import json
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Dict
 
 from PyQt5.QtWidgets import (
     QWidget,
@@ -20,7 +21,7 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QApplication,
 )
-from PyQt5.QtCore import Qt, pyqtSignal, QSize
+from PyQt5.QtCore import Qt, pyqtSignal, QSize, QTimer
 from PyQt5.QtGui import QFont, QTextCursor, QIcon, QPixmap, QPainter
 from PyQt5.QtSvg import QSvgRenderer
 
@@ -273,7 +274,76 @@ class ManualReviewPanel(QWidget):
         super().__init__(parent)
         self.current_test_case: Optional[TestCase] = None
         self._editing_timestamp: Optional[str] = None  # Timestamp сообщения, которое редактируется
+        
+        # Загружаем маппинг иконок
+        self._icon_mapping = self._load_icon_mapping()
+        
         self._setup_ui()
+    
+    def _load_icon_mapping(self) -> Dict[str, Dict[str, str]]:
+        """Загрузить маппинг иконок из JSON файла."""
+        project_root = Path(__file__).parent.parent.parent.parent
+        mapping_file = project_root / "icons" / "icon_mapping.json"
+        
+        if mapping_file.exists():
+            try:
+                with open(mapping_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    if isinstance(data, dict) and any(key in data for key in ['panels', 'context_menu', 'panel_buttons']):
+                        return data
+                    else:
+                        return {
+                            'panels': data if isinstance(data, dict) else {},
+                            'context_menu': {},
+                            'panel_buttons': {}
+                        }
+            except (json.JSONDecodeError, IOError) as e:
+                print(f"Ошибка загрузки маппинга иконок: {e}")
+        
+        return {
+            'panels': {},
+            'context_menu': {},
+            'panel_buttons': {
+                "send": "arrow-right-circle.svg"
+            }
+        }
+    
+    def _get_panel_button_icon(self, icon_key: str) -> Optional[str]:
+        """Получить имя файла иконки для кнопки панели по ключу."""
+        panel_buttons_mapping = self._icon_mapping.get('panel_buttons', {})
+        return panel_buttons_mapping.get(icon_key)
+    
+    def _load_svg_icon(self, icon_name: str, size: int = 20, color: Optional[str] = None) -> Optional[QIcon]:
+        """Загрузить SVG иконку из файла и вернуть QIcon."""
+        icon_path = get_icon_path(icon_name)
+        
+        if not icon_path.exists():
+            return None
+        
+        try:
+            with open(icon_path, 'r', encoding='utf-8') as f:
+                svg_content = f.read()
+            
+            if color:
+                svg_content = svg_content.replace('currentColor', color)
+                svg_content = svg_content.replace('stroke="currentColor"', f'stroke="{color}"')
+                svg_content = svg_content.replace('fill="currentColor"', f'fill="{color}"')
+            
+            renderer = QSvgRenderer(svg_content.encode('utf-8'))
+            if not renderer.isValid():
+                return None
+            
+            pixmap = QPixmap(size, size)
+            pixmap.fill(Qt.transparent)
+            
+            painter = QPainter(pixmap)
+            painter.setRenderHint(QPainter.Antialiasing)
+            renderer.render(painter)
+            painter.end()
+            
+            return QIcon(pixmap)
+        except Exception:
+            return None
 
     def _setup_ui(self):
         layout = QVBoxLayout(self)
@@ -326,40 +396,52 @@ class ManualReviewPanel(QWidget):
         input_container = QFrame()
         input_layout = QVBoxLayout(input_container)
         input_layout.setContentsMargins(0, 0, 0, 0)
-        input_layout.setSpacing(UI_METRICS.base_spacing)
+        input_layout.setSpacing(0)
 
-        # Поле ввода сообщения
-        self.message_input = QTextEdit()
-        self.message_input.setPlaceholderText("Введите сообщение...")
-        self.message_input.setMaximumHeight(100)
-        self.message_input.setAcceptRichText(False)
-        input_layout.addWidget(self.message_input)
-
-        # Кнопка отправки
-        send_button_layout = QHBoxLayout()
-        send_button_layout.addStretch()
+        # Контейнер для поля ввода с кнопкой внутри (используем QWidget для абсолютного позиционирования)
+        input_wrapper = QWidget()
+        input_wrapper.setFixedHeight(100)  # Фиксированная высота для контейнера
         
-        self.send_button = QPushButton("Отправить")
-        self.send_button.setFixedHeight(32)
-        self.send_button.setCursor(Qt.PointingHandCursor)
-        self.send_button.setStyleSheet("""
-            QPushButton {
-                background-color: #6CC24A;
-                color: #ffffff;
-                border: none;
+        # Поле ввода сообщения
+        self.message_input = QTextEdit(input_wrapper)
+        self.message_input.setPlaceholderText("Введите сообщение...")
+        self.message_input.setAcceptRichText(False)
+        # Добавляем отступ справа для кнопки
+        self.message_input.setStyleSheet("""
+            QTextEdit {
+                padding-right: 50px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
                 border-radius: 4px;
-                padding: 6px 16px;
-                font-weight: bold;
+                background-color: rgba(255, 255, 255, 0.05);
             }
-            QPushButton:hover {
-                background-color: #5AA83A;
+        """)
+        
+        # Кнопка отправки - размещаем поверх поля ввода в правом нижнем углу
+        self.send_button = QToolButton(input_wrapper)
+        icon_name = self._get_panel_button_icon("send")
+        if icon_name:
+            icon = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+            if icon:
+                self.send_button.setIcon(icon)
+                self.send_button.setIconSize(QSize(16, 16))
+            else:
+                self.send_button.setText("→")
+        else:
+            self.send_button.setText("→")
+        
+        self.send_button.setToolTip("Отправить (Ctrl+Enter)")
+        self.send_button.setCursor(Qt.PointingHandCursor)
+        self.send_button.setAutoRaise(True)
+        self.send_button.setFixedSize(24, 24)
+        self.send_button.setStyleSheet("""
+            QToolButton {
+                border: 1px solid transparent;
+                border-radius: 4px;
+                padding: 0px;
             }
-            QPushButton:pressed {
-                background-color: #4A882A;
-            }
-            QPushButton:disabled {
-                background-color: #555555;
-                color: #888888;
+            QToolButton:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                border-color: rgba(255, 255, 255, 0.2);
             }
         """)
         self.send_button.clicked.connect(self._on_send_clicked)
@@ -367,8 +449,31 @@ class ManualReviewPanel(QWidget):
         # Обработка Enter для отправки
         self.message_input.keyPressEvent = self._handle_key_press
         
-        send_button_layout.addWidget(self.send_button)
-        input_layout.addLayout(send_button_layout)
+        # Переопределяем resizeEvent для контейнера
+        def input_wrapper_resize_event(event):
+            QWidget.resizeEvent(input_wrapper, event)
+            # Обновляем размеры поля ввода
+            self.message_input.setGeometry(0, 0, input_wrapper.width(), input_wrapper.height())
+            # Обновляем позицию кнопки
+            button_size = 24
+            margin = 8
+            x = input_wrapper.width() - button_size - margin
+            y = input_wrapper.height() - button_size - margin
+            self.send_button.move(x, y)
+        
+        input_wrapper.resizeEvent = input_wrapper_resize_event
+        
+        input_layout.addWidget(input_wrapper)
+        
+        # Инициализируем позицию кнопки после отрисовки
+        def init_button_position():
+            button_size = 24
+            margin = 8
+            x = input_wrapper.width() - button_size - margin
+            y = input_wrapper.height() - button_size - margin
+            self.send_button.move(x, y)
+        
+        QTimer.singleShot(0, init_button_position)
 
         layout.addWidget(input_container)
 

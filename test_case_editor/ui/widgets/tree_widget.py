@@ -934,7 +934,33 @@ class TestCaseTreeWidget(QTreeWidget):
     def _rename_file(self, test_case):
         expanded_paths = self._capture_expanded_state()
         old_filename = test_case._filename
-        new_filename, ok = QInputDialog.getText(self, 'Переименовать файл', 'Новое имя файла:', text=old_filename)
+        
+        # Создаем кастомный диалог для переименования с увеличенным размером
+        dialog = QDialog(self)
+        dialog.setWindowTitle('Переименовать файл')
+        dialog.setMinimumWidth(500)  # Увеличиваем минимальную ширину
+        dialog.setMinimumHeight(120)
+        
+        layout = QVBoxLayout(dialog)
+        
+        label = QLabel('Новое имя файла:')
+        layout.addWidget(label)
+        
+        line_edit = QLineEdit(old_filename)
+        line_edit.selectAll()  # Выделяем весь текст для удобства редактирования
+        layout.addWidget(line_edit)
+        
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        button_box.accepted.connect(dialog.accept)
+        button_box.rejected.connect(dialog.reject)
+        layout.addWidget(button_box)
+        
+        # Устанавливаем фокус на поле ввода
+        line_edit.setFocus()
+        
+        ok = dialog.exec_() == QDialog.Accepted
+        new_filename = line_edit.text().strip() if ok else ""
+        
         if ok and new_filename and new_filename != old_filename:
             if not new_filename.endswith('.json'):
                 new_filename += '.json'

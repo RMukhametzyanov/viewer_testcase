@@ -41,7 +41,7 @@ class FilterPanel(QWidget):
         # Определяем все доступные поля для фильтрации
         self._all_fields = {
             "author": "Автор",
-            "owner": "Владелец",
+            "owner": "Исполнитель",
             "reviewer": "Ревьювер",
             "status": "Статус",
             "resolved": "Resolved",

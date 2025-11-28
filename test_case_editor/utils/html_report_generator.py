@@ -13,6 +13,7 @@ from ..repositories.test_case_repository import TestCaseRepository
 def generate_html_report(
     test_cases_dir: Path,
     app_dir: Optional[Path] = None,
+    project_name: Optional[str] = None,
 ) -> Optional[Path]:
     """
     Генерирует HTML отчет с статистикой по тест-кейсам.
@@ -61,9 +62,12 @@ def generate_html_report(
         # Генерируем HTML
         html_content = _generate_html_content(stats, owners, dt, failed_cases, skipped_cases, reasons_stats, test_cases)
         
-        # Формируем имя файла с датой
+        # Формируем имя файла с датой и названием проекта
         date_str = dt.strftime("%Y-%m-%d")
-        html_filename = f"Отчет о прохождении тестирования {date_str}.html"
+        if project_name and project_name.strip():
+            html_filename = f"{project_name.strip()}. Отчет о прохождении тестирования {date_str}.html"
+        else:
+            html_filename = f"Отчет о прохождении тестирования {date_str}.html"
         
         # Сохраняем HTML файл
         html_file = report_dir / html_filename

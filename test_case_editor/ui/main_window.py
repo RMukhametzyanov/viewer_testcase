@@ -41,9 +41,10 @@ from PyQt5.QtWidgets import (
     QCheckBox,
     QButtonGroup,
     QSizePolicy,
+    QShortcut,
 )
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject, QStringListModel, QSortFilterProxyModel, QRegularExpression, QTimer, QEvent, QSize
-from PyQt5.QtGui import QFont, QIcon, QPixmap, QPainter
+from PyQt5.QtGui import QFont, QIcon, QPixmap, QPainter, QKeySequence
 from PyQt5.QtSvg import QSvgRenderer
 
 from ..models.test_case import TestCase
@@ -1221,6 +1222,12 @@ class MainWindow(QMainWindow):
     def setup_ui(self):
         """Настройка пользовательского интерфейса"""
         self.setWindowTitle("Test Case Editor")
+        
+        # Устанавливаем иконку окна
+        logo_path = get_icon_path("logo.png")
+        if logo_path and logo_path.exists():
+            window_icon = QIcon(str(logo_path))
+            self.setWindowIcon(window_icon)
         if not self._geometry_initialized:
             self._apply_initial_geometry()
             self._geometry_initialized = True
@@ -1374,6 +1381,7 @@ class MainWindow(QMainWindow):
         self.form_widget.status_changed.connect(self._on_status_changed)
         self.form_widget.unsaved_changes_state.connect(self._on_form_unsaved_state)
         self.form_widget.before_save.connect(self._on_form_before_save)
+        self.form_widget.file_attached_to_step.connect(self._on_file_attached_to_step)
         self.detail_stack.addWidget(self.form_widget)
         
         # Панель фильтров
@@ -1535,6 +1543,9 @@ class MainWindow(QMainWindow):
         
         # Создаем кнопку "Сохранить" в статус-баре
         self._create_statusbar_save_button()
+        
+        # Создаем горячую клавишу Ctrl+S для сохранения
+        self._create_save_shortcut()
         
         # Отображаем статус LLM сразу (серый, пока проверка не завершена)
         self._update_statusbar_statistics()
@@ -1833,6 +1844,12 @@ class MainWindow(QMainWindow):
                     opacity: 0.8;
                 }}
             """)
+    
+    def _create_save_shortcut(self):
+        """Создать горячую клавишу Ctrl+S для сохранения"""
+        save_shortcut = QShortcut(QKeySequence("Ctrl+S"), self)
+        save_shortcut.activated.connect(self._on_save_button_clicked)
+        self.save_shortcut = save_shortcut  # Сохраняем ссылку, чтобы не удалился
     
     def _unhighlight_save_button(self):
         """Убрать подсветку с кнопки 'Сохранить'"""
@@ -2844,6 +2861,17 @@ class MainWindow(QMainWindow):
         self.form_widget.has_unsaved_changes = True
         self.form_widget.unsaved_changes_state.emit(True)
     
+    def _on_file_attached_to_step(self):
+        """Обработка прикрепления файла к шагу из формы"""
+        if not self.current_test_case:
+            return
+        # Обновляем панель "Файлы" для отображения нового файла
+        if hasattr(self, "aux_panel"):
+            self.aux_panel.set_files_test_case(self.current_test_case)
+        # Помечаем изменения в форме (чтобы появилась кнопка сохранения)
+        self.form_widget.has_unsaved_changes = True
+        self.form_widget.unsaved_changes_state.emit(True)
+    
     def _on_manual_review_notes_changed(self):
         """Обработка изменения notes в панели ручного ревью"""
         if not self.current_test_case:
@@ -3652,7 +3680,9 @@ class MainWindow(QMainWindow):
         else:
             llm_status_color = "#F5555D"  # Красный - недоступен
         
-        llm_status_html = f"<span style='color: {llm_status_color};'>LLM</span>"
+        # Используем название модели вместо "LLM", если модель выбрана
+        llm_model_name = self.llm_model if self.llm_model else "LLM"
+        llm_status_html = f"<span style='color: {llm_status_color};'>{llm_model_name}</span>"
         
         if not self.test_cases:
             # Показываем только статус LLM, если нет тест-кейсов
@@ -4286,10 +4316,14 @@ class MainWindow(QMainWindow):
                     self.statusBar().showMessage(f"Ошибка создания папки Reports: {e}")
                     return
             
+            # Получаем название проекта из настроек
+            project_name = self.settings.get('project_name', '').strip()
+            
             # Генерируем отчет
             report_dir = generate_html_report(
                 test_cases_dir=self.test_cases_dir,
                 app_dir=app_dir,
+                project_name=project_name if project_name else None,
             )
             
             if report_dir:
@@ -4337,7 +4371,14 @@ class MainWindow(QMainWindow):
             # Генерируем суммарный отчет
             from ..utils.summary_report_generator import generate_summary_report
             
-            summary_file = generate_summary_report(reports_dir, app_dir)
+            # Получаем название проекта из настроек
+            project_name = self.settings.get('project_name', '').strip()
+            
+            summary_file = generate_summary_report(
+                reports_dir, 
+                app_dir,
+                project_name=project_name if project_name else None,
+            )
             
             if summary_file:
                 # Открываем проводник с отчетом

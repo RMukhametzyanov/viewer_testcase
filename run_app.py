@@ -11,6 +11,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from PyQt5.QtWidgets import QApplication
+from PyQt5.QtGui import QIcon
+from pathlib import Path
 from test_case_editor.ui import MainWindow
 from test_case_editor.ui.styles.app_theme import build_app_style_sheet
 from test_case_editor.ui.styles.ui_metrics import UI_METRICS
@@ -95,6 +97,13 @@ def main():
     # Применяем стили с учетом настроек
     style_sheet = build_app_style_sheet(UI_METRICS)
     app.setStyleSheet(style_sheet)
+    
+    # Устанавливаем иконку приложения
+    app_root = Path(__file__).parent
+    logo_path = app_root / "icons" / "logo.png"
+    if logo_path.exists():
+        app_icon = QIcon(str(logo_path))
+        app.setWindowIcon(app_icon)
     
     # Создаем главное окно
     window = MainWindow()
