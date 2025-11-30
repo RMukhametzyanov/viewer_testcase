@@ -28,8 +28,19 @@ pip install -r requirements.txt
 ### Запуск приложения
 
 ```bash
-python run_app_v2.py
+python run_app.py
 ```
+
+### Сборка дистрибутива для MacOS
+
+Для создания дистрибутива приложения, который можно запускать двойным кликом на MacOS, используйте скрипт сборки:
+
+```bash
+chmod +x build_macos.sh
+./build_macos.sh
+```
+
+Подробная инструкция по сборке находится в файле [BUILD_INSTRUCTIONS.md](BUILD_INSTRUCTIONS.md).
 
 ---
 
