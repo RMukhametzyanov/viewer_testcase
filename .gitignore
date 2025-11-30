@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Build и дистрибутивы
+build/
+dist/
+*.spec
+*.app
+
+# Настройки IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Отчеты
+Reports/
+
+# Тест-кейсы (если не нужно коммитить)
+# testcases/
+
+# Временные файлы
+*.log
+*.tmp
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+

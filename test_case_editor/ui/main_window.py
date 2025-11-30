@@ -58,6 +58,7 @@ from .widgets.filter_panel import FilterPanel
 from ..utils import llm
 from ..utils.prompt_builder import build_review_prompt, build_creation_prompt
 from ..utils.list_models import fetch_models as fetch_llm_models
+from ..utils.settings_path import get_settings_path
 from ..utils.allure_generator import generate_allure_report
 from ..utils.html_report_generator import generate_html_report
 from .styles.ui_metrics import UI_METRICS
@@ -1010,7 +1011,7 @@ class MainWindow(QMainWindow):
         self.service = TestCaseService(repository)
         
         # Настройки
-        self.settings_file = Path("settings.json")
+        self.settings_file = get_settings_path()
         self.settings = self.load_settings()
         default_sizes = {'left': 350, 'form_area': 900, 'review': 360}
         self.panel_sizes = dict(default_sizes)

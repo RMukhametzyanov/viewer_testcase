@@ -27,7 +27,11 @@ fi
 
 # Очистка предыдущих сборок
 echo -e "${YELLOW}🧹 Очистка предыдущих сборок...${NC}"
-rm -rf build dist *.spec __pycache__
+rm -rf build dist __pycache__
+# Не удаляем app.spec если он существует
+if [ -f "app.spec" ]; then
+    echo -e "${YELLOW}📋 Используется существующий app.spec${NC}"
+fi
 
 # Создание .spec файла если его нет
 if [ ! -f "app.spec" ]; then
@@ -35,15 +39,19 @@ if [ ! -f "app.spec" ]; then
     python3 -m PyInstaller --name "Test Case Editor" \
         --windowed \
         --onedir \
-        --icon=NONE \
         --add-data "icons:icons" \
         --hidden-import PyQt5.QtSvg \
         --hidden-import PyQt5.QtCore \
         --hidden-import PyQt5.QtGui \
         --hidden-import PyQt5.QtWidgets \
         run_app.py
-    # Переименовываем созданный spec файл
-    mv "Test Case Editor.spec" app.spec 2>/dev/null || true
+    # Исправляем созданный spec файл - убираем icon='NONE'
+    if [ -f "Test Case Editor.spec" ]; then
+        sed -i '' "s/icon='NONE',//g" "Test Case Editor.spec"
+        sed -i '' "s/icon=\"NONE\",//g" "Test Case Editor.spec"
+        # Переименовываем созданный spec файл
+        mv "Test Case Editor.spec" app.spec 2>/dev/null || true
+    fi
 fi
 
 # Сборка приложения

@@ -11,8 +11,10 @@ from typing import Any, Dict, Iterable, List
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
+from .settings_path import get_settings_path
 
-SETTINGS_PATH = Path(__file__).resolve().parent.parent.parent / "settings.json"
+
+SETTINGS_PATH = get_settings_path()
 
 
 def load_settings(path: Path) -> Dict[str, Any]:
