@@ -17,6 +17,7 @@ from test_case_editor.ui import MainWindow
 from test_case_editor.ui.styles.app_theme import build_app_style_sheet
 from test_case_editor.ui.styles.ui_metrics import UI_METRICS
 from test_case_editor.ui.styles.theme_provider import THEME_PROVIDER
+from test_case_editor.utils.settings_path import get_settings_path
 
 
 def main():
@@ -63,7 +64,7 @@ def main():
     app.setStyle('Fusion')
     
     # Загружаем настройки и применяем к UI_METRICS и THEME_PROVIDER перед созданием окна
-    settings_file = Path("settings.json")
+    settings_file = get_settings_path()
     if settings_file.exists():
         try:
             with settings_file.open("r", encoding="utf-8") as f:

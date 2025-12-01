@@ -1,8 +1,10 @@
 """Главное окно приложения"""
 
 import json
+import os
 import re
 import subprocess
+import sys
 from pathlib import Path
 from typing import List, Optional, Dict
 
@@ -59,6 +61,7 @@ from .widgets.filter_panel import FilterPanel
 from ..utils import llm
 from ..utils.prompt_builder import build_review_prompt, build_creation_prompt
 from ..utils.list_models import fetch_models as fetch_llm_models
+from ..utils.settings_path import get_settings_path
 from ..utils.allure_generator import generate_allure_report
 from ..utils.html_report_generator import generate_html_report
 from ..utils.resource_path import get_icon_path, get_icons_dir
@@ -188,6 +191,12 @@ class SettingsDialog(QDialog):
 
         # Кнопки внизу
         button_layout = QHBoxLayout()
+        
+        # Кнопка для открытия settings.json в проводнике
+        open_settings_btn = QPushButton("Открыть settings.json")
+        open_settings_btn.clicked.connect(self._open_settings_file_in_explorer)
+        button_layout.addWidget(open_settings_btn)
+        
         button_layout.addStretch()
         button_box = QDialogButtonBox(
             QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
@@ -951,6 +960,36 @@ class SettingsDialog(QDialog):
         
         self.accept()
 
+    def _open_settings_file_in_explorer(self):
+        """Открыть файл settings.json в проводнике"""
+        try:
+            settings_file = get_settings_path()
+            
+            # Создаем файл, если его нет
+            if not settings_file.exists():
+                settings_file.parent.mkdir(parents=True, exist_ok=True)
+                # Создаем пустой файл с минимальными настройками
+                with open(settings_file, 'w', encoding='utf-8') as f:
+                    json.dump({}, f, ensure_ascii=False, indent=4)
+            
+            # Открываем файл в проводнике с выделением
+            if sys.platform == "win32":
+                # Windows: открываем папку и выделяем файл
+                normalized = os.path.normpath(str(settings_file))
+                subprocess.run(["explorer", "/select,", normalized], check=False)
+            elif sys.platform == "darwin":
+                # macOS: открываем Finder и выделяем файл
+                subprocess.run(["open", "-R", str(settings_file)], check=False)
+            else:
+                # Linux: открываем файловый менеджер
+                subprocess.run(["xdg-open", str(settings_file.parent)], check=False)
+        except Exception as e:
+            QMessageBox.warning(
+                self,
+                "Ошибка",
+                f"Не удалось открыть файл настроек в проводнике:\n{str(e)}"
+            )
+
     def get_settings(self) -> dict:
         """Получить сохраненные настройки"""
         return self.settings
@@ -1146,7 +1185,7 @@ class MainWindow(QMainWindow):
         self.service = TestCaseService(repository)
         
         # Настройки
-        self.settings_file = Path("settings.json")
+        self.settings_file = get_settings_path()
         self.settings = self.load_settings()
         default_sizes = {'left': 350, 'form_area': 900, 'review': 360}
         self.panel_sizes = dict(default_sizes)
