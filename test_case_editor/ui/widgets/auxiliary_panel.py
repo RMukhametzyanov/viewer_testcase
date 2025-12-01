@@ -20,6 +20,7 @@ from .json_preview_widget import JsonPreviewWidget
 from .information_panel import InformationPanel
 from .files_panel import FilesPanel
 from .reports_panel import ReportsPanel
+from .manual_review_panel import ManualReviewPanel
 from ...models import TestCase
 from ..styles.ui_metrics import UI_METRICS
 
@@ -37,6 +38,7 @@ class AuxiliaryPanel(QWidget):
     generate_report_requested = pyqtSignal()  # Сигнал для запроса генерации отчета
     generate_summary_report_requested = pyqtSignal()  # Сигнал для запроса генерации суммарного отчета
     tab_changed = pyqtSignal(str)  # Сигнал об изменении активной вкладки
+    manual_review_notes_changed = pyqtSignal()  # Сигнал об изменении notes в ручном ревью
 
     def __init__(
         self,
@@ -47,7 +49,7 @@ class AuxiliaryPanel(QWidget):
         creation_default_files: Optional[List[Path]] = None,
     ):
         super().__init__(parent)
-        self._tabs_order = ["information", "review", "creation", "json", "files", "reports"]
+        self._tabs_order = ["information", "review", "creation", "json", "files", "reports", "manual_review"]
         self._methodic_path = methodic_path
         self._review_default_prompt = default_review_prompt
         self._creation_default_prompt = default_creation_prompt or "Создай ТТ"
@@ -104,6 +106,11 @@ class AuxiliaryPanel(QWidget):
         self.reports_panel.generate_report_requested.connect(self.generate_report_requested.emit)
         self.reports_panel.generate_summary_report_requested.connect(self.generate_summary_report_requested.emit)
         self._stack.addWidget(self.reports_panel)
+        
+        # Вкладка ручного ревью
+        self.manual_review_panel = ManualReviewPanel()
+        self.manual_review_panel.notes_changed.connect(self._on_manual_review_notes_changed)
+        self._stack.addWidget(self.manual_review_panel)
 
         main_layout.addLayout(self._stack, stretch=1)
 
@@ -160,6 +167,11 @@ class AuxiliaryPanel(QWidget):
         """Установить режим редактирования для панели информации"""
         if hasattr(self, "information_panel"):
             self.information_panel.set_edit_mode(enabled)
+    
+    def set_information_testers(self, testers: List[str]):
+        """Установить список тестировщиков для панели информации"""
+        if hasattr(self, "information_panel"):
+            self.information_panel.set_testers(testers)
 
     # ------------------------------------------------------------------ files
 
@@ -167,6 +179,17 @@ class AuxiliaryPanel(QWidget):
         """Установить тест-кейс для панели файлов"""
         if hasattr(self, "files_panel"):
             self.files_panel.load_test_case(test_case)
+    
+    # ------------------------------------------------------------------ manual_review
+    
+    def set_manual_review_test_case(self, test_case: Optional[TestCase]):
+        """Установить тест-кейс для панели ручного ревью"""
+        if hasattr(self, "manual_review_panel"):
+            self.manual_review_panel.load_test_case(test_case)
+    
+    def _on_manual_review_notes_changed(self):
+        """Обработчик изменения notes в панели ручного ревью"""
+        self.manual_review_notes_changed.emit()
     
     # ------------------------------------------------------------------ reports
 

@@ -25,7 +25,7 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 from PyQt5.QtCore import Qt, pyqtSignal, QMimeData, QByteArray, QSize
-from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter
+from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter, QPen
 from PyQt5.QtSvg import QSvgRenderer
 
 from ...services.test_case_service import TestCaseService
@@ -57,6 +57,7 @@ class TestCaseTreeWidget(QTreeWidget):
     tree_updated = pyqtSignal()
     review_requested = pyqtSignal(object)
     test_cases_updated = pyqtSignal()  # Сигнал для обновления тест-кейсов после изменения статусов
+    add_to_review_requested = pyqtSignal(TestCase)  # Сигнал для добавления файла в панель ревью
 
     def __init__(self, service: TestCaseService, parent=None):
         super().__init__(parent)
@@ -208,7 +209,8 @@ class TestCaseTreeWidget(QTreeWidget):
         self.test_cases_dir = test_cases_dir
         self.clear()
 
-        if not test_cases_dir.exists():
+        # Если путь пустой или не существует, оставляем дерево пустым
+        if not test_cases_dir or str(test_cases_dir).strip() == "" or not test_cases_dir.exists():
             return
 
         self._populate_directory(test_cases_dir, self.invisibleRootItem(), test_cases)
@@ -239,8 +241,8 @@ class TestCaseTreeWidget(QTreeWidget):
                 if data.get('type') == 'file':
                     test_case = data.get('test_case')
                     if test_case:
-                        # В режиме редактирования иконки не показываем
                         if not self._edit_mode:
+                            # В режиме запуска тестов показываем цветные кружки
                             icon, color = self._get_test_case_icon_and_color(test_case)
                             child.setText(0, test_case.name)
                             if icon:
@@ -248,8 +250,10 @@ class TestCaseTreeWidget(QTreeWidget):
                             else:
                                 child.setIcon(0, QIcon())  # Пустая иконка
                         else:
+                            # В режиме редактирования показываем пустые кружки для элементов с неполными статусами
                             child.setText(0, test_case.name)
-                            child.setIcon(0, QIcon())  # Пустая иконка в режиме редактирования
+                            icon = self._get_edit_mode_icon(test_case)
+                            child.setIcon(0, icon)
                 elif data.get('type') == 'folder':
                     # Обновляем отображение папки
                     folder_path = data.get('path')
@@ -311,7 +315,9 @@ class TestCaseTreeWidget(QTreeWidget):
                 if not self._edit_mode:
                     icon, color = self._get_test_case_icon_and_color(test_case)
                 else:
-                    icon, color = None, ""
+                    # В режиме редактирования показываем пустые кружки для элементов с неполными статусами
+                    icon = self._get_edit_mode_icon(test_case)
+                    color = ""
                 
                 item = QTreeWidgetItem(parent_item)
                 # Устанавливаем текст и иконку
@@ -391,18 +397,128 @@ class TestCaseTreeWidget(QTreeWidget):
         if all_have_status and all_passed:
             return (self._create_colored_circle_icon('#6CC24A'), '#6CC24A')  # Зеленый залитый кружок
         
-        # Не все шаги имеют статус и нет failed/skipped - без иконки
-        return (None, '#8B9099')
+        # Не все шаги имеют статус и нет failed/skipped - пустой кружок с серой обводкой
+        return (self._create_empty_circle_with_gray_border(), '#8B9099')
+    
+    def _create_empty_circle_with_gray_border(self, size: int = 12) -> QIcon:
+        """
+        Создать иконку пустого кружка без заливки с серой обводкой.
+        Используется для тест-кейсов, где не все шаги имеют статус.
+        
+        Args:
+            size: Размер иконки в пикселях
+        
+        Returns:
+            QIcon: Иконка пустого кружка с серой обводкой
+        """
+        try:
+            # Используем кэш для оптимизации
+            cache_key = f"empty_gray_border_{size}"
+            if cache_key in self._icon_cache:
+                return self._icon_cache[cache_key]
+            
+            pixmap = QPixmap(size, size)
+            pixmap.fill(Qt.transparent)
+            
+            painter = QPainter(pixmap)
+            painter.setRenderHint(QPainter.Antialiasing)
+            
+            # Рисуем только серую обводку (без заливки)
+            margin = 2
+            pen = QPen(QColor('#8B9099'))
+            pen.setWidth(1)
+            painter.setPen(pen)
+            painter.setBrush(Qt.NoBrush)  # Без заливки
+            painter.drawEllipse(margin, margin, size - 2 * margin, size - 2 * margin)
+            
+            painter.end()
+            
+            icon = QIcon(pixmap)
+            self._icon_cache[cache_key] = icon
+            return icon
+        except Exception as e:
+            print(f"Ошибка создания пустого кружка с серой обводкой: {e}")
+            return QIcon()
+    
+    def _create_empty_circle_icon(self, color: str = "#8B9099", size: int = 12) -> QIcon:
+        """
+        Создать иконку пустого (незаполненного) кружка.
+        
+        Args:
+            color: Цвет обводки кружка в формате hex
+            size: Размер иконки в пикселях
+        
+        Returns:
+            QIcon: Иконка пустого кружка
+        """
+        try:
+            # Используем кэш для оптимизации
+            cache_key = f"empty_{color}_{size}"
+            if cache_key in self._icon_cache:
+                return self._icon_cache[cache_key]
+            
+            pixmap = QPixmap(size, size)
+            pixmap.fill(Qt.transparent)
+            
+            painter = QPainter(pixmap)
+            painter.setRenderHint(QPainter.Antialiasing)
+            
+            # Рисуем только обводку (пустой кружок)
+            pen = QPen(QColor(color))
+            pen.setWidth(2)
+            painter.setPen(pen)
+            painter.setBrush(Qt.NoBrush)  # Без заливки
+            
+            # Отступ для обводки
+            margin = 2
+            painter.drawEllipse(margin, margin, size - 2 * margin, size - 2 * margin)
+            
+            painter.end()
+            
+            icon = QIcon(pixmap)
+            self._icon_cache[cache_key] = icon
+            return icon
+        except Exception as e:
+            print(f"Ошибка создания пустого кружка: {e}")
+            return QIcon()
+    
+    def _get_edit_mode_icon(self, test_case) -> QIcon:
+        """
+        Получить иконку для тест-кейса в режиме редактирования.
+        Показывает пустой кружок, если не все шаги имеют статусы.
+        
+        Returns:
+            QIcon: Иконка пустого кружка или пустая иконка
+        """
+        if not test_case or not test_case.steps:
+            # Если нет шагов, возвращаем пустую иконку
+            return QIcon()
+        
+        steps = test_case.steps
+        if not steps:
+            return QIcon()
+        
+        # Получаем статусы всех шагов (включая пустые)
+        step_statuses = [(step.status or "").strip().lower() for step in steps]
+        
+        # Проверяем, все ли шаги имеют статус
+        all_have_status = all(s for s in step_statuses)  # Все статусы непустые
+        
+        if not all_have_status:
+            # Не все шаги имеют статус - показываем пустой кружок
+            return self._create_empty_circle_icon("#8B9099", 12)
+        
+        # Все шаги имеют статус - не показываем иконку
+        return QIcon()
     
     @staticmethod
     def _status_icon(status: str) -> str:
         """Устаревший метод, оставлен для совместимости"""
         return {
             'Done': '✓',
-            'Blocked': '⚠',
-            'In Progress': '⟳',
+            'Review': '👁',
+            'Design': '⟳',
             'Draft': '○',
-            'Deprecated': '×',
         }.get(status, '○')
 
     @staticmethod
@@ -410,10 +526,9 @@ class TestCaseTreeWidget(QTreeWidget):
         """Устаревший метод, оставлен для совместимости"""
         return {
             'Done': '#6CC24A',
-            'Blocked': '#F5555D',
-            'In Progress': '#FFA931',
+            'Review': '#4A90E2',
+            'Design': '#FFA931',
             'Draft': '#8B9099',
-            'Deprecated': '#6B7380',
         }.get(status, '#E1E3E6')
     
     def _calculate_folder_status(self, folder_path: Path, test_cases: list) -> Tuple[Optional[QIcon], str]:
@@ -468,8 +583,8 @@ class TestCaseTreeWidget(QTreeWidget):
         if all_have_status and all_passed:
             return (self._create_colored_circle_icon('#6CC24A'), '#6CC24A')  # Зеленый залитый кружок
         
-        # Не все шаги имеют статус и нет failed/skipped
-        return (None, '#8B9099')  # Без иконки
+        # Не все шаги имеют статус и нет failed/skipped - пустой кружок с серой обводкой
+        return (self._create_empty_circle_with_gray_border(), '#8B9099')
     
     def _calculate_folder_status_from_tree(self, folder_item: QTreeWidgetItem) -> Tuple[Optional[QIcon], str]:
         """
@@ -518,8 +633,8 @@ class TestCaseTreeWidget(QTreeWidget):
         if all_have_status and all_passed:
             return (self._create_colored_circle_icon('#6CC24A'), '#6CC24A')  # Зеленый залитый кружок
         
-        # Не все шаги имеют статус и нет failed/skipped
-        return (None, '#8B9099')  # Без иконки
+        # Не все шаги имеют статус и нет failed/skipped - пустой кружок с серой обводкой
+        return (self._create_empty_circle_with_gray_border(), '#8B9099')
 
     # ----------------------------------------------------------- interactions
 
@@ -605,9 +720,9 @@ class TestCaseTreeWidget(QTreeWidget):
             icon_name = self._get_context_menu_icon("create_folder")
             if icon_name:
                 icon_create = self._load_svg_icon(icon_name, size=16, color="#ffffff")
-                action_new_folder = menu.addAction(icon_create, "Создать подпапку")
+                action_new_folder = menu.addAction(icon_create, "Создать папку")
             else:
-                action_new_folder = menu.addAction("Создать подпапку")
+                action_new_folder = menu.addAction("Создать папку")
             action_new_folder.triggered.connect(lambda: self._create_folder(folder_path))
 
             menu.addSeparator()
@@ -729,6 +844,17 @@ class TestCaseTreeWidget(QTreeWidget):
                     action_delete = menu.addAction("Удалить")
                 action_delete.triggered.connect(lambda: self._delete_test_case(test_case))
 
+                menu.addSeparator()
+
+                # Добавить в панель ревью
+                icon_name = self._get_context_menu_icon("add_to_review")
+                if icon_name:
+                    icon_add = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                    action_add_to_review = menu.addAction(icon_add, "Добавить в панель ревью")
+                else:
+                    action_add_to_review = menu.addAction("Добавить в панель ревью")
+                action_add_to_review.triggered.connect(lambda: self.add_to_review_requested.emit(test_case))
+
             menu.exec_(self.mapToGlobal(position))
         except Exception as e:
             QMessageBox.critical(self, "Ошибка", f"Ошибка при отображении контекстного меню: {str(e)}")
@@ -808,7 +934,33 @@ class TestCaseTreeWidget(QTreeWidget):
     def _rename_file(self, test_case):
         expanded_paths = self._capture_expanded_state()
         old_filename = test_case._filename
-        new_filename, ok = QInputDialog.getText(self, 'Переименовать файл', 'Новое имя файла:', text=old_filename)
+        
+        # Создаем кастомный диалог для переименования с увеличенным размером
+        dialog = QDialog(self)
+        dialog.setWindowTitle('Переименовать файл')
+        dialog.setMinimumWidth(500)  # Увеличиваем минимальную ширину
+        dialog.setMinimumHeight(120)
+        
+        layout = QVBoxLayout(dialog)
+        
+        label = QLabel('Новое имя файла:')
+        layout.addWidget(label)
+        
+        line_edit = QLineEdit(old_filename)
+        line_edit.selectAll()  # Выделяем весь текст для удобства редактирования
+        layout.addWidget(line_edit)
+        
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        button_box.accepted.connect(dialog.accept)
+        button_box.rejected.connect(dialog.reject)
+        layout.addWidget(button_box)
+        
+        # Устанавливаем фокус на поле ввода
+        line_edit.setFocus()
+        
+        ok = dialog.exec_() == QDialog.Accepted
+        new_filename = line_edit.text().strip() if ok else ""
+        
         if ok and new_filename and new_filename != old_filename:
             if not new_filename.endswith('.json'):
                 new_filename += '.json'
@@ -1087,6 +1239,29 @@ class TestCaseTreeWidget(QTreeWidget):
         self._apply_filter(self.invisibleRootItem(), pattern, filters)
         if not pattern and not filters:
             self.collapseAll()
+    
+    def count_visible_test_cases(self) -> int:
+        """Подсчитать количество видимых тест-кейсов в дереве после фильтрации.
+        
+        Returns:
+            int: Количество видимых тест-кейсов
+        """
+        count = 0
+        
+        def count_items(item: QTreeWidgetItem):
+            nonlocal count
+            for i in range(item.childCount()):
+                child = item.child(i)
+                # Проверяем, видим ли элемент
+                if not child.isHidden():
+                    data = child.data(0, Qt.UserRole)
+                    if data and isinstance(data, dict) and data.get('type') == 'file':
+                        count += 1
+                # Рекурсивно проверяем дочерние элементы
+                count_items(child)
+        
+        count_items(self.invisibleRootItem())
+        return count
 
     def _apply_filter(self, item: QTreeWidgetItem, pattern: str, filters: Dict) -> bool:
         """Применить фильтры к элементу дерева и его детям.
@@ -1325,6 +1500,33 @@ class TestCaseTreeWidget(QTreeWidget):
                             # Одиночный выбор (для обратной совместимости)
                             filter_tag_lower = filter_tags.lower().strip()
                             if filter_tag_lower not in test_case_tags:
+                                filter_match = False
+                    
+                    # Фильтр по resolved (проверяем notes)
+                    if 'resolved' in filters and filters['resolved']:
+                        resolved_filter = filters['resolved']
+                        # Получаем все статусы resolved из notes тест-кейса
+                        test_case_resolved_statuses = set()
+                        if hasattr(test_case, 'notes') and test_case.notes:
+                            for note_data in test_case.notes.values():
+                                if isinstance(note_data, dict):
+                                    resolved = note_data.get("resolved", "new")
+                                    if resolved:
+                                        test_case_resolved_statuses.add(resolved.strip())
+                        
+                        # Если у тест-кейса нет notes с resolved, считаем, что у него нет resolved статусов
+                        if not test_case_resolved_statuses:
+                            test_case_resolved_statuses.add("пусто")
+                        
+                        # Проверяем, есть ли пересечение между фильтром и статусами тест-кейса
+                        if isinstance(resolved_filter, list):
+                            # Множественный выбор - проверяем пересечение
+                            filter_set = set(r.strip() for r in resolved_filter)
+                            if not filter_set.intersection(test_case_resolved_statuses):
+                                filter_match = False
+                        else:
+                            # Одиночный выбор
+                            if resolved_filter.strip() not in test_case_resolved_statuses:
                                 filter_match = False
             
             # Для файлов: проверяем текстовый поиск и фильтры

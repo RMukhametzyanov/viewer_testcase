@@ -10,6 +10,7 @@ from typing import List, Optional, Dict, Tuple
 def generate_summary_report(
     reports_dir: Path,
     app_dir: Optional[Path] = None,
+    project_name: Optional[str] = None,
 ) -> Optional[Path]:
     """
     Генерирует суммарный HTML отчет на основе всех HTML отчетов в папке Reports.
@@ -37,8 +38,16 @@ def generate_summary_report(
         # Генерируем HTML с графиком
         html_content = _generate_summary_html_content(report_data)
         
+        # Формируем имя файла с датой и названием проекта
+        dt = datetime.now()
+        date_str = dt.strftime("%Y-%m-%d")
+        if project_name and project_name.strip():
+            summary_filename = f"{project_name.strip()}.Суммарный отчет {date_str}.html"
+        else:
+            summary_filename = f"Суммарный отчет {date_str}.html"
+        
         # Сохраняем HTML файл
-        summary_file = reports_dir / "Суммарный отчет.html"
+        summary_file = reports_dir / summary_filename
         summary_file.write_text(html_content, encoding='utf-8')
         
         return summary_file

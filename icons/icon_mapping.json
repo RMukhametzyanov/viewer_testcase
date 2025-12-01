@@ -5,7 +5,8 @@
     "creation": "file-plus.svg",
     "json": "code.svg",
     "files": "file.svg",
-    "reports": "book.svg"
+    "reports": "book.svg",
+    "manual_review": "send.svg"
   },
   "context_menu": {
     "open_explorer": "external-link.svg",
@@ -15,10 +16,14 @@
     "duplicate": "copy.svg",
     "delete": "x.svg",
     "create_test_case": "file-plus.svg",
-    "create_folder": "folder-plus.svg"
+    "create_folder": "folder-plus.svg",
+    "add_to_review": "file-plus.svg"
   },
   "panel_buttons": {
-    "attach_files": "file-plus.svg"
+    "attach_files": "file-plus.svg",
+    "save": "save.svg",
+    "send": "arrow-right-circle.svg",
+    "copy": "copy.svg"
   },
   "status_icons": {
     "passed": "check-circle.svg",
@@ -42,6 +47,18 @@
   },
   "search": {
     "filter": "filter.svg"
+  },
+  "manual_review": {
+    "edit": "edit-2.svg",
+    "delete": "x.svg",
+    "resolved_new": "help-circle.svg",
+    "resolved_fixed": "arrow-right-circle.svg",
+    "resolved_closed": "check-circle.svg"
+  },
+  "filter_panel": {
+    "add_field": "plus.svg",
+    "apply": "play.svg",
+    "reset": "refresh-ccw.svg"
   }
 }
 
