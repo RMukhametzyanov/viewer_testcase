@@ -1,0 +1,18 @@
+[project]
+name = "test-case-editor"
+version = "1.0.0"
+description = "Редактор тест-кейсов. Приложение для создания, редактирования и управления тест-кейсами в формате JSON."
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "PyQt5>=5.15.0",
+    "flet>=0.21.0",
+]
+
+[project.scripts]
+test-case-editor = "run_app:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+

@@ -41,9 +41,10 @@ from PyQt5.QtWidgets import (
     QCheckBox,
     QButtonGroup,
     QSizePolicy,
+    QShortcut,
 )
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject, QStringListModel, QSortFilterProxyModel, QRegularExpression, QTimer, QEvent, QSize
-from PyQt5.QtGui import QFont, QIcon, QPixmap, QPainter
+from PyQt5.QtGui import QFont, QIcon, QPixmap, QPainter, QKeySequence
 from PyQt5.QtSvg import QSvgRenderer
 
 from ..models.test_case import TestCase
@@ -61,6 +62,7 @@ from ..utils.list_models import fetch_models as fetch_llm_models
 from ..utils.settings_path import get_settings_path
 from ..utils.allure_generator import generate_allure_report
 from ..utils.html_report_generator import generate_html_report
+from ..utils.resource_path import get_icon_path, get_icons_dir
 from .styles.ui_metrics import UI_METRICS
 from .styles.app_theme import build_app_style_sheet
 from .styles.theme_provider import THEME_PROVIDER, ThemeProvider
@@ -146,6 +148,7 @@ class SettingsDialog(QDialog):
             ("Панели", "panels"),
             ("Внешний вид", "appearance"),
             ("Панель Информация", "information_panel"),
+            ("Импорт", "import"),
         ]
         
         self.section_widgets = {}
@@ -167,6 +170,8 @@ class SettingsDialog(QDialog):
                 widget = self._create_appearance_tab()
             elif key == "information_panel":
                 widget = self._create_information_panel_tab()
+            elif key == "import":
+                widget = self._create_import_tab()
             else:
                 widget = QWidget()
             
@@ -208,6 +213,27 @@ class SettingsDialog(QDialog):
         content = QWidget()
         content_layout = QVBoxLayout(content)
         content_layout.setSpacing(UI_METRICS.section_spacing)
+        
+        # Название проекта
+        project_group = QGroupBox("Название проекта")
+        project_layout = QVBoxLayout()
+        self.project_name_edit = QLineEdit()
+        self.project_name_edit.setPlaceholderText("Введите название проекта")
+        project_layout.addWidget(self.project_name_edit)
+        project_group.setLayout(project_layout)
+        content_layout.addWidget(project_group)
+        
+        # Список тестировщиков
+        testers_group = QGroupBox("Тестировщики")
+        testers_layout = QVBoxLayout()
+        testers_label = QLabel("Введите список тестировщиков (каждый с новой строки):")
+        self.testers_edit = QTextEdit()
+        self.testers_edit.setPlaceholderText("Тестировщик 1\nТестировщик 2\nТестировщик 3")
+        self.testers_edit.setMaximumHeight(150)
+        testers_layout.addWidget(testers_label)
+        testers_layout.addWidget(self.testers_edit)
+        testers_group.setLayout(testers_layout)
+        content_layout.addWidget(testers_group)
         
         # Папка с тест-кейсами
         test_cases_group = QGroupBox("Папка с тест-кейсами")
@@ -675,13 +701,20 @@ class SettingsDialog(QDialog):
     def _load_settings(self):
         """Загрузить настройки в поля формы"""
         # Общие
+        self.project_name_edit.setText(self.settings.get('project_name', ''))
+        # Список тестировщиков
+        testers_list = self.settings.get('testers', [])
+        if isinstance(testers_list, list):
+            self.testers_edit.setPlainText('\n'.join(testers_list))
+        elif isinstance(testers_list, str):
+            self.testers_edit.setPlainText(testers_list)
         self.test_cases_dir_edit.setText(self.settings.get('test_cases_dir', ''))
         self.methodic_path_edit.setText(self.settings.get('LLM_METHODIC_PATH', ''))
         
         # LLM
         self.llm_host_edit.setText(self.settings.get('LLM_HOST', ''))
-        # Загружаем модели для комбобокса
-        self._load_llm_models()
+        # Загружаем модели для комбобокса (используем кэш, чтобы не блокировать UI)
+        self._load_llm_models(use_cached=True)
         # Устанавливаем текущую модель
         current_model = self.settings.get('LLM_MODEL', '')
         if current_model:
@@ -776,9 +809,59 @@ class SettingsDialog(QDialog):
         if hasattr(self, 'info_expected_result_check'):
             self.info_expected_result_check.setChecked(info_visibility.get('expected_result', True))
 
+    def _create_import_tab(self) -> QWidget:
+        """Создать вкладку настроек импорта"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        layout.setSpacing(UI_METRICS.base_spacing)
+        
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.NoFrame)
+        
+        content = QWidget()
+        content_layout = QVBoxLayout(content)
+        content_layout.setSpacing(UI_METRICS.section_spacing)
+        
+        # Импорт из ALM
+        import_group = QGroupBox("Импорт из ALM")
+        import_layout = QVBoxLayout()
+        
+        import_label = QLabel(
+            "Импорт тест-кейсов из ALM с созданием структуры папок согласно иерархии."
+        )
+        import_label.setWordWrap(True)
+        import_layout.addWidget(import_label)
+        
+        import_btn = QPushButton("Импорт из ALM")
+        import_btn.clicked.connect(self._on_import_from_alm_clicked)
+        import_layout.addWidget(import_btn)
+        
+        import_group.setLayout(import_layout)
+        content_layout.addWidget(import_group)
+        
+        content_layout.addStretch()
+        scroll.setWidget(content)
+        layout.addWidget(scroll)
+        
+        return widget
+    
+    def _on_import_from_alm_clicked(self):
+        """Обработчик нажатия кнопки импорта из ALM в настройках"""
+        if self.parent_window and hasattr(self.parent_window, 'convert_from_azure'):
+            # Закрываем диалог настроек перед импортом
+            self.accept()
+            # Вызываем метод импорта из главного окна
+            self.parent_window.convert_from_azure()
+
     def _save_and_accept(self):
         """Сохранить настройки и закрыть диалог"""
         # Общие
+        self.settings['project_name'] = self.project_name_edit.text().strip()
+        # Список тестировщиков - сохраняем как список
+        testers_text = self.testers_edit.toPlainText().strip()
+        testers_list = [t.strip() for t in testers_text.split('\n') if t.strip()]
+        self.settings['testers'] = testers_list
         self.settings['test_cases_dir'] = self.test_cases_dir_edit.text().strip()
         self.settings['LLM_METHODIC_PATH'] = self.methodic_path_edit.text().strip()
         
@@ -873,8 +956,12 @@ class SettingsDialog(QDialog):
         """Получить сохраненные настройки"""
         return self.settings
     
-    def _load_llm_models(self):
-        """Загрузить список доступных LLM моделей"""
+    def _load_llm_models(self, use_cached: bool = True):
+        """Загрузить список доступных LLM моделей
+        
+        Args:
+            use_cached: Если True, использует кэшированные модели из главного окна вместо запроса к серверу
+        """
         if not self.parent_window:
             return
         
@@ -887,13 +974,26 @@ class SettingsDialog(QDialog):
             else:
                 models = []
         else:
-            # Загружаем модели с указанного хоста
-            try:
-                from ..utils.list_models import fetch_models as fetch_llm_models
-                models = fetch_llm_models(host)
-                models = [str(m).strip() for m in (models or []) if str(m or "").strip()]
-            except Exception:
-                models = []
+            # Если use_cached=True, используем кэшированные модели из главного окна (если есть)
+            # чтобы не блокировать UI при открытии диалога
+            if use_cached:
+                # Пытаемся использовать кэш из главного окна, если хост совпадает
+                if (hasattr(self.parent_window, 'llm_host') and 
+                    self.parent_window.llm_host == host and
+                    hasattr(self.parent_window, 'available_llm_models')):
+                    models = self.parent_window.available_llm_models
+                else:
+                    # Если хост другой или кэша нет, используем пустой список
+                    # (текущая модель будет добавлена ниже)
+                    models = []
+            else:
+                # Синхронная загрузка только при явном запросе (кнопка "Обновить")
+                try:
+                    from ..utils.list_models import fetch_models as fetch_llm_models
+                    models = fetch_llm_models(host)
+                    models = [str(m).strip() for m in (models or []) if str(m or "").strip()]
+                except Exception:
+                    models = []
         
         # Добавляем текущую модель, если её нет в списке
         current_model = self.settings.get('LLM_MODEL', '')
@@ -905,15 +1005,16 @@ class SettingsDialog(QDialog):
         self._reset_llm_model_filter()
     
     def _refresh_llm_models(self):
-        """Обновить список LLM моделей"""
-        self._load_llm_models()
+        """Обновить список LLM моделей (с запросом к серверу)"""
+        # При обновлении делаем реальный запрос к серверу
+        self._load_llm_models(use_cached=False)
         QMessageBox.information(self, "Обновление", "Список моделей обновлен")
     
     def _on_llm_host_changed(self, text: str):
         """Обработчик изменения LLM Host"""
-        # При изменении хоста обновляем список моделей
+        # При изменении хоста обновляем список моделей (используем кэш, чтобы не блокировать UI)
         if text.strip():
-            QTimer.singleShot(500, self._load_llm_models)  # Задержка для завершения ввода
+            QTimer.singleShot(500, lambda: self._load_llm_models(use_cached=True))  # Задержка для завершения ввода
     
     def _on_llm_model_changed(self, text: str):
         """Обработчик изменения выбранной модели"""
@@ -989,6 +1090,41 @@ class _LLMWorker(QObject):
             self.finished.emit(response)
 
 
+class _LLMAvailabilityWorker(QObject):
+    """Воркер для проверки доступности LLM в фоновом потоке"""
+    availability_checked = pyqtSignal(bool)  # True если доступен, False если нет
+
+    def __init__(self, host: Optional[str]):
+        super().__init__()
+        self.host = host
+
+    def run(self):
+        """Проверить доступность LLM"""
+        try:
+            if not self.host or not str(self.host).strip():
+                self.availability_checked.emit(False)
+                return
+            
+            # Используем короткий timeout для проверки доступности
+            try:
+                models = fetch_llm_models(str(self.host).strip(), timeout=5.0)
+                # Если получили список моделей (даже пустой), значит LLM доступен
+                is_available = True
+            except Exception:
+                # Любая ошибка означает, что LLM недоступен
+                is_available = False
+            
+            # Отправляем сигнал в любом случае
+            self.availability_checked.emit(is_available)
+        except Exception:
+            # На всякий случай, если произошла ошибка на верхнем уровне
+            try:
+                self.availability_checked.emit(False)
+            except Exception:
+                # Игнорируем ошибки при отправке сигнала
+                pass
+
+
 class MainWindow(QMainWindow):
     """
     Главное окно редактора тест-кейсов
@@ -1017,9 +1153,15 @@ class MainWindow(QMainWindow):
         self.panel_sizes = dict(default_sizes)
         self.panel_sizes.update(self.settings.get('panel_sizes', {}))
         self._last_review_width = self.panel_sizes.get('review', 0) or 360
-        self.test_cases_dir = Path(self.settings.get('test_cases_dir', 'testcases'))
-        if not self.test_cases_dir.exists():
+        test_cases_dir_str = self.settings.get('test_cases_dir', '').strip()
+        if not test_cases_dir_str:
+            # Если test_cases_dir пустое, запрашиваем выбор папки
             self.test_cases_dir = self.prompt_select_folder()
+        else:
+            self.test_cases_dir = Path(test_cases_dir_str)
+            if not self.test_cases_dir.exists():
+                # Если путь указан, но папка не существует, запрашиваем выбор папки
+                self.test_cases_dir = self.prompt_select_folder()
         self.default_prompt = self.settings.get('DEFAULT_PROMT', "Опиши задачу для ревью.")
         self.create_tc_prompt = self.settings.get('DEFAULT_PROMT_CREATE_TC', "Создай ТТ")
         self.llm_model = self.settings.get('LLM_MODEL', "").strip()
@@ -1043,8 +1185,14 @@ class MainWindow(QMainWindow):
         self._model_proxy_model.setSourceModel(self._model_list_model)
         self._model_options: List[str] = []
         self._suppress_model_change = False
-        self.available_llm_models = self._fetch_available_llm_models()
+        # Инициализируем списком с текущей моделью, если она есть (неблокирующий запуск)
+        self.available_llm_models = [self.llm_model] if self.llm_model else []
         self.selected_llm_model = self.llm_model
+        # Статус доступности LLM: None - неизвестен, True - доступен, False - недоступен
+        self._llm_available: Optional[bool] = None
+        # Таймер для периодической проверки LLM (каждые 5 минут)
+        self._llm_check_timer = QTimer(self)
+        self._llm_check_timer.timeout.connect(self._check_llm_availability)
         methodic_setting = self.settings.get('LLM_METHODIC_PATH')
         if methodic_setting:
             self.methodic_path = Path(methodic_setting).expanduser()
@@ -1058,6 +1206,8 @@ class MainWindow(QMainWindow):
         self.test_cases = []
         self._llm_thread: Optional[QThread] = None
         self._llm_worker: Optional[_LLMWorker] = None
+        self._llm_availability_thread: Optional[QThread] = None
+        self._llm_availability_worker: Optional[_LLMAvailabilityWorker] = None
         self._current_test_case_path: Optional[Path] = None
         self._current_filters: Dict = {}
         self._current_mode: str = "edit"
@@ -1073,6 +1223,12 @@ class MainWindow(QMainWindow):
     def setup_ui(self):
         """Настройка пользовательского интерфейса"""
         self.setWindowTitle("Test Case Editor")
+        
+        # Устанавливаем иконку окна
+        logo_path = get_icon_path("logo.png")
+        if logo_path and logo_path.exists():
+            window_icon = QIcon(str(logo_path))
+            self.setWindowIcon(window_icon)
         if not self._geometry_initialized:
             self._apply_initial_geometry()
             self._geometry_initialized = True
@@ -1150,8 +1306,7 @@ class MainWindow(QMainWindow):
         # Иконка фильтра
         self.filter_button = QToolButton()
         # Загружаем иконку фильтра из icon_mapping.json
-        project_root = Path(__file__).parent.parent.parent
-        mapping_file = project_root / "icons" / "icon_mapping.json"
+        mapping_file = get_icons_dir() / "icon_mapping.json"
         filter_icon_name = "filter.svg"
         if mapping_file.exists():
             try:
@@ -1195,6 +1350,7 @@ class MainWindow(QMainWindow):
         self.tree_widget.tree_updated.connect(self._on_tree_updated)
         self.tree_widget.review_requested.connect(self._on_review_requested)
         self.tree_widget.test_cases_updated.connect(self._on_test_cases_updated)
+        self.tree_widget.add_to_review_requested.connect(self._on_add_to_review_requested)
         layout.addWidget(self.tree_widget, 1)
         
         return panel
@@ -1226,6 +1382,7 @@ class MainWindow(QMainWindow):
         self.form_widget.status_changed.connect(self._on_status_changed)
         self.form_widget.unsaved_changes_state.connect(self._on_form_unsaved_state)
         self.form_widget.before_save.connect(self._on_form_before_save)
+        self.form_widget.file_attached_to_step.connect(self._on_file_attached_to_step)
         self.detail_stack.addWidget(self.form_widget)
         
         # Панель фильтров
@@ -1244,6 +1401,14 @@ class MainWindow(QMainWindow):
             default_review_prompt=self.default_prompt,
             default_creation_prompt=self.create_tc_prompt,
         )
+        # Устанавливаем список тестировщиков из настроек
+        testers_list = self.settings.get('testers', [])
+        if isinstance(testers_list, list):
+            self.aux_panel.set_information_testers(testers_list)
+        elif isinstance(testers_list, str):
+            # Если сохранено как строка, разбиваем по переносам строк
+            testers_list = [t.strip() for t in testers_list.split('\n') if t.strip()]
+            self.aux_panel.set_information_testers(testers_list)
         # Устанавливаем минимальную и максимальную ширину для aux_panel
         # чтобы предотвратить автоматическое расширение
         self.aux_panel.setMinimumWidth(220)
@@ -1256,6 +1421,7 @@ class MainWindow(QMainWindow):
         self.aux_panel.generate_report_requested.connect(self._generate_html_report)
         self.aux_panel.generate_summary_report_requested.connect(self._generate_summary_report)
         self.aux_panel.tab_changed.connect(self._on_aux_panel_tab_changed)
+        self.aux_panel.manual_review_notes_changed.connect(self._on_manual_review_notes_changed)
         self.detail_splitter.addWidget(self.aux_panel)
         
         # Создаем кнопки панелей в toolbar после создания aux_panel
@@ -1283,8 +1449,6 @@ class MainWindow(QMainWindow):
         select_folder_action.triggered.connect(self.select_test_cases_folder)
         select_folder_action.setShortcut('Ctrl+O')
 
-        convert_action = self.file_menu.addAction('Импорт из ALM')
-        convert_action.triggered.connect(self.convert_from_azure)
         self.file_menu.addSeparator()
 
         exit_action = self.file_menu.addAction('Выход')
@@ -1331,10 +1495,18 @@ class MainWindow(QMainWindow):
         generate_report_action.triggered.connect(self._generate_html_report)
         settings_action.setShortcut('Ctrl+,')
 
-        # Меню "Git"
-        self.git_menu = menubar.addMenu('Git')
-        git_commit_action = self.git_menu.addAction('Выполнить commit и push…')
-        git_commit_action.triggered.connect(self._open_git_commit_dialog)
+        # Меню "Git" - создаем через QAction чтобы иконка отображалась рядом с текстом
+        self.git_menu_action = QAction('Git', self)
+        self.git_menu = QMenu(self)
+        self.git_menu_action.setMenu(self.git_menu)
+        menubar.addAction(self.git_menu_action)
+        self.git_commit_action = self.git_menu.addAction('Commit…')
+        self.git_commit_action.triggered.connect(self._open_git_commit_dialog)
+        self.git_push_action = self.git_menu.addAction('Push')
+        self.git_push_action.triggered.connect(self._perform_git_push)
+        
+        # Обновляем индикаторы статуса Git
+        self._update_git_status_indicators()
     
     def _create_toolbar(self):
         """Создать панель инструментов с быстрыми действиями"""
@@ -1367,16 +1539,24 @@ class MainWindow(QMainWindow):
         
         self._update_mode_indicator()
         
-        # Создаем label для статистики в статус-баре
+        # Создаем label для статистики в статус-баре (включая статус LLM)
         self._create_statusbar_statistics_label()
         
         # Создаем кнопку "Сохранить" в статус-баре
         self._create_statusbar_save_button()
+        
+        # Создаем горячую клавишу Ctrl+S для сохранения
+        self._create_save_shortcut()
+        
+        # Отображаем статус LLM сразу (серый, пока проверка не завершена)
+        self._update_statusbar_statistics()
+        
+        # Запускаем проверку LLM в фоне после инициализации UI (с небольшой задержкой)
+        QTimer.singleShot(500, self._start_llm_availability_check)
     
     def _load_icon_mapping(self) -> dict:
         """Загрузить маппинг панелей на иконки из JSON файла."""
-        project_root = Path(__file__).parent.parent.parent
-        mapping_file = project_root / "icons" / "icon_mapping.json"
+        mapping_file = get_icons_dir() / "icon_mapping.json"
         
         if mapping_file.exists():
             try:
@@ -1400,8 +1580,7 @@ class MainWindow(QMainWindow):
     
     def _load_svg_icon(self, icon_name: str, size: int = 24, color: Optional[str] = None) -> Optional[QIcon]:
         """Загрузить SVG иконку из файла и вернуть QIcon."""
-        project_root = Path(__file__).parent.parent.parent
-        icon_path = project_root / "icons" / icon_name
+        icon_path = get_icon_path(icon_name)
         
         if not icon_path.exists():
             print(f"Иконка не найдена: {icon_path}")
@@ -1445,7 +1624,7 @@ class MainWindow(QMainWindow):
         icon_mapping = self._load_icon_mapping()
         
         # Порядок панелей
-        tabs_order = ["information", "review", "creation", "json", "files", "reports"]
+        tabs_order = ["information", "review", "creation", "json", "files", "reports", "manual_review"]
         
         # Маппинг панелей на подсказки
         tooltips = {
@@ -1455,6 +1634,7 @@ class MainWindow(QMainWindow):
             "json": "JSON превью",
             "files": "Файлы",
             "reports": "Отчетность",
+            "manual_review": "Ручное ревью",
         }
         
         for index, tab_id in enumerate(tabs_order):
@@ -1666,6 +1846,12 @@ class MainWindow(QMainWindow):
                 }}
             """)
     
+    def _create_save_shortcut(self):
+        """Создать горячую клавишу Ctrl+S для сохранения"""
+        save_shortcut = QShortcut(QKeySequence("Ctrl+S"), self)
+        save_shortcut.activated.connect(self._on_save_button_clicked)
+        self.save_shortcut = save_shortcut  # Сохраняем ссылку, чтобы не удалился
+    
     def _unhighlight_save_button(self):
         """Убрать подсветку с кнопки 'Сохранить'"""
         if hasattr(self, "statusbar_save_button"):
@@ -1702,35 +1888,78 @@ class MainWindow(QMainWindow):
         if dialog.exec_() == QDialog.Accepted:
             comment = dialog.get_comment().strip()
             if comment:
-                self._perform_git_commit_push(comment)
+                self._perform_git_commit(comment)
 
-    def _perform_git_commit_push(self, message: str):
-        """Выполнить git commit и push в директории тест-кейсов."""
-        repo_path = self.test_cases_dir
+    def _get_git_repo_info(self):
+        """Получить информацию о git репозитории (корень и относительный путь)."""
+        test_cases_dir = self.test_cases_dir
 
-        if not repo_path.exists():
+        if not test_cases_dir or not test_cases_dir.exists():
             QMessageBox.warning(
                 self,
                 "Git",
-                f"Папка с тест-кейсами не найдена:\n{repo_path}",
+                f"Папка с тест-кейсами не найдена:\n{test_cases_dir}",
             )
-            return
+            return None, None
 
+        # Находим корень git репозитория
         try:
-            status_proc = subprocess.run(
-                ["git", "status", "--porcelain"],
-                cwd=str(repo_path),
+            repo_root_proc = subprocess.run(
+                ["git", "rev-parse", "--show-toplevel"],
+                cwd=str(test_cases_dir),
                 capture_output=True,
                 text=True,
+                encoding='utf-8',
+                errors='replace',
                 check=True,
             )
+            repo_root = Path(repo_root_proc.stdout.strip())
         except FileNotFoundError:
             QMessageBox.critical(
                 self,
                 "Git",
                 "Команда git не найдена. Установите Git и убедитесь, что он доступен в PATH.",
             )
+            return None, None
+        except subprocess.CalledProcessError as exc:
+            error_message = exc.stderr or exc.stdout or str(exc)
+            QMessageBox.critical(
+                self,
+                "Git",
+                f"Папка с тест-кейсами не является частью git репозитория:\n{error_message}",
+            )
+            return None, None
+
+        # Вычисляем относительный путь от корня репозитория до test_cases_dir
+        try:
+            test_cases_dir_abs = test_cases_dir.resolve()
+            repo_root_abs = repo_root.resolve()
+            relative_path = test_cases_dir_abs.relative_to(repo_root_abs)
+            # Преобразуем в строку с использованием слешей (для git)
+            git_path = str(relative_path).replace("\\", "/")
+        except ValueError:
+            # Если test_cases_dir не находится внутри repo_root, используем весь репозиторий
+            git_path = "."
+
+        return repo_root, git_path
+
+    def _perform_git_commit(self, message: str):
+        """Выполнить git commit только файлов из директории тест-кейсов."""
+        repo_root, git_path = self._get_git_repo_info()
+        if repo_root is None or git_path is None:
             return
+
+        # Проверяем статус только файлов из test_cases_dir
+        try:
+            status_proc = subprocess.run(
+                ["git", "status", "--porcelain", git_path],
+                cwd=str(repo_root),
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='replace',
+                check=True,
+            )
         except subprocess.CalledProcessError as exc:
             error_message = exc.stderr or exc.stdout or str(exc)
             QMessageBox.critical(
@@ -1744,61 +1973,551 @@ class MainWindow(QMainWindow):
             QMessageBox.information(
                 self,
                 "Git",
-                "Нет изменений для коммита.",
+                "Нет изменений для коммита в папке с тест-кейсами.",
             )
             return
 
         self.statusBar().showMessage("Git: подготовка изменений…")
-        commands = [
-            ("Git: подготовка файлов…", ["git", "add", "--all"]),
-            ("Git: создаю коммит…", ["git", "commit", "-m", message]),
-            ("Git: отправляю изменения…", ["git", "push"]),
-        ]
-
-        for status_text, cmd in commands:
-            self.statusBar().showMessage(status_text)
-            try:
-                result = subprocess.run(
-                    cmd,
-                    cwd=str(repo_path),
-                    capture_output=True,
-                    text=True,
-                )
-            except FileNotFoundError:
+        
+        # Шаг 1: Добавление файлов
+        try:
+            self.statusBar().showMessage("Git: подготовка файлов…")
+            add_result = subprocess.run(
+                ["git", "add", git_path],
+                cwd=str(repo_root),
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='replace',
+            )
+            if add_result.returncode != 0:
+                stderr = (add_result.stderr or "").strip()
+                stdout = (add_result.stdout or "").strip()
+                combined_output = stderr or stdout or "Неизвестная ошибка."
                 QMessageBox.critical(
                     self,
                     "Git",
-                    "Команда git не найдена. Установите Git и убедитесь, что он доступен в PATH.",
+                    f"Не удалось добавить файлы в индекс:\n{combined_output}",
                 )
-                self.statusBar().showMessage("Git: ошибка выполнения")
+                self.statusBar().showMessage("Git: ошибка при добавлении файлов")
                 return
+        except FileNotFoundError:
+            QMessageBox.critical(
+                self,
+                "Git",
+                "Команда git не найдена. Установите Git и убедитесь, что он доступен в PATH.",
+            )
+            self.statusBar().showMessage("Git: ошибка выполнения")
+            return
 
-            if result.returncode != 0:
-                stderr = (result.stderr or "").strip()
-                stdout = (result.stdout or "").strip()
+        # Шаг 2: Создание коммита
+        try:
+            self.statusBar().showMessage("Git: создаю коммит…")
+            commit_result = subprocess.run(
+                ["git", "commit", "-m", message],
+                cwd=str(repo_root),
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='replace',
+            )
+            
+            if commit_result.returncode != 0:
+                stderr = (commit_result.stderr or "").strip()
+                stdout = (commit_result.stdout or "").strip()
                 combined_output = stderr or stdout or "Неизвестная ошибка."
+                
                 # Если git commit сообщает об отсутствии изменений
-                if "nothing to commit" in combined_output.lower():
+                if "nothing to commit" in combined_output.lower() or "no changes" in combined_output.lower():
                     QMessageBox.information(
                         self,
                         "Git",
                         "Нет изменений для коммита.",
                     )
+                    self.statusBar().showMessage("Git: нет изменений для коммита")
+                    return
+                
+                # Проверяем, не исправил ли pre-commit хук файлы автоматически
+                if "files were modified by this hook" in combined_output.lower() or "fixing" in combined_output.lower():
+                    # Pre-commit хук исправил файлы, нужно добавить их и повторить коммит
+                    self.statusBar().showMessage("Git: pre-commit хук исправил файлы, добавляю изменения…")
+                    
+                    # Добавляем исправленные файлы
+                    try:
+                        add_result = subprocess.run(
+                            ["git", "add", git_path],
+                            cwd=str(repo_root),
+                            capture_output=True,
+                            text=True,
+                            encoding='utf-8',
+                            errors='replace',
+                        )
+                        
+                        if add_result.returncode == 0:
+                            # Повторяем коммит
+                            self.statusBar().showMessage("Git: повторяю коммит после исправлений…")
+                            retry_commit_result = subprocess.run(
+                                ["git", "commit", "-m", message],
+                                cwd=str(repo_root),
+                                capture_output=True,
+                                text=True,
+                                encoding='utf-8',
+                                errors='replace',
+                            )
+                            
+                            if retry_commit_result.returncode == 0:
+                                # Коммит успешно создан после исправлений
+                                QMessageBox.information(
+                                    self,
+                                    "Git",
+                                    "Коммит успешно создан.\n\n"
+                                    "Pre-commit хук автоматически исправил некоторые файлы (например, добавил символ новой строки в конец файла).",
+                                )
+                                self.statusBar().showMessage("Git: коммит успешно создан")
+                                # Обновляем индикаторы статуса Git
+                                self._update_git_status_indicators()
+                                return
+                            else:
+                                # Повторный коммит тоже не удался
+                                retry_stderr = (retry_commit_result.stderr or "").strip()
+                                retry_stdout = (retry_commit_result.stdout or "").strip()
+                                retry_output = retry_stderr or retry_stdout or "Неизвестная ошибка."
+                                QMessageBox.critical(
+                                    self,
+                                    "Git",
+                                    f"Не удалось создать коммит после исправлений:\n{retry_output}",
+                                )
+                                self.statusBar().showMessage("Git: ошибка при создании коммита")
+                                return
+                        else:
+                            # Не удалось добавить исправленные файлы
+                            QMessageBox.critical(
+                                self,
+                                "Git",
+                                f"Не удалось добавить исправленные файлы:\n{add_result.stderr or add_result.stdout}",
+                            )
+                            self.statusBar().showMessage("Git: ошибка при добавлении файлов")
+                            return
+                    except FileNotFoundError:
+                        QMessageBox.critical(
+                            self,
+                            "Git",
+                            "Команда git не найдена. Установите Git и убедитесь, что он доступен в PATH.",
+                        )
+                        self.statusBar().showMessage("Git: ошибка выполнения")
+                        return
                 else:
+                    # Другая ошибка коммита
                     QMessageBox.critical(
                         self,
                         "Git",
-                        f"Команда {' '.join(cmd)} завершилась с ошибкой:\n{combined_output}",
+                        f"Не удалось создать коммит:\n{combined_output}",
                     )
-                self.statusBar().showMessage("Git: ошибка выполнения")
+                    self.statusBar().showMessage("Git: ошибка при создании коммита")
                 return
+            else:
+                # Коммит успешно создан
+                QMessageBox.information(
+                    self,
+                    "Git",
+                    "Коммит успешно создан.",
+                )
+                self.statusBar().showMessage("Git: коммит успешно создан")
+                # Обновляем индикаторы статуса Git
+                self._update_git_status_indicators()
+        except FileNotFoundError:
+            QMessageBox.critical(
+                self,
+                "Git",
+                "Команда git не найдена. Установите Git и убедитесь, что он доступен в PATH.",
+            )
+            self.statusBar().showMessage("Git: ошибка выполнения")
+            return
 
-        QMessageBox.information(
-            self,
-            "Git",
-            "Изменения успешно отправлены в удалённый репозиторий.",
-        )
-        self.statusBar().showMessage("Git: изменения отправлены")
+    def _perform_git_push(self):
+        """Выполнить git push только файлов из директории тест-кейсов."""
+        repo_root, git_path = self._get_git_repo_info()
+        if repo_root is None or git_path is None:
+            return
+
+        # Проверяем, есть ли коммиты для отправки
+        try:
+            status_proc = subprocess.run(
+                ["git", "status", "--porcelain", "-b"],
+                cwd=str(repo_root),
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='replace',
+                check=True,
+            )
+            
+            # Проверяем, есть ли локальные коммиты, которые не отправлены
+            ahead_proc = subprocess.run(
+                ["git", "rev-list", "--count", "@{u}..HEAD"],
+                cwd=str(repo_root),
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='replace',
+            )
+            
+            # Если команда не удалась, возможно нет upstream ветки
+            if ahead_proc.returncode != 0:
+                # Проверяем наличие коммитов другим способом
+                log_proc = subprocess.run(
+                    ["git", "log", "--oneline", "-1"],
+                    cwd=str(repo_root),
+                    capture_output=True,
+                    text=True,
+                    encoding='utf-8',
+                    errors='replace',
+                )
+                if not log_proc.stdout.strip():
+                    QMessageBox.information(
+                        self,
+                        "Git",
+                        "Нет коммитов для отправки.",
+                    )
+                    return
+        except subprocess.CalledProcessError as exc:
+            error_message = exc.stderr or exc.stdout or str(exc)
+            QMessageBox.critical(
+                self,
+                "Git",
+                f"Не удалось проверить статус репозитория:\n{error_message}",
+            )
+            return
+
+        # Отправка изменений (push)
+        try:
+            self.statusBar().showMessage("Git: отправляю изменения…")
+            push_result = subprocess.run(
+                ["git", "push"],
+                cwd=str(repo_root),
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='replace',
+                timeout=60,  # Таймаут 60 секунд для push
+            )
+            
+            if push_result.returncode != 0:
+                stderr = (push_result.stderr or "").strip()
+                stdout = (push_result.stdout or "").strip()
+                combined_output = stderr or stdout or "Неизвестная ошибка."
+                
+                # Определяем тип ошибки для более понятного сообщения
+                error_lower = combined_output.lower()
+                if any(keyword in error_lower for keyword in ["could not resolve", "failed to connect", "connection refused", "network", "unreachable", "timeout"]):
+                    error_message = (
+                        "Не удалось отправить изменения в удалённый репозиторий.\n\n"
+                        "Возможные причины:\n"
+                        "• GitLab недоступен или перегружен\n"
+                        "• Проблемы с сетевым подключением\n"
+                        "• Неверный URL удалённого репозитория\n\n"
+                        f"Детали ошибки:\n{combined_output}"
+                    )
+                elif "authentication" in error_lower or "permission" in error_lower or "denied" in error_lower:
+                    error_message = (
+                        "Не удалось отправить изменения: проблема с аутентификацией.\n\n"
+                        "Проверьте:\n"
+                        "• Настройки доступа к репозиторию\n"
+                        "• Учётные данные Git\n\n"
+                        f"Детали ошибки:\n{combined_output}"
+                    )
+                elif "rejected" in error_lower or "non-fast-forward" in error_lower:
+                    error_message = (
+                        "Не удалось отправить изменения: удалённый репозиторий содержит новые коммиты.\n\n"
+                        "Выполните 'git pull' перед push или используйте 'git push --force' (осторожно!).\n\n"
+                        f"Детали ошибки:\n{combined_output}"
+                    )
+                elif "no upstream" in error_lower or "no tracking" in error_lower or "has no upstream branch" in error_lower:
+                    # Автоматически настраиваем upstream ветку
+                    self.statusBar().showMessage("Git: настраиваю upstream ветку…")
+                    
+                    # Получаем имя текущей ветки
+                    try:
+                        branch_proc = subprocess.run(
+                            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+                            cwd=str(repo_root),
+                            capture_output=True,
+                            text=True,
+                            encoding='utf-8',
+                            errors='replace',
+                            check=True,
+                        )
+                        branch_name = branch_proc.stdout.strip()
+                    except subprocess.CalledProcessError:
+                        QMessageBox.warning(
+                            self,
+                            "Git Push - Ошибка",
+                            "Не удалось определить имя текущей ветки.",
+                        )
+                        self.statusBar().showMessage("Git: ошибка определения ветки")
+                        return
+                    
+                    # Получаем имя удалённого репозитория (по умолчанию "origin")
+                    try:
+                        remote_proc = subprocess.run(
+                            ["git", "remote"],
+                            cwd=str(repo_root),
+                            capture_output=True,
+                            text=True,
+                            encoding='utf-8',
+                            errors='replace',
+                            check=True,
+                        )
+                        remotes = remote_proc.stdout.strip().split('\n')
+                        remote_name = remotes[0] if remotes and remotes[0] else "origin"
+                    except subprocess.CalledProcessError:
+                        # Если не удалось получить список удалённых репозиториев, используем "origin"
+                        remote_name = "origin"
+                    
+                    # Выполняем push с настройкой upstream
+                    try:
+                        self.statusBar().showMessage(f"Git: отправляю изменения в {remote_name}/{branch_name}…")
+                        push_setup_result = subprocess.run(
+                            ["git", "push", "-u", remote_name, branch_name],
+                            cwd=str(repo_root),
+                            capture_output=True,
+                            text=True,
+                            encoding='utf-8',
+                            errors='replace',
+                            timeout=60,
+                        )
+                        
+                        if push_setup_result.returncode != 0:
+                            stderr = (push_setup_result.stderr or "").strip()
+                            stdout = (push_setup_result.stdout or "").strip()
+                            combined_output = stderr or stdout or "Неизвестная ошибка."
+                            
+                            # Определяем тип ошибки
+                            error_lower_setup = combined_output.lower()
+                            if any(keyword in error_lower_setup for keyword in ["could not resolve", "failed to connect", "connection refused", "network", "unreachable", "timeout"]):
+                                error_message = (
+                                    "Не удалось отправить изменения в удалённый репозиторий.\n\n"
+                                    "Возможные причины:\n"
+                                    "• GitLab недоступен или перегружен\n"
+                                    "• Проблемы с сетевым подключением\n"
+                                    "• Неверный URL удалённого репозитория\n\n"
+                                    f"Детали ошибки:\n{combined_output}"
+                                )
+                            elif "authentication" in error_lower_setup or "permission" in error_lower_setup or "denied" in error_lower_setup:
+                                error_message = (
+                                    "Не удалось отправить изменения: проблема с аутентификацией.\n\n"
+                                    "Проверьте:\n"
+                                    "• Настройки доступа к репозиторию\n"
+                                    "• Учётные данные Git\n\n"
+                                    f"Детали ошибки:\n{combined_output}"
+                                )
+                            else:
+                                error_message = (
+                                    "Не удалось отправить изменения в удалённый репозиторий.\n\n"
+                                    f"Детали ошибки:\n{combined_output}"
+                                )
+                            
+                            QMessageBox.warning(
+                                self,
+                                "Git Push - Ошибка",
+                                error_message,
+                            )
+                            self.statusBar().showMessage("Git: не удалось отправить изменения")
+                            return
+                        else:
+                            # Push успешно выполнен с настройкой upstream
+                            QMessageBox.information(
+                                self,
+                                "Git",
+                                f"Изменения успешно отправлены в {remote_name}/{branch_name}.\n\n"
+                                "Upstream ветка настроена автоматически.",
+                            )
+                            self.statusBar().showMessage("Git: изменения успешно отправлены")
+                            # Обновляем индикаторы статуса Git
+                            self._update_git_status_indicators()
+                            return
+                            
+                    except subprocess.TimeoutExpired:
+                        QMessageBox.warning(
+                            self,
+                            "Git Push - Таймаут",
+                            (
+                                "Превышено время ожидания при отправке изменений.\n\n"
+                                "Возможные причины:\n"
+                                "• GitLab недоступен или перегружен\n"
+                                "• Медленное сетевое подключение\n"
+                                "• Слишком большой объём данных для отправки\n\n"
+                                "Попробуйте выполнить push позже или проверьте подключение к сети."
+                            ),
+                        )
+                        self.statusBar().showMessage("Git: таймаут при отправке изменений")
+                        return
+                    except FileNotFoundError:
+                        QMessageBox.critical(
+                            self,
+                            "Git",
+                            "Команда git не найдена. Установите Git и убедитесь, что он доступен в PATH.",
+                        )
+                        self.statusBar().showMessage("Git: ошибка выполнения")
+                        return
+                else:
+                    error_message = (
+                        "Не удалось отправить изменения в удалённый репозиторий.\n\n"
+                        f"Детали ошибки:\n{combined_output}"
+                    )
+                
+                QMessageBox.warning(
+                    self,
+                    "Git Push - Ошибка",
+                    error_message,
+                )
+                self.statusBar().showMessage("Git: не удалось отправить изменения")
+                return
+            else:
+                # Push успешно выполнен
+                QMessageBox.information(
+                    self,
+                    "Git",
+                    "Изменения успешно отправлены в удалённый репозиторий.",
+                )
+                self.statusBar().showMessage("Git: изменения успешно отправлены")
+                # Обновляем индикаторы статуса Git
+                self._update_git_status_indicators()
+                
+        except subprocess.TimeoutExpired:
+            QMessageBox.warning(
+                self,
+                "Git Push - Таймаут",
+                (
+                    "Превышено время ожидания при отправке изменений.\n\n"
+                    "Возможные причины:\n"
+                    "• GitLab недоступен или перегружен\n"
+                    "• Медленное сетевое подключение\n"
+                    "• Слишком большой объём данных для отправки\n\n"
+                    "Попробуйте выполнить push позже или проверьте подключение к сети."
+                ),
+            )
+            self.statusBar().showMessage("Git: таймаут при отправке изменений")
+            return
+        except FileNotFoundError:
+            QMessageBox.critical(
+                self,
+                "Git",
+                "Команда git не найдена. Установите Git и убедитесь, что он доступен в PATH.",
+            )
+            self.statusBar().showMessage("Git: ошибка выполнения")
+            return
+    
+    def _check_git_status(self):
+        """Проверить статус Git: есть ли незакоммиченные изменения и незапушенные коммиты."""
+        repo_root, git_path = self._get_git_repo_info()
+        if repo_root is None or git_path is None:
+            return False, False
+        
+        has_uncommitted = False
+        has_unpushed = False
+        
+        try:
+            # Проверяем наличие незакоммиченных изменений
+            status_proc = subprocess.run(
+                ["git", "status", "--porcelain", git_path],
+                cwd=str(repo_root),
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='replace',
+                check=True,
+            )
+            has_uncommitted = bool(status_proc.stdout.strip())
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            # Если не удалось проверить, считаем что изменений нет
+            pass
+        
+        try:
+            # Проверяем наличие незапушенных коммитов
+            # Сначала проверяем, есть ли upstream ветка
+            ahead_proc = subprocess.run(
+                ["git", "rev-list", "--count", "@{u}..HEAD"],
+                cwd=str(repo_root),
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='replace',
+            )
+            
+            if ahead_proc.returncode == 0:
+                ahead_count = ahead_proc.stdout.strip()
+                has_unpushed = bool(ahead_count and int(ahead_count) > 0)
+            else:
+                # Если нет upstream, проверяем наличие локальных коммитов
+                # и наличие удалённого репозитория
+                remote_check = subprocess.run(
+                    ["git", "remote"],
+                    cwd=str(repo_root),
+                    capture_output=True,
+                    text=True,
+                    encoding='utf-8',
+                    errors='replace',
+                )
+                if remote_check.returncode == 0 and remote_check.stdout.strip():
+                    # Есть удалённый репозиторий, но нет upstream - возможно есть коммиты для push
+                    log_proc = subprocess.run(
+                        ["git", "log", "--oneline", "-1"],
+                        cwd=str(repo_root),
+                        capture_output=True,
+                        text=True,
+                        encoding='utf-8',
+                        errors='replace',
+                    )
+                    has_unpushed = bool(log_proc.stdout.strip())
+        except (subprocess.CalledProcessError, FileNotFoundError, ValueError):
+            # Если не удалось проверить, считаем что коммитов для push нет
+            pass
+        
+        return has_uncommitted, has_unpushed
+    
+    def _update_git_status_indicators(self):
+        """Обновить визуальные индикаторы статуса Git в меню."""
+        if not hasattr(self, 'git_commit_action') or not hasattr(self, 'git_push_action'):
+            return
+        
+        has_uncommitted, has_unpushed = self._check_git_status()
+        
+        # Обновляем индикатор для Commit
+        if has_uncommitted:
+            # Есть незакоммиченные изменения - добавляем индикатор
+            self.git_commit_action.setText('● Commit…')
+        else:
+            # Нет незакоммиченных изменений - обычный текст
+            self.git_commit_action.setText('Commit…')
+        
+        # Обновляем индикатор для Push
+        if has_unpushed:
+            # Есть незапушенные коммиты - добавляем индикатор
+            self.git_push_action.setText('● Push')
+        else:
+            # Нет незапушенных коммитов - обычный текст
+            self.git_push_action.setText('Push')
+        
+        # Обновляем иконку меню Git (используем git_menu_action чтобы иконка отображалась рядом с текстом)
+        if hasattr(self, 'git_menu_action'):
+            if has_uncommitted:
+                # Приоритет: незакоммиченные изменения - желтая иконка
+                icon = self._load_svg_icon('arrow-up-right.svg', size=16, color='#f39c12')
+                if icon:
+                    self.git_menu_action.setIcon(icon)
+                else:
+                    self.git_menu_action.setIcon(QIcon())
+            elif has_unpushed:
+                # Есть незапушенные коммиты - синяя иконка
+                icon = self._load_svg_icon('arrow-up-right.svg', size=16, color='#3498db')
+                if icon:
+                    self.git_menu_action.setIcon(icon)
+                else:
+                    self.git_menu_action.setIcon(QIcon())
+            else:
+                # Нет изменений - убираем иконку
+                self.git_menu_action.setIcon(QIcon())
     
     def select_test_cases_folder(self):
         """Обработчик выбора папки с тест-кейсами"""
@@ -1860,16 +2579,9 @@ class MainWindow(QMainWindow):
     
     def prompt_select_folder(self) -> Path:
         """Диалог выбора папки"""
-        msg_box = QMessageBox()
-        msg_box.setIcon(QMessageBox.Information)
-        msg_box.setWindowTitle("Выбор папки с тест-кейсами")
-        msg_box.setText("Папка с тест-кейсами не найдена.\n\nПожалуйста, выберите папку.")
-        msg_box.setStandardButtons(QMessageBox.Ok)
-        msg_box.exec_()
-        
         folder = QFileDialog.getExistingDirectory(
             None,
-            "Выберите папку с тест-кейсами",
+            "Выберите папку с тест-кейсами вашего репозитория",
             str(Path.cwd()),
             QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks
         )
@@ -1880,12 +2592,11 @@ class MainWindow(QMainWindow):
             self.save_settings(self.settings)
             return selected_path
         
-        # По умолчанию
-        default = Path("testcases")
-        default.mkdir(exist_ok=True)
-        self.settings['test_cases_dir'] = str(default)
+        # Если пользователь отменил выбор, сохраняем пустое значение
+        # Это приведет к пустому дереву и диалог будет показан при следующем запуске
+        self.settings['test_cases_dir'] = ""
         self.save_settings(self.settings)
-        return default
+        return Path("")
     
     def load_all_test_cases(self):
         """
@@ -1894,6 +2605,20 @@ class MainWindow(QMainWindow):
         Демонстрирует Dependency Inversion:
         не работаем напрямую с файлами, используем сервис
         """
+        # Если test_cases_dir пустое, не загружаем тест-кейсы и оставляем дерево пустым
+        test_cases_dir_str = str(self.test_cases_dir).strip() if self.test_cases_dir else ""
+        if not self.test_cases_dir or test_cases_dir_str == "":
+            self.test_cases = []
+            if hasattr(self, "tree_widget"):
+                self.tree_widget.load_tree(Path(""), [])
+            if hasattr(self, 'filter_panel'):
+                self.filter_panel.update_test_cases([])
+            if hasattr(self, "placeholder"):
+                self.placeholder.update_statistics([])
+            if hasattr(self, "aux_panel"):
+                self.aux_panel.update_reports_panel()
+            return
+        
         expanded_state = set()
         selected_filepath = None
         # Сохраняем размеры панелей перед обновлением
@@ -1918,13 +2643,16 @@ class MainWindow(QMainWindow):
         # Восстанавливаем выбранный элемент
         if selected_filepath:
             self.tree_widget.restore_selected_item(selected_filepath)
+        # Обновляем индикаторы статусов в дереве (в режиме запуска тестов)
+        if not self.tree_widget._edit_mode:
+            self.tree_widget._update_tree_icons(self.tree_widget.invisibleRootItem())
         
         # Восстанавливаем размеры панелей после обновления
         if saved_detail_sizes and hasattr(self, "detail_splitter"):
             self.detail_splitter.setSizes(saved_detail_sizes)
         
-        # Обновляем счетчики
-        self.placeholder.update_count(len(self.test_cases))
+        # Обновляем статистику
+        self.placeholder.update_statistics(self.test_cases)
         
         self._update_json_preview()
         # Обновляем статусбар (покажет статистику в режиме запуска или обычное сообщение в режиме редактирования)
@@ -1940,21 +2668,50 @@ class MainWindow(QMainWindow):
 
     def _on_test_case_selected(self, test_case: TestCase):
         """Обработка выбора тест-кейса"""
-        # Устанавливаем флаг для предотвращения автоматического изменения размеров панелей
-        self._preserve_panel_sizes = True
-        
         # Проверяем наличие несохраненных изменений перед переключением
         if hasattr(self, "form_widget") and self.form_widget.has_unsaved_changes:
-            # Подсвечиваем кнопку "Сохранить" и показываем предупреждение
-            if hasattr(self, "statusbar_save_button"):
-                self.statusbar_save_button.setVisible(True)
-                self._highlight_save_button()
-            self.statusBar().showMessage(
-                "Есть несохраненные изменения. Сохраните изменения перед переключением на другой тест-кейс.",
-                5000
+            # Сохраняем предыдущий выбранный элемент для возможности отмены
+            # Находим элемент по текущему тест-кейсу, так как currentItem() уже указывает на новый
+            previous_test_case = self.current_test_case
+            previous_item = None
+            if previous_test_case and hasattr(previous_test_case, "_filepath"):
+                previous_item = self.tree_widget._find_item_by_filepath(
+                    self.tree_widget.invisibleRootItem(), 
+                    previous_test_case._filepath
+                )
+            
+            # Показываем диалог с вопросом о сохранении
+            reply = QMessageBox.question(
+                self,
+                "Несохраненные изменения",
+                "Есть несохраненные изменения. Сохранить?",
+                QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel,
+                QMessageBox.Yes
             )
-            # Переключаемся на новый тест-кейс, но предупреждаем пользователя
-            # (изменения будут потеряны, но пользователь видит подсвеченную кнопку)
+            
+            if reply == QMessageBox.Cancel:
+                # Отменяем переключение - возвращаем выделение на предыдущий элемент
+                if previous_item:
+                    # Временно блокируем сигнал, чтобы не вызвать рекурсию
+                    self.tree_widget.itemClicked.disconnect()
+                    self.tree_widget.setCurrentItem(previous_item)
+                    self.tree_widget.itemClicked.connect(self.tree_widget._on_item_clicked)
+                return
+            elif reply == QMessageBox.Yes:
+                # Сохраняем изменения перед переключением
+                if hasattr(self, "form_widget"):
+                    self.form_widget.save()
+                    # После сохранения проверяем, не было ли ошибки сохранения
+                    if self.form_widget.has_unsaved_changes:
+                        # Если сохранение не удалось, отменяем переключение
+                        if previous_item:
+                            self.tree_widget.itemClicked.disconnect()
+                            self.tree_widget.setCurrentItem(previous_item)
+                            self.tree_widget.itemClicked.connect(self.tree_widget._on_item_clicked)
+                        return
+        
+        # Устанавливаем флаг для предотвращения автоматического изменения размеров панелей
+        self._preserve_panel_sizes = True
         
         self.current_test_case = test_case
         self.detail_stack.setCurrentWidget(self.form_widget)
@@ -1963,6 +2720,7 @@ class MainWindow(QMainWindow):
         if hasattr(self, "aux_panel"):
             self.aux_panel.set_information_test_case(test_case)
             self.aux_panel.set_files_test_case(test_case)
+            self.aux_panel.set_manual_review_test_case(test_case)
             # Подключаем сигнал изменения attachments в панели файлов
             if hasattr(self.aux_panel, "files_panel"):
                 try:
@@ -2024,6 +2782,10 @@ class MainWindow(QMainWindow):
             if selected_filepath:
                 self.tree_widget.restore_selected_item(selected_filepath)
             
+            # Обновляем индикаторы статусов в дереве (в режиме запуска тестов)
+            if not self.tree_widget._edit_mode:
+                self.tree_widget._update_tree_icons(self.tree_widget.invisibleRootItem())
+            
             # Обновляем статистику в statusbar
             self._update_statusbar_statistics()
             
@@ -2054,6 +2816,12 @@ class MainWindow(QMainWindow):
         # Обновляем панель отчетности
         if hasattr(self, "aux_panel"):
             self.aux_panel.update_reports_panel()
+        # Обновляем индикаторы статусов в дереве (в режиме запуска тестов)
+        if hasattr(self, "tree_widget") and not self.tree_widget._edit_mode:
+            self.tree_widget._update_tree_icons(self.tree_widget.invisibleRootItem())
+        # Обновляем статистику при изменении статуса
+        if hasattr(self, "placeholder") and hasattr(self, "test_cases"):
+            self.placeholder.update_statistics(self.test_cases)
     
     def _on_test_case_saved(self):
         """Обработка сохранения тест-кейса"""
@@ -2062,7 +2830,13 @@ class MainWindow(QMainWindow):
             self.aux_panel.set_information_test_case(self.current_test_case)
             # Обновляем панель "Файлы" для отображения прикрепленных файлов
             self.aux_panel.set_files_test_case(self.current_test_case)
+            self.aux_panel.set_manual_review_test_case(self.current_test_case)
         self.load_all_test_cases()
+        # Обновляем индикаторы статусов в дереве (в режиме запуска тестов)
+        if hasattr(self, "tree_widget") and not self.tree_widget._edit_mode:
+            self.tree_widget._update_tree_icons(self.tree_widget.invisibleRootItem())
+        # Обновляем индикаторы статуса Git после сохранения
+        self._update_git_status_indicators()
         self._update_json_preview()
         # Обновляем статистику в statusbar (всегда)
         self._update_statusbar_statistics()
@@ -2076,6 +2850,9 @@ class MainWindow(QMainWindow):
         # Помечаем изменения в форме (чтобы появилась кнопка сохранения)
         self.form_widget.has_unsaved_changes = True
         self.form_widget.unsaved_changes_state.emit(True)
+        # Обновляем статистику при изменении данных
+        if hasattr(self, "placeholder") and hasattr(self, "test_cases"):
+            self.placeholder.update_statistics(self.test_cases)
     
     def _on_files_attachment_changed(self):
         """Обработка изменения attachments в панели файлов"""
@@ -2084,6 +2861,34 @@ class MainWindow(QMainWindow):
         # Помечаем изменения в форме (чтобы появилась кнопка сохранения)
         self.form_widget.has_unsaved_changes = True
         self.form_widget.unsaved_changes_state.emit(True)
+    
+    def _on_file_attached_to_step(self):
+        """Обработка прикрепления файла к шагу из формы"""
+        if not self.current_test_case:
+            return
+        # Обновляем панель "Файлы" для отображения нового файла
+        if hasattr(self, "aux_panel"):
+            self.aux_panel.set_files_test_case(self.current_test_case)
+        # Помечаем изменения в форме (чтобы появилась кнопка сохранения)
+        self.form_widget.has_unsaved_changes = True
+        self.form_widget.unsaved_changes_state.emit(True)
+    
+    def _on_manual_review_notes_changed(self):
+        """Обработка изменения notes в панели ручного ревью"""
+        if not self.current_test_case:
+            return
+        
+        # Notes уже обновлены в current_test_case в момент вызова сигнала
+        # Автоматически сохраняем тест-кейс после изменения notes
+        if hasattr(self, "form_widget") and self.current_test_case:
+            # Убеждаемся, что form_widget использует тот же объект тест-кейса
+            if self.form_widget.current_test_case != self.current_test_case:
+                self.form_widget.current_test_case = self.current_test_case
+            # Сохраняем тест-кейс (notes уже обновлены в current_test_case)
+            self.form_widget.save()
+        
+        # Обновляем JSON preview, чтобы показать изменения
+        self._update_json_preview()
     
     def _on_form_before_save(self, test_case: TestCase):
         """Обновить данные тест-кейса из панели информации перед сохранением"""
@@ -2117,8 +2922,7 @@ class MainWindow(QMainWindow):
         # Обновляем цвет иконки фильтра на зеленый
         if hasattr(self, 'filter_button'):
             filter_icon_name = "filter.svg"
-            project_root = Path(__file__).parent.parent.parent
-            mapping_file = project_root / "icons" / "icon_mapping.json"
+            mapping_file = get_icons_dir() / "icon_mapping.json"
             if mapping_file.exists():
                 try:
                     with open(mapping_file, 'r', encoding='utf-8') as f:
@@ -2135,14 +2939,16 @@ class MainWindow(QMainWindow):
         query = self.search_input.text() if hasattr(self, 'search_input') else ""
         if hasattr(self, 'tree_widget'):
             self.tree_widget.filter_items(query, filters)
+            # Подсчитываем количество найденных тест-кейсов
+            count = self.tree_widget.count_visible_test_cases()
+            self.statusBar().showMessage(f"Найдено тест-кейсов: {count}")
     
     def _on_filters_reset(self):
         """Обработчик сброса фильтров."""
         # Возвращаем белый цвет иконки фильтра
         if hasattr(self, 'filter_button'):
             filter_icon_name = "filter.svg"
-            project_root = Path(__file__).parent.parent.parent
-            mapping_file = project_root / "icons" / "icon_mapping.json"
+            mapping_file = get_icons_dir() / "icon_mapping.json"
             if mapping_file.exists():
                 try:
                     with open(mapping_file, 'r', encoding='utf-8') as f:
@@ -2174,6 +2980,16 @@ class MainWindow(QMainWindow):
         self.aux_panel.set_review_prompt_text(base_prompt)
         self.aux_panel.clear_review_response()
         self.statusBar().showMessage("Панель ревью открыта")
+    
+    def _on_add_to_review_requested(self, test_case: TestCase):
+        """Добавить файл тест-кейса в панель ревью."""
+        if hasattr(self, "aux_panel") and hasattr(self.aux_panel, "review_panel"):
+            if hasattr(test_case, "_filepath") and test_case._filepath:
+                self.aux_panel.review_panel.add_attachments([test_case._filepath])
+                # Переключаемся на панель ревью, если она не активна
+                if self.aux_panel._stack.currentIndex() != self.aux_panel._tabs_order.index("review"):
+                    self.aux_panel.select_tab("review")
+                self.statusBar().showMessage(f"Файл {test_case._filepath.name} добавлен в панель ревью")
 
     def _on_prompt_saved(self, text: str):
         """Сохранение промта в настройках."""
@@ -2223,6 +3039,59 @@ class MainWindow(QMainWindow):
         if self.llm_model and self.llm_model not in cleaned:
             cleaned.insert(0, self.llm_model)
         return cleaned or fallback
+
+    def _start_llm_availability_check(self):
+        """Запустить первую проверку доступности LLM и настроить периодическую проверку"""
+        # Запускаем первую проверку сразу (с небольшой задержкой, чтобы UI успел инициализироваться)
+        QTimer.singleShot(100, self._check_llm_availability)
+        # Настраиваем таймер для периодической проверки каждые 5 минут (300000 мс)
+        self._llm_check_timer.start(300000)  # 5 минут
+
+    def _check_llm_availability(self):
+        """Проверить доступность LLM в фоновом потоке"""
+        # Если предыдущая проверка еще выполняется, не запускаем новую
+        if self._llm_availability_thread and self._llm_availability_thread.isRunning():
+            return
+        
+        # Если host не задан, просто устанавливаем статус как недоступный
+        if not self.llm_host or not self.llm_host.strip():
+            self._llm_available = False
+            self._update_statusbar_statistics()
+            return
+        
+        # Создаем воркер и поток для проверки доступности
+        worker = _LLMAvailabilityWorker(self.llm_host)
+        thread = QThread()
+        worker.moveToThread(thread)
+
+        # Подключаем сигналы
+        worker.availability_checked.connect(self._on_llm_availability_checked)
+        thread.started.connect(worker.run)
+
+        thread.start()
+
+        self._llm_availability_worker = worker
+        self._llm_availability_thread = thread
+
+    def _on_llm_availability_checked(self, is_available: bool):
+        """Обработчик результата проверки доступности LLM"""
+        self._llm_available = is_available
+        # Обновляем статистику, так как она теперь включает статус LLM
+        self._update_statusbar_statistics()
+        # Очищаем воркер и поток после обновления статуса
+        QTimer.singleShot(0, self._cleanup_llm_availability_worker)
+
+    def _cleanup_llm_availability_worker(self):
+        """Очистка воркера и потока проверки доступности LLM"""
+        if self._llm_availability_thread:
+            if self._llm_availability_thread.isRunning():
+                self._llm_availability_thread.quit()
+                self._llm_availability_thread.wait()
+            self._llm_availability_thread.deleteLater()
+            self._llm_availability_thread = None
+        if self._llm_availability_worker:
+            self._llm_availability_worker.deleteLater()
+            self._llm_availability_worker = None
 
     def _apply_model_options(self):
         models = self.available_llm_models or ([self.llm_model] if self.llm_model else [])
@@ -2362,6 +3231,9 @@ class MainWindow(QMainWindow):
         self.load_all_test_cases()
         if self.current_test_case:
             self.form_widget.load_test_case(self.current_test_case)
+        # Обновляем индикаторы статусов в дереве (в режиме запуска тестов)
+        if hasattr(self, "tree_widget") and not self.tree_widget._edit_mode:
+            self.tree_widget._update_tree_icons(self.tree_widget.invisibleRootItem())
         # Обновляем статистику в statusbar (всегда)
         self._update_statusbar_statistics()
         QMessageBox.information(self, "Готово", f"Статусы сброшены для {count} тест-кейсов")
@@ -2375,6 +3247,9 @@ class MainWindow(QMainWindow):
         self.service.save_test_case(self.current_test_case)
         self.form_widget.load_test_case(self.current_test_case)
         self.load_all_test_cases()
+        # Обновляем индикаторы статусов в дереве (в режиме запуска тестов)
+        if hasattr(self, "tree_widget") and not self.tree_widget._edit_mode:
+            self.tree_widget._update_tree_icons(self.tree_widget.invisibleRootItem())
         # Обновляем статистику в statusbar (всегда)
         self._update_statusbar_statistics()
         self._update_statistics_panel()
@@ -2387,6 +3262,9 @@ class MainWindow(QMainWindow):
         self.service.save_test_case(self.current_test_case)
         self.form_widget.load_test_case(self.current_test_case)
         self.load_all_test_cases()
+        # Обновляем индикаторы статусов в дереве (в режиме запуска тестов)
+        if hasattr(self, "tree_widget") and not self.tree_widget._edit_mode:
+            self.tree_widget._update_tree_icons(self.tree_widget.invisibleRootItem())
         # Обновляем статусбар (покажет статистику в режиме запуска или сообщение в режиме редактирования)
         if self._current_mode == "run":
             self._update_statusbar_statistics()
@@ -2791,20 +3669,38 @@ class MainWindow(QMainWindow):
         self._update_statusbar_statistics()
 
     def _update_statusbar_statistics(self):
-        """Обновить статистику в statusbar (всегда видна)"""
+        """Обновить статистику в statusbar (всегда видна, включает статус LLM)"""
         if not hasattr(self, "statusbar_stats_label"):
             return
         
+        # Определяем цвет и текст для статуса LLM (всегда отображается)
+        if self._llm_available is None:
+            llm_status_color = "#95a5a6"  # Серый - статус неизвестен
+        elif self._llm_available:
+            llm_status_color = "#6CC24A"  # Зеленый - доступен
+        else:
+            llm_status_color = "#F5555D"  # Красный - недоступен
+        
+        # Используем название модели вместо "LLM", если модель выбрана
+        llm_model_name = self.llm_model if self.llm_model else "LLM"
+        llm_status_html = f"<span style='color: {llm_status_color};'>{llm_model_name}</span>"
+        
         if not self.test_cases:
-            self.statusbar_stats_label.setVisible(False)
-            self.statusBar().showMessage("Тест-кейсы не загружены")
+            # Показываем только статус LLM, если нет тест-кейсов
+            stats_text = llm_status_html
+            self.statusbar_stats_label.setText(stats_text)
+            self.statusbar_stats_label.setVisible(True)
+            self.statusBar().showMessage("")
             return
         
         cases = list(self.test_cases or [])
         total = len(cases)
         if not total:
-            self.statusbar_stats_label.setVisible(False)
-            self.statusBar().showMessage("Тест-кейсы не загружены")
+            # Показываем только статус LLM, если список пуст
+            stats_text = llm_status_html
+            self.statusbar_stats_label.setText(stats_text)
+            self.statusbar_stats_label.setVisible(True)
+            self.statusBar().showMessage("")
             return
         
         pending_cases = 0
@@ -2835,8 +3731,10 @@ class MainWindow(QMainWindow):
         passed_percent = (passed_cases / total * 100) if total > 0 else 0
         pending_percent = (pending_cases / total * 100) if total > 0 else 0
         
-        # Формируем текст статистики с HTML-форматированием и цветами (как в массовых операциях)
+        # Формируем текст статистики с HTML-форматированием и цветами
+        # Статус LLM добавляется в начало с разделителем |
         stats_text = (
+            f"{llm_status_html} | "
             f"Всего тест-кейсов: {total} | "
             f"Успешно: <span style='color: #6CC24A;'>{passed_cases}</span> "
             f"(<span style='color: #6CC24A;'>{passed_percent:.1f}%</span>) | "
@@ -3108,8 +4006,14 @@ class MainWindow(QMainWindow):
                 self.load_all_test_cases()
         
         # Обновляем LLM настройки
+        llm_host_changed = False
         if 'LLM_HOST' in new_settings:
+            old_host = self.llm_host
             self.llm_host = new_settings['LLM_HOST'].strip()
+            if old_host != self.llm_host:
+                llm_host_changed = True
+                # Сбрасываем статус доступности при изменении хоста
+                self._llm_available = None
         if 'LLM_MODEL' in new_settings:
             self.llm_model = new_settings['LLM_MODEL'].strip()
             # Обновляем модель в селекторе
@@ -3117,6 +4021,24 @@ class MainWindow(QMainWindow):
                 current_text = self.model_selector.currentText()
                 if current_text != self.llm_model:
                     self.model_selector.setCurrentText(self.llm_model)
+        
+        # Если изменился LLM_HOST, запускаем новую проверку доступности
+        if llm_host_changed:
+            self._check_llm_availability()
+            # Обновляем статистику, чтобы отобразить обновленный статус
+            self._update_statusbar_statistics()
+        
+        # Обновляем список тестировщиков
+        if 'testers' in new_settings:
+            testers_list = new_settings['testers']
+            if isinstance(testers_list, list):
+                if hasattr(self, 'aux_panel'):
+                    self.aux_panel.set_information_testers(testers_list)
+            elif isinstance(testers_list, str):
+                # Если сохранено как строка, разбиваем по переносам строк
+                testers_list = [t.strip() for t in testers_list.split('\n') if t.strip()]
+                if hasattr(self, 'aux_panel'):
+                    self.aux_panel.set_information_testers(testers_list)
         
         # Обновляем промпты
         if 'DEFAULT_PROMT' in new_settings:
@@ -3197,6 +4119,18 @@ class MainWindow(QMainWindow):
                 layout.setContentsMargins(margins[0], UI_METRICS.group_title_spacing, margins[2], margins[3])
     
     def closeEvent(self, event):
+        # Останавливаем таймер проверки LLM
+        if hasattr(self, '_llm_check_timer'):
+            self._llm_check_timer.stop()
+        
+        # Очищаем потоки проверки LLM
+        if hasattr(self, '_cleanup_llm_availability_worker'):
+            self._cleanup_llm_availability_worker()
+        
+        # Очищаем потоки LLM запросов
+        if hasattr(self, '_cleanup_llm_worker'):
+            self._cleanup_llm_worker()
+        
         if self.isMaximized():
             geom = self.normalGeometry()
             geometry_data = {
@@ -3369,10 +4303,28 @@ class MainWindow(QMainWindow):
             # Определяем папку приложения
             app_dir = Path(__file__).resolve().parent.parent.parent
             
+            # Проверяем и создаем папку Reports, если её нет
+            reports_dir = app_dir / "Reports"
+            if not reports_dir.exists():
+                try:
+                    reports_dir.mkdir(parents=True, exist_ok=True)
+                except Exception as e:
+                    QMessageBox.warning(
+                        self,
+                        "Ошибка создания папки",
+                        f"Не удалось создать папку Reports:\n{e}"
+                    )
+                    self.statusBar().showMessage(f"Ошибка создания папки Reports: {e}")
+                    return
+            
+            # Получаем название проекта из настроек
+            project_name = self.settings.get('project_name', '').strip()
+            
             # Генерируем отчет
             report_dir = generate_html_report(
                 test_cases_dir=self.test_cases_dir,
                 app_dir=app_dir,
+                project_name=project_name if project_name else None,
             )
             
             if report_dir:
@@ -3420,7 +4372,14 @@ class MainWindow(QMainWindow):
             # Генерируем суммарный отчет
             from ..utils.summary_report_generator import generate_summary_report
             
-            summary_file = generate_summary_report(reports_dir, app_dir)
+            # Получаем название проекта из настроек
+            project_name = self.settings.get('project_name', '').strip()
+            
+            summary_file = generate_summary_report(
+                reports_dir, 
+                app_dir,
+                project_name=project_name if project_name else None,
+            )
             
             if summary_file:
                 # Открываем проводник с отчетом
@@ -3459,4 +4418,5 @@ def create_main_window() -> MainWindow:
     Использует паттерн Factory для централизованного создания окна
     """
     return MainWindow()
+
 

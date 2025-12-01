@@ -1,43 +1,37 @@
 """
 Утилита для определения пути к ресурсам приложения.
-Поддерживает как режим разработки, так и собранное приложение PyInstaller.
+Работает как в исходном коде, так и в собранном EXE через PyInstaller.
 """
 
 import sys
 from pathlib import Path
 
 
-def get_resource_path(relative_path: str = "") -> Path:
+def get_resource_path(relative_path: str) -> Path:
     """
-    Получить абсолютный путь к ресурсу приложения.
+    Получить абсолютный путь к ресурсу.
     
-    В режиме разработки возвращает путь относительно корня проекта.
-    В собранном приложении PyInstaller использует sys._MEIPASS.
+    В собранном приложении (PyInstaller) ресурсы находятся в sys._MEIPASS.
+    В исходном коде - относительно корня проекта.
     
     Args:
-        relative_path: Относительный путь к ресурсу (например, "icons/icon_mapping.json")
+        relative_path: Относительный путь к ресурсу (например, "icons/info.svg")
     
     Returns:
         Path: Абсолютный путь к ресурсу
     """
-    # Проверяем, запущено ли приложение из PyInstaller
+    # Проверяем, запущено ли приложение из собранного EXE
     if hasattr(sys, '_MEIPASS'):
-        # Собранное приложение - ресурсы находятся в _MEIPASS
+        # В собранном приложении ресурсы находятся в sys._MEIPASS
         base_path = Path(sys._MEIPASS)
     else:
-        # Режим разработки - определяем корень проекта
-        # run_app.py находится в корне, поэтому идем на 4 уровня вверх от utils
-        # или на 1 уровень вверх от корня проекта
-        if Path(__file__).parent.parent.parent.name == "test_case_editor":
-            # Мы в test_case_editor/utils/resource_path.py
-            base_path = Path(__file__).parent.parent.parent.parent
-        else:
-            # Альтернативный способ - от run_app.py
-            base_path = Path(__file__).parent.parent.parent.parent
+        # В исходном коде определяем корень проекта
+        # Ищем корень проекта (где находится run_app.py)
+        current_file = Path(__file__).resolve()
+        # test_case_editor/utils/resource_path.py -> test_case_editor/utils -> test_case_editor -> корень проекта
+        base_path = current_file.parent.parent.parent
     
-    if relative_path:
-        return base_path / relative_path
-    return base_path
+    return base_path / relative_path
 
 
 def get_icons_dir() -> Path:
@@ -58,7 +52,11 @@ def get_icon_path(icon_name: str) -> Path:
         icon_name: Имя файла иконки (например, "info.svg")
     
     Returns:
-        Path: Полный путь к файлу иконки
+        Path: Полный путь к иконке
     """
     return get_icons_dir() / icon_name
+
+
+
+
 

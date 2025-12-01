@@ -171,6 +171,7 @@ class TestCaseFormWidget(QWidget):
     """
     
     status_changed = pyqtSignal()  # Сигнал об изменении статуса шага
+    file_attached_to_step = pyqtSignal()  # Сигнал о прикреплении файла к шагу
 
     # Методы для работы с таблицей шагов в стиле TestOps
     def _create_step_text_edit(self, placeholder: str) -> QTextEdit:
@@ -858,7 +859,7 @@ class TestCaseFormWidget(QWidget):
         self._add_labeled_widget(people_row, "Автор:", self.author_input)
 
         self.owner_input = self._create_line_edit()
-        self._add_labeled_widget(people_row, "Владелец:", self.owner_input)
+        self._add_labeled_widget(people_row, "Исполнитель:", self.owner_input)
 
         self.reviewer_input = self._create_line_edit()
         self._add_labeled_widget(people_row, "Ревьюер:", self.reviewer_input)
@@ -867,7 +868,7 @@ class TestCaseFormWidget(QWidget):
         status_row = QHBoxLayout()
         status_row.setSpacing(UI_METRICS.base_spacing)
         self.status_input = _NoWheelComboBox()
-        self.status_input.addItems(["Draft", "In Progress", "Done", "Blocked", "Deprecated"])
+        self.status_input.addItems(["Draft", "Design", "Review", "Done"])
         self.status_input.setEditable(True)
         self.status_input.currentTextChanged.connect(self._mark_changed)
         self._add_labeled_widget(status_row, "Статус:", self.status_input)
@@ -1736,6 +1737,9 @@ class TestCaseFormWidget(QWidget):
                     step = self.current_test_case.steps[row]
                     if file_path_str not in step.attachments:
                         step.attachments.append(file_path_str)
+                
+                # Эмитируем сигнал о прикреплении файла для обновления панели "Файлы"
+                self.file_attached_to_step.emit()
                 
                 self._mark_changed()
                 

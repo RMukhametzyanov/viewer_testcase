@@ -6,8 +6,8 @@ import json
 from pathlib import Path
 from typing import Optional
 
-from PyQt5.QtCore import Qt, QRegularExpression
-from PyQt5.QtGui import QFont, QColor, QTextCharFormat, QSyntaxHighlighter
+from PyQt5.QtCore import Qt, QRegularExpression, QSize
+from PyQt5.QtGui import QFont, QColor, QTextCharFormat, QSyntaxHighlighter, QIcon, QPixmap, QPainter
 from PyQt5.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -15,10 +15,16 @@ from PyQt5.QtWidgets import (
     QPlainTextEdit,
     QHBoxLayout,
     QPushButton,
+    QToolButton,
     QMessageBox,
+    QScrollArea,
+    QSizePolicy,
 )
+from PyQt5.QtSvg import QSvgRenderer
 
 from ...models import TestCase
+from ...utils.resource_path import get_icon_path
+from ..styles.ui_metrics import UI_METRICS
 
 
 class _JsonHighlighter(QSyntaxHighlighter):
@@ -81,38 +87,116 @@ class JsonPreviewWidget(QWidget):
         super().__init__(parent)
         self._current_path: Optional[Path] = None
         self._setup_ui()
+    
+    def _load_svg_icon(self, icon_name: str, size: int = 16, color: Optional[str] = None) -> Optional[QIcon]:
+        """Загрузить SVG иконку из файла и вернуть QIcon."""
+        icon_path = get_icon_path(icon_name)
+        
+        if not icon_path.exists():
+            return None
+        
+        try:
+            with open(icon_path, 'r', encoding='utf-8') as f:
+                svg_content = f.read()
+            
+            if color:
+                svg_content = svg_content.replace('currentColor', color)
+                svg_content = svg_content.replace('stroke="currentColor"', f'stroke="{color}"')
+                svg_content = svg_content.replace('fill="currentColor"', f'fill="{color}"')
+            
+            renderer = QSvgRenderer(svg_content.encode('utf-8'))
+            if not renderer.isValid():
+                return None
+            
+            pixmap = QPixmap(size, size)
+            pixmap.fill(Qt.transparent)
+            
+            painter = QPainter(pixmap)
+            painter.setRenderHint(QPainter.Antialiasing)
+            renderer.render(painter)
+            painter.end()
+            
+            return QIcon(pixmap)
+        except Exception:
+            return None
 
     def _setup_ui(self) -> None:
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(8, 8, 8, 8)
-        layout.setSpacing(6)
-
-        header = QHBoxLayout()
-        title = QLabel("JSON превью")
-        header.addWidget(title)
-        header.addStretch(1)
-
-        self.copy_button = QPushButton("Копировать")
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll_area.setFrameShape(QScrollArea.NoFrame)
+        
+        content_widget = QWidget()
+        content_layout = QVBoxLayout(content_widget)
+        # Используем те же отступы, что и в панели "Отчетность" (эталон)
+        content_layout.setContentsMargins(
+            UI_METRICS.container_padding,
+            UI_METRICS.container_padding,
+            UI_METRICS.container_padding,
+            UI_METRICS.container_padding,
+        )
+        content_layout.setSpacing(UI_METRICS.section_spacing)
+        
+        scroll_area.setWidget(content_widget)
+        main_layout.addWidget(scroll_area)
+        
+        # Заголовок с кнопкой (как в панели "Отчетность")
+        title_layout = QHBoxLayout()
+        title_layout.setContentsMargins(0, 0, 0, 0)
+        title_layout.setSpacing(10)
+        
+        title_label = QLabel("JSON превью")
+        # Используем тот же стиль заголовка, что и в панели "Отчетность"
+        title_label.setStyleSheet("font-weight: 600; font-size: 14px;")
+        title_layout.addWidget(title_label)
+        
+        title_layout.addStretch()
+        
+        # Кнопка копирования с иконкой
+        self.copy_button = QToolButton()
+        copy_icon = self._load_svg_icon("copy.svg", size=16, color="#ffffff")
+        if copy_icon:
+            self.copy_button.setIcon(copy_icon)
+            self.copy_button.setIconSize(QSize(16, 16))
+        else:
+            self.copy_button.setText("Копировать")
+        self.copy_button.setToolTip("Копировать")
         self.copy_button.setCursor(Qt.PointingHandCursor)
-        self.copy_button.setFixedHeight(28)
+        self.copy_button.setAutoRaise(True)
+        self.copy_button.setFixedSize(24, 24)
+        self.copy_button.setStyleSheet("""
+            QToolButton {
+                border: 1px solid transparent;
+                border-radius: 4px;
+                padding: 0px;
+            }
+            QToolButton:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                border-color: rgba(255, 255, 255, 0.2);
+            }
+        """)
         self.copy_button.clicked.connect(self._copy_json)  # type: ignore[attr-defined]
-        header.addWidget(self.copy_button, 0, Qt.AlignRight)
-        layout.addLayout(header)
+        title_layout.addWidget(self.copy_button)
+        
+        content_layout.addLayout(title_layout)
 
         self.path_label = QLabel("Файл: -")
         self.path_label.setWordWrap(True)
-        layout.addWidget(self.path_label)
+        content_layout.addWidget(self.path_label)
 
         self.text_edit = QPlainTextEdit()
         self.text_edit.setReadOnly(True)
         self.text_edit.setLineWrapMode(QPlainTextEdit.NoWrap)
         self.text_edit.setFont(QFont("Consolas", 10))
         # Устанавливаем правильную политику размера - не расширяется автоматически
-        from PyQt5.QtWidgets import QSizePolicy
         self.text_edit.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         # Включаем горизонтальный скроллбар для длинных строк
         self.text_edit.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        layout.addWidget(self.text_edit, 1)
+        content_layout.addWidget(self.text_edit, 1)
         self._highlighter = _JsonHighlighter(self.text_edit.document())
 
         self._set_placeholder()

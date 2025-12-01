@@ -670,29 +670,45 @@ class TestCaseService:
     def _normalize_assigned_to(value: Any) -> str:
         """
         Преобразовать значение поля System.AssignedTo в строку.
+        Удаляет формат <DOMAIN\\USERNAME> из результата, оставляя только имя пользователя.
         """
         if value is None:
             return ""
 
+        result = ""
         if isinstance(value, dict):
             for key in ("displayName", "name", "uniqueName", "descriptor"):
                 candidate = value.get(key)
                 if candidate:
-                    return str(candidate)
+                    result = str(candidate)
+                    break
             # на случай других структур попробуем превратить в JSON
-            try:
-                return json.dumps(value, ensure_ascii=False)
-            except (TypeError, ValueError):
-                return str(value)
-
-        return str(value)
+            if not result:
+                try:
+                    result = json.dumps(value, ensure_ascii=False)
+                except (TypeError, ValueError):
+                    result = str(value)
+        else:
+            result = str(value)
+        
+        # Удаляем формат <DOMAIN\\USERNAME> или DOMAIN\\USERNAME
+        if result:
+            import re
+            # Удаляем угловые скобки
+            result = result.strip('<>')
+            # Если есть формат DOMAIN\\USERNAME, берем только USERNAME (часть после последнего \\)
+            if '\\' in result:
+                result = result.split('\\')[-1]
+        
+        return result
 
     @staticmethod
     def _normalize_status(value: Any) -> str:
         """
         Преобразовать статус к одному из поддерживаемых значений.
+        Поддерживаемые значения: Draft, Design, Review, Done
         """
-        allowed = {"Draft", "In Progress", "Done", "Blocked", "Deprecated"}
+        allowed = {"Draft", "Design", "Review", "Done"}
         if value is None:
             return "Draft"
 
@@ -700,20 +716,46 @@ class TestCaseService:
         if not candidate:
             return "Draft"
 
+        # Нормализуем к поддерживаемым значениям
+        candidate_lower = candidate.lower()
+        
+        # Маппинг старых значений на новые
         mapping = {
-            "review": "In Progress",
-            "ревью": "In Progress",
-            "design": "In Progress",
-            "готов": "Done",
-            "done": "Done",
-            "blocked": "Blocked",
-            "deprecated": "Deprecated",
+            # Старые значения -> новые
+            "in progress": "Design",
+            "inprogress": "Design",
+            "blocked": "Draft",
+            "deprecated": "Draft",
+            # Новые значения (прямое соответствие)
             "draft": "Draft",
+            "design": "Design",
+            "review": "Review",
+            "done": "Done",
+            # Русские варианты
+            "черновик": "Draft",
+            "проект": "Design",
+            "дизайн": "Design",
+            "ревью": "Review",
+            "готов": "Done",
+            "готово": "Done",
+            # Варианты из Azure DevOps
+            "active": "Design",
+            "closed": "Done",
+            "new": "Draft",
         }
 
-        normalized = mapping.get(candidate.lower(), candidate)
-        if normalized not in allowed:
-            return "Draft"
-        return normalized
+        normalized = mapping.get(candidate_lower, candidate)
+        
+        # Если значение уже в правильном формате, используем его
+        if normalized in allowed:
+            return normalized
+        
+        # Если значение похоже на одно из поддерживаемых (регистронезависимо)
+        for allowed_value in allowed:
+            if candidate_lower == allowed_value.lower():
+                return allowed_value
+        
+        # По умолчанию возвращаем Draft
+        return "Draft"
 
 

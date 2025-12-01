@@ -6,7 +6,7 @@ import shutil
 from pathlib import Path
 from typing import List, Optional
 
-from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtCore import pyqtSignal, Qt, QSize
 from PyQt5.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -41,8 +41,9 @@ class FileItemWidget(QWidget):
 
     def _setup_ui(self):
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(5, 2, 5, 2)
-        layout.setSpacing(2)
+        # Увеличиваем вертикальные отступы, чтобы текст не обрезался
+        layout.setContentsMargins(5, 10, 5, 10)
+        layout.setSpacing(8)
 
         # Первая строка: имя файла и кнопка удаления в одной строке
         file_row = QHBoxLayout()
@@ -55,6 +56,10 @@ class FileItemWidget(QWidget):
         file_label.setToolTip(str(self.file_path))  # Полный путь в подсказке
         # Обрезаем текст вручную, если он слишком длинный
         file_label.setTextFormat(Qt.PlainText)
+        # Устанавливаем минимальную высоту для label, чтобы текст не обрезался
+        font_metrics = file_label.fontMetrics()
+        # Увеличиваем отступы для текста - используем lineSpacing для лучшего отображения
+        file_label.setMinimumHeight(font_metrics.lineSpacing() + 10)  # Добавляем больше отступов
         file_row.addWidget(file_label, 1)  # Растягивается, но оставляет место для кнопки
 
         # Минималистичная кнопка удаления, как в шагах
@@ -91,11 +96,30 @@ class FileItemWidget(QWidget):
             steps_label = QLabel(f"Прикреплен к: {steps_text}")
             steps_label.setStyleSheet("color: rgba(255, 255, 255, 0.6); font-size: 11px;")
             steps_label.setWordWrap(True)  # Разрешаем перенос текста на новую строку
+            # Устанавливаем минимальную высоту для label, чтобы текст не обрезался
+            font_metrics = steps_label.fontMetrics()
+            # Увеличиваем отступы для текста - используем lineSpacing для лучшего отображения
+            steps_label.setMinimumHeight(font_metrics.lineSpacing() + 10)  # Добавляем больше отступов
             layout.addWidget(steps_label)
         else:
             no_attachment_label = QLabel("Не прикреплен к шагам")
             no_attachment_label.setStyleSheet("color: rgba(255, 255, 255, 0.4); font-size: 11px; font-style: italic;")
+            # Устанавливаем минимальную высоту для label, чтобы текст не обрезался
+            font_metrics = no_attachment_label.fontMetrics()
+            # Увеличиваем отступы для текста - используем lineSpacing для лучшего отображения
+            no_attachment_label.setMinimumHeight(font_metrics.lineSpacing() + 10)  # Добавляем больше отступов
             layout.addWidget(no_attachment_label)
+    
+    def sizeHint(self) -> QSize:
+        """Возвращает предпочтительный размер виджета с учетом увеличенных отступов."""
+        hint = super().sizeHint()
+        # Убеждаемся, что высота достаточна для отображения текста без обрезания
+        # Высота = отступы сверху/снизу (10+10=20) + высота первой строки + spacing (8) + высота второй строки
+        font_metrics = self.fontMetrics()
+        first_line_height = font_metrics.lineSpacing() + 10  # Имя файла с отступами
+        second_line_height = font_metrics.lineSpacing() + 10  # Информация о шагах с отступами
+        min_height = 20 + first_line_height + 8 + second_line_height  # Отступы + строки + spacing
+        return QSize(hint.width(), max(hint.height(), min_height))
 
     def _on_delete_clicked(self):
         self.delete_requested.emit(self.file_path)
@@ -127,6 +151,7 @@ class FilesPanel(QWidget):
 
         content_widget = QWidget()
         content_layout = QVBoxLayout(content_widget)
+        # Используем те же отступы, что и в панели "Отчетность" (эталон)
         content_layout.setContentsMargins(
             UI_METRICS.container_padding,
             UI_METRICS.container_padding,
@@ -137,15 +162,24 @@ class FilesPanel(QWidget):
 
         scroll_area.setWidget(content_widget)
         main_layout.addWidget(scroll_area)
-
-        # Заголовок
+        
+        # Заголовок с кнопкой (как в панели "Отчетность")
+        title_layout = QHBoxLayout()
+        title_layout.setContentsMargins(0, 0, 0, 0)
+        title_layout.setSpacing(10)
+        
         title_label = QLabel("Файлы")
+        # Используем тот же стиль заголовка, что и в панели "Отчетность"
         title_label.setStyleSheet("font-weight: 600; font-size: 14px;")
-        content_layout.addWidget(title_label)
+        title_layout.addWidget(title_label)
+        
+        title_layout.addStretch()
+        
+        content_layout.addLayout(title_layout)
 
         # Список прикрепленных файлов (перемещен наверх)
         self.files_list = QListWidget()
-        content_layout.addWidget(self.files_list, stretch=1)
+        content_layout.addWidget(self.files_list)
         self._update_files_height()
 
         # Инструкция (перемещена вниз)
@@ -153,6 +187,9 @@ class FilesPanel(QWidget):
         instruction_label.setStyleSheet("color: rgba(255, 255, 255, 0.6); font-size: 12px;")
         instruction_label.setWordWrap(True)
         content_layout.addWidget(instruction_label)
+        
+        # Добавляем растягивающийся элемент в конец, чтобы заголовок всегда был сверху
+        content_layout.addStretch()
 
     # --- Публичные методы ---
 

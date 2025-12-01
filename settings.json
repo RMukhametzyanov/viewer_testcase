@@ -1,19 +1,19 @@
 {
-    "test_cases_dir": "C:/all_testcases_spektr",
-    "DEFAULT_PROMT": "",
+    "test_cases_dir": "C:\\spektr-autotest\\manual_tests",
+    "DEFAULT_PROMT": "Сделай ревью тест-кейса. Поверхностное описание шагов не приемлемо. Необходимы детальные шаги.",
     "panel_sizes": {
-        "left": 515,
-        "form_area": 1630,
-        "review": 561
+        "left": 364,
+        "form_area": 1710,
+        "review": 559
     },
-    "LLM_MODEL": "deepseek-v3.1:latest",
-    "LLM_HOST": "http://spb99-vkc-dhwgpu06.devzone.local:11434",
+    "LLM_MODEL": "qwen2.5:32b-instruct",
+    "LLM_HOST": "http://spb99-vkc-dhwgpu07.devzone.local:11434",
     "LLM_METHODIC_PATH": "C:\\viewer_testcase\\test_case_editor\\docs\\test-cases-guidelines.md",
     "window_geometry": {
-        "x": 104,
-        "y": 56,
-        "width": 2094,
-        "height": 934,
+        "x": 137,
+        "y": 55,
+        "width": 2101,
+        "height": 977,
         "is_fullscreen": false
     },
     "DEFAULT_PROMT_CREATE_TC": "Создай тест-кейсы с акцентом на аспекты указанные в методике и ЧТЗ. Поверхностное описание шагов не приемлемо. Необходимы детальные шаги.",
@@ -50,11 +50,16 @@
         "description": true,
         "expected_result": false
     },
-    "last_test_plan_name": "Регина",
     "skip_reasons": [
         "Автотесты",
         "Нагрузочное тестирование",
         "Test-first",
         "Другое"
+    ],
+    "project_name": "СПЕКТР",
+    "testers": [
+        "Руст",
+        "Сергей",
+        "Анна"
     ]
 }

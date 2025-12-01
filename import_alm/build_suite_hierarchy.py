@@ -102,13 +102,40 @@ def build_hierarchy_map(suites: List[Dict], root_id: int = ROOT_TEST_PLAN_ID) ->
     return hierarchy_map
 
 
-def main():
-    # Загружаем данные
-    input_file = 'all_suites.json'
-    output_file = 'suite_hierarchy_map.json'
+def build_and_save_hierarchy(input_file: str = 'all_suites.json', output_file: str = 'suite_hierarchy_map.json', output_dir: str = None) -> str:
+    """
+    Строит карту иерархии и сохраняет её в файл.
     
-    print(f"Загрузка данных из {input_file}...")
-    with open(input_file, 'r', encoding='utf-8') as f:
+    Args:
+        input_file: Путь к входному файлу с suites
+        output_file: Имя выходного файла
+        output_dir: Директория для сохранения (если None, используется текущая)
+    
+    Returns:
+        Путь к сохраненному файлу
+    """
+    import os
+    
+    # Определяем полный путь к выходному файлу
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+        output_path = os.path.join(output_dir, output_file)
+    else:
+        output_path = output_file
+    
+    # Определяем полный путь к входному файлу
+    if os.path.isabs(input_file):
+        input_path = input_file
+    else:
+        # Если относительный путь, ищем относительно директории скрипта
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        input_path = os.path.join(script_dir, input_file)
+        if not os.path.exists(input_path):
+            # Если не найден, пробуем относительный путь от текущей директории
+            input_path = input_file
+    
+    print(f"Загрузка данных из {input_path}...")
+    with open(input_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
     
     suites = data.get('value', [])
@@ -119,8 +146,8 @@ def main():
     hierarchy_map = build_hierarchy_map(suites)
     
     # Сохраняем результат
-    print(f"Сохранение результата в {output_file}...")
-    with open(output_file, 'w', encoding='utf-8') as f:
+    print(f"Сохранение результата в {output_path}...")
+    with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(hierarchy_map, f, ensure_ascii=False, indent=2)
     
     print(f"Готово! Обработано suites: {len(hierarchy_map)}")
@@ -129,6 +156,12 @@ def main():
     chains_with_parents = sum(1 for chain in hierarchy_map.values() if len(chain) > 0)
     print(f"Suites с родителями: {chains_with_parents}")
     print(f"Корневой suite (без родителей): {len([s for s in suites if s.get('id') == ROOT_TEST_PLAN_ID])}")
+    
+    return output_path
+
+
+def main():
+    build_and_save_hierarchy()
 
 
 if __name__ == '__main__':

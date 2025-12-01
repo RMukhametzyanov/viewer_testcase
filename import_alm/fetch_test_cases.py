@@ -190,25 +190,32 @@ def fetch_test_cases(session: requests.Session, suite_id: int) -> Dict:
         return None
 
 
-def save_test_cases(suite_id: int, data: Dict) -> bool:
+def save_test_cases(suite_id: int, data: Dict, output_dir: str = None) -> bool:
     """
     Сохраняет данные test cases в JSON файл.
     
     Args:
         suite_id: ID suite
         data: Данные для сохранения
+        output_dir: Директория для сохранения (если None, используется текущая)
     
     Returns:
         True если успешно, False в противном случае
     """
     filename = f"{suite_id}.json"
     
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+        filepath = os.path.join(output_dir, filename)
+    else:
+        filepath = filename
+    
     try:
-        with open(filename, 'w', encoding='utf-8') as f:
+        with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
         return True
     except Exception as e:
-        print(f"  ОШИБКА при сохранении файла {filename}: {e}")
+        print(f"  ОШИБКА при сохранении файла {filepath}: {e}")
         return False
 
 
@@ -241,20 +248,24 @@ def load_suite_ids(hierarchy_map_file: str) -> List[int]:
         return []
 
 
-def main():
-    """Основная функция скрипта."""
-    print("=" * 60)
-    print("Скрипт получения test cases для suites")
-    print("=" * 60)
-    print()
+def fetch_all_test_cases(hierarchy_map_file: str, output_dir: str = None) -> Dict[str, int]:
+    """
+    Получает все test cases для suites из карты иерархии.
     
+    Args:
+        hierarchy_map_file: Путь к файлу с картой иерархии
+        output_dir: Директория для сохранения файлов (если None, используется текущая)
+    
+    Returns:
+        Словарь со статистикой: {'total': int, 'success': int, 'skipped': int, 'error': int}
+    """
     # Загружаем список suite IDs
-    print(f"Загрузка suite IDs из {HIERARCHY_MAP_FILE}...")
-    suite_ids = load_suite_ids(HIERARCHY_MAP_FILE)
+    print(f"Загрузка suite IDs из {hierarchy_map_file}...")
+    suite_ids = load_suite_ids(hierarchy_map_file)
     
     if not suite_ids:
         print("Не удалось загрузить suite IDs. Завершение работы.")
-        return
+        return {'total': 0, 'success': 0, 'skipped': 0, 'error': 0}
     
     print(f"Найдено suites: {len(suite_ids)}")
     print()
@@ -277,7 +288,12 @@ def main():
         
         # Проверяем, не существует ли уже файл
         filename = f"{suite_id}.json"
-        if os.path.exists(filename):
+        if output_dir:
+            filepath = os.path.join(output_dir, filename)
+        else:
+            filepath = filename
+        
+        if os.path.exists(filepath):
             print(f"Пропущен (файл {filename} уже существует)")
             skipped_count += 1
             continue
@@ -289,7 +305,7 @@ def main():
             error_count += 1
         else:
             # Сохраняем результат
-            if save_test_cases(suite_id, data):
+            if save_test_cases(suite_id, data, output_dir):
                 success_count += 1
             else:
                 error_count += 1
@@ -306,6 +322,23 @@ def main():
     print(f"  Успешно обработано: {success_count}")
     print(f"  Пропущено (файл существует): {skipped_count}")
     print(f"  Ошибок: {error_count}")
+    
+    return {
+        'total': total,
+        'success': success_count,
+        'skipped': skipped_count,
+        'error': error_count
+    }
+
+
+def main():
+    """Основная функция скрипта."""
+    print("=" * 60)
+    print("Скрипт получения test cases для suites")
+    print("=" * 60)
+    print()
+    
+    fetch_all_test_cases(HIERARCHY_MAP_FILE)
     print()
     print("Готово!")
 
