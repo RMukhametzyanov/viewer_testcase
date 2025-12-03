@@ -179,6 +179,7 @@ class FilesPanel(QWidget):
 
         # Список прикрепленных файлов (перемещен наверх)
         self.files_list = QListWidget()
+        self.files_list.itemDoubleClicked.connect(self._on_item_double_clicked)
         content_layout.addWidget(self.files_list)
         self._update_files_height()
 
@@ -612,3 +613,37 @@ class FilesPanel(QWidget):
             metrics_height = self.files_list.fontMetrics().height() + 12
         new_height = frame + metrics_height * count
         self.files_list.setFixedHeight(min(new_height, 300))  # Максимум 300px
+
+    def _on_item_double_clicked(self, item: QListWidgetItem):
+        """Обработчик двойного клика по элементу списка файлов - открывает проводник до файла"""
+        # Получаем виджет элемента
+        item_widget = self.files_list.itemWidget(item)
+        if not item_widget or not isinstance(item_widget, FileItemWidget):
+            return
+        
+        file_path = item_widget.file_path
+        if not file_path or not file_path.exists():
+            return
+        
+        # Открываем файл/папку в проводнике
+        try:
+            import subprocess
+            import platform
+            
+            if platform.system() == "Windows":
+                if file_path.is_file():
+                    # Для файла открываем папку и выделяем файл
+                    subprocess.Popen(f'explorer /select,"{file_path}"')
+                else:
+                    # Для папки просто открываем
+                    subprocess.Popen(f'explorer "{file_path}"')
+            elif platform.system() == "Darwin":  # macOS
+                if file_path.is_file():
+                    subprocess.Popen(["open", "-R", str(file_path)])
+                else:
+                    subprocess.Popen(["open", str(file_path)])
+            else:  # Linux
+                subprocess.Popen(["xdg-open", str(file_path)])
+        except Exception:
+            # Игнорируем ошибки открытия
+            pass
