@@ -861,6 +861,174 @@ class TestCaseTreeWidget(QTreeWidget):
 
     # ------------------------------------------------------- actions
 
+    class FolderNameDialog(QDialog):
+        """Диалог для ввода имени папки с валидацией"""
+        
+        def __init__(self, parent=None, title: str = "Имя папки", initial_text: str = ""):
+            super().__init__(parent)
+            self.setWindowTitle(title)
+            self.setMinimumWidth(500)
+            self.setMinimumHeight(150)
+            self._setup_ui(initial_text)
+        
+        def _setup_ui(self, initial_text: str):
+            layout = QVBoxLayout(self)
+            
+            # Метка с подсказкой
+            hint_label = QLabel("Имя файла не должно содержать следующих знаков: \\ / : * ? \" < > |")
+            hint_label.setWordWrap(True)
+            hint_label.setStyleSheet("color: #666; font-size: 10pt;")
+            layout.addWidget(hint_label)
+            
+            # Поле ввода
+            label = QLabel("Введите имя папки:")
+            layout.addWidget(label)
+            
+            self.name_edit = QLineEdit(initial_text)
+            self.name_edit.selectAll()  # Выделяем весь текст для удобства редактирования
+            self.name_edit.textChanged.connect(self._on_text_changed)
+            layout.addWidget(self.name_edit)
+            
+            # Метка для отображения ошибки валидации
+            self.error_label = QLabel()
+            self.error_label.setWordWrap(True)
+            self.error_label.setStyleSheet("color: #d32f2f; font-size: 9pt;")
+            self.error_label.setVisible(False)
+            layout.addWidget(self.error_label)
+            
+            # Кнопки
+            button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+            button_box.accepted.connect(self._on_accept)
+            button_box.rejected.connect(self.reject)
+            self.ok_button = button_box.button(QDialogButtonBox.Ok)
+            layout.addWidget(button_box)
+            
+            # Устанавливаем фокус на поле ввода
+            self.name_edit.setFocus()
+        
+        def _on_text_changed(self, text: str):
+            """Обработчик изменения текста - скрываем ошибку при вводе"""
+            self.error_label.setVisible(False)
+        
+        def _on_accept(self):
+            """Обработчик нажатия кнопки OK - проверяем валидность"""
+            name = self.name_edit.text().strip()
+            if not name:
+                self.error_label.setText("Имя папки не может быть пустым")
+                self.error_label.setVisible(True)
+                return
+            
+            # Проверяем на запрещенные символы
+            is_valid, found_chars = TestCaseTreeWidget._validate_folder_name(name)
+            if not is_valid:
+                self.error_label.setText("Имя файла не должно содержать следующих знаков: \\ / : * ? \" < > |")
+                self.error_label.setVisible(True)
+                return
+            
+            # Если все в порядке, принимаем диалог
+            self.accept()
+        
+        def get_name(self) -> str:
+            """Получить введенное имя папки"""
+            return self.name_edit.text().strip()
+
+    class FileNameDialog(QDialog):
+        """Диалог для ввода имени файла с валидацией"""
+        
+        def __init__(self, parent=None, title: str = "Имя файла", initial_text: str = ""):
+            super().__init__(parent)
+            self.setWindowTitle(title)
+            self.setMinimumWidth(500)
+            self.setMinimumHeight(150)
+            self._setup_ui(initial_text)
+        
+        def _setup_ui(self, initial_text: str):
+            layout = QVBoxLayout(self)
+            
+            # Метка с подсказкой
+            hint_label = QLabel("Имя файла не должно содержать следующих знаков: \\ / : * ? \" < > |")
+            hint_label.setWordWrap(True)
+            hint_label.setStyleSheet("color: #666; font-size: 10pt;")
+            layout.addWidget(hint_label)
+            
+            # Поле ввода
+            label = QLabel("Введите имя файла:")
+            layout.addWidget(label)
+            
+            self.name_edit = QLineEdit(initial_text)
+            self.name_edit.selectAll()  # Выделяем весь текст для удобства редактирования
+            self.name_edit.textChanged.connect(self._on_text_changed)
+            layout.addWidget(self.name_edit)
+            
+            # Метка для отображения ошибки валидации
+            self.error_label = QLabel()
+            self.error_label.setWordWrap(True)
+            self.error_label.setStyleSheet("color: #d32f2f; font-size: 9pt;")
+            self.error_label.setVisible(False)
+            layout.addWidget(self.error_label)
+            
+            # Кнопки
+            button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+            button_box.accepted.connect(self._on_accept)
+            button_box.rejected.connect(self.reject)
+            self.ok_button = button_box.button(QDialogButtonBox.Ok)
+            layout.addWidget(button_box)
+            
+            # Устанавливаем фокус на поле ввода
+            self.name_edit.setFocus()
+        
+        def _on_text_changed(self, text: str):
+            """Обработчик изменения текста - скрываем ошибку при вводе"""
+            self.error_label.setVisible(False)
+        
+        def _on_accept(self):
+            """Обработчик нажатия кнопки OK - проверяем валидность"""
+            name = self.name_edit.text().strip()
+            if not name:
+                self.error_label.setText("Имя файла не может быть пустым")
+                self.error_label.setVisible(True)
+                return
+            
+            # Убираем расширение .json для валидации (если есть)
+            name_without_ext = name
+            if name_without_ext.endswith('.json'):
+                name_without_ext = name_without_ext[:-5]
+            
+            # Проверяем на запрещенные символы (без расширения)
+            is_valid, found_chars = TestCaseTreeWidget._validate_folder_name(name_without_ext)
+            if not is_valid:
+                self.error_label.setText("Имя файла не должно содержать следующих знаков: \\ / : * ? \" < > |")
+                self.error_label.setVisible(True)
+                return
+            
+            # Если все в порядке, принимаем диалог
+            self.accept()
+        
+        def get_name(self) -> str:
+            """Получить введенное имя файла"""
+            return self.name_edit.text().strip()
+
+    @staticmethod
+    def _validate_folder_name(name: str) -> Tuple[bool, Optional[str]]:
+        """Проверить имя папки на наличие запрещенных символов.
+        
+        Args:
+            name: Имя папки для проверки
+            
+        Returns:
+            Tuple[bool, Optional[str]]: (валидно, список запрещенных символов)
+        """
+        if not name:
+            return False, None
+        
+        # Запрещенные символы для имен файлов/папок в Windows
+        forbidden_chars = ['\\', '/', ':', '*', '?', '"', '<', '>', '|']
+        found_chars = [char for char in forbidden_chars if char in name]
+        
+        if found_chars:
+            return False, ' '.join(found_chars)
+        return True, None
+
     def _create_test_case(self, target_folder):
         expanded_paths = self._capture_expanded_state()
         test_case = self.service.create_new_test_case(target_folder)
@@ -870,27 +1038,31 @@ class TestCaseTreeWidget(QTreeWidget):
             self.test_case_selected.emit(test_case)
 
     def _create_folder(self, parent_dir):
-        folder_name, ok = QInputDialog.getText(self, 'Создать папку', 'Имя папки:', text='Новая папка')
-        if ok and folder_name:
-            new_folder = parent_dir / folder_name
-            try:
-                new_folder.mkdir(exist_ok=True)
-                self.tree_updated.emit()
-            except Exception as e:
-                QMessageBox.critical(self, "Ошибка", f"Не удалось создать папку:\n{e}")
+        dialog = self.FolderNameDialog(self, 'Создать папку', 'Новая папка')
+        if dialog.exec_() == QDialog.Accepted:
+            folder_name = dialog.get_name()
+            if folder_name:
+                new_folder = parent_dir / folder_name
+                try:
+                    new_folder.mkdir(exist_ok=True)
+                    self.tree_updated.emit()
+                except Exception as e:
+                    QMessageBox.critical(self, "Ошибка", f"Не удалось создать папку:\n{e}")
 
     def _rename_folder(self, folder_path):
         expanded_paths = self._capture_expanded_state()
         old_name = folder_path.name
-        new_name, ok = QInputDialog.getText(self, 'Переименовать папку', 'Новое имя:', text=old_name)
-        if ok and new_name and new_name != old_name:
-            new_path = folder_path.parent / new_name
-            try:
-                folder_path.rename(new_path)
-                self.tree_updated.emit()
-                self._restore_expanded_state(expanded_paths)
-            except Exception as e:
-                QMessageBox.critical(self, "Ошибка", f"Не удалось переименовать:\n{e}")
+        dialog = self.FolderNameDialog(self, 'Переименовать папку', old_name)
+        if dialog.exec_() == QDialog.Accepted:
+            new_name = dialog.get_name()
+            if new_name and new_name != old_name:
+                new_path = folder_path.parent / new_name
+                try:
+                    folder_path.rename(new_path)
+                    self.tree_updated.emit()
+                    self._restore_expanded_state(expanded_paths)
+                except Exception as e:
+                    QMessageBox.critical(self, "Ошибка", f"Не удалось переименовать:\n{e}")
 
     def _delete_folder(self, folder_path):
         expanded_paths = self._capture_expanded_state()
@@ -935,45 +1107,22 @@ class TestCaseTreeWidget(QTreeWidget):
         expanded_paths = self._capture_expanded_state()
         old_filename = test_case._filename
         
-        # Создаем кастомный диалог для переименования с увеличенным размером
-        dialog = QDialog(self)
-        dialog.setWindowTitle('Переименовать файл')
-        dialog.setMinimumWidth(500)  # Увеличиваем минимальную ширину
-        dialog.setMinimumHeight(120)
-        
-        layout = QVBoxLayout(dialog)
-        
-        label = QLabel('Новое имя файла:')
-        layout.addWidget(label)
-        
-        line_edit = QLineEdit(old_filename)
-        line_edit.selectAll()  # Выделяем весь текст для удобства редактирования
-        layout.addWidget(line_edit)
-        
-        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        button_box.accepted.connect(dialog.accept)
-        button_box.rejected.connect(dialog.reject)
-        layout.addWidget(button_box)
-        
-        # Устанавливаем фокус на поле ввода
-        line_edit.setFocus()
-        
-        ok = dialog.exec_() == QDialog.Accepted
-        new_filename = line_edit.text().strip() if ok else ""
-        
-        if ok and new_filename and new_filename != old_filename:
-            if not new_filename.endswith('.json'):
-                new_filename += '.json'
+        dialog = self.FileNameDialog(self, 'Переименовать файл', old_filename)
+        if dialog.exec_() == QDialog.Accepted:
+            new_filename = dialog.get_name()
+            if new_filename and new_filename != old_filename:
+                if not new_filename.endswith('.json'):
+                    new_filename += '.json'
 
-            old_path = test_case._filepath
-            new_path = old_path.parent / new_filename
+                old_path = test_case._filepath
+                new_path = old_path.parent / new_filename
 
-            try:
-                old_path.rename(new_path)
-                self.tree_updated.emit()
-                self._restore_expanded_state(expanded_paths)
-            except Exception as e:
-                QMessageBox.critical(self, "Ошибка", f"Не удалось переименовать:\n{e}")
+                try:
+                    old_path.rename(new_path)
+                    self.tree_updated.emit()
+                    self._restore_expanded_state(expanded_paths)
+                except Exception as e:
+                    QMessageBox.critical(self, "Ошибка", f"Не удалось переименовать:\n{e}")
 
     def _duplicate_test_case(self, test_case):
         expanded_paths = self._capture_expanded_state()
