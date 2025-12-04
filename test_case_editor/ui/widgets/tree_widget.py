@@ -119,6 +119,9 @@ class TestCaseTreeWidget(QTreeWidget):
         self.setHeaderHidden(True)
         self.setIndentation(20)
         self.setAnimated(True)
+        
+        # Включаем множественный выбор (Ctrl на Windows/Linux, Cmd на macOS)
+        self.setSelectionMode(QAbstractItemView.ExtendedSelection)
 
         self.itemClicked.connect(self._on_item_clicked)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -131,6 +134,10 @@ class TestCaseTreeWidget(QTreeWidget):
         
         # Кэш для цветных иконок кружков
         self._icon_cache = {}
+        
+        # Для визуальной подсветки при drag & drop
+        self._drag_over_item: Optional[QTreeWidgetItem] = None
+        self._original_style: Optional[str] = None
 
     def _load_icon_mapping(self) -> Dict[str, Dict[str, str]]:
         """Загрузить маппинг иконок из JSON файла."""
@@ -714,6 +721,11 @@ class TestCaseTreeWidget(QTreeWidget):
     # ----------------------------------------------------------- interactions
 
     def _on_item_clicked(self, item: QTreeWidgetItem, column: int):
+        # При множественном выборе не открываем тест-кейс
+        selected_items = self.selectedItems()
+        if len(selected_items) > 1:
+            return
+        
         data = item.data(0, Qt.UserRole)
         if data and data.get('type') == 'file':
             test_case = data.get('test_case')
@@ -726,6 +738,35 @@ class TestCaseTreeWidget(QTreeWidget):
             self._show_root_menu(position)
             return
 
+        # Получаем все выделенные элементы
+        selected_items = self.selectedItems()
+        
+        # Проверяем, есть ли множественный выбор файлов
+        selected_files = []
+        selected_folders = []
+        for selected_item in selected_items:
+            data = selected_item.data(0, Qt.UserRole)
+            if not data:
+                continue
+            if data.get('type') == 'file':
+                test_case = data.get('test_case')
+                if test_case:
+                    selected_files.append(test_case)
+            elif data.get('type') == 'folder':
+                selected_folders.append(data)
+        
+        # Если выделено несколько файлов, показываем меню для множественного выбора
+        if len(selected_files) > 1:
+            self._show_multiple_files_menu(position, selected_files)
+            return
+        
+        # Если выделена папка и файлы, или только папка
+        if selected_folders:
+            # Показываем меню для первой папки (или можно сделать общее меню)
+            self._show_folder_menu(position, selected_folders[0])
+            return
+        
+        # Одиночный выбор - используем старую логику
         data = item.data(0, Qt.UserRole)
         if not data:
             return
@@ -830,6 +871,35 @@ class TestCaseTreeWidget(QTreeWidget):
 
         menu.exec_(self.mapToGlobal(position))
 
+    def _show_multiple_files_menu(self, position, test_cases: List[TestCase]):
+        """Показать контекстное меню для множественного выбора файлов"""
+        try:
+            menu = ContextMenu(self)
+            
+            # Добавить в панель ревью
+            icon_name = self._get_context_menu_icon("add_to_review")
+            if icon_name:
+                icon_add = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                action_add_to_review = menu.addAction(icon_add, f"Добавить в панель ревью ({len(test_cases)})")
+            else:
+                action_add_to_review = menu.addAction(f"Добавить в панель ревью ({len(test_cases)})")
+            action_add_to_review.triggered.connect(lambda: self._add_multiple_to_review(test_cases))
+            
+            menu.addSeparator()
+            
+            # Удалить
+            icon_name = self._get_context_menu_icon("delete")
+            if icon_name:
+                icon_x = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                action_delete = menu.addAction(icon_x, f"Удалить ({len(test_cases)})")
+            else:
+                action_delete = menu.addAction(f"Удалить ({len(test_cases)})")
+            action_delete.triggered.connect(lambda: self._delete_multiple_test_cases(test_cases))
+            
+            menu.exec_(self.mapToGlobal(position))
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Ошибка при отображении контекстного меню: {str(e)}")
+    
     def _show_file_menu(self, position, file_data):
         try:
             menu = ContextMenu(self)
@@ -1177,6 +1247,63 @@ class TestCaseTreeWidget(QTreeWidget):
 
         self.tree_updated.emit()
         self._restore_expanded_state(expanded_paths)
+    
+    def _delete_multiple_test_cases(self, test_cases: List[TestCase]):
+        """Удалить несколько тест-кейсов"""
+        if not test_cases:
+            return
+        
+        names = [getattr(tc, "name", None) or getattr(tc, "title", "тест-кейс") for tc in test_cases[:5]]
+        if len(test_cases) > 5:
+            names_text = ", ".join(names) + f" и еще {len(test_cases) - 5}"
+        else:
+            names_text = ", ".join(names)
+        
+        reply = QMessageBox.question(
+            self,
+            "Удаление тест-кейсов",
+            f"Удалить {len(test_cases)} тест-кейсов?\n\n{names_text}",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+        if reply != QMessageBox.Yes:
+            return
+        
+        expanded_paths = self._capture_expanded_state()
+        deleted_count = 0
+        failed_count = 0
+        
+        for test_case in test_cases:
+            try:
+                success = self.service.delete_test_case(test_case)
+                if success:
+                    deleted_count += 1
+                else:
+                    failed_count += 1
+            except Exception as exc:
+                failed_count += 1
+                print(f"Ошибка при удалении тест-кейса: {exc}")
+        
+        self.tree_updated.emit()
+        self._restore_expanded_state(expanded_paths)
+        
+        if failed_count > 0:
+            QMessageBox.warning(
+                self,
+                "Удаление",
+                f"Удалено: {deleted_count}\nНе удалось удалить: {failed_count}"
+            )
+        else:
+            QMessageBox.information(
+                self,
+                "Удаление",
+                f"Успешно удалено {deleted_count} тест-кейсов"
+            )
+    
+    def _add_multiple_to_review(self, test_cases: List[TestCase]):
+        """Добавить несколько тест-кейсов в панель ревью"""
+        for test_case in test_cases:
+            self.add_to_review_requested.emit(test_case)
 
     def _rename_file(self, test_case):
         expanded_paths = self._capture_expanded_state()
@@ -1787,25 +1914,38 @@ class TestCaseTreeWidget(QTreeWidget):
     def mimeData(self, items):
         if not items:
             return None
-        item = items[0]
-        data = item.data(0, Qt.UserRole)
-        if not data:
+        
+        # Поддержка множественного выбора
+        paths = []
+        types = set()
+        
+        for item in items:
+            data = item.data(0, Qt.UserRole)
+            if not data:
+                continue
+            
+            item_type = data.get("type")
+            types.add(item_type)
+            
+            if item_type == "file":
+                test_case = data.get("test_case")
+                if test_case and getattr(test_case, "_filepath", None):
+                    paths.append({"type": "file", "path": str(test_case._filepath)})
+            elif item_type == "folder":
+                folder_path = data.get("path")
+                if folder_path:
+                    paths.append({"type": "folder", "path": str(folder_path)})
+        
+        if not paths:
             return None
-
-        payload = {"type": data.get("type")}
-        if payload["type"] == "file":
-            test_case = data.get("test_case")
-            if not test_case or not getattr(test_case, "_filepath", None):
-                return None
-            payload["path"] = str(test_case._filepath)
-        elif payload["type"] == "folder":
-            folder_path = data.get("path")
-            if not folder_path:
-                return None
-            payload["path"] = str(folder_path)
+        
+        # Если все элементы одного типа, используем старый формат для обратной совместимости
+        if len(types) == 1 and len(paths) == 1:
+            payload = paths[0]
         else:
-            return None
-
+            # Множественный выбор - используем массив
+            payload = {"multiple": True, "items": paths}
+        
         mime = QMimeData()
         mime.setData(self.MIME_TYPE, QByteArray(json.dumps(payload).encode("utf-8")))
         return mime
@@ -1813,10 +1953,21 @@ class TestCaseTreeWidget(QTreeWidget):
     def dragEnterEvent(self, event):
         if event.mimeData().hasFormat(self.MIME_TYPE):
             event.acceptProposedAction()
+            self._update_drag_over_item(event.pos())
         else:
             event.ignore()
-
-    dragMoveEvent = dragEnterEvent
+    
+    def dragMoveEvent(self, event):
+        if event.mimeData().hasFormat(self.MIME_TYPE):
+            event.acceptProposedAction()
+            self._update_drag_over_item(event.pos())
+        else:
+            event.ignore()
+    
+    def dragLeaveEvent(self, event):
+        """Обработка выхода drag & drop"""
+        self._clear_drag_over_item()
+        super().dragLeaveEvent(event)
 
     def dropEvent(self, event):
         mime = event.mimeData()
@@ -1834,41 +1985,104 @@ class TestCaseTreeWidget(QTreeWidget):
             event.ignore()
             return
 
-        source_type = payload.get("type")
-        source_path = payload.get("path")
-        if not source_type or not source_path:
-            event.ignore()
-            return
-
         target_folder = self._resolve_drop_target(event.pos())
         if target_folder is None:
             event.ignore()
             return
         target_folder = Path(target_folder)
 
-        source_path_obj = Path(source_path)
-        if source_type == "file":
-            if source_path_obj.parent == target_folder:
+        # Поддержка множественного выбора
+        if payload.get("multiple"):
+            items = payload.get("items", [])
+            moved_count = 0
+            for item_data in items:
+                source_type = item_data.get("type")
+                source_path = item_data.get("path")
+                if not source_type or not source_path:
+                    continue
+                
+                source_path_obj = Path(source_path)
+                if source_type == "file":
+                    if source_path_obj.parent == target_folder:
+                        continue
+                    if self.service.move_item(source_path_obj, target_folder):
+                        moved_count += 1
+                elif source_type == "folder":
+                    if source_path_obj == target_folder or self._is_subpath(target_folder, source_path_obj):
+                        continue
+                    if self.service.move_item(source_path_obj, target_folder):
+                        moved_count += 1
+            
+            if moved_count > 0:
+                event.acceptProposedAction()
+                self._clear_drag_over_item()
+                expanded_paths = self._capture_expanded_state()
+                self.tree_updated.emit()
+                self._restore_expanded_state(expanded_paths)
+            else:
                 event.ignore()
-                return
-            moved = self.service.move_item(source_path_obj, target_folder)
-        elif source_type == "folder":
-            if source_path_obj == target_folder or self._is_subpath(target_folder, source_path_obj):
-                event.ignore()
-                return
-            moved = self.service.move_item(source_path_obj, target_folder)
         else:
-            event.ignore()
+            # Одиночный выбор (старый формат для обратной совместимости)
+            source_type = payload.get("type")
+            source_path = payload.get("path")
+            if not source_type or not source_path:
+                event.ignore()
+                return
+
+            source_path_obj = Path(source_path)
+            if source_type == "file":
+                if source_path_obj.parent == target_folder:
+                    event.ignore()
+                    return
+                moved = self.service.move_item(source_path_obj, target_folder)
+            elif source_type == "folder":
+                if source_path_obj == target_folder or self._is_subpath(target_folder, source_path_obj):
+                    event.ignore()
+                    return
+                moved = self.service.move_item(source_path_obj, target_folder)
+            else:
+                event.ignore()
+                return
+
+            if moved:
+                event.acceptProposedAction()
+                self._clear_drag_over_item()
+                expanded_paths = self._capture_expanded_state()
+                self.tree_updated.emit()
+                self._restore_expanded_state(expanded_paths)
+            else:
+                event.ignore()
+                self._clear_drag_over_item()
+
+    def _update_drag_over_item(self, position):
+        """Обновить визуальное выделение элемента при drag & drop"""
+        item = self.itemAt(position)
+        
+        # Если элемент не изменился, ничего не делаем
+        if item == self._drag_over_item:
             return
-
-        if moved:
-            event.acceptProposedAction()
-            expanded_paths = self._capture_expanded_state()
-            self.tree_updated.emit()
-            self._restore_expanded_state(expanded_paths)
-        else:
-            event.ignore()
-
+        
+        # Убираем выделение с предыдущего элемента
+        self._clear_drag_over_item()
+        
+        # Добавляем выделение новому элементу
+        if item:
+            self._drag_over_item = item
+            data = item.data(0, Qt.UserRole)
+            
+            # Подсвечиваем только папки и файлы (не корневой элемент)
+            if data and isinstance(data, dict):
+                # Применяем визуальное выделение через стиль
+                highlight_color = QColor(100, 150, 255, 80)  # Полупрозрачный синий фон
+                item.setBackground(0, highlight_color)
+    
+    def _clear_drag_over_item(self):
+        """Убрать визуальное выделение элемента"""
+        if self._drag_over_item:
+            # Убираем фон
+            self._drag_over_item.setBackground(0, QColor())
+            self._drag_over_item = None
+    
     def _resolve_drop_target(self, position):
         item = self.itemAt(position)
         if not item:
