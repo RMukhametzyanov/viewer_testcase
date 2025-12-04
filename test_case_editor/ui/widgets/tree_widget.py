@@ -24,12 +24,36 @@ from PyQt5.QtWidgets import (
     QDialogButtonBox,
     QWidget,
 )
-from PyQt5.QtCore import Qt, pyqtSignal, QMimeData, QByteArray, QSize
-from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter, QPen
+from PyQt5.QtCore import Qt, pyqtSignal, QMimeData, QByteArray, QSize, QPoint
+from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter, QPen, QMouseEvent
 from PyQt5.QtSvg import QSvgRenderer
 
 from ...services.test_case_service import TestCaseService
 from ...models.test_case import TestCase
+
+
+class ContextMenu(QMenu):
+    """Кастомное контекстное меню, которое срабатывает только по ЛКМ"""
+    
+    def mousePressEvent(self, event: QMouseEvent):
+        """Переопределяем обработку нажатия мыши - только ЛКМ активирует действия"""
+        if event.button() == Qt.LeftButton:
+            super().mousePressEvent(event)
+        elif event.button() == Qt.RightButton:
+            # ПКМ просто закрывает меню без активации действия
+            event.accept()
+        else:
+            super().mousePressEvent(event)
+    
+    def mouseReleaseEvent(self, event: QMouseEvent):
+        """Переопределяем обработку отпускания мыши - только ЛКМ активирует действия"""
+        if event.button() == Qt.LeftButton:
+            super().mouseReleaseEvent(event)
+        elif event.button() == Qt.RightButton:
+            # ПКМ просто закрывает меню без активации действия
+            event.accept()
+        else:
+            super().mouseReleaseEvent(event)
 
 
 class TestCaseTreeWidget(QTreeWidget):
@@ -714,7 +738,7 @@ class TestCaseTreeWidget(QTreeWidget):
     # ------------------------------------------------------------ menus
 
     def _show_root_menu(self, position):
-        menu = QMenu(self)
+        menu = ContextMenu(self)
 
         icon_name = self._get_context_menu_icon("create_test_case")
         if icon_name:
@@ -737,7 +761,7 @@ class TestCaseTreeWidget(QTreeWidget):
         menu.exec_(self.mapToGlobal(position))
 
     def _show_folder_menu(self, position, folder_data):
-        menu = QMenu(self)
+        menu = ContextMenu(self)
 
         folder_path = folder_data['path']
         
@@ -808,7 +832,7 @@ class TestCaseTreeWidget(QTreeWidget):
 
     def _show_file_menu(self, position, file_data):
         try:
-            menu = QMenu(self)
+            menu = ContextMenu(self)
 
             test_case = file_data.get('test_case')
             if not test_case:
