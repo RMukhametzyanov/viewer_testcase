@@ -2003,21 +2003,25 @@ class TestCaseTreeWidget(QTreeWidget):
         mime = event.mimeData()
         if not mime.hasFormat(self.MIME_TYPE):
             event.ignore()
+            self._clear_drag_over_item()
             return
 
         if not self.test_cases_dir:
             event.ignore()
+            self._clear_drag_over_item()
             return
 
         try:
             payload = json.loads(bytes(mime.data(self.MIME_TYPE)).decode("utf-8"))
         except (ValueError, json.JSONDecodeError):
             event.ignore()
+            self._clear_drag_over_item()
             return
 
         target_folder = self._resolve_drop_target(event.pos())
         if target_folder is None:
             event.ignore()
+            self._clear_drag_over_item()
             return
         target_folder = Path(target_folder)
 
@@ -2045,43 +2049,52 @@ class TestCaseTreeWidget(QTreeWidget):
             
             if moved_count > 0:
                 event.acceptProposedAction()
+                # Очищаем подсветку ДО перестроения дерева, чтобы избежать обращения к невалидным элементам
                 self._clear_drag_over_item()
                 expanded_paths = self._capture_expanded_state()
                 self.tree_updated.emit()
                 self._restore_expanded_state(expanded_paths)
             else:
                 event.ignore()
+                # Очищаем подсветку если операция не удалась
+                self._clear_drag_over_item()
         else:
             # Одиночный выбор (старый формат для обратной совместимости)
             source_type = payload.get("type")
             source_path = payload.get("path")
             if not source_type or not source_path:
                 event.ignore()
+                self._clear_drag_over_item()
                 return
 
             source_path_obj = Path(source_path)
             if source_type == "file":
                 if source_path_obj.parent == target_folder:
                     event.ignore()
+                    self._clear_drag_over_item()
                     return
                 moved = self.service.move_item(source_path_obj, target_folder)
             elif source_type == "folder":
                 if source_path_obj == target_folder or self._is_subpath(target_folder, source_path_obj):
                     event.ignore()
+                    self._clear_drag_over_item()
                     return
                 moved = self.service.move_item(source_path_obj, target_folder)
             else:
                 event.ignore()
+                self._clear_drag_over_item()
                 return
 
             if moved:
                 event.acceptProposedAction()
+                # Очищаем подсветку ДО перестроения дерева, чтобы избежать обращения к невалидным элементам
                 self._clear_drag_over_item()
                 expanded_paths = self._capture_expanded_state()
                 self.tree_updated.emit()
                 self._restore_expanded_state(expanded_paths)
             else:
                 event.ignore()
+                # Очищаем подсветку если операция не удалась
                 self._clear_drag_over_item()
 
     def _update_drag_over_item(self, position):
@@ -2109,12 +2122,14 @@ class TestCaseTreeWidget(QTreeWidget):
     def _clear_drag_over_item(self):
         """Убрать визуальное выделение элемента"""
         if self._drag_over_item:
-            # Обновляем виджет для перерисовки без подсветки
-            self.viewport().update()
-            self.update()
-            
+            # Очищаем ссылку на элемент
             self._drag_over_item = None
             self._original_background = None
+            
+            # Принудительно обновляем виджет для перерисовки без подсветки
+            # Используем update() для безопасной перерисовки (repaint() может быть небезопасным)
+            self.viewport().update()
+            self.update()
     
     def _resolve_drop_target(self, position):
         item = self.itemAt(position)
