@@ -65,6 +65,7 @@ class TestCaseTreeWidget(QTreeWidget):
         self.test_cases_dir: Optional[Path] = None
         self._edit_mode = True  # По умолчанию режим редактирования
         self._skip_reasons: List[str] = ['Автотесты', 'Нагрузочное тестирование', 'Другое']  # Значения по умолчанию
+        self._show_folder_counters = False  # По умолчанию счетчики выключены
         
         # Загружаем маппинг иконок
         self._icon_mapping = self._load_icon_mapping()
@@ -75,6 +76,20 @@ class TestCaseTreeWidget(QTreeWidget):
         """Установить список причин пропуска из настроек"""
         if reasons and isinstance(reasons, list):
             self._skip_reasons = reasons
+    
+    def set_show_folder_counters(self, show: bool):
+        """Установить отображение счетчиков JSON файлов в папках"""
+        if self._show_folder_counters != show:
+            self._show_folder_counters = show
+            # Обновляем дерево, чтобы применить изменения
+            if self.test_cases_dir:
+                # Сохраняем состояние развернутых папок
+                expanded_paths = self._capture_expanded_state()
+                # Перезагружаем дерево
+                test_cases = self.service.load_all_test_cases(self.test_cases_dir)
+                self.load_tree(self.test_cases_dir, test_cases)
+                # Восстанавливаем состояние
+                self._restore_expanded_state(expanded_paths)
 
     def _setup_ui(self):
         self.setHeaderHidden(True)
@@ -258,7 +273,15 @@ class TestCaseTreeWidget(QTreeWidget):
                     # Обновляем отображение папки
                     folder_path = data.get('path')
                     if folder_path:
-                        child.setText(0, f"📁 {folder_path.name}")
+                        # Формируем текст папки с учетом счетчика
+                        folder_name = folder_path.name
+                        if self._show_folder_counters:
+                            json_count = self._count_json_files_in_folder(folder_path)
+                            # Показываем счетчик только если количество больше 0
+                            if json_count > 0:
+                                folder_name = f"{folder_path.name} ({json_count})"
+                        
+                        child.setText(0, f"📁 {folder_name}")
                         if not self._edit_mode:
                             # Пересчитываем статус папки на основе дерева
                             folder_icon, folder_color = self._calculate_folder_status_from_tree(child)
@@ -287,6 +310,25 @@ class TestCaseTreeWidget(QTreeWidget):
             data['icon'] = folder_icon
             data['color'] = folder_color
 
+    def _count_json_files_in_folder(self, folder_path: Path) -> int:
+        """Подсчитать количество JSON файлов непосредственно в папке (без подпапок).
+        
+        Args:
+            folder_path: Путь к папке
+            
+        Returns:
+            int: Количество JSON файлов в папке
+        """
+        if not folder_path.exists() or not folder_path.is_dir():
+            return 0
+        
+        count = 0
+        for item in folder_path.iterdir():
+            if item.is_file() and item.suffix.lower() == '.json':
+                count += 1
+        
+        return count
+    
     def _populate_directory(self, directory: Path, parent_item: QTreeWidgetItem, test_cases: list):
         for subdir in sorted([d for d in directory.iterdir() if d.is_dir()]):
             # Пропускаем папки _attachment
@@ -299,8 +341,17 @@ class TestCaseTreeWidget(QTreeWidget):
                 folder_icon, folder_color = self._calculate_folder_status(subdir, test_cases)
             else:
                 folder_icon, folder_color = None, ""
+            
+            # Формируем текст папки с учетом счетчика
+            folder_name = subdir.name
+            if self._show_folder_counters:
+                json_count = self._count_json_files_in_folder(subdir)
+                # Показываем счетчик только если количество больше 0
+                if json_count > 0:
+                    folder_name = f"{subdir.name} ({json_count})"
+            
             # Устанавливаем текст и иконку
-            folder_item.setText(0, f"📁 {subdir.name}")
+            folder_item.setText(0, f"📁 {folder_name}")
             if folder_icon:
                 folder_item.setIcon(0, folder_icon)
             else:
