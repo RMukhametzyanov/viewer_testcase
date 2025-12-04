@@ -23,9 +23,10 @@ from PyQt5.QtWidgets import (
     QLineEdit,
     QDialogButtonBox,
     QWidget,
+    QStyle,
 )
 from PyQt5.QtCore import Qt, pyqtSignal, QMimeData, QByteArray, QSize, QPoint
-from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter, QPen, QMouseEvent
+from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter, QPen, QMouseEvent, QBrush
 from PyQt5.QtSvg import QSvgRenderer
 
 from ...services.test_case_service import TestCaseService
@@ -137,7 +138,36 @@ class TestCaseTreeWidget(QTreeWidget):
         
         # Для визуальной подсветки при drag & drop
         self._drag_over_item: Optional[QTreeWidgetItem] = None
-        self._original_style: Optional[str] = None
+        self._original_background: Optional[QBrush] = None
+    
+    def drawRow(self, painter: QPainter, option, index):
+        """Переопределяем отрисовку строки для добавления подсветки при drag & drop"""
+        # Получаем элемент
+        item = self.itemFromIndex(index)
+        
+        # Если это элемент с подсветкой drag & drop, рисуем фон ПЕРЕД стандартной отрисовкой
+        if item == self._drag_over_item:
+            # Сохраняем состояние painter
+            painter.save()
+            
+            # Используем более яркий и заметный цвет для подсветки
+            highlight_color = QColor(100, 150, 255, 180)  # Полупрозрачный синий
+            highlight_brush = QBrush(highlight_color)
+            
+            # Рисуем фон на всю ширину строки
+            rect = option.rect
+            # Расширяем прямоугольник на всю ширину виджета для лучшей видимости
+            full_rect = rect
+            full_rect.setLeft(0)
+            full_rect.setRight(self.viewport().width())
+            
+            painter.fillRect(full_rect, highlight_brush)
+            
+            # Восстанавливаем состояние painter
+            painter.restore()
+        
+        # Вызываем стандартную отрисовку поверх фона
+        super().drawRow(painter, option, index)
 
     def _load_icon_mapping(self) -> Dict[str, Dict[str, str]]:
         """Загрузить маппинг иконок из JSON файла."""
@@ -2072,16 +2102,19 @@ class TestCaseTreeWidget(QTreeWidget):
             
             # Подсвечиваем только папки и файлы (не корневой элемент)
             if data and isinstance(data, dict):
-                # Применяем визуальное выделение через стиль
-                highlight_color = QColor(100, 150, 255, 80)  # Полупрозрачный синий фон
-                item.setBackground(0, highlight_color)
+                # Фон теперь рисуется в drawRow, просто обновляем виджет
+                self.viewport().update()
+                self.update()
     
     def _clear_drag_over_item(self):
         """Убрать визуальное выделение элемента"""
         if self._drag_over_item:
-            # Убираем фон
-            self._drag_over_item.setBackground(0, QColor())
+            # Обновляем виджет для перерисовки без подсветки
+            self.viewport().update()
+            self.update()
+            
             self._drag_over_item = None
+            self._original_background = None
     
     def _resolve_drop_target(self, position):
         item = self.itemAt(position)
