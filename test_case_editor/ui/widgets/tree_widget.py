@@ -1508,6 +1508,15 @@ class TestCaseTreeWidget(QTreeWidget):
             item_text = item.text(0).lower()
             text_match = not pattern or pattern in item_text
             
+            # Для файлов также проверяем test_case_id
+            if item_data and isinstance(item_data, dict) and item_data.get('type') == 'file':
+                test_case = item_data.get('test_case')
+                if test_case and isinstance(test_case, TestCase) and pattern:
+                    # Если есть паттерн поиска, проверяем также test_case_id
+                    test_case_id = (getattr(test_case, 'test_case_id', '') or "").strip().lower()
+                    if test_case_id and pattern in test_case_id:
+                        text_match = True
+            
             # Проверяем фильтры для тест-кейсов
             filter_match = True
             if item_data and isinstance(item_data, dict) and item_data.get('type') == 'file':

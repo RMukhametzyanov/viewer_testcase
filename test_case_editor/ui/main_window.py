@@ -1352,7 +1352,7 @@ class MainWindow(QMainWindow):
         search_layout.setSpacing(UI_METRICS.base_spacing // 2)
         
         self.search_input = QLineEdit()
-        self.search_input.setPlaceholderText("🔍 Поиск...")
+        self.search_input.setPlaceholderText("Название или идентификатор")
         self.search_input.textChanged.connect(self._filter_tree)
         search_layout.addWidget(self.search_input, 1)
         
