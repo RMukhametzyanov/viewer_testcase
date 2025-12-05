@@ -37,7 +37,7 @@ from PyQt5.QtWidgets import (
     QStyle,
 )
 from PyQt5.QtCore import Qt, pyqtSignal, QEvent, QSize, QTimer, QRect
-from PyQt5.QtGui import QFont, QTextOption, QIcon, QPixmap, QPainter, QColor, QDragEnterEvent, QDropEvent, QDragLeaveEvent, QMouseEvent
+from PyQt5.QtGui import QFont, QTextOption, QIcon, QPixmap, QPainter, QColor, QDragEnterEvent, QDropEvent, QDragLeaveEvent, QMouseEvent, QWheelEvent
 from PyQt5.QtSvg import QSvgRenderer
 
 from ...models.test_case import TestCase, TestCaseStep
@@ -128,6 +128,11 @@ class _StepsTableWidget(QTableWidget):
         self.setDragDropMode(QAbstractItemView.DropOnly)
         self.setDefaultDropAction(Qt.CopyAction)
         self._drag_over_row = -1  # Текущая строка, над которой происходит drag
+        
+        # Настройка плавной прокрутки по пикселям
+        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
+        
         # Применяем стиль для обводки строки при drag & drop
         self.setStyleSheet("""
             QTableWidget::item {
@@ -195,6 +200,38 @@ class _StepsTableWidget(QTableWidget):
                         # Убираем фон у существующего item
                         item.setBackground(QColor())
             self._drag_over_row = -1
+    
+    def wheelEvent(self, event: QWheelEvent):
+        """Переопределяем wheelEvent для плавной пиксельной прокрутки."""
+        # Получаем вертикальный скроллбар
+        v_scrollbar = self.verticalScrollBar()
+        if v_scrollbar and v_scrollbar.isVisible():
+            # Получаем дельту прокрутки
+            delta = event.angleDelta().y()
+            
+            # Проверяем, есть ли пиксельная дельта (новые версии Qt)
+            pixel_delta = event.pixelDelta().y() if not event.pixelDelta().isNull() else None
+            
+            if pixel_delta is not None:
+                # Если есть пиксельная дельта, используем её напрямую
+                current_value = v_scrollbar.value()
+                new_value = current_value - pixel_delta
+                v_scrollbar.setValue(new_value)
+            else:
+                # Если delta в градусах (обычно 120 градусов за клик), конвертируем в пиксели
+                # Используем более плавный коэффициент для пиксельной прокрутки
+                # Стандартный шаг - 15 пикселей на 120 градусов (1 клик)
+                pixel_delta = (delta / 120.0) * 15
+                
+                # Прокручиваем на вычисленное количество пикселей
+                current_value = v_scrollbar.value()
+                new_value = current_value - int(pixel_delta)
+                v_scrollbar.setValue(new_value)
+            
+            event.accept()
+        else:
+            # Если вертикальный скроллбар не виден, используем стандартное поведение
+            super().wheelEvent(event)
     
     def dropEvent(self, event: QDropEvent):
         """Обработка drop файлов."""
@@ -1369,7 +1406,10 @@ class TestCaseFormWidget(QWidget):
             # Раскрываем: скрываем другие блоки, растягиваем steps_group на всю высоту
             self.title_group.setVisible(False)
             self.precond_group.setVisible(False)
-            self.bulk_operations_group.setVisible(False)
+            # bulk_operations_group скрываем только если не в режиме запуска тестов
+            # В режиме запуска тестов она должна оставаться видимой
+            if hasattr(self, 'bulk_operations_group'):
+                self.bulk_operations_group.setVisible(False)
             
             # Увеличиваем stretch factor для steps_group, чтобы он занял всё доступное пространство
             self.form_layout.setStretchFactor(self.steps_group, 10)
@@ -1377,8 +1417,9 @@ class TestCaseFormWidget(QWidget):
             # Сворачиваем: показываем все блоки, возвращаем исходный stretch factor
             self.title_group.setVisible(True)
             self.precond_group.setVisible(True)
-            # bulk_operations_group показывается только в режиме запуска тестов
-            # его видимость управляется отдельно
+            # bulk_operations_group показываем только в режиме запуска тестов
+            if hasattr(self, 'bulk_operations_group'):
+                self.bulk_operations_group.setVisible(getattr(self, '_run_mode_enabled', False))
             
             # Возвращаем исходный stretch factor
             self.form_layout.setStretchFactor(self.steps_group, 1)
