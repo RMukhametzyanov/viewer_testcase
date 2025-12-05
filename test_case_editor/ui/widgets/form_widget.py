@@ -33,15 +33,77 @@ from PyQt5.QtWidgets import (
     QFileDialog,
     QDialog,
     QDialogButtonBox,
+    QStyleOptionGroupBox,
+    QStyle,
 )
-from PyQt5.QtCore import Qt, pyqtSignal, QEvent, QSize, QTimer
-from PyQt5.QtGui import QFont, QTextOption, QIcon, QPixmap, QPainter, QColor, QDragEnterEvent, QDropEvent, QDragLeaveEvent
+from PyQt5.QtCore import Qt, pyqtSignal, QEvent, QSize, QTimer, QRect
+from PyQt5.QtGui import QFont, QTextOption, QIcon, QPixmap, QPainter, QColor, QDragEnterEvent, QDropEvent, QDragLeaveEvent, QMouseEvent, QWheelEvent
 from PyQt5.QtSvg import QSvgRenderer
 
 from ...models.test_case import TestCase, TestCaseStep
 from ...services.test_case_service import TestCaseService
 from ...utils.datetime_utils import format_datetime, get_current_datetime
 from ..styles.ui_metrics import UI_METRICS
+
+
+class _ExpandableGroupBox(QGroupBox):
+    """QGroupBox с возможностью раскрытия/сворачивания по клику на заголовке."""
+    
+    def __init__(self, title: str, parent=None):
+        super().__init__(title, parent)
+        self._is_expanded = False
+        self._toggle_callback = None
+        self._base_title = title  # Сохраняем исходное название без стрелки
+        self._update_title()
+    
+    def set_toggle_callback(self, callback):
+        """Установить функцию обратного вызова при переключении состояния."""
+        self._toggle_callback = callback
+    
+    def _update_title(self):
+        """Обновить заголовок с учетом состояния раскрытия/сворачивания."""
+        if self._is_expanded:
+            # Стрелка вниз когда развернуто
+            self.setTitle(f"{self._base_title} ↓")
+        else:
+            # Стрелка вверх когда свернуто
+            self.setTitle(f"{self._base_title} ↑")
+    
+    def mousePressEvent(self, event: QMouseEvent):
+        """Обработка клика мыши - проверяем, был ли клик на заголовке."""
+        if event.button() == Qt.LeftButton:
+            # Используем QStyleOptionGroupBox для точного определения области заголовка
+            option = QStyleOptionGroupBox()
+            self.initStyleOption(option)
+            
+            # Получаем область заголовка через стиль
+            style = self.style()
+            header_rect = style.subControlRect(
+                QStyle.CC_GroupBox, 
+                option, 
+                QStyle.SC_GroupBoxLabel, 
+                self
+            )
+            
+            # Расширяем область заголовка немного вниз для удобства клика
+            header_rect.setBottom(header_rect.bottom() + 10)
+            
+            if header_rect.contains(event.pos()):
+                self._toggle_expanded()
+                event.accept()
+                return
+        super().mousePressEvent(event)
+    
+    def _toggle_expanded(self):
+        """Переключить состояние раскрытия/сворачивания."""
+        self._is_expanded = not self._is_expanded
+        self._update_title()  # Обновляем заголовок с новой стрелкой
+        if self._toggle_callback:
+            self._toggle_callback(self._is_expanded)
+    
+    def is_expanded(self) -> bool:
+        """Проверить, раскрыт ли блок."""
+        return self._is_expanded
 
 
 class _NoWheelComboBox(QComboBox):
@@ -66,6 +128,11 @@ class _StepsTableWidget(QTableWidget):
         self.setDragDropMode(QAbstractItemView.DropOnly)
         self.setDefaultDropAction(Qt.CopyAction)
         self._drag_over_row = -1  # Текущая строка, над которой происходит drag
+        
+        # Настройка плавной прокрутки по пикселям
+        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
+        
         # Применяем стиль для обводки строки при drag & drop
         self.setStyleSheet("""
             QTableWidget::item {
@@ -133,6 +200,38 @@ class _StepsTableWidget(QTableWidget):
                         # Убираем фон у существующего item
                         item.setBackground(QColor())
             self._drag_over_row = -1
+    
+    def wheelEvent(self, event: QWheelEvent):
+        """Переопределяем wheelEvent для плавной пиксельной прокрутки."""
+        # Получаем вертикальный скроллбар
+        v_scrollbar = self.verticalScrollBar()
+        if v_scrollbar and v_scrollbar.isVisible():
+            # Получаем дельту прокрутки
+            delta = event.angleDelta().y()
+            
+            # Проверяем, есть ли пиксельная дельта (новые версии Qt)
+            pixel_delta = event.pixelDelta().y() if not event.pixelDelta().isNull() else None
+            
+            if pixel_delta is not None:
+                # Если есть пиксельная дельта, используем её напрямую
+                current_value = v_scrollbar.value()
+                new_value = current_value - pixel_delta
+                v_scrollbar.setValue(new_value)
+            else:
+                # Если delta в градусах (обычно 120 градусов за клик), конвертируем в пиксели
+                # Используем более плавный коэффициент для пиксельной прокрутки
+                # Стандартный шаг - 15 пикселей на 120 градусов (1 клик)
+                pixel_delta = (delta / 120.0) * 15
+                
+                # Прокручиваем на вычисленное количество пикселей
+                current_value = v_scrollbar.value()
+                new_value = current_value - int(pixel_delta)
+                v_scrollbar.setValue(new_value)
+            
+            event.accept()
+        else:
+            # Если вертикальный скроллбар не виден, используем стандартное поведение
+            super().wheelEvent(event)
     
     def dropEvent(self, event: QDropEvent):
         """Обработка drop файлов."""
@@ -605,10 +704,148 @@ class TestCaseFormWidget(QWidget):
         QTimer.singleShot(0, self._update_table_row_heights)
         self._mark_changed()
     
+    def _calculate_text_edit_height(self, text_edit: QTextEdit, lines: int) -> int:
+        """Вычислить высоту QTextEdit для указанного количества строк"""
+        metrics = text_edit.fontMetrics()
+        line_height = metrics.lineSpacing()
+        margins = text_edit.contentsMargins()
+        doc_margin = text_edit.document().documentMargin()
+        return int(lines * line_height + doc_margin * 2 + margins.top() + margins.bottom() + 10)
+    
+    def _calculate_widget_height(self, widget: QWidget) -> int:
+        """Вычислить высоту виджета на основе его содержимого"""
+        if not widget:
+            return 0
+        
+        # Пробуем получить реальную высоту через sizeHint
+        hint_height = widget.sizeHint().height()
+        if hint_height > 0:
+            return hint_height
+        
+        # Если sizeHint не работает, вычисляем на основе layout
+        layout = widget.layout()
+        if layout:
+            # Получаем margins layout
+            margins = layout.getContentsMargins()
+            total_margins = margins[1] + margins[3]  # top + bottom
+            
+            # Подсчитываем высоту всех виджетов в layout
+            total_widgets_height = 0
+            spacing = layout.spacing()
+            widget_count = 0
+            
+            for i in range(layout.count()):
+                item = layout.itemAt(i)
+                if item and item.widget():
+                    widget_item = item.widget()
+                    # Если это QToolButton, используем его фиксированный размер
+                    if hasattr(widget_item, 'height') and widget_item.height() > 0:
+                        total_widgets_height += widget_item.height()
+                    elif hasattr(widget_item, 'sizeHint'):
+                        widget_hint = widget_item.sizeHint()
+                        if widget_hint.isValid():
+                            total_widgets_height += widget_hint.height()
+                        else:
+                            # Fallback для кнопок: 24px
+                            total_widgets_height += 24
+                    else:
+                        total_widgets_height += 24  # Fallback
+                    widget_count += 1
+            
+            # Добавляем spacing между виджетами (widget_count - 1)
+            if widget_count > 1:
+                total_widgets_height += spacing * (widget_count - 1)
+            
+            return total_widgets_height + total_margins
+        
+        # Если layout нет, возвращаем минимальную высоту
+        return 50
+    
     def _update_table_row_heights(self):
-        """Обновить высоты всех строк таблицы."""
+        """Обновить высоты всех строк таблицы индивидуально."""
+        # Обновляем высоту каждой строки отдельно на основе её содержимого
+        # Это позволяет иметь разную высоту для разных строк
         for row in range(self.steps_table.rowCount()):
-            self.steps_table.resizeRowToContents(row)
+            # Получаем виджеты в строке для расчета высоты
+            action_edit = self.steps_table.cellWidget(row, 1)
+            expected_edit = self.steps_table.cellWidget(row, 2)
+            status_widget = self.steps_table.cellWidget(row, 3)  # Виджет статусов (в режиме запуска)
+            actions_widget = self.steps_table.cellWidget(row, 4)  # Виджет действий (в режиме редактирования)
+            
+            if action_edit and expected_edit:
+                # Вычисляем высоту для 20 строк (максимум)
+                max_text_height_20_lines = max(
+                    self._calculate_text_edit_height(action_edit, 20),
+                    self._calculate_text_edit_height(expected_edit, 20)
+                )
+                
+                # Вычисляем реальную высоту текста
+                action_doc_height = action_edit.document().size().height()
+                action_margins = action_edit.contentsMargins()
+                action_real_height = action_doc_height + action_margins.top() + action_margins.bottom() + 10
+                
+                expected_doc_height = expected_edit.document().size().height()
+                expected_margins = expected_edit.contentsMargins()
+                expected_real_height = expected_doc_height + expected_margins.top() + expected_margins.bottom() + 10
+                
+                # Вычисляем минимальную высоту (1 строка)
+                min_text_height = max(
+                    self._calculate_text_edit_height(action_edit, 1),
+                    self._calculate_text_edit_height(expected_edit, 1)
+                )
+                
+                # Применяем ограничение в 20 строк для каждого QTextEdit
+                # Если текст превышает 20 строк, устанавливаем максимальную высоту и включаем скролл
+                if action_real_height > max_text_height_20_lines:
+                    action_edit.setMinimumHeight(min_text_height)
+                    action_edit.setMaximumHeight(max_text_height_20_lines)
+                    action_edit.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+                    action_height = max_text_height_20_lines
+                else:
+                    action_edit.setMinimumHeight(min_text_height)
+                    action_edit.setMaximumHeight(16777215)  # QWIDGETSIZE_MAX - убираем ограничение
+                    action_edit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+                    action_height = action_real_height
+                
+                if expected_real_height > max_text_height_20_lines:
+                    expected_edit.setMinimumHeight(min_text_height)
+                    expected_edit.setMaximumHeight(max_text_height_20_lines)
+                    expected_edit.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+                    expected_height = max_text_height_20_lines
+                else:
+                    expected_edit.setMinimumHeight(min_text_height)
+                    expected_edit.setMaximumHeight(16777215)  # QWIDGETSIZE_MAX - убираем ограничение
+                    expected_edit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+                    expected_height = expected_real_height
+                
+                text_height = max(action_height, expected_height)
+                
+                # Вычисляем высоту виджета действий (колонка 4) - виден в режиме редактирования
+                actions_widget_height = 0
+                if actions_widget and not self.steps_table.isColumnHidden(4):
+                    actions_widget_height = self._calculate_widget_height(actions_widget)
+                    # В режиме редактирования: 6 кнопок по 24px + spacing + margins
+                    if actions_widget_height <= 0:
+                        actions_widget_height = 6 * 24 + 5 * 2 + 2 * 2  # 158px fallback
+                
+                # Вычисляем высоту виджета статусов (колонка 3) - виден в режиме запуска тестов
+                status_widget_height = 0
+                if status_widget and not self.steps_table.isColumnHidden(3):
+                    status_widget_height = self._calculate_widget_height(status_widget)
+                    # В режиме запуска тестов: 3 кнопки по 24px + spacing + margins
+                    if status_widget_height <= 0:
+                        status_widget_height = 3 * 24 + 2 * 2 + 2 * 2  # 80px fallback
+                
+                # Берем максимальную высоту из всех элементов строки
+                min_height = 50
+                max_height = max(text_height, actions_widget_height, status_widget_height, min_height)
+                
+                # Устанавливаем высоту строки на основе содержимого
+                self.steps_table.setRowHeight(row, int(max_height))
+            else:
+                # Если виджеты еще не созданы, используем стандартный метод
+                self.steps_table.resizeRowToContents(row)
+        
         # Также обновляем ширину колонки с номером
         self.steps_table.resizeColumnToContents(0)
     
@@ -810,22 +1047,26 @@ class TestCaseFormWidget(QWidget):
         )
         
         # Название тест-кейса
-        title_group = self._create_title_group()
-        form_layout.addWidget(title_group)
+        self.title_group = self._create_title_group()
+        form_layout.addWidget(self.title_group)
 
         # Предусловия
-        precond_group = self._create_precondition_group()
-        form_layout.addWidget(precond_group)
+        self.precond_group = self._create_precondition_group()
+        form_layout.addWidget(self.precond_group)
 
         # Массовые операции (только в режиме запуска тестов)
         self.bulk_operations_group = self._create_bulk_operations_group()
         self.bulk_operations_group.setVisible(False)
         form_layout.addWidget(self.bulk_operations_group)
 
-        # Шаги тестирования
-        steps_group = self._create_steps_group()
-        steps_group.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        form_layout.addWidget(steps_group, 1)
+        # Шаги тестирования (раскрывающийся блок)
+        self.steps_group = self._create_steps_group()
+        self.steps_group.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.steps_group.set_toggle_callback(self._on_steps_group_toggle)
+        form_layout.addWidget(self.steps_group, 1)
+        
+        # Сохраняем ссылку на form_layout для управления видимостью
+        self.form_layout = form_layout
         
         form_layout.addStretch()
 
@@ -1090,9 +1331,9 @@ class TestCaseFormWidget(QWidget):
             combo.setCurrentIndex(0)
         combo.blockSignals(False)
     
-    def _create_steps_group(self) -> QGroupBox:
+    def _create_steps_group(self) -> _ExpandableGroupBox:
         """Группа шагов тестирования в формате TestOps - единая таблица"""
-        group = QGroupBox("Шаги тестирования")
+        group = _ExpandableGroupBox("Шаги тестирования")
         layout = QVBoxLayout()
         layout.setContentsMargins(
             UI_METRICS.container_padding,
@@ -1122,9 +1363,12 @@ class TestCaseFormWidget(QWidget):
         self.steps_table.setColumnWidth(3, 60)   # Статус (уменьшено для вертикальных кнопок)
         self.steps_table.setColumnWidth(4, 60)   # Действия (уменьшено для вертикальных кнопок)
         
-        # Настройка вертикального заголовка для автоматической подстройки высоты строк
+        # Настройка вертикального заголовка для индивидуальной высоты строк
         self.steps_table.verticalHeader().setVisible(False)
-        self.steps_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        # Используем Interactive вместо ResizeToContents, чтобы каждая строка могла иметь свою высоту
+        # ResizeToContents может синхронизировать высоты всех строк, делая их одинаковыми
+        # uniformRowHeights по умолчанию False в QTableWidget, что позволяет разную высоту строк
+        self.steps_table.verticalHeader().setSectionResizeMode(QHeaderView.Interactive)
         self.steps_table.verticalHeader().setMinimumSectionSize(50)
         
         # Настройка таблицы
@@ -1152,6 +1396,33 @@ class TestCaseFormWidget(QWidget):
         
         group.setLayout(layout)
         return group
+    
+    def _on_steps_group_toggle(self, is_expanded: bool):
+        """Обработчик переключения состояния блока 'Шаги тестирования'."""
+        if not hasattr(self, 'form_layout') or not hasattr(self, 'title_group'):
+            return
+        
+        if is_expanded:
+            # Раскрываем: скрываем другие блоки, растягиваем steps_group на всю высоту
+            self.title_group.setVisible(False)
+            self.precond_group.setVisible(False)
+            # bulk_operations_group скрываем только если не в режиме запуска тестов
+            # В режиме запуска тестов она должна оставаться видимой
+            if hasattr(self, 'bulk_operations_group'):
+                self.bulk_operations_group.setVisible(False)
+            
+            # Увеличиваем stretch factor для steps_group, чтобы он занял всё доступное пространство
+            self.form_layout.setStretchFactor(self.steps_group, 10)
+        else:
+            # Сворачиваем: показываем все блоки, возвращаем исходный stretch factor
+            self.title_group.setVisible(True)
+            self.precond_group.setVisible(True)
+            # bulk_operations_group показываем только в режиме запуска тестов
+            if hasattr(self, 'bulk_operations_group'):
+                self.bulk_operations_group.setVisible(getattr(self, '_run_mode_enabled', False))
+            
+            # Возвращаем исходный stretch factor
+            self.form_layout.setStretchFactor(self.steps_group, 1)
     
     def load_test_case(self, test_case: TestCase):
         """Загрузить тест-кейс в форму"""

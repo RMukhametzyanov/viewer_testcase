@@ -557,6 +557,15 @@ class SettingsDialog(QDialog):
         padding_group.setLayout(padding_layout)
         content_layout.addWidget(padding_group)
         
+        # Счетчики в дереве
+        tree_group = QGroupBox("Дерево элементов")
+        tree_layout = QVBoxLayout()
+        self.show_folder_counters_check = QCheckBox("Показывать счетчики JSON файлов в папках")
+        self.show_folder_counters_check.setToolTip("Отображать количество JSON файлов в каждой папке дерева (например: Кандидаты (6))")
+        tree_layout.addWidget(self.show_folder_counters_check)
+        tree_group.setLayout(tree_layout)
+        content_layout.addWidget(tree_group)
+        
         content_layout.addStretch()
         scroll.setWidget(content)
         layout.addWidget(scroll)
@@ -758,6 +767,9 @@ class SettingsDialog(QDialog):
         self.container_padding_spin.setValue(self.settings.get('container_padding', 12))
         self.text_padding_spin.setValue(self.settings.get('text_input_vertical_padding', 2))
         self.group_title_spacing_spin.setValue(self.settings.get('group_title_spacing', 1))
+        # Счетчики в дереве
+        if hasattr(self, 'show_folder_counters_check'):
+            self.show_folder_counters_check.setChecked(self.settings.get('show_folder_counters', False))
         
         # Панель Информация - видимость элементов (отдельно для каждого элемента)
         info_visibility = self.settings.get('information_panel_visibility', {})
@@ -897,6 +909,9 @@ class SettingsDialog(QDialog):
         self.settings['container_padding'] = self.container_padding_spin.value()
         self.settings['text_input_vertical_padding'] = self.text_padding_spin.value()
         self.settings['group_title_spacing'] = self.group_title_spacing_spin.value()
+        # Счетчики в дереве
+        if hasattr(self, 'show_folder_counters_check'):
+            self.settings['show_folder_counters'] = self.show_folder_counters_check.isChecked()
         
         # Панель Информация - видимость элементов (отдельно для каждого элемента)
         if 'information_panel_visibility' not in self.settings:
@@ -1337,7 +1352,7 @@ class MainWindow(QMainWindow):
         search_layout.setSpacing(UI_METRICS.base_spacing // 2)
         
         self.search_input = QLineEdit()
-        self.search_input.setPlaceholderText("🔍 Поиск...")
+        self.search_input.setPlaceholderText("Название или идентификатор")
         self.search_input.textChanged.connect(self._filter_tree)
         search_layout.addWidget(self.search_input, 1)
         
@@ -1384,6 +1399,9 @@ class MainWindow(QMainWindow):
         # Передаем настройки для списка причин пропуска
         skip_reasons = self.settings.get('skip_reasons', ['Автотесты', 'Нагрузочное тестирование', 'Другое'])
         self.tree_widget.set_skip_reasons(skip_reasons)
+        # Передаем настройку для отображения счетчиков
+        show_counters = self.settings.get('show_folder_counters', False)
+        self.tree_widget.set_show_folder_counters(show_counters)
         self.tree_widget.test_case_selected.connect(self._on_test_case_selected)
         self.tree_widget.tree_updated.connect(self._on_tree_updated)
         self.tree_widget.review_requested.connect(self._on_review_requested)
@@ -1885,8 +1903,10 @@ class MainWindow(QMainWindow):
             """)
     
     def _create_save_shortcut(self):
-        """Создать горячую клавишу Ctrl+S для сохранения"""
-        save_shortcut = QShortcut(QKeySequence("Ctrl+S"), self)
+        """Создать горячую клавишу для сохранения (Ctrl+S на Windows/Linux, Cmd+S на macOS)"""
+        # Используем QKeySequence.Save, который автоматически использует правильную комбинацию для каждой платформы
+        # На Windows/Linux это Ctrl+S, на macOS это Cmd+S
+        save_shortcut = QShortcut(QKeySequence.Save, self)
         save_shortcut.activated.connect(self._on_save_button_clicked)
         self.save_shortcut = save_shortcut  # Сохраняем ссылку, чтобы не удалился
     
@@ -2585,6 +2605,7 @@ class MainWindow(QMainWindow):
             'LLM_METHODIC_PATH': str(self._default_methodic_path()),
             'panel_sizes': {'left': 350, 'form_area': 900, 'review': 0},
             'skip_reasons': ['Автотесты', 'Нагрузочное тестирование', 'Другое'],
+            'show_folder_counters': False,
         }
         
         if self.settings_file.exists():
@@ -4077,6 +4098,12 @@ class MainWindow(QMainWindow):
                 testers_list = [t.strip() for t in testers_list.split('\n') if t.strip()]
                 if hasattr(self, 'aux_panel'):
                     self.aux_panel.set_information_testers(testers_list)
+        
+        # Обновляем настройку счетчиков в дереве
+        if 'show_folder_counters' in new_settings:
+            show_counters = new_settings.get('show_folder_counters', False)
+            if hasattr(self, 'tree_widget'):
+                self.tree_widget.set_show_folder_counters(show_counters)
         
         # Обновляем промпты
         if 'DEFAULT_PROMT' in new_settings:
