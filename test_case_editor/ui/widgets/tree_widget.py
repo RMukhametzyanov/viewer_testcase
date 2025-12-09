@@ -110,11 +110,9 @@ class TestCaseTreeWidget(QTreeWidget):
             if self.test_cases_dir:
                 # Сохраняем состояние развернутых папок
                 expanded_paths = self._capture_expanded_state()
-                # Перезагружаем дерево
+                # Перезагружаем дерево с передачей состояния для предотвращения прыгания
                 test_cases = self.service.load_all_test_cases(self.test_cases_dir)
-                self.load_tree(self.test_cases_dir, test_cases)
-                # Восстанавливаем состояние
-                self._restore_expanded_state(expanded_paths)
+                self.load_tree(self.test_cases_dir, test_cases, expanded_state=expanded_paths)
 
     def _setup_ui(self):
         self.setHeaderHidden(True)
@@ -292,19 +290,41 @@ class TestCaseTreeWidget(QTreeWidget):
 
     # ------------------------------------------------------------------ load
 
-    def load_tree(self, test_cases_dir: Path, test_cases: list):
+    def load_tree(self, test_cases_dir: Path, test_cases: list, expanded_state: Optional[set] = None):
+        """
+        Загрузить дерево тест-кейсов.
+        
+        Args:
+            test_cases_dir: Директория с тест-кейсами
+            test_cases: Список тест-кейсов
+            expanded_state: Множество путей к папкам, которые должны быть развернуты (опционально)
+        """
         self.test_cases_dir = test_cases_dir
-        self.clear()
+        
+        # Отключаем обновления виджета во время перестройки для предотвращения визуального "прыгания"
+        self.setUpdatesEnabled(False)
+        try:
+            self.clear()
 
-        # Если путь пустой или не существует, оставляем дерево пустым
-        if not test_cases_dir or str(test_cases_dir).strip() == "" or not test_cases_dir.exists():
-            return
+            # Если путь пустой или не существует, оставляем дерево пустым
+            if not test_cases_dir or str(test_cases_dir).strip() == "" or not test_cases_dir.exists():
+                return
 
-        self._populate_directory(test_cases_dir, self.invisibleRootItem(), test_cases)
-        self.collapseAll()
-        # После загрузки обновляем статусы папок на основе актуальных данных дерева
-        if not self._edit_mode:
-            self._update_folder_statuses(self.invisibleRootItem())
+            self._populate_directory(test_cases_dir, self.invisibleRootItem(), test_cases)
+            
+            # Если передан expanded_state, восстанавливаем состояние сразу после заполнения
+            # Если нет - сворачиваем все
+            if expanded_state:
+                self._restore_expanded_state(expanded_state)
+            else:
+                self.collapseAll()
+            
+            # После загрузки обновляем статусы папок на основе актуальных данных дерева
+            if not self._edit_mode:
+                self._update_folder_statuses(self.invisibleRootItem())
+        finally:
+            # Включаем обновления обратно
+            self.setUpdatesEnabled(True)
     
     def set_edit_mode(self, enabled: bool):
         """Установить режим редактирования (скрыть/показать иконки статусов)"""

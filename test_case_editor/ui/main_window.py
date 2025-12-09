@@ -2696,9 +2696,8 @@ class MainWindow(QMainWindow):
         if hasattr(self, 'filter_panel'):
             self.filter_panel.update_test_cases(self.test_cases)
         
-        # Обновляем дерево
-        self.tree_widget.load_tree(self.test_cases_dir, self.test_cases)
-        self.tree_widget.restore_expanded_state(expanded_state)
+        # Обновляем дерево с передачей состояния для восстановления (предотвращает прыгание)
+        self.tree_widget.load_tree(self.test_cases_dir, self.test_cases, expanded_state=expanded_state)
         # Восстанавливаем выбранный элемент
         if selected_filepath:
             self.tree_widget.restore_selected_item(selected_filepath)
