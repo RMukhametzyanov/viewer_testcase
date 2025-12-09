@@ -2705,6 +2705,14 @@ class MainWindow(QMainWindow):
         if not self.tree_widget._edit_mode:
             self.tree_widget._update_tree_icons(self.tree_widget.invisibleRootItem())
         
+        # Восстанавливаем фильтры ПОСЛЕ всех операций с деревом (включая обновление иконок)
+        # Это гарантирует, что фильтры применяются к полностью сформированному дереву
+        if hasattr(self, 'search_input') and hasattr(self, 'tree_widget'):
+            query = self.search_input.text()
+            filters = getattr(self, '_current_filters', {})
+            if query or filters:
+                self.tree_widget.filter_items(query, filters)
+        
         # Восстанавливаем размеры панелей после обновления
         if saved_detail_sizes and hasattr(self, "detail_splitter"):
             self.detail_splitter.setSizes(saved_detail_sizes)
@@ -2822,6 +2830,7 @@ class MainWindow(QMainWindow):
     
     def _on_tree_updated(self):
         """Обработка обновления дерева"""
+        # load_all_test_cases() уже применяет фильтры внутри себя
         self.load_all_test_cases()
         self.statusBar().showMessage("Дерево тест-кейсов обновлено.")
     
@@ -2839,6 +2848,14 @@ class MainWindow(QMainWindow):
             self.tree_widget.restore_expanded_state(expanded_state)
             if selected_filepath:
                 self.tree_widget.restore_selected_item(selected_filepath)
+            
+            # load_all_test_cases() уже применяет фильтры внутри себя, но нужно применить их после восстановления состояния
+            # чтобы фильтры работали с правильным состоянием развернутых папок
+            if hasattr(self, 'search_input') and hasattr(self, 'tree_widget'):
+                query = self.search_input.text()
+                filters = getattr(self, '_current_filters', {})
+                if query or filters:
+                    self.tree_widget.filter_items(query, filters)
             
             # Обновляем индикаторы статусов в дереве (в режиме запуска тестов)
             if not self.tree_widget._edit_mode:
@@ -2959,6 +2976,14 @@ class MainWindow(QMainWindow):
         filters = getattr(self, '_current_filters', {})
         self.tree_widget.filter_items(query, filters)
     
+    def _apply_current_filters(self):
+        """Применить текущие фильтры к дереву после перезагрузки."""
+        if hasattr(self, 'search_input') and hasattr(self, 'tree_widget'):
+            query = self.search_input.text()
+            filters = getattr(self, '_current_filters', {})
+            if query or filters:
+                self.tree_widget.filter_items(query, filters)
+    
     def _on_filter_button_clicked(self):
         """Обработчик клика на кнопку фильтра."""
         if not hasattr(self, 'filter_panel'):
@@ -2977,6 +3002,9 @@ class MainWindow(QMainWindow):
     
     def _on_filters_applied(self, filters: dict):
         """Обработчик применения фильтров."""
+        # Сохраняем фильтры для последующего восстановления после перезагрузки дерева
+        self._current_filters = filters.copy() if filters else {}
+        
         # Обновляем цвет иконки фильтра на зеленый
         if hasattr(self, 'filter_button'):
             filter_icon_name = "filter.svg"

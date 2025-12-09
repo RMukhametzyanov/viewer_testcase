@@ -1961,8 +1961,8 @@ class TestCaseTreeWidget(QTreeWidget):
             
             visible = own_match or matches
             item.setHidden(not visible)
-            # Убрано автоматическое разворачивание папок при фильтрации
-            # Состояние развернутых папок сохраняется пользователем
+            if pattern or filters:
+                item.setExpanded(matches or own_match)
             return visible
 
         return matches
