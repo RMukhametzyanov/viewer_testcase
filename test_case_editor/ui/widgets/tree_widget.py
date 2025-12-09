@@ -1961,8 +1961,8 @@ class TestCaseTreeWidget(QTreeWidget):
             
             visible = own_match or matches
             item.setHidden(not visible)
-            if pattern or filters:
-                item.setExpanded(matches or own_match)
+            # Убрано автоматическое разворачивание папок при фильтрации
+            # Состояние развернутых папок сохраняется пользователем
             return visible
 
         return matches
@@ -2363,16 +2363,42 @@ class TestCaseTreeWidget(QTreeWidget):
             if test_case:
                 return getattr(test_case, "_filepath", None)
         return None
+    
+    def capture_scroll_position(self) -> int:
+        """Сохранить текущую позицию скролла."""
+        scrollbar = self.verticalScrollBar()
+        if scrollbar:
+            return scrollbar.value()
+        return 0
+    
+    def restore_scroll_position(self, position: int):
+        """Восстановить позицию скролла."""
+        scrollbar = self.verticalScrollBar()
+        if scrollbar:
+            # Устанавливаем позицию скролла с задержкой, чтобы дерево успело обновиться
+            # Используем несколько попыток для надежности
+            def set_scroll():
+                if scrollbar:
+                    scrollbar.setValue(position)
+            QTimer.singleShot(50, set_scroll)
+            # Дополнительная попытка на случай, если первая не сработала
+            QTimer.singleShot(100, set_scroll)
 
-    def restore_selected_item(self, filepath: Optional[Path]):
-        """Восстановить выбранный элемент по пути к файлу."""
+    def restore_selected_item(self, filepath: Optional[Path], restore_scroll: bool = False):
+        """Восстановить выбранный элемент по пути к файлу.
+        
+        Args:
+            filepath: Путь к файлу тест-кейса
+            restore_scroll: Если True, прокручивает дерево к элементу. Если False, только выделяет элемент.
+        """
         if not filepath:
             return
         
         item = self._find_item_by_filepath(self.invisibleRootItem(), filepath)
         if item:
             self.setCurrentItem(item)
-            self.scrollToItem(item)
+            if restore_scroll:
+                self.scrollToItem(item)
             # Не вызываем test_case_selected.emit, чтобы не перезагружать форму
 
     def _find_item_by_filepath(self, parent: QTreeWidgetItem, filepath: Path) -> Optional[QTreeWidgetItem]:

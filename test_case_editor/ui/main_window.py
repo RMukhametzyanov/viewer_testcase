@@ -2685,10 +2685,13 @@ class MainWindow(QMainWindow):
         if hasattr(self, "detail_splitter"):
             saved_detail_sizes = self.detail_splitter.sizes()
         
+        scroll_position = 0
         if hasattr(self, "tree_widget"):
             expanded_state = self.tree_widget.capture_expanded_state()
             # Сохраняем путь к выбранному элементу для восстановления фокуса
             selected_filepath = self.tree_widget.capture_selected_item()
+            # Сохраняем позицию скролла для восстановления после перезагрузки
+            scroll_position = self.tree_widget.capture_scroll_position()
 
         self.test_cases = self.service.load_all_test_cases(self.test_cases_dir)
         
@@ -2698,9 +2701,9 @@ class MainWindow(QMainWindow):
         
         # Обновляем дерево с передачей состояния для восстановления (предотвращает прыгание)
         self.tree_widget.load_tree(self.test_cases_dir, self.test_cases, expanded_state=expanded_state)
-        # Восстанавливаем выбранный элемент
+        # Восстанавливаем выбранный элемент (без прокрутки, чтобы сохранить позицию скролла)
         if selected_filepath:
-            self.tree_widget.restore_selected_item(selected_filepath)
+            self.tree_widget.restore_selected_item(selected_filepath, restore_scroll=False)
         # Обновляем индикаторы статусов в дереве (в режиме запуска тестов)
         if not self.tree_widget._edit_mode:
             self.tree_widget._update_tree_icons(self.tree_widget.invisibleRootItem())
@@ -2712,6 +2715,11 @@ class MainWindow(QMainWindow):
             filters = getattr(self, '_current_filters', {})
             if query or filters:
                 self.tree_widget.filter_items(query, filters)
+        
+        # Восстанавливаем позицию скролла ПОСЛЕ применения фильтров
+        # Фильтры могут изменить высоту дерева, поэтому позицию нужно восстанавливать после них
+        if hasattr(self, "tree_widget"):
+            self.tree_widget.restore_scroll_position(scroll_position)
         
         # Восстанавливаем размеры панелей после обновления
         if saved_detail_sizes and hasattr(self, "detail_splitter"):
@@ -2840,6 +2848,7 @@ class MainWindow(QMainWindow):
             # Сохраняем состояние дерева
             expanded_state = self.tree_widget.capture_expanded_state()
             selected_filepath = self.tree_widget.capture_selected_item()
+            scroll_position = self.tree_widget.capture_scroll_position()
             
             # Перезагружаем тест-кейсы
             self.load_all_test_cases()
@@ -2847,7 +2856,7 @@ class MainWindow(QMainWindow):
             # Восстанавливаем состояние дерева
             self.tree_widget.restore_expanded_state(expanded_state)
             if selected_filepath:
-                self.tree_widget.restore_selected_item(selected_filepath)
+                self.tree_widget.restore_selected_item(selected_filepath, restore_scroll=False)
             
             # load_all_test_cases() уже применяет фильтры внутри себя, но нужно применить их после восстановления состояния
             # чтобы фильтры работали с правильным состоянием развернутых папок
@@ -2856,6 +2865,10 @@ class MainWindow(QMainWindow):
                 filters = getattr(self, '_current_filters', {})
                 if query or filters:
                     self.tree_widget.filter_items(query, filters)
+            
+            # Восстанавливаем позицию скролла ПОСЛЕ применения фильтров
+            # Фильтры могут изменить высоту дерева, поэтому позицию нужно восстанавливать после них
+            self.tree_widget.restore_scroll_position(scroll_position)
             
             # Обновляем индикаторы статусов в дереве (в режиме запуска тестов)
             if not self.tree_widget._edit_mode:
