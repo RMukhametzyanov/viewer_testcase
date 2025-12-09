@@ -25,7 +25,7 @@ from PyQt5.QtWidgets import (
     QWidget,
     QStyle,
 )
-from PyQt5.QtCore import Qt, pyqtSignal, QMimeData, QByteArray, QSize, QPoint
+from PyQt5.QtCore import Qt, pyqtSignal, QMimeData, QByteArray, QSize, QPoint, QTimer
 from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter, QPen, QMouseEvent, QBrush
 from PyQt5.QtSvg import QSvgRenderer
 
@@ -139,6 +139,17 @@ class TestCaseTreeWidget(QTreeWidget):
         # Для визуальной подсветки при drag & drop
         self._drag_over_item: Optional[QTreeWidgetItem] = None
         self._original_background: Optional[QBrush] = None
+        
+        # Таймер для автоматического разворачивания папок при drag & drop
+        self._expand_timer = QTimer(self)
+        self._expand_timer.setSingleShot(True)
+        self._expand_timer.timeout.connect(self._auto_expand_folder)
+        self._expand_target_item: Optional[QTreeWidgetItem] = None
+        
+        # Таймер для плавной автоскролли при drag & drop
+        self._scroll_timer = QTimer(self)
+        self._scroll_timer.timeout.connect(self._perform_smooth_scroll)
+        self._scroll_direction = 0  # -1 для вверх, 1 для вниз, 0 для остановки
     
     def drawRow(self, painter: QPainter, option, index):
         """Переопределяем отрисовку строки для добавления подсветки при drag & drop"""
@@ -1991,11 +2002,19 @@ class TestCaseTreeWidget(QTreeWidget):
         if event.mimeData().hasFormat(self.MIME_TYPE):
             event.acceptProposedAction()
             self._update_drag_over_item(event.pos())
+            # Автоскролл при приближении к краям виджета
+            self._auto_scroll_on_drag(event.pos())
         else:
             event.ignore()
     
     def dragLeaveEvent(self, event):
         """Обработка выхода drag & drop"""
+        # Останавливаем таймер разворачивания
+        self._expand_timer.stop()
+        self._expand_target_item = None
+        # Останавливаем таймер автоскролла
+        self._scroll_timer.stop()
+        self._scroll_direction = 0
         self._clear_drag_over_item()
         super().dragLeaveEvent(event)
 
@@ -2101,8 +2120,15 @@ class TestCaseTreeWidget(QTreeWidget):
         """Обновить визуальное выделение элемента при drag & drop"""
         item = self.itemAt(position)
         
-        # Если элемент не изменился, ничего не делаем
+        # Если элемент не изменился, проверяем только состояние таймера
         if item == self._drag_over_item:
+            # Если элемент не изменился, но папка уже развернута, останавливаем таймер
+            if item:
+                data = item.data(0, Qt.UserRole)
+                if data and isinstance(data, dict):
+                    if data.get("type") == "folder" and item.isExpanded():
+                        self._expand_timer.stop()
+                        self._expand_target_item = None
             return
         
         # Убираем выделение с предыдущего элемента
@@ -2118,9 +2144,25 @@ class TestCaseTreeWidget(QTreeWidget):
                 # Фон теперь рисуется в drawRow, просто обновляем виджет
                 self.viewport().update()
                 self.update()
+                
+                # Запускаем таймер для автоматического разворачивания папок
+                if data.get("type") == "folder" and not item.isExpanded() and item.childCount() > 0:
+                    self._expand_target_item = item
+                    self._expand_timer.start(2000)  # 2 секунды
+                else:
+                    # Останавливаем таймер, если элемент не папка или уже развернут
+                    self._expand_timer.stop()
+                    self._expand_target_item = None
     
     def _clear_drag_over_item(self):
         """Убрать визуальное выделение элемента"""
+        # Останавливаем таймер разворачивания
+        self._expand_timer.stop()
+        self._expand_target_item = None
+        # Останавливаем таймер автоскролла
+        self._scroll_timer.stop()
+        self._scroll_direction = 0
+        
         if self._drag_over_item:
             # Очищаем ссылку на элемент
             self._drag_over_item = None
@@ -2130,6 +2172,91 @@ class TestCaseTreeWidget(QTreeWidget):
             # Используем update() для безопасной перерисовки (repaint() может быть небезопасным)
             self.viewport().update()
             self.update()
+    
+    def _auto_scroll_on_drag(self, position):
+        """Автоматическая прокрутка дерева при drag & drop, если курсор близко к краю"""
+        viewport = self.viewport()
+        viewport_rect = viewport.rect()
+        
+        # Порог для начала автоскролла (в пикселях от края)
+        scroll_threshold = 30
+        
+        # Проверяем верхний край
+        if position.y() < scroll_threshold:
+            scrollbar = self.verticalScrollBar()
+            if scrollbar and scrollbar.value() > scrollbar.minimum():
+                # Запускаем плавную прокрутку вверх
+                if self._scroll_direction != -1:
+                    self._scroll_direction = -1
+                    if not self._scroll_timer.isActive():
+                        self._scroll_timer.start(16)  # ~60 FPS для плавности
+            else:
+                # Достигли верха, останавливаем прокрутку
+                self._scroll_timer.stop()
+                self._scroll_direction = 0
+        
+        # Проверяем нижний край
+        elif position.y() > viewport_rect.height() - scroll_threshold:
+            scrollbar = self.verticalScrollBar()
+            if scrollbar and scrollbar.value() < scrollbar.maximum():
+                # Запускаем плавную прокрутку вниз
+                if self._scroll_direction != 1:
+                    self._scroll_direction = 1
+                    if not self._scroll_timer.isActive():
+                        self._scroll_timer.start(16)  # ~60 FPS для плавности
+            else:
+                # Достигли низа, останавливаем прокрутку
+                self._scroll_timer.stop()
+                self._scroll_direction = 0
+        else:
+            # Курсор вне зоны автоскролла, останавливаем прокрутку
+            self._scroll_timer.stop()
+            self._scroll_direction = 0
+    
+    def _perform_smooth_scroll(self):
+        """Выполнить один шаг плавной прокрутки"""
+        if self._scroll_direction == 0:
+            self._scroll_timer.stop()
+            return
+        
+        scrollbar = self.verticalScrollBar()
+        if not scrollbar:
+            self._scroll_timer.stop()
+            self._scroll_direction = 0
+            return
+        
+        # Попиксельная прокрутка для максимальной плавности
+        scroll_speed = 1  # 1 пиксель за тик
+        current_value = scrollbar.value()
+        
+        if self._scroll_direction == -1:  # Прокрутка вверх
+            if current_value > scrollbar.minimum():
+                new_value = max(scrollbar.minimum(), current_value - scroll_speed)
+                scrollbar.setValue(new_value)
+            else:
+                # Достигли верха, останавливаем
+                self._scroll_timer.stop()
+                self._scroll_direction = 0
+        elif self._scroll_direction == 1:  # Прокрутка вниз
+            if current_value < scrollbar.maximum():
+                new_value = min(scrollbar.maximum(), current_value + scroll_speed)
+                scrollbar.setValue(new_value)
+            else:
+                # Достигли низа, останавливаем
+                self._scroll_timer.stop()
+                self._scroll_direction = 0
+    
+    def _auto_expand_folder(self):
+        """Автоматически развернуть папку после задержки при drag & drop"""
+        if self._expand_target_item and not self._expand_target_item.isExpanded():
+            # Проверяем, что элемент все еще является папкой
+            data = self._expand_target_item.data(0, Qt.UserRole)
+            if data and data.get("type") == "folder":
+                self._expand_target_item.setExpanded(True)
+                # Обновляем позицию drag over item, так как дерево изменилось
+                if self._drag_over_item == self._expand_target_item:
+                    self.viewport().update()
+                    self.update()
     
     def _resolve_drop_target(self, position):
         item = self.itemAt(position)
