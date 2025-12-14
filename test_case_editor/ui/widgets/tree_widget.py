@@ -423,8 +423,8 @@ class TestCaseTreeWidget(QTreeWidget):
     
     def _populate_directory(self, directory: Path, parent_item: QTreeWidgetItem, test_cases: list):
         for subdir in sorted([d for d in directory.iterdir() if d.is_dir()]):
-            # Пропускаем папки _attachment
-            if subdir.name == "_attachment":
+            # Пропускаем папки _attachment и Reports_by_viewer
+            if subdir.name == "_attachment" or subdir.name == "Reports_by_viewer":
                 continue
             folder_item = QTreeWidgetItem(parent_item)
             

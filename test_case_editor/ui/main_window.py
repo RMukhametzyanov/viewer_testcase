@@ -1480,6 +1480,10 @@ class MainWindow(QMainWindow):
         self.aux_panel.manual_review_notes_changed.connect(self._on_manual_review_notes_changed)
         self.detail_splitter.addWidget(self.aux_panel)
         
+        # Устанавливаем test_cases_dir для панели отчетности
+        if hasattr(self.aux_panel, 'reports_panel') and self.test_cases_dir:
+            self.aux_panel.reports_panel.set_test_cases_dir(self.test_cases_dir)
+        
         # Создаем кнопки панелей в toolbar после создания aux_panel
         self._create_panel_buttons()
         
@@ -2649,6 +2653,9 @@ class MainWindow(QMainWindow):
             selected_path = Path(folder)
             self.settings['test_cases_dir'] = str(selected_path)
             self.save_settings(self.settings)
+            # Обновляем панель отчетности
+            if hasattr(self, 'aux_panel') and hasattr(self.aux_panel, 'reports_panel'):
+                self.aux_panel.reports_panel.set_test_cases_dir(selected_path)
             return selected_path
         
         # Если пользователь отменил выбор, сохраняем пустое значение
@@ -4103,6 +4110,9 @@ class MainWindow(QMainWindow):
             if old_dir != self.test_cases_dir:
                 # Перезагружаем дерево тест-кейсов, если изменилась папка
                 self.load_all_test_cases()
+                # Обновляем панель отчетности
+                if hasattr(self, 'aux_panel') and hasattr(self.aux_panel, 'reports_panel'):
+                    self.aux_panel.reports_panel.set_test_cases_dir(self.test_cases_dir)
         
         # Обновляем LLM настройки
         llm_host_changed = False
@@ -4408,8 +4418,8 @@ class MainWindow(QMainWindow):
             # Определяем папку приложения
             app_dir = Path(__file__).resolve().parent.parent.parent
             
-            # Проверяем и создаем папку Reports, если её нет
-            reports_dir = app_dir / "Reports"
+            # Проверяем и создаем папку Reports_by_viewer в родительской директории test_cases_dir
+            reports_dir = self.test_cases_dir.parent / "Reports_by_viewer"
             if not reports_dir.exists():
                 try:
                     reports_dir.mkdir(parents=True, exist_ok=True)
@@ -4417,9 +4427,9 @@ class MainWindow(QMainWindow):
                     QMessageBox.warning(
                         self,
                         "Ошибка создания папки",
-                        f"Не удалось создать папку Reports:\n{e}"
+                        f"Не удалось создать папку Reports_by_viewer:\n{e}"
                     )
-                    self.statusBar().showMessage(f"Ошибка создания папки Reports: {e}")
+                    self.statusBar().showMessage(f"Ошибка создания папки Reports_by_viewer: {e}")
                     return
             
             # Получаем название проекта из настроек
@@ -4456,22 +4466,22 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage(f"Ошибка: {e}")
 
     def _generate_summary_report(self):
-        """Генерация суммарного HTML отчета на основе всех отчетов в папке Reports"""
+        """Генерация суммарного HTML отчета на основе всех отчетов в папке Reports_by_viewer"""
         try:
             # Определяем папку приложения
             current_file = Path(__file__).resolve()
             app_dir = current_file.parent.parent.parent
             
-            # Определяем папку Reports
-            reports_dir = app_dir / "Reports"
+            # Определяем папку Reports_by_viewer в родительской директории test_cases_dir
+            reports_dir = self.test_cases_dir.parent / "Reports_by_viewer"
             
             if not reports_dir.exists():
                 QMessageBox.warning(
                     self,
-                    "Папка Reports не найдена",
-                    f"Папка Reports не существует:\n{reports_dir}",
+                    "Папка Reports_by_viewer не найдена",
+                    f"Папка Reports_by_viewer не существует:\n{reports_dir}",
                 )
-                self.statusBar().showMessage("Папка Reports не найдена")
+                self.statusBar().showMessage("Папка Reports_by_viewer не найдена")
                 return
             
             # Генерируем суммарный отчет
@@ -4504,7 +4514,7 @@ class MainWindow(QMainWindow):
                     self,
                     "Ошибка генерации суммарного отчета",
                     "Не удалось сгенерировать суммарный отчет.\n"
-                    "Убедитесь, что в папке Reports есть HTML отчеты.",
+                    "Убедитесь, что в папке Reports_by_viewer есть HTML отчеты.",
                 )
                 self.statusBar().showMessage("Ошибка при генерации суммарного отчета")
         except Exception as e:

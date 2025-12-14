@@ -13,10 +13,10 @@ def generate_summary_report(
     project_name: Optional[str] = None,
 ) -> Optional[Path]:
     """
-    Генерирует суммарный HTML отчет на основе всех HTML отчетов в папке Reports.
+    Генерирует суммарный HTML отчет на основе всех HTML отчетов в папке Reports_by_viewer.
     
     Args:
-        reports_dir: Путь к папке Reports
+        reports_dir: Путь к папке Reports_by_viewer
         app_dir: Путь к папке приложения (где находится run_app.py)
                 Если None, определяется автоматически
     
@@ -61,7 +61,7 @@ def generate_summary_report(
 
 def _collect_all_reports_data(reports_dir: Path) -> List[Dict]:
     """
-    Собрать данные из всех HTML отчетов в папке Reports.
+    Собрать данные из всех HTML отчетов в папке Reports_by_viewer.
     
     Returns:
         Список словарей с данными каждого отчета:

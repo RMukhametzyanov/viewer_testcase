@@ -1,4 +1,4 @@
-"""Виджет для отображения структуры папки Reports."""
+"""Виджет для отображения структуры папки Reports_by_viewer."""
 
 import json
 from pathlib import Path
@@ -24,7 +24,7 @@ from ..styles.ui_metrics import UI_METRICS
 
 
 class ReportsPanel(QWidget):
-    """Панель для отображения структуры папки Reports"""
+    """Панель для отображения структуры папки Reports_by_viewer"""
     
     generate_report_requested = pyqtSignal()  # Сигнал для запроса генерации отчета
     generate_summary_report_requested = pyqtSignal()  # Сигнал для запроса генерации суммарного отчета
@@ -102,7 +102,7 @@ class ReportsPanel(QWidget):
         content_layout.addLayout(title_layout)
         
         # Описание
-        desc_label = QLabel("Структура папки Reports с отчетами")
+        desc_label = QLabel("Структура папки Reports_by_viewer с отчетами")
         desc_label.setStyleSheet("color: #888; font-size: 12px; margin-bottom: 10px;")
         content_layout.addWidget(desc_label)
         
@@ -263,23 +263,43 @@ class ReportsPanel(QWidget):
             return None
     
     def _find_reports_dir(self):
-        """Найти папку Reports относительно корня проекта"""
+        """Найти папку Reports_by_viewer в родительской директории test_cases_dir"""
         try:
-            # Ищем корень проекта (где находится run_app.py)
-            current_file = Path(__file__).resolve()
-            # Поднимаемся от widgets/ -> ui/ -> test_case_editor/ -> корень проекта
-            app_dir = current_file.parent.parent.parent.parent
-            self.reports_dir = app_dir / "Reports"
+            # Получаем test_cases_dir из родительского окна
+            parent_window = self.parent()
+            while parent_window and not hasattr(parent_window, 'test_cases_dir'):
+                parent_window = parent_window.parent()
+            
+            if parent_window and hasattr(parent_window, 'test_cases_dir') and parent_window.test_cases_dir:
+                # Создаем путь к Reports_by_viewer в родительской директории test_cases_dir
+                self.reports_dir = parent_window.test_cases_dir.parent / "Reports_by_viewer"
+            else:
+                # Fallback: ищем корень проекта (где находится run_app.py)
+                current_file = Path(__file__).resolve()
+                app_dir = current_file.parent.parent.parent.parent
+                self.reports_dir = app_dir / "Reports_by_viewer"
         except Exception:
             self.reports_dir = None
+    
+    def set_test_cases_dir(self, test_cases_dir: Path):
+        """Установить путь к папке с тест-кейсами и обновить путь к папке отчетов"""
+        if test_cases_dir and test_cases_dir.exists():
+            # Создаем путь к Reports_by_viewer в родительской директории test_cases_dir
+            self.reports_dir = test_cases_dir.parent / "Reports_by_viewer"
+            # Обновляем список отчетов
+            self.refresh_reports()
     
     def refresh_reports(self):
         """Обновить список отчетов"""
         self.reports_tree.clear()
         
+        # Если папка не найдена, пытаемся найти её заново
+        if not self.reports_dir or not self.reports_dir.exists():
+            self._find_reports_dir()
+        
         if not self.reports_dir or not self.reports_dir.exists():
             no_reports_item = QTreeWidgetItem(self.reports_tree)
-            no_reports_item.setText(0, "Папка Reports не найдена")
+            no_reports_item.setText(0, "Папка Reports_by_viewer не найдена")
             no_reports_item.setFlags(no_reports_item.flags() & ~Qt.ItemIsSelectable)
             return
         
