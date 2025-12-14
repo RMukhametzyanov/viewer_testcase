@@ -147,17 +147,24 @@ class SettingsDialog(QDialog):
             ("Общие", "general"),
             ("LLM", "llm"),
             ("Промпты", "prompts"),
-            ("Панели", "panels"),
+            ("Панели", "panels"),  # Скрыт, но функционал сохранен
             ("Внешний вид", "appearance"),
             ("Панель Информация", "information_panel"),
+            ("Тест кейс", "test_case"),
             ("Импорт", "import"),
         ]
         
         self.section_widgets = {}
+        self.panels_item = None  # Сохраняем ссылку на элемент "Панели" для скрытия
         for name, key in sections:
             # Добавляем в список навигации
             item = QListWidgetItem(name)
             self.nav_list.addItem(item)
+            
+            # Скрываем пункт "Панели"
+            if key == "panels":
+                self.panels_item = item
+                item.setHidden(True)
             
             # Создаем и добавляем контент
             if key == "general":
@@ -172,6 +179,8 @@ class SettingsDialog(QDialog):
                 widget = self._create_appearance_tab()
             elif key == "information_panel":
                 widget = self._create_information_panel_tab()
+            elif key == "test_case":
+                widget = self._create_test_case_tab()
             elif key == "import":
                 widget = self._create_import_tab()
             else:
@@ -432,6 +441,42 @@ class SettingsDialog(QDialog):
         
         panels_group.setLayout(panels_layout)
         content_layout.addWidget(panels_group)
+        
+        content_layout.addStretch()
+        scroll.setWidget(content)
+        layout.addWidget(scroll)
+        
+        return widget
+
+    def _create_test_case_tab(self) -> QWidget:
+        """Создать вкладку настроек тест-кейса"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        layout.setSpacing(UI_METRICS.base_spacing)
+        
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.NoFrame)
+        
+        content = QWidget()
+        content_layout = QVBoxLayout(content)
+        content_layout.setSpacing(UI_METRICS.section_spacing)
+        
+        # Причины пропуска теста
+        skip_reasons_group = QGroupBox("Причины пропуска теста")
+        skip_reasons_layout = QVBoxLayout()
+        skip_reasons_layout.setSpacing(UI_METRICS.base_spacing)
+        
+        # Многострочное поле для причин (кроме "Другое")
+        reasons_label = QLabel("Список причин пропуска (каждая причина с новой строки):")
+        skip_reasons_layout.addWidget(reasons_label)
+        
+        self.skip_reasons_edit = QTextEdit()
+        self.skip_reasons_edit.setPlaceholderText("Автотесты\nНагрузочное тестирование\nTest-first")
+        skip_reasons_layout.addWidget(self.skip_reasons_edit)
+        
+        skip_reasons_group.setLayout(skip_reasons_layout)
+        content_layout.addWidget(skip_reasons_group)
         
         content_layout.addStretch()
         scroll.setWidget(content)
@@ -747,6 +792,13 @@ class SettingsDialog(QDialog):
         self.form_area_spin.setValue(panel_sizes.get('form_area', 900))
         self.review_panel_spin.setValue(panel_sizes.get('review', 360))
         
+        # Тест кейс - причины пропуска (кроме "Другое")
+        if hasattr(self, 'skip_reasons_edit'):
+            skip_reasons = self.settings.get('skip_reasons', [])
+            # Фильтруем "Другое" и формируем текст
+            reasons_text = '\n'.join([r for r in skip_reasons if r != "Другое"])
+            self.skip_reasons_edit.setPlainText(reasons_text)
+        
         # Внешний вид
         self.theme_combo.setCurrentText(self.settings.get('theme', 'dark'))
         font_family = self.settings.get('font_family', 'Segoe UI')
@@ -899,6 +951,17 @@ class SettingsDialog(QDialog):
         self.settings['panel_sizes']['left'] = self.left_panel_spin.value()
         self.settings['panel_sizes']['form_area'] = self.form_area_spin.value()
         self.settings['panel_sizes']['review'] = self.review_panel_spin.value()
+        
+        # Тест кейс - причины пропуска
+        if hasattr(self, 'skip_reasons_edit'):
+            # Получаем текст из многострочного поля
+            reasons_text = self.skip_reasons_edit.toPlainText().strip()
+            # Разбиваем на строки и фильтруем пустые
+            skip_reasons = [r.strip() for r in reasons_text.split('\n') if r.strip()]
+            # Добавляем "Другое" если его нет
+            if "Другое" not in skip_reasons:
+                skip_reasons.append("Другое")
+            self.settings['skip_reasons'] = skip_reasons
         
         # Внешний вид
         self.settings['theme'] = self.theme_combo.currentText().strip()
