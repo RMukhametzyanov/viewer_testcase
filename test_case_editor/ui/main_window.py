@@ -1907,10 +1907,22 @@ class MainWindow(QMainWindow):
             """)
     
     def _create_save_shortcut(self):
-        """Создать горячую клавишу для сохранения (Ctrl+S на Windows/Linux, Cmd+S на macOS)"""
-        # Используем QKeySequence.Save, который автоматически использует правильную комбинацию для каждой платформы
-        # На Windows/Linux это Ctrl+S, на macOS это Cmd+S
-        save_shortcut = QShortcut(QKeySequence.Save, self)
+        """Создать горячую клавишу для сохранения (Ctrl+S на Windows/Linux, Cmd+S на macOS)
+        
+        Использует явную комбинацию клавиш с кодами клавиш, которая работает независимо от раскладки клавиатуры.
+        На macOS используется Meta (Cmd), на Windows/Linux - Control.
+        """
+        # На macOS используем Meta (Cmd), на Windows/Linux - Control
+        # Используем коды клавиш напрямую для работы независимо от раскладки
+        if sys.platform == "darwin":
+            # macOS: Cmd+S (MetaModifier = Cmd)
+            # Используем конструктор QKeySequence с модификатором и кодом клавиши
+            key_sequence = QKeySequence(Qt.MetaModifier + Qt.Key_S)
+        else:
+            # Windows/Linux: Ctrl+S
+            key_sequence = QKeySequence(Qt.ControlModifier + Qt.Key_S)
+        
+        save_shortcut = QShortcut(key_sequence, self)
         save_shortcut.activated.connect(self._on_save_button_clicked)
         self.save_shortcut = save_shortcut  # Сохраняем ссылку, чтобы не удалился
     
