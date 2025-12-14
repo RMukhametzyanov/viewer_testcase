@@ -56,7 +56,6 @@ from .widgets.placeholder_widget import PlaceholderWidget
 from .widgets.tree_widget import TestCaseTreeWidget
 from .widgets.form_widget import TestCaseFormWidget
 from .widgets.auxiliary_panel import AuxiliaryPanel
-from .widgets.toggle_switch import ToggleSwitch
 from .widgets.filter_panel import FilterPanel
 from ..utils import llm
 from ..utils.prompt_builder import build_review_prompt, build_creation_prompt
@@ -65,6 +64,7 @@ from ..utils.settings_path import get_settings_path
 from ..utils.allure_generator import generate_allure_report
 from ..utils.html_report_generator import generate_html_report
 from ..utils.resource_path import get_icon_path, get_icons_dir
+from ..git_conflict_resolver import GitConflictDetector, GitConflictResolverDialog
 from .styles.ui_metrics import UI_METRICS
 from .styles.app_theme import build_app_style_sheet
 from .styles.theme_provider import THEME_PROVIDER, ThemeProvider
@@ -1618,17 +1618,7 @@ class MainWindow(QMainWindow):
         generate_report_action.triggered.connect(self._generate_html_report)
         settings_action.setShortcut('Ctrl+,')
 
-        # Меню "Git" - создаем через QAction чтобы иконка отображалась рядом с текстом
-        self.git_menu_action = QAction('Git', self)
-        self.git_menu = QMenu(self)
-        self.git_menu_action.setMenu(self.git_menu)
-        menubar.addAction(self.git_menu_action)
-        self.git_commit_action = self.git_menu.addAction('Commit…')
-        self.git_commit_action.triggered.connect(self._open_git_commit_dialog)
-        self.git_push_action = self.git_menu.addAction('Push')
-        self.git_push_action.triggered.connect(self._perform_git_push)
-        
-        # Обновляем индикаторы статуса Git
+        # Обновляем индикаторы статуса Git (для кнопки синхронизации)
         self._update_git_status_indicators()
     
     def _create_toolbar(self):
@@ -1637,19 +1627,32 @@ class MainWindow(QMainWindow):
         self.toolbar.setMovable(False)  # Не позволяем перемещать панель
         self.addToolBar(self.toolbar)
         
-        # Переключатель режима
-        self.mode_edit_label = QLabel("Редактирование")
-        self.toolbar.addWidget(self.mode_edit_label)
+        # Кнопка синхронизации Git (слева)
+        self._create_git_sync_button()
         
-        self.mode_switch = ToggleSwitch()
-        self.mode_switch.toggled.connect(self._on_mode_switch_changed)
-        self.toolbar.addWidget(self.mode_switch)
+        # Отступ перед разделителем
+        spacer_before = QWidget()
+        spacer_before.setFixedWidth(2)
+        self.toolbar.addWidget(spacer_before)
         
-        self.mode_run_label = QLabel("Запуск тестов")
-        self.toolbar.addWidget(self.mode_run_label)
+        # Вертикальный разделитель
+        separator = QFrame()
+        separator.setFrameShape(QFrame.VLine)
+        separator.setFrameShadow(QFrame.Sunken)
+        separator.setStyleSheet("color: rgba(255, 255, 255, 0.3);")
+        separator.setFixedWidth(1)
+        separator.setFixedHeight(24)
+        self.toolbar.addWidget(separator)
+        
+        # Отступ после разделителя
+        spacer_after = QWidget()
+        spacer_after.setFixedWidth(2)
+        self.toolbar.addWidget(spacer_after)
+        
+        # Кнопки режимов с иконками (слева, после разделителя)
+        self._create_mode_buttons()
         
         # Добавляем растягивающийся разделитель, чтобы кнопки панелей были справа
-        self.toolbar.addSeparator()
         spacer = QWidget()
         spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         self.toolbar.addWidget(spacer)
@@ -1685,20 +1688,24 @@ class MainWindow(QMainWindow):
             try:
                 with open(mapping_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
-                    if isinstance(data, dict) and 'panels' in data:
-                        return data.get('panels', {})
-                    else:
+                    # Возвращаем весь словарь, чтобы иметь доступ ко всем секциям
+                    if isinstance(data, dict):
                         return data
+                    else:
+                        return {}
             except (json.JSONDecodeError, IOError) as e:
                 print(f"Ошибка загрузки маппинга иконок: {e}")
         
+        # Возвращаем словарь с секцией panels для обратной совместимости
         return {
-            "information": "info.svg",
-            "review": "eye.svg",
-            "creation": "file-plus.svg",
-            "json": "code.svg",
-            "files": "file.svg",
-            "reports": "book.svg"
+            "panels": {
+                "information": "info.svg",
+                "review": "eye.svg",
+                "creation": "file-plus.svg",
+                "json": "code.svg",
+                "files": "file.svg",
+                "reports": "book.svg"
+            }
         }
     
     def _load_svg_icon(self, icon_name: str, size: int = 24, color: Optional[str] = None) -> Optional[QIcon]:
@@ -1743,8 +1750,14 @@ class MainWindow(QMainWindow):
         if not hasattr(self, 'toolbar') or not self.toolbar:
             return
         
+        # Добавляем разделитель перед кнопками панелей
+        self.toolbar.addSeparator()
+        
         # Загружаем маппинг иконок
         icon_mapping = self._load_icon_mapping()
+        
+        # Получаем секцию panels из маппинга
+        panels_mapping = icon_mapping.get('panels', icon_mapping)  # Для обратной совместимости
         
         # Порядок панелей
         tabs_order = ["information", "review", "creation", "json", "files", "reports", "manual_review"]
@@ -1764,7 +1777,7 @@ class MainWindow(QMainWindow):
             button = QToolButton()
             
             # Загружаем иконку из SVG файла
-            icon_name = icon_mapping.get(tab_id)
+            icon_name = panels_mapping.get(tab_id)
             if icon_name:
                 icon = self._load_svg_icon(icon_name, size=20, color="#ffffff")
                 if icon and not icon.isNull():
@@ -1812,6 +1825,114 @@ class MainWindow(QMainWindow):
             if hasattr(self, 'aux_panel'):
                 self.aux_panel.setVisible(True)
                 self.aux_panel.select_tab("information")
+    
+    def _create_mode_buttons(self):
+        """Создать кнопки режимов редактирования и запуска тестов с иконками."""
+        # Загружаем маппинг иконок
+        icon_mapping = self._load_icon_mapping()
+        toolbar_mapping = icon_mapping.get('toolbar', {})
+        
+        # Кнопка режима редактирования
+        self.mode_edit_button = QToolButton()
+        edit_icon_name = toolbar_mapping.get('edit_mode', 'edit.svg')
+        edit_icon = self._load_svg_icon(edit_icon_name, size=20, color="#ffffff")
+        if edit_icon and not edit_icon.isNull():
+            self.mode_edit_button.setIcon(edit_icon)
+            self.mode_edit_button.setIconSize(QSize(20, 20))
+        else:
+            print(f"Предупреждение: не удалось загрузить иконку {edit_icon_name} для режима редактирования")
+            self.mode_edit_button.setText("E")
+        self.mode_edit_button.setToolTip("Редактирование")
+        self.mode_edit_button.setCursor(Qt.PointingHandCursor)
+        self.mode_edit_button.setAutoRaise(True)
+        self.mode_edit_button.setFixedSize(32, 32)
+        self.mode_edit_button.setCheckable(False)
+        self.mode_edit_button.setStyleSheet(self._get_panel_button_style(False))
+        # При клике переключаем на режим редактирования
+        self.mode_edit_button.clicked.connect(lambda: self._set_mode("edit"))
+        self.toolbar.addWidget(self.mode_edit_button)
+        
+        # Кнопка режима запуска тестов
+        self.mode_run_button = QToolButton()
+        run_icon_name = toolbar_mapping.get('run_mode', 'check-square.svg')
+        run_icon = self._load_svg_icon(run_icon_name, size=20, color="#ffffff")
+        if run_icon and not run_icon.isNull():
+            self.mode_run_button.setIcon(run_icon)
+            self.mode_run_button.setIconSize(QSize(20, 20))
+        else:
+            print(f"Предупреждение: не удалось загрузить иконку {run_icon_name} для режима запуска тестов")
+            self.mode_run_button.setText("R")
+        self.mode_run_button.setToolTip("Запуск тестов")
+        self.mode_run_button.setCursor(Qt.PointingHandCursor)
+        self.mode_run_button.setAutoRaise(True)
+        self.mode_run_button.setFixedSize(32, 32)
+        self.mode_run_button.setCheckable(False)
+        self.mode_run_button.setStyleSheet(self._get_panel_button_style(False))
+        # При клике переключаем на режим запуска
+        self.mode_run_button.clicked.connect(lambda: self._set_mode("run"))
+        self.toolbar.addWidget(self.mode_run_button)
+    
+    def _create_git_sync_button(self):
+        """Создать кнопку синхронизации git в toolbar."""
+        # Проверяем, что toolbar существует
+        if not hasattr(self, 'toolbar') or not self.toolbar:
+            return
+        
+        # Загружаем маппинг иконок
+        icon_mapping = self._load_icon_mapping()
+        
+        # Создаем кнопку
+        git_sync_button = QToolButton()
+        
+        # Загружаем иконку из SVG файла
+        toolbar_mapping = icon_mapping.get('toolbar', {})
+        icon_name = toolbar_mapping.get('git_sync', 'gitlab.svg')
+        icon = self._load_svg_icon(icon_name, size=20, color="#ffffff")
+        if icon and not icon.isNull():
+            git_sync_button.setIcon(icon)
+            git_sync_button.setIconSize(QSize(20, 20))
+        else:
+            print(f"Предупреждение: не удалось загрузить иконку {icon_name} для синхронизации git")
+            git_sync_button.setText("Git")
+        
+        git_sync_button.setToolTip("Синхронизация с репозиторием (Pull, Commit, Push)")
+        git_sync_button.setCursor(Qt.PointingHandCursor)
+        git_sync_button.setAutoRaise(True)
+        git_sync_button.setFixedSize(32, 32)
+        
+        # Стиль кнопки (похожий на кнопки панелей, но не checkable)
+        git_sync_button.setStyleSheet(self._get_panel_button_style(False))
+        
+        # Подключаем обработчик клика
+        git_sync_button.clicked.connect(self._perform_git_sync)
+        
+        self.toolbar.addWidget(git_sync_button)
+        self.git_sync_button = git_sync_button
+        
+        # Обновляем стиль кнопки при создании
+        has_uncommitted, has_unpushed, has_conflicts = self._check_git_status()
+        self._update_git_sync_button_style(has_conflicts, has_uncommitted)
+    
+    def _update_git_sync_button_style(self, has_conflicts: bool, has_uncommitted: bool):
+        """Обновить цвет иконки синхронизации Git в зависимости от состояния."""
+        if not hasattr(self, 'git_sync_button'):
+            return
+        
+        # Определяем цвет иконки
+        icon_color = "#ffffff"  # По умолчанию - белый
+        if has_conflicts:
+            icon_color = "#e74c3c"  # Красный для конфликтов
+        elif has_uncommitted:
+            icon_color = "#f39c12"  # Желтый для незакоммиченных изменений
+        
+        # Загружаем иконку с нужным цветом
+        icon_mapping = self._load_icon_mapping()
+        toolbar_mapping = icon_mapping.get('toolbar', {})
+        icon_name = toolbar_mapping.get('git_sync', 'gitlab.svg')
+        icon = self._load_svg_icon(icon_name, size=20, color=icon_color)
+        if icon and not icon.isNull():
+            self.git_sync_button.setIcon(icon)
+            self.git_sync_button.setIconSize(QSize(20, 20))
     
     def _on_panel_button_clicked(self, tab_id: str, checked: bool):
         """Обработчик клика на кнопку панели."""
@@ -2545,17 +2666,118 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("Git: ошибка выполнения")
             return
     
-    def _check_git_status(self):
-        """Проверить статус Git: есть ли незакоммиченные изменения и незапушенные коммиты."""
+    def _perform_git_pull(self):
+        """Выполнить git pull для получения изменений из удалённого репозитория."""
         repo_root, git_path = self._get_git_repo_info()
         if repo_root is None or git_path is None:
-            return False, False
-        
-        has_uncommitted = False
-        has_unpushed = False
+            return
         
         try:
-            # Проверяем наличие незакоммиченных изменений
+            self.statusBar().showMessage("Git: получаю изменения из удалённого репозитория…")
+            pull_result = subprocess.run(
+                ["git", "pull"],
+                cwd=str(repo_root),
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='replace',
+                timeout=60,  # Таймаут 60 секунд для pull
+            )
+            
+            if pull_result.returncode != 0:
+                stderr = (pull_result.stderr or "").strip()
+                stdout = (pull_result.stdout or "").strip()
+                combined_output = stderr or stdout or "Неизвестная ошибка."
+                
+                # Определяем тип ошибки для более понятного сообщения
+                error_lower = combined_output.lower()
+                if any(keyword in error_lower for keyword in ["could not resolve", "failed to connect", "connection refused", "network", "unreachable", "timeout"]):
+                    error_message = (
+                        "Не удалось получить изменения из удалённого репозитория.\n\n"
+                        "Возможные причины:\n"
+                        "• GitLab недоступен или перегружен\n"
+                        "• Проблемы с сетевым подключением\n"
+                        "• Неверный URL удалённого репозитория\n\n"
+                        f"Детали ошибки:\n{combined_output}"
+                    )
+                elif "authentication" in error_lower or "permission" in error_lower or "denied" in error_lower:
+                    error_message = (
+                        "Не удалось получить изменения: проблема с аутентификацией.\n\n"
+                        "Проверьте:\n"
+                        "• Настройки доступа к репозиторию\n"
+                        "• Учётные данные Git\n\n"
+                        f"Детали ошибки:\n{combined_output}"
+                    )
+                elif "merge conflict" in error_lower or "conflict" in error_lower:
+                    # Открываем решатель конфликтов
+                    self._open_conflict_resolver()
+                    return False
+                else:
+                    error_message = (
+                        "Не удалось получить изменения из удалённого репозитория.\n\n"
+                        f"Детали ошибки:\n{combined_output}"
+                    )
+                
+                QMessageBox.warning(
+                    self,
+                    "Git Pull - Ошибка",
+                    error_message,
+                )
+                self.statusBar().showMessage("Git: не удалось получить изменения")
+                return False
+            else:
+                # Pull успешно выполнен
+                output = (pull_result.stdout or "").strip()
+                if output and "already up to date" not in output.lower():
+                    QMessageBox.information(
+                        self,
+                        "Git",
+                        "Изменения успешно получены из удалённого репозитория.",
+                    )
+                self.statusBar().showMessage("Git: изменения успешно получены")
+                # Обновляем индикаторы статуса Git
+                self._update_git_status_indicators()
+                return True
+                
+        except subprocess.TimeoutExpired:
+            QMessageBox.warning(
+                self,
+                "Git Pull - Таймаут",
+                (
+                    "Превышено время ожидания при получении изменений.\n\n"
+                    "Возможные причины:\n"
+                    "• GitLab недоступен или перегружен\n"
+                    "• Медленное сетевое подключение\n"
+                    "• Слишком большой объём данных для получения\n\n"
+                    "Попробуйте выполнить pull позже или проверьте подключение к сети."
+                ),
+            )
+            self.statusBar().showMessage("Git: таймаут при получении изменений")
+            return False
+        except FileNotFoundError:
+            QMessageBox.critical(
+                self,
+                "Git",
+                "Команда git не найдена. Установите Git и убедитесь, что он доступен в PATH.",
+            )
+            self.statusBar().showMessage("Git: ошибка выполнения")
+            return False
+    
+    def _perform_git_sync(self):
+        """Выполнить синхронизацию с репозиторием: pull, commit (если есть изменения), push."""
+        repo_root, git_path = self._get_git_repo_info()
+        if repo_root is None or git_path is None:
+            return
+        
+        # Шаг 1: Pull - получаем изменения из удалённого репозитория
+        self.statusBar().showMessage("Git: синхронизация с репозиторием…")
+        pull_success = self._perform_git_pull()
+        if not pull_success:
+            # Если pull не удался, не продолжаем синхронизацию
+            return
+        
+        # Шаг 2: Проверяем, есть ли локальные изменения для коммита
+        try:
             status_proc = subprocess.run(
                 ["git", "status", "--porcelain", git_path],
                 cwd=str(repo_root),
@@ -2565,7 +2787,65 @@ class MainWindow(QMainWindow):
                 errors='replace',
                 check=True,
             )
-            has_uncommitted = bool(status_proc.stdout.strip())
+            has_changes = bool(status_proc.stdout.strip())
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            has_changes = False
+        
+        # Шаг 3: Если есть изменения, делаем commit
+        if has_changes:
+            # Открываем диалог для ввода комментария коммита
+            dialog = GitCommitDialog(self)
+            if dialog.exec_() == QDialog.Accepted:
+                comment = dialog.get_comment().strip()
+                if comment:
+                    self._perform_git_commit(comment)
+                else:
+                    # Пользователь отменил коммит, но продолжаем push если есть что отправлять
+                    pass
+            else:
+                # Пользователь отменил коммит, но продолжаем push если есть что отправлять
+                pass
+        
+        # Шаг 4: Push - отправляем изменения в удалённый репозиторий
+        self._perform_git_push()
+    
+    def _check_git_status(self):
+        """Проверить статус Git: есть ли незакоммиченные изменения, незапушенные коммиты и конфликты."""
+        repo_root, git_path = self._get_git_repo_info()
+        if repo_root is None or git_path is None:
+            return False, False, False
+        
+        has_uncommitted = False
+        has_unpushed = False
+        has_conflicts = False
+        
+        try:
+            # Проверяем наличие незакоммиченных изменений и конфликтов
+            status_proc = subprocess.run(
+                ["git", "status", "--porcelain", git_path],
+                cwd=str(repo_root),
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='replace',
+                check=True,
+            )
+            status_output = status_proc.stdout.strip()
+            has_uncommitted = bool(status_output)
+            
+            # Проверяем наличие конфликтов слияния
+            # Конфликты обозначаются как "UU", "AA", "DD", "AU", "UA", "DU", "UD" в первой колонке
+            if status_output:
+                for line in status_output.split('\n'):
+                    if line:
+                        # Первые два символа - статус файла
+                        status_code = line[:2]
+                        # Конфликты: UU (оба изменены), AA (оба добавлены), DD (оба удалены),
+                        # AU (добавлен нами, обновлен ими), UA (обновлен нами, добавлен ими),
+                        # DU (удален нами, обновлен ими), UD (обновлен нами, удален ими)
+                        if status_code in ['UU', 'AA', 'DD', 'AU', 'UA', 'DU', 'UD']:
+                            has_conflicts = True
+                            break
         except (subprocess.CalledProcessError, FileNotFoundError):
             # Если не удалось проверить, считаем что изменений нет
             pass
@@ -2611,50 +2891,50 @@ class MainWindow(QMainWindow):
             # Если не удалось проверить, считаем что коммитов для push нет
             pass
         
-        return has_uncommitted, has_unpushed
+        return has_uncommitted, has_unpushed, has_conflicts
     
     def _update_git_status_indicators(self):
-        """Обновить визуальные индикаторы статуса Git в меню."""
-        if not hasattr(self, 'git_commit_action') or not hasattr(self, 'git_push_action'):
+        """Обновить визуальные индикаторы статуса Git (для кнопки синхронизации)."""
+        has_uncommitted, has_unpushed, has_conflicts = self._check_git_status()
+        
+        # Обновляем стиль кнопки синхронизации Git
+        self._update_git_sync_button_style(has_conflicts, has_uncommitted)
+    
+    def _open_conflict_resolver(self):
+        """Открыть диалог для решения конфликтов Git."""
+        repo_root, git_path = self._get_git_repo_info()
+        if repo_root is None or git_path is None:
             return
         
-        has_uncommitted, has_unpushed = self._check_git_status()
+        # Обнаруживаем файлы с конфликтами
+        detector = GitConflictDetector(repo_root)
+        conflicted_files = detector.find_conflicted_files(git_path)
         
-        # Обновляем индикатор для Commit
-        if has_uncommitted:
-            # Есть незакоммиченные изменения - добавляем индикатор
-            self.git_commit_action.setText('● Commit…')
+        if not conflicted_files:
+            QMessageBox.information(
+                self,
+                "Нет конфликтов",
+                "Конфликты не обнаружены."
+            )
+            return
+        
+        # Открываем диалог решения конфликтов
+        dialog = GitConflictResolverDialog(repo_root, conflicted_files, self)
+        dialog.conflicts_resolved.connect(self._on_conflicts_resolved)
+        dialog.exec_()
+    
+    def _on_conflicts_resolved(self, all_resolved: bool):
+        """Обработчик разрешения конфликтов."""
+        if all_resolved:
+            # Обновляем статус Git
+            self._update_git_status_indicators()
+            QMessageBox.information(
+                self,
+                "Конфликты разрешены",
+                "Все конфликты успешно разрешены. Вы можете продолжить синхронизацию."
+            )
         else:
-            # Нет незакоммиченных изменений - обычный текст
-            self.git_commit_action.setText('Commit…')
-        
-        # Обновляем индикатор для Push
-        if has_unpushed:
-            # Есть незапушенные коммиты - добавляем индикатор
-            self.git_push_action.setText('● Push')
-        else:
-            # Нет незапушенных коммитов - обычный текст
-            self.git_push_action.setText('Push')
-        
-        # Обновляем иконку меню Git (используем git_menu_action чтобы иконка отображалась рядом с текстом)
-        if hasattr(self, 'git_menu_action'):
-            if has_uncommitted:
-                # Приоритет: незакоммиченные изменения - желтая иконка
-                icon = self._load_svg_icon('arrow-up-right.svg', size=16, color='#f39c12')
-                if icon:
-                    self.git_menu_action.setIcon(icon)
-                else:
-                    self.git_menu_action.setIcon(QIcon())
-            elif has_unpushed:
-                # Есть незапушенные коммиты - синяя иконка
-                icon = self._load_svg_icon('arrow-up-right.svg', size=16, color='#3498db')
-                if icon:
-                    self.git_menu_action.setIcon(icon)
-                else:
-                    self.git_menu_action.setIcon(QIcon())
-            else:
-                # Нет изменений - убираем иконку
-                self.git_menu_action.setIcon(QIcon())
+            self._update_git_status_indicators()
     
     def select_test_cases_folder(self):
         """Обработчик выбора папки с тест-кейсами"""
@@ -3815,17 +4095,14 @@ class MainWindow(QMainWindow):
 
     def _update_mode_indicator(self):
         is_run = self._current_mode == "run"
-        if hasattr(self, "mode_switch"):
-            self.mode_switch.blockSignals(True)
-            self.mode_switch.setChecked(is_run)
-            self.mode_switch.blockSignals(False)
-        if hasattr(self, "mode_edit_label"):
-            self.mode_edit_label.setStyleSheet(
-                "color: #ffffff;" if not is_run else "color: #777777;"
+        # Обновляем стиль кнопок режимов (активная - яркая, неактивная - тусклая)
+        if hasattr(self, "mode_edit_button"):
+            self.mode_edit_button.setStyleSheet(
+                self._get_panel_button_style(not is_run)  # Активна когда не в режиме запуска
             )
-        if hasattr(self, "mode_run_label"):
-            self.mode_run_label.setStyleSheet(
-                "color: #ffffff;" if is_run else "color: #777777;"
+        if hasattr(self, "mode_run_button"):
+            self.mode_run_button.setStyleSheet(
+                self._get_panel_button_style(is_run)  # Активна когда в режиме запуска
             )
 
     def _apply_mode_state(self):
@@ -4309,6 +4586,52 @@ class MainWindow(QMainWindow):
                 layout.setContentsMargins(margins[0], UI_METRICS.group_title_spacing, margins[2], margins[3])
     
     def closeEvent(self, event):
+        # Проверяем наличие незакоммиченных изменений
+        has_uncommitted, has_unpushed, has_conflicts = self._check_git_status()
+        
+        if has_uncommitted or has_unpushed:
+            # Формируем сообщение
+            message_parts = []
+            if has_uncommitted:
+                message_parts.append("• Есть незакоммиченные изменения")
+            if has_unpushed:
+                message_parts.append("• Есть незапушенные коммиты")
+            
+            message = "Обнаружены незавершенные изменения в Git:\n\n" + "\n".join(message_parts)
+            message += "\n\nХотите сделать коммит и пуш перед закрытием?"
+            
+            reply = QMessageBox.question(
+                self,
+                "Незавершенные изменения Git",
+                message,
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.Yes
+            )
+            
+            if reply == QMessageBox.Yes:
+                # Если есть незакоммиченные изменения, делаем коммит
+                if has_uncommitted:
+                    dialog = GitCommitDialog(self)
+                    if dialog.exec_() == QDialog.Accepted:
+                        comment = dialog.get_comment().strip()
+                        if comment:
+                            # Выполняем коммит синхронно (блокируем UI)
+                            self._perform_git_commit(comment)
+                            # Проверяем статус после коммита
+                            has_uncommitted, has_unpushed, has_conflicts = self._check_git_status()
+                        else:
+                            # Пользователь отменил коммит, отменяем закрытие
+                            event.ignore()
+                            return
+                    else:
+                        # Пользователь отменил диалог коммита, отменяем закрытие
+                        event.ignore()
+                        return
+                
+                # Если есть незапушенные коммиты, делаем пуш
+                if has_unpushed:
+                    self._perform_git_push()
+        
         # Останавливаем таймер проверки LLM
         if hasattr(self, '_llm_check_timer'):
             self._llm_check_timer.stop()
@@ -4456,8 +4779,6 @@ class MainWindow(QMainWindow):
         if 'group_title_spacing' in self.settings:
             UI_METRICS.group_title_spacing = self.settings['group_title_spacing']
 
-    def _on_mode_switch_changed(self, checked: bool):
-        self._set_mode("run" if checked else "edit")
 
     def _generate_allure_report(self):
         """Генерация Allure отчета из JSON файлов тест-кейсов"""
