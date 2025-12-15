@@ -1859,6 +1859,8 @@ class TestCaseFormWidget(QWidget):
         self.steps_table.setColumnHidden(4, not enabled)  # Показать действия в режиме редактирования
         
         self._update_step_controls_state()
+        # Обновляем высоту строк после изменения видимости колонок
+        QTimer.singleShot(0, self._update_table_row_heights)
 
     def set_run_mode(self, enabled: bool):
         self._run_mode_enabled = enabled
@@ -1881,6 +1883,9 @@ class TestCaseFormWidget(QWidget):
                 if buttons:
                     for btn in buttons:
                         btn.setEnabled(enabled)
+        
+        # Обновляем высоту строк после изменения видимости колонок
+        QTimer.singleShot(0, self._update_table_row_heights)
 
     def _refresh_step_indices(self):
         """Обновить номера шагов в колонке №."""

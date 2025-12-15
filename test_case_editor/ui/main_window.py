@@ -64,7 +64,6 @@ from ..utils.settings_path import get_settings_path
 from ..utils.allure_generator import generate_allure_report
 from ..utils.html_report_generator import generate_html_report
 from ..utils.resource_path import get_icon_path, get_icons_dir
-from ..git_conflict_resolver import GitConflictDetector, GitConflictResolverDialog
 from .styles.ui_metrics import UI_METRICS
 from .styles.app_theme import build_app_style_sheet
 from .styles.theme_provider import THEME_PROVIDER, ThemeProvider
@@ -1582,11 +1581,13 @@ class MainWindow(QMainWindow):
         self.view_menu = menubar.addMenu('Вид')
         width_action = self.view_menu.addAction('Настроить ширины панелей…')
         width_action.triggered.connect(self._configure_panel_widths)
+        width_action.setVisible(False)  # Скрываем, управление через панель инструментов
         statistics_action = self.view_menu.addAction('Показать статистику')
         statistics_action.triggered.connect(self._show_statistics_panel)
         
-        # Подменю "Режим" в меню "Вид"
+        # Подменю "Режим" в меню "Вид" (скрыто, управление через панель инструментов)
         mode_menu = self.view_menu.addMenu('Режим')
+        mode_menu.setVisible(False)  # Скрываем, управление через панель инструментов
         self._mode_action_group = QActionGroup(self)
         self._mode_action_group.setExclusive(True)
         self._mode_actions = {}
@@ -2709,8 +2710,13 @@ class MainWindow(QMainWindow):
                         f"Детали ошибки:\n{combined_output}"
                     )
                 elif "merge conflict" in error_lower or "conflict" in error_lower:
-                    # Открываем решатель конфликтов
-                    self._open_conflict_resolver()
+                    # Сообщаем пользователю о конфликтах
+                    QMessageBox.warning(
+                        self,
+                        "Git Pull - Конфликты",
+                        "Обнаружены конфликты при слиянии. Пожалуйста, разрешите их вручную с помощью Git."
+                    )
+                    self.statusBar().showMessage("Git: обнаружены конфликты")
                     return False
                 else:
                     error_message = (
@@ -2899,42 +2905,6 @@ class MainWindow(QMainWindow):
         
         # Обновляем стиль кнопки синхронизации Git
         self._update_git_sync_button_style(has_conflicts, has_uncommitted)
-    
-    def _open_conflict_resolver(self):
-        """Открыть диалог для решения конфликтов Git."""
-        repo_root, git_path = self._get_git_repo_info()
-        if repo_root is None or git_path is None:
-            return
-        
-        # Обнаруживаем файлы с конфликтами
-        detector = GitConflictDetector(repo_root)
-        conflicted_files = detector.find_conflicted_files(git_path)
-        
-        if not conflicted_files:
-            QMessageBox.information(
-                self,
-                "Нет конфликтов",
-                "Конфликты не обнаружены."
-            )
-            return
-        
-        # Открываем диалог решения конфликтов
-        dialog = GitConflictResolverDialog(repo_root, conflicted_files, self)
-        dialog.conflicts_resolved.connect(self._on_conflicts_resolved)
-        dialog.exec_()
-    
-    def _on_conflicts_resolved(self, all_resolved: bool):
-        """Обработчик разрешения конфликтов."""
-        if all_resolved:
-            # Обновляем статус Git
-            self._update_git_status_indicators()
-            QMessageBox.information(
-                self,
-                "Конфликты разрешены",
-                "Все конфликты успешно разрешены. Вы можете продолжить синхронизацию."
-            )
-        else:
-            self._update_git_status_indicators()
     
     def select_test_cases_folder(self):
         """Обработчик выбора папки с тест-кейсами"""
