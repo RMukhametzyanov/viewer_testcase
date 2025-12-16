@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import (
     QFrame,
     QLabel,
     QApplication,
+    QLineEdit,
 )
 from PyQt5.QtCore import Qt, pyqtSignal, QPoint, QSize, QEvent
 from PyQt5.QtGui import QColor, QPainter, QPolygon
@@ -51,10 +52,12 @@ class CheckboxComboBox(QWidget):
     
     selection_changed = pyqtSignal(list)  # Сигнал с выбранными значениями
     
-    def __init__(self, parent: Optional[QWidget] = None):
+    def __init__(self, parent: Optional[QWidget] = None, enable_search: bool = False):
         super().__init__(parent)
         self._selected_values: List[str] = []
         self._all_values: List[str] = []
+        self._enable_search = enable_search
+        self._search_edit: Optional[QLineEdit] = None
         self._setup_ui()
     
     def _setup_ui(self):
@@ -77,6 +80,14 @@ class CheckboxComboBox(QWidget):
         dropdown_layout = QVBoxLayout(self.dropdown)
         dropdown_layout.setContentsMargins(0, 0, 0, 0)
         dropdown_layout.setSpacing(0)
+        
+        # Добавляем строку поиска, если включена
+        if self._enable_search:
+            self._search_edit = QLineEdit()
+            self._search_edit.setPlaceholderText("Поиск...")
+            self._search_edit.setStyleSheet(self._get_search_style())
+            self._search_edit.textChanged.connect(self._on_search_text_changed)
+            dropdown_layout.addWidget(self._search_edit)
         
         self.list_widget = QListWidget()
         self.list_widget.setStyleSheet(self._get_list_style())
@@ -134,15 +145,50 @@ class CheckboxComboBox(QWidget):
             }}
         """
     
+    def _get_search_style(self) -> str:
+        """Получить стиль для строки поиска"""
+        colors = THEME_PROVIDER.colors
+        return f"""
+            QLineEdit {{
+                background-color: {colors.input_background};
+                border: 1px solid {colors.input_border};
+                border-radius: 4px;
+                color: {colors.text_primary};
+                padding: 4px 8px;
+                margin: 4px;
+            }}
+            QLineEdit:focus {{
+                border-color: {colors.border_hover};
+            }}
+        """
+    
     def setValues(self, values: List[str]):
         """Установить список значений"""
         self._all_values = sorted(values)
-        self.list_widget.clear()
-        for value in self._all_values:
-            item = QListWidgetItem(value)
-            item.setCheckState(Qt.Unchecked)
-            self.list_widget.addItem(item)
+        self._apply_filter()
         self._update_button_text()
+    
+    def _apply_filter(self, search_text: str = ""):
+        """Применить фильтр к списку"""
+        self.list_widget.clear()
+        search_lower = search_text.lower().strip()
+        
+        for value in self._all_values:
+            # Если есть поиск, фильтруем по тексту
+            if search_lower and search_lower not in value.lower():
+                continue
+            
+            item = QListWidgetItem(value)
+            # Сохраняем состояние чекбокса, если значение было выбрано
+            if value in self._selected_values:
+                item.setCheckState(Qt.Checked)
+            else:
+                item.setCheckState(Qt.Unchecked)
+            self.list_widget.addItem(item)
+    
+    def _on_search_text_changed(self, text: str):
+        """Обработчик изменения текста поиска"""
+        self._apply_filter(text)
     
     def getSelectedValues(self) -> List[str]:
         """Получить выбранные значения"""
@@ -204,6 +250,11 @@ class CheckboxComboBox(QWidget):
         max_rows = min(10, self.list_widget.count())
         dropdown_height = row_height * max_rows + 4
         
+        # Добавляем высоту строки поиска, если она есть
+        if self._enable_search and self._search_edit:
+            search_height = self._search_edit.sizeHint().height() + 8  # +8 для отступов
+            dropdown_height += search_height
+        
         # Устанавливаем dropdown как независимое popup окно
         # Важно: сначала устанавливаем флаги, потом убираем родителя
         self.dropdown.setWindowFlags(Qt.Popup | Qt.FramelessWindowHint)
@@ -216,7 +267,13 @@ class CheckboxComboBox(QWidget):
         
         self.dropdown.show()
         self.dropdown.raise_()
-        self.list_widget.setFocus()
+        
+        # Очищаем строку поиска при открытии
+        if self._enable_search and self._search_edit:
+            self._search_edit.clear()
+            self._search_edit.setFocus()
+        else:
+            self.list_widget.setFocus()
         
         # Устанавливаем обработчик событий для закрытия при клике вне виджета
         QApplication.instance().installEventFilter(self)

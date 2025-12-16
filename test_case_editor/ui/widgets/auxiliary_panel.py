@@ -150,6 +150,9 @@ class AuxiliaryPanel(QWidget):
 
         if tab_id == "creation":
             self.ensure_creation_defaults()
+        elif tab_id == "reports":
+            # Обновляем панель отчетности при переключении на вкладку
+            self.update_reports_panel()
 
     # ------------------------------------------------------------------ information
 

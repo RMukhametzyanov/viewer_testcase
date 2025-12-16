@@ -59,6 +59,11 @@
     "add_field": "plus.svg",
     "apply": "play.svg",
     "reset": "refresh-ccw.svg"
+  },
+  "toolbar": {
+    "git_sync": "gitlab.svg",
+    "edit_mode": "edit.svg",
+    "run_mode": "check-square.svg"
   }
 }
 

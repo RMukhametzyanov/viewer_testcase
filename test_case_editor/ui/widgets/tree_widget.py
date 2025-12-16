@@ -23,13 +23,38 @@ from PyQt5.QtWidgets import (
     QLineEdit,
     QDialogButtonBox,
     QWidget,
+    QStyle,
 )
-from PyQt5.QtCore import Qt, pyqtSignal, QMimeData, QByteArray, QSize
-from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter, QPen
+from PyQt5.QtCore import Qt, pyqtSignal, QMimeData, QByteArray, QSize, QPoint, QTimer
+from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter, QPen, QMouseEvent, QBrush
 from PyQt5.QtSvg import QSvgRenderer
 
 from ...services.test_case_service import TestCaseService
 from ...models.test_case import TestCase
+
+
+class ContextMenu(QMenu):
+    """Кастомное контекстное меню, которое срабатывает только по ЛКМ"""
+    
+    def mousePressEvent(self, event: QMouseEvent):
+        """Переопределяем обработку нажатия мыши - только ЛКМ активирует действия"""
+        if event.button() == Qt.LeftButton:
+            super().mousePressEvent(event)
+        elif event.button() == Qt.RightButton:
+            # ПКМ просто закрывает меню без активации действия
+            event.accept()
+        else:
+            super().mousePressEvent(event)
+    
+    def mouseReleaseEvent(self, event: QMouseEvent):
+        """Переопределяем обработку отпускания мыши - только ЛКМ активирует действия"""
+        if event.button() == Qt.LeftButton:
+            super().mouseReleaseEvent(event)
+        elif event.button() == Qt.RightButton:
+            # ПКМ просто закрывает меню без активации действия
+            event.accept()
+        else:
+            super().mouseReleaseEvent(event)
 
 
 class TestCaseTreeWidget(QTreeWidget):
@@ -65,6 +90,7 @@ class TestCaseTreeWidget(QTreeWidget):
         self.test_cases_dir: Optional[Path] = None
         self._edit_mode = True  # По умолчанию режим редактирования
         self._skip_reasons: List[str] = ['Автотесты', 'Нагрузочное тестирование', 'Другое']  # Значения по умолчанию
+        self._show_folder_counters = False  # По умолчанию счетчики выключены
         
         # Загружаем маппинг иконок
         self._icon_mapping = self._load_icon_mapping()
@@ -75,11 +101,26 @@ class TestCaseTreeWidget(QTreeWidget):
         """Установить список причин пропуска из настроек"""
         if reasons and isinstance(reasons, list):
             self._skip_reasons = reasons
+    
+    def set_show_folder_counters(self, show: bool):
+        """Установить отображение счетчиков JSON файлов в папках"""
+        if self._show_folder_counters != show:
+            self._show_folder_counters = show
+            # Обновляем дерево, чтобы применить изменения
+            if self.test_cases_dir:
+                # Сохраняем состояние развернутых папок
+                expanded_paths = self._capture_expanded_state()
+                # Перезагружаем дерево с передачей состояния для предотвращения прыгания
+                test_cases = self.service.load_all_test_cases(self.test_cases_dir)
+                self.load_tree(self.test_cases_dir, test_cases, expanded_state=expanded_paths)
 
     def _setup_ui(self):
         self.setHeaderHidden(True)
         self.setIndentation(20)
         self.setAnimated(True)
+        
+        # Включаем множественный выбор (Ctrl на Windows/Linux, Cmd на macOS)
+        self.setSelectionMode(QAbstractItemView.ExtendedSelection)
 
         self.itemClicked.connect(self._on_item_clicked)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -92,6 +133,50 @@ class TestCaseTreeWidget(QTreeWidget):
         
         # Кэш для цветных иконок кружков
         self._icon_cache = {}
+        
+        # Для визуальной подсветки при drag & drop
+        self._drag_over_item: Optional[QTreeWidgetItem] = None
+        self._original_background: Optional[QBrush] = None
+        
+        # Таймер для автоматического разворачивания папок при drag & drop
+        self._expand_timer = QTimer(self)
+        self._expand_timer.setSingleShot(True)
+        self._expand_timer.timeout.connect(self._auto_expand_folder)
+        self._expand_target_item: Optional[QTreeWidgetItem] = None
+        
+        # Таймер для плавной автоскролли при drag & drop
+        self._scroll_timer = QTimer(self)
+        self._scroll_timer.timeout.connect(self._perform_smooth_scroll)
+        self._scroll_direction = 0  # -1 для вверх, 1 для вниз, 0 для остановки
+    
+    def drawRow(self, painter: QPainter, option, index):
+        """Переопределяем отрисовку строки для добавления подсветки при drag & drop"""
+        # Получаем элемент
+        item = self.itemFromIndex(index)
+        
+        # Если это элемент с подсветкой drag & drop, рисуем фон ПЕРЕД стандартной отрисовкой
+        if item == self._drag_over_item:
+            # Сохраняем состояние painter
+            painter.save()
+            
+            # Используем более яркий и заметный цвет для подсветки
+            highlight_color = QColor(100, 150, 255, 180)  # Полупрозрачный синий
+            highlight_brush = QBrush(highlight_color)
+            
+            # Рисуем фон на всю ширину строки
+            rect = option.rect
+            # Расширяем прямоугольник на всю ширину виджета для лучшей видимости
+            full_rect = rect
+            full_rect.setLeft(0)
+            full_rect.setRight(self.viewport().width())
+            
+            painter.fillRect(full_rect, highlight_brush)
+            
+            # Восстанавливаем состояние painter
+            painter.restore()
+        
+        # Вызываем стандартную отрисовку поверх фона
+        super().drawRow(painter, option, index)
 
     def _load_icon_mapping(self) -> Dict[str, Dict[str, str]]:
         """Загрузить маппинг иконок из JSON файла."""
@@ -205,19 +290,41 @@ class TestCaseTreeWidget(QTreeWidget):
 
     # ------------------------------------------------------------------ load
 
-    def load_tree(self, test_cases_dir: Path, test_cases: list):
+    def load_tree(self, test_cases_dir: Path, test_cases: list, expanded_state: Optional[set] = None):
+        """
+        Загрузить дерево тест-кейсов.
+        
+        Args:
+            test_cases_dir: Директория с тест-кейсами
+            test_cases: Список тест-кейсов
+            expanded_state: Множество путей к папкам, которые должны быть развернуты (опционально)
+        """
         self.test_cases_dir = test_cases_dir
-        self.clear()
+        
+        # Отключаем обновления виджета во время перестройки для предотвращения визуального "прыгания"
+        self.setUpdatesEnabled(False)
+        try:
+            self.clear()
 
-        # Если путь пустой или не существует, оставляем дерево пустым
-        if not test_cases_dir or str(test_cases_dir).strip() == "" or not test_cases_dir.exists():
-            return
+            # Если путь пустой или не существует, оставляем дерево пустым
+            if not test_cases_dir or str(test_cases_dir).strip() == "" or not test_cases_dir.exists():
+                return
 
-        self._populate_directory(test_cases_dir, self.invisibleRootItem(), test_cases)
-        self.collapseAll()
-        # После загрузки обновляем статусы папок на основе актуальных данных дерева
-        if not self._edit_mode:
-            self._update_folder_statuses(self.invisibleRootItem())
+            self._populate_directory(test_cases_dir, self.invisibleRootItem(), test_cases)
+            
+            # Если передан expanded_state, восстанавливаем состояние сразу после заполнения
+            # Если нет - сворачиваем все
+            if expanded_state:
+                self._restore_expanded_state(expanded_state)
+            else:
+                self.collapseAll()
+            
+            # После загрузки обновляем статусы папок на основе актуальных данных дерева
+            if not self._edit_mode:
+                self._update_folder_statuses(self.invisibleRootItem())
+        finally:
+            # Включаем обновления обратно
+            self.setUpdatesEnabled(True)
     
     def set_edit_mode(self, enabled: bool):
         """Установить режим редактирования (скрыть/показать иконки статусов)"""
@@ -258,7 +365,15 @@ class TestCaseTreeWidget(QTreeWidget):
                     # Обновляем отображение папки
                     folder_path = data.get('path')
                     if folder_path:
-                        child.setText(0, f"📁 {folder_path.name}")
+                        # Формируем текст папки с учетом счетчика
+                        folder_name = folder_path.name
+                        if self._show_folder_counters:
+                            json_count = self._count_json_files_in_folder(folder_path)
+                            # Показываем счетчик только если количество больше 0
+                            if json_count > 0:
+                                folder_name = f"{folder_path.name} ({json_count})"
+                        
+                        child.setText(0, f"📁 {folder_name}")
                         if not self._edit_mode:
                             # Пересчитываем статус папки на основе дерева
                             folder_icon, folder_color = self._calculate_folder_status_from_tree(child)
@@ -287,10 +402,29 @@ class TestCaseTreeWidget(QTreeWidget):
             data['icon'] = folder_icon
             data['color'] = folder_color
 
+    def _count_json_files_in_folder(self, folder_path: Path) -> int:
+        """Подсчитать количество JSON файлов непосредственно в папке (без подпапок).
+        
+        Args:
+            folder_path: Путь к папке
+            
+        Returns:
+            int: Количество JSON файлов в папке
+        """
+        if not folder_path.exists() or not folder_path.is_dir():
+            return 0
+        
+        count = 0
+        for item in folder_path.iterdir():
+            if item.is_file() and item.suffix.lower() == '.json':
+                count += 1
+        
+        return count
+    
     def _populate_directory(self, directory: Path, parent_item: QTreeWidgetItem, test_cases: list):
         for subdir in sorted([d for d in directory.iterdir() if d.is_dir()]):
-            # Пропускаем папки _attachment
-            if subdir.name == "_attachment":
+            # Пропускаем папки _attachment и Reports_by_viewer
+            if subdir.name == "_attachment" or subdir.name == "Reports_by_viewer":
                 continue
             folder_item = QTreeWidgetItem(parent_item)
             
@@ -299,8 +433,17 @@ class TestCaseTreeWidget(QTreeWidget):
                 folder_icon, folder_color = self._calculate_folder_status(subdir, test_cases)
             else:
                 folder_icon, folder_color = None, ""
+            
+            # Формируем текст папки с учетом счетчика
+            folder_name = subdir.name
+            if self._show_folder_counters:
+                json_count = self._count_json_files_in_folder(subdir)
+                # Показываем счетчик только если количество больше 0
+                if json_count > 0:
+                    folder_name = f"{subdir.name} ({json_count})"
+            
             # Устанавливаем текст и иконку
-            folder_item.setText(0, f"📁 {subdir.name}")
+            folder_item.setText(0, f"📁 {folder_name}")
             if folder_icon:
                 folder_item.setIcon(0, folder_icon)
             else:
@@ -639,6 +782,11 @@ class TestCaseTreeWidget(QTreeWidget):
     # ----------------------------------------------------------- interactions
 
     def _on_item_clicked(self, item: QTreeWidgetItem, column: int):
+        # При множественном выборе не открываем тест-кейс
+        selected_items = self.selectedItems()
+        if len(selected_items) > 1:
+            return
+        
         data = item.data(0, Qt.UserRole)
         if data and data.get('type') == 'file':
             test_case = data.get('test_case')
@@ -651,6 +799,35 @@ class TestCaseTreeWidget(QTreeWidget):
             self._show_root_menu(position)
             return
 
+        # Получаем все выделенные элементы
+        selected_items = self.selectedItems()
+        
+        # Проверяем, есть ли множественный выбор файлов
+        selected_files = []
+        selected_folders = []
+        for selected_item in selected_items:
+            data = selected_item.data(0, Qt.UserRole)
+            if not data:
+                continue
+            if data.get('type') == 'file':
+                test_case = data.get('test_case')
+                if test_case:
+                    selected_files.append(test_case)
+            elif data.get('type') == 'folder':
+                selected_folders.append(data)
+        
+        # Если выделено несколько файлов, показываем меню для множественного выбора
+        if len(selected_files) > 1:
+            self._show_multiple_files_menu(position, selected_files)
+            return
+        
+        # Если выделена папка и файлы, или только папка
+        if selected_folders:
+            # Показываем меню для первой папки (или можно сделать общее меню)
+            self._show_folder_menu(position, selected_folders[0])
+            return
+        
+        # Одиночный выбор - используем старую логику
         data = item.data(0, Qt.UserRole)
         if not data:
             return
@@ -663,7 +840,7 @@ class TestCaseTreeWidget(QTreeWidget):
     # ------------------------------------------------------------ menus
 
     def _show_root_menu(self, position):
-        menu = QMenu(self)
+        menu = ContextMenu(self)
 
         icon_name = self._get_context_menu_icon("create_test_case")
         if icon_name:
@@ -686,7 +863,7 @@ class TestCaseTreeWidget(QTreeWidget):
         menu.exec_(self.mapToGlobal(position))
 
     def _show_folder_menu(self, position, folder_data):
-        menu = QMenu(self)
+        menu = ContextMenu(self)
 
         folder_path = folder_data['path']
         
@@ -755,9 +932,38 @@ class TestCaseTreeWidget(QTreeWidget):
 
         menu.exec_(self.mapToGlobal(position))
 
+    def _show_multiple_files_menu(self, position, test_cases: List[TestCase]):
+        """Показать контекстное меню для множественного выбора файлов"""
+        try:
+            menu = ContextMenu(self)
+            
+            # Добавить в панель ревью
+            icon_name = self._get_context_menu_icon("add_to_review")
+            if icon_name:
+                icon_add = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                action_add_to_review = menu.addAction(icon_add, f"Добавить в панель ревью ({len(test_cases)})")
+            else:
+                action_add_to_review = menu.addAction(f"Добавить в панель ревью ({len(test_cases)})")
+            action_add_to_review.triggered.connect(lambda: self._add_multiple_to_review(test_cases))
+            
+            menu.addSeparator()
+            
+            # Удалить
+            icon_name = self._get_context_menu_icon("delete")
+            if icon_name:
+                icon_x = self._load_svg_icon(icon_name, size=16, color="#ffffff")
+                action_delete = menu.addAction(icon_x, f"Удалить ({len(test_cases)})")
+            else:
+                action_delete = menu.addAction(f"Удалить ({len(test_cases)})")
+            action_delete.triggered.connect(lambda: self._delete_multiple_test_cases(test_cases))
+            
+            menu.exec_(self.mapToGlobal(position))
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Ошибка при отображении контекстного меню: {str(e)}")
+    
     def _show_file_menu(self, position, file_data):
         try:
-            menu = QMenu(self)
+            menu = ContextMenu(self)
 
             test_case = file_data.get('test_case')
             if not test_case:
@@ -861,6 +1067,174 @@ class TestCaseTreeWidget(QTreeWidget):
 
     # ------------------------------------------------------- actions
 
+    class FolderNameDialog(QDialog):
+        """Диалог для ввода имени папки с валидацией"""
+        
+        def __init__(self, parent=None, title: str = "Имя папки", initial_text: str = ""):
+            super().__init__(parent)
+            self.setWindowTitle(title)
+            self.setMinimumWidth(500)
+            self.setMinimumHeight(150)
+            self._setup_ui(initial_text)
+        
+        def _setup_ui(self, initial_text: str):
+            layout = QVBoxLayout(self)
+            
+            # Метка с подсказкой
+            hint_label = QLabel("Имя файла не должно содержать следующих знаков: \\ / : * ? \" < > |")
+            hint_label.setWordWrap(True)
+            hint_label.setStyleSheet("color: #666; font-size: 10pt;")
+            layout.addWidget(hint_label)
+            
+            # Поле ввода
+            label = QLabel("Введите имя папки:")
+            layout.addWidget(label)
+            
+            self.name_edit = QLineEdit(initial_text)
+            self.name_edit.selectAll()  # Выделяем весь текст для удобства редактирования
+            self.name_edit.textChanged.connect(self._on_text_changed)
+            layout.addWidget(self.name_edit)
+            
+            # Метка для отображения ошибки валидации
+            self.error_label = QLabel()
+            self.error_label.setWordWrap(True)
+            self.error_label.setStyleSheet("color: #d32f2f; font-size: 9pt;")
+            self.error_label.setVisible(False)
+            layout.addWidget(self.error_label)
+            
+            # Кнопки
+            button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+            button_box.accepted.connect(self._on_accept)
+            button_box.rejected.connect(self.reject)
+            self.ok_button = button_box.button(QDialogButtonBox.Ok)
+            layout.addWidget(button_box)
+            
+            # Устанавливаем фокус на поле ввода
+            self.name_edit.setFocus()
+        
+        def _on_text_changed(self, text: str):
+            """Обработчик изменения текста - скрываем ошибку при вводе"""
+            self.error_label.setVisible(False)
+        
+        def _on_accept(self):
+            """Обработчик нажатия кнопки OK - проверяем валидность"""
+            name = self.name_edit.text().strip()
+            if not name:
+                self.error_label.setText("Имя папки не может быть пустым")
+                self.error_label.setVisible(True)
+                return
+            
+            # Проверяем на запрещенные символы
+            is_valid, found_chars = TestCaseTreeWidget._validate_folder_name(name)
+            if not is_valid:
+                self.error_label.setText("Имя файла не должно содержать следующих знаков: \\ / : * ? \" < > |")
+                self.error_label.setVisible(True)
+                return
+            
+            # Если все в порядке, принимаем диалог
+            self.accept()
+        
+        def get_name(self) -> str:
+            """Получить введенное имя папки"""
+            return self.name_edit.text().strip()
+
+    class FileNameDialog(QDialog):
+        """Диалог для ввода имени файла с валидацией"""
+        
+        def __init__(self, parent=None, title: str = "Имя файла", initial_text: str = ""):
+            super().__init__(parent)
+            self.setWindowTitle(title)
+            self.setMinimumWidth(500)
+            self.setMinimumHeight(150)
+            self._setup_ui(initial_text)
+        
+        def _setup_ui(self, initial_text: str):
+            layout = QVBoxLayout(self)
+            
+            # Метка с подсказкой
+            hint_label = QLabel("Имя файла не должно содержать следующих знаков: \\ / : * ? \" < > |")
+            hint_label.setWordWrap(True)
+            hint_label.setStyleSheet("color: #666; font-size: 10pt;")
+            layout.addWidget(hint_label)
+            
+            # Поле ввода
+            label = QLabel("Введите имя файла:")
+            layout.addWidget(label)
+            
+            self.name_edit = QLineEdit(initial_text)
+            self.name_edit.selectAll()  # Выделяем весь текст для удобства редактирования
+            self.name_edit.textChanged.connect(self._on_text_changed)
+            layout.addWidget(self.name_edit)
+            
+            # Метка для отображения ошибки валидации
+            self.error_label = QLabel()
+            self.error_label.setWordWrap(True)
+            self.error_label.setStyleSheet("color: #d32f2f; font-size: 9pt;")
+            self.error_label.setVisible(False)
+            layout.addWidget(self.error_label)
+            
+            # Кнопки
+            button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+            button_box.accepted.connect(self._on_accept)
+            button_box.rejected.connect(self.reject)
+            self.ok_button = button_box.button(QDialogButtonBox.Ok)
+            layout.addWidget(button_box)
+            
+            # Устанавливаем фокус на поле ввода
+            self.name_edit.setFocus()
+        
+        def _on_text_changed(self, text: str):
+            """Обработчик изменения текста - скрываем ошибку при вводе"""
+            self.error_label.setVisible(False)
+        
+        def _on_accept(self):
+            """Обработчик нажатия кнопки OK - проверяем валидность"""
+            name = self.name_edit.text().strip()
+            if not name:
+                self.error_label.setText("Имя файла не может быть пустым")
+                self.error_label.setVisible(True)
+                return
+            
+            # Убираем расширение .json для валидации (если есть)
+            name_without_ext = name
+            if name_without_ext.endswith('.json'):
+                name_without_ext = name_without_ext[:-5]
+            
+            # Проверяем на запрещенные символы (без расширения)
+            is_valid, found_chars = TestCaseTreeWidget._validate_folder_name(name_without_ext)
+            if not is_valid:
+                self.error_label.setText("Имя файла не должно содержать следующих знаков: \\ / : * ? \" < > |")
+                self.error_label.setVisible(True)
+                return
+            
+            # Если все в порядке, принимаем диалог
+            self.accept()
+        
+        def get_name(self) -> str:
+            """Получить введенное имя файла"""
+            return self.name_edit.text().strip()
+
+    @staticmethod
+    def _validate_folder_name(name: str) -> Tuple[bool, Optional[str]]:
+        """Проверить имя папки на наличие запрещенных символов.
+        
+        Args:
+            name: Имя папки для проверки
+            
+        Returns:
+            Tuple[bool, Optional[str]]: (валидно, список запрещенных символов)
+        """
+        if not name:
+            return False, None
+        
+        # Запрещенные символы для имен файлов/папок в Windows
+        forbidden_chars = ['\\', '/', ':', '*', '?', '"', '<', '>', '|']
+        found_chars = [char for char in forbidden_chars if char in name]
+        
+        if found_chars:
+            return False, ' '.join(found_chars)
+        return True, None
+
     def _create_test_case(self, target_folder):
         expanded_paths = self._capture_expanded_state()
         test_case = self.service.create_new_test_case(target_folder)
@@ -870,27 +1244,31 @@ class TestCaseTreeWidget(QTreeWidget):
             self.test_case_selected.emit(test_case)
 
     def _create_folder(self, parent_dir):
-        folder_name, ok = QInputDialog.getText(self, 'Создать папку', 'Имя папки:', text='Новая папка')
-        if ok and folder_name:
-            new_folder = parent_dir / folder_name
-            try:
-                new_folder.mkdir(exist_ok=True)
-                self.tree_updated.emit()
-            except Exception as e:
-                QMessageBox.critical(self, "Ошибка", f"Не удалось создать папку:\n{e}")
+        dialog = self.FolderNameDialog(self, 'Создать папку', 'Новая папка')
+        if dialog.exec_() == QDialog.Accepted:
+            folder_name = dialog.get_name()
+            if folder_name:
+                new_folder = parent_dir / folder_name
+                try:
+                    new_folder.mkdir(exist_ok=True)
+                    self.tree_updated.emit()
+                except Exception as e:
+                    QMessageBox.critical(self, "Ошибка", f"Не удалось создать папку:\n{e}")
 
     def _rename_folder(self, folder_path):
         expanded_paths = self._capture_expanded_state()
         old_name = folder_path.name
-        new_name, ok = QInputDialog.getText(self, 'Переименовать папку', 'Новое имя:', text=old_name)
-        if ok and new_name and new_name != old_name:
-            new_path = folder_path.parent / new_name
-            try:
-                folder_path.rename(new_path)
-                self.tree_updated.emit()
-                self._restore_expanded_state(expanded_paths)
-            except Exception as e:
-                QMessageBox.critical(self, "Ошибка", f"Не удалось переименовать:\n{e}")
+        dialog = self.FolderNameDialog(self, 'Переименовать папку', old_name)
+        if dialog.exec_() == QDialog.Accepted:
+            new_name = dialog.get_name()
+            if new_name and new_name != old_name:
+                new_path = folder_path.parent / new_name
+                try:
+                    folder_path.rename(new_path)
+                    self.tree_updated.emit()
+                    self._restore_expanded_state(expanded_paths)
+                except Exception as e:
+                    QMessageBox.critical(self, "Ошибка", f"Не удалось переименовать:\n{e}")
 
     def _delete_folder(self, folder_path):
         expanded_paths = self._capture_expanded_state()
@@ -930,50 +1308,84 @@ class TestCaseTreeWidget(QTreeWidget):
 
         self.tree_updated.emit()
         self._restore_expanded_state(expanded_paths)
+    
+    def _delete_multiple_test_cases(self, test_cases: List[TestCase]):
+        """Удалить несколько тест-кейсов"""
+        if not test_cases:
+            return
+        
+        names = [getattr(tc, "name", None) or getattr(tc, "title", "тест-кейс") for tc in test_cases[:5]]
+        if len(test_cases) > 5:
+            names_text = ", ".join(names) + f" и еще {len(test_cases) - 5}"
+        else:
+            names_text = ", ".join(names)
+        
+        reply = QMessageBox.question(
+            self,
+            "Удаление тест-кейсов",
+            f"Удалить {len(test_cases)} тест-кейсов?\n\n{names_text}",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+        if reply != QMessageBox.Yes:
+            return
+        
+        expanded_paths = self._capture_expanded_state()
+        deleted_count = 0
+        failed_count = 0
+        
+        for test_case in test_cases:
+            try:
+                success = self.service.delete_test_case(test_case)
+                if success:
+                    deleted_count += 1
+                else:
+                    failed_count += 1
+            except Exception as exc:
+                failed_count += 1
+                print(f"Ошибка при удалении тест-кейса: {exc}")
+        
+        self.tree_updated.emit()
+        self._restore_expanded_state(expanded_paths)
+        
+        if failed_count > 0:
+            QMessageBox.warning(
+                self,
+                "Удаление",
+                f"Удалено: {deleted_count}\nНе удалось удалить: {failed_count}"
+            )
+        else:
+            QMessageBox.information(
+                self,
+                "Удаление",
+                f"Успешно удалено {deleted_count} тест-кейсов"
+            )
+    
+    def _add_multiple_to_review(self, test_cases: List[TestCase]):
+        """Добавить несколько тест-кейсов в панель ревью"""
+        for test_case in test_cases:
+            self.add_to_review_requested.emit(test_case)
 
     def _rename_file(self, test_case):
         expanded_paths = self._capture_expanded_state()
         old_filename = test_case._filename
         
-        # Создаем кастомный диалог для переименования с увеличенным размером
-        dialog = QDialog(self)
-        dialog.setWindowTitle('Переименовать файл')
-        dialog.setMinimumWidth(500)  # Увеличиваем минимальную ширину
-        dialog.setMinimumHeight(120)
-        
-        layout = QVBoxLayout(dialog)
-        
-        label = QLabel('Новое имя файла:')
-        layout.addWidget(label)
-        
-        line_edit = QLineEdit(old_filename)
-        line_edit.selectAll()  # Выделяем весь текст для удобства редактирования
-        layout.addWidget(line_edit)
-        
-        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        button_box.accepted.connect(dialog.accept)
-        button_box.rejected.connect(dialog.reject)
-        layout.addWidget(button_box)
-        
-        # Устанавливаем фокус на поле ввода
-        line_edit.setFocus()
-        
-        ok = dialog.exec_() == QDialog.Accepted
-        new_filename = line_edit.text().strip() if ok else ""
-        
-        if ok and new_filename and new_filename != old_filename:
-            if not new_filename.endswith('.json'):
-                new_filename += '.json'
+        dialog = self.FileNameDialog(self, 'Переименовать файл', old_filename)
+        if dialog.exec_() == QDialog.Accepted:
+            new_filename = dialog.get_name()
+            if new_filename and new_filename != old_filename:
+                if not new_filename.endswith('.json'):
+                    new_filename += '.json'
 
-            old_path = test_case._filepath
-            new_path = old_path.parent / new_filename
+                old_path = test_case._filepath
+                new_path = old_path.parent / new_filename
 
-            try:
-                old_path.rename(new_path)
-                self.tree_updated.emit()
-                self._restore_expanded_state(expanded_paths)
-            except Exception as e:
-                QMessageBox.critical(self, "Ошибка", f"Не удалось переименовать:\n{e}")
+                try:
+                    old_path.rename(new_path)
+                    self.tree_updated.emit()
+                    self._restore_expanded_state(expanded_paths)
+                except Exception as e:
+                    QMessageBox.critical(self, "Ошибка", f"Не удалось переименовать:\n{e}")
 
     def _duplicate_test_case(self, test_case):
         expanded_paths = self._capture_expanded_state()
@@ -1284,6 +1696,15 @@ class TestCaseTreeWidget(QTreeWidget):
             item_text = item.text(0).lower()
             text_match = not pattern or pattern in item_text
             
+            # Для файлов также проверяем test_case_id
+            if item_data and isinstance(item_data, dict) and item_data.get('type') == 'file':
+                test_case = item_data.get('test_case')
+                if test_case and isinstance(test_case, TestCase) and pattern:
+                    # Если есть паттерн поиска, проверяем также test_case_id
+                    test_case_id = (getattr(test_case, 'test_case_id', '') or "").strip().lower()
+                    if test_case_id and pattern in test_case_id:
+                        text_match = True
+            
             # Проверяем фильтры для тест-кейсов
             filter_match = True
             if item_data and isinstance(item_data, dict) and item_data.get('type') == 'file':
@@ -1540,8 +1961,8 @@ class TestCaseTreeWidget(QTreeWidget):
             
             visible = own_match or matches
             item.setHidden(not visible)
-            if pattern or filters:
-                item.setExpanded(matches or own_match)
+            # Убрано автоматическое разворачивание папок при фильтрации
+            # Состояние развернутых папок сохраняется пользователем
             return visible
 
         return matches
@@ -1554,25 +1975,38 @@ class TestCaseTreeWidget(QTreeWidget):
     def mimeData(self, items):
         if not items:
             return None
-        item = items[0]
-        data = item.data(0, Qt.UserRole)
-        if not data:
+        
+        # Поддержка множественного выбора
+        paths = []
+        types = set()
+        
+        for item in items:
+            data = item.data(0, Qt.UserRole)
+            if not data:
+                continue
+            
+            item_type = data.get("type")
+            types.add(item_type)
+            
+            if item_type == "file":
+                test_case = data.get("test_case")
+                if test_case and getattr(test_case, "_filepath", None):
+                    paths.append({"type": "file", "path": str(test_case._filepath)})
+            elif item_type == "folder":
+                folder_path = data.get("path")
+                if folder_path:
+                    paths.append({"type": "folder", "path": str(folder_path)})
+        
+        if not paths:
             return None
-
-        payload = {"type": data.get("type")}
-        if payload["type"] == "file":
-            test_case = data.get("test_case")
-            if not test_case or not getattr(test_case, "_filepath", None):
-                return None
-            payload["path"] = str(test_case._filepath)
-        elif payload["type"] == "folder":
-            folder_path = data.get("path")
-            if not folder_path:
-                return None
-            payload["path"] = str(folder_path)
+        
+        # Если все элементы одного типа, используем старый формат для обратной совместимости
+        if len(types) == 1 and len(paths) == 1:
+            payload = paths[0]
         else:
-            return None
-
+            # Множественный выбор - используем массив
+            payload = {"multiple": True, "items": paths}
+        
         mime = QMimeData()
         mime.setData(self.MIME_TYPE, QByteArray(json.dumps(payload).encode("utf-8")))
         return mime
@@ -1580,62 +2014,270 @@ class TestCaseTreeWidget(QTreeWidget):
     def dragEnterEvent(self, event):
         if event.mimeData().hasFormat(self.MIME_TYPE):
             event.acceptProposedAction()
+            self._update_drag_over_item(event.pos())
         else:
             event.ignore()
-
-    dragMoveEvent = dragEnterEvent
+    
+    def dragMoveEvent(self, event):
+        if event.mimeData().hasFormat(self.MIME_TYPE):
+            event.acceptProposedAction()
+            self._update_drag_over_item(event.pos())
+            # Автоскролл при приближении к краям виджета
+            self._auto_scroll_on_drag(event.pos())
+        else:
+            event.ignore()
+    
+    def dragLeaveEvent(self, event):
+        """Обработка выхода drag & drop"""
+        # Останавливаем таймер разворачивания
+        self._expand_timer.stop()
+        self._expand_target_item = None
+        # Останавливаем таймер автоскролла
+        self._scroll_timer.stop()
+        self._scroll_direction = 0
+        self._clear_drag_over_item()
+        super().dragLeaveEvent(event)
 
     def dropEvent(self, event):
         mime = event.mimeData()
         if not mime.hasFormat(self.MIME_TYPE):
             event.ignore()
+            self._clear_drag_over_item()
             return
 
         if not self.test_cases_dir:
             event.ignore()
+            self._clear_drag_over_item()
             return
 
         try:
             payload = json.loads(bytes(mime.data(self.MIME_TYPE)).decode("utf-8"))
         except (ValueError, json.JSONDecodeError):
             event.ignore()
-            return
-
-        source_type = payload.get("type")
-        source_path = payload.get("path")
-        if not source_type or not source_path:
-            event.ignore()
+            self._clear_drag_over_item()
             return
 
         target_folder = self._resolve_drop_target(event.pos())
         if target_folder is None:
             event.ignore()
+            self._clear_drag_over_item()
             return
         target_folder = Path(target_folder)
 
-        source_path_obj = Path(source_path)
-        if source_type == "file":
-            if source_path_obj.parent == target_folder:
+        # Поддержка множественного выбора
+        if payload.get("multiple"):
+            items = payload.get("items", [])
+            moved_count = 0
+            for item_data in items:
+                source_type = item_data.get("type")
+                source_path = item_data.get("path")
+                if not source_type or not source_path:
+                    continue
+                
+                source_path_obj = Path(source_path)
+                if source_type == "file":
+                    if source_path_obj.parent == target_folder:
+                        continue
+                    if self.service.move_item(source_path_obj, target_folder):
+                        moved_count += 1
+                elif source_type == "folder":
+                    if source_path_obj == target_folder or self._is_subpath(target_folder, source_path_obj):
+                        continue
+                    if self.service.move_item(source_path_obj, target_folder):
+                        moved_count += 1
+            
+            if moved_count > 0:
+                event.acceptProposedAction()
+                # Очищаем подсветку ДО перестроения дерева, чтобы избежать обращения к невалидным элементам
+                self._clear_drag_over_item()
+                expanded_paths = self._capture_expanded_state()
+                self.tree_updated.emit()
+                self._restore_expanded_state(expanded_paths)
+            else:
                 event.ignore()
-                return
-            moved = self.service.move_item(source_path_obj, target_folder)
-        elif source_type == "folder":
-            if source_path_obj == target_folder or self._is_subpath(target_folder, source_path_obj):
-                event.ignore()
-                return
-            moved = self.service.move_item(source_path_obj, target_folder)
+                # Очищаем подсветку если операция не удалась
+                self._clear_drag_over_item()
         else:
-            event.ignore()
+            # Одиночный выбор (старый формат для обратной совместимости)
+            source_type = payload.get("type")
+            source_path = payload.get("path")
+            if not source_type or not source_path:
+                event.ignore()
+                self._clear_drag_over_item()
+                return
+
+            source_path_obj = Path(source_path)
+            if source_type == "file":
+                if source_path_obj.parent == target_folder:
+                    event.ignore()
+                    self._clear_drag_over_item()
+                    return
+                moved = self.service.move_item(source_path_obj, target_folder)
+            elif source_type == "folder":
+                if source_path_obj == target_folder or self._is_subpath(target_folder, source_path_obj):
+                    event.ignore()
+                    self._clear_drag_over_item()
+                    return
+                moved = self.service.move_item(source_path_obj, target_folder)
+            else:
+                event.ignore()
+                self._clear_drag_over_item()
+                return
+
+            if moved:
+                event.acceptProposedAction()
+                # Очищаем подсветку ДО перестроения дерева, чтобы избежать обращения к невалидным элементам
+                self._clear_drag_over_item()
+                expanded_paths = self._capture_expanded_state()
+                self.tree_updated.emit()
+                self._restore_expanded_state(expanded_paths)
+            else:
+                event.ignore()
+                # Очищаем подсветку если операция не удалась
+                self._clear_drag_over_item()
+
+    def _update_drag_over_item(self, position):
+        """Обновить визуальное выделение элемента при drag & drop"""
+        item = self.itemAt(position)
+        
+        # Если элемент не изменился, проверяем только состояние таймера
+        if item == self._drag_over_item:
+            # Если элемент не изменился, но папка уже развернута, останавливаем таймер
+            if item:
+                data = item.data(0, Qt.UserRole)
+                if data and isinstance(data, dict):
+                    if data.get("type") == "folder" and item.isExpanded():
+                        self._expand_timer.stop()
+                        self._expand_target_item = None
             return
-
-        if moved:
-            event.acceptProposedAction()
-            expanded_paths = self._capture_expanded_state()
-            self.tree_updated.emit()
-            self._restore_expanded_state(expanded_paths)
+        
+        # Убираем выделение с предыдущего элемента
+        self._clear_drag_over_item()
+        
+        # Добавляем выделение новому элементу
+        if item:
+            self._drag_over_item = item
+            data = item.data(0, Qt.UserRole)
+            
+            # Подсвечиваем только папки и файлы (не корневой элемент)
+            if data and isinstance(data, dict):
+                # Фон теперь рисуется в drawRow, просто обновляем виджет
+                self.viewport().update()
+                self.update()
+                
+                # Запускаем таймер для автоматического разворачивания папок
+                if data.get("type") == "folder" and not item.isExpanded() and item.childCount() > 0:
+                    self._expand_target_item = item
+                    self._expand_timer.start(2000)  # 2 секунды
+                else:
+                    # Останавливаем таймер, если элемент не папка или уже развернут
+                    self._expand_timer.stop()
+                    self._expand_target_item = None
+    
+    def _clear_drag_over_item(self):
+        """Убрать визуальное выделение элемента"""
+        # Останавливаем таймер разворачивания
+        self._expand_timer.stop()
+        self._expand_target_item = None
+        # Останавливаем таймер автоскролла
+        self._scroll_timer.stop()
+        self._scroll_direction = 0
+        
+        if self._drag_over_item:
+            # Очищаем ссылку на элемент
+            self._drag_over_item = None
+            self._original_background = None
+            
+            # Принудительно обновляем виджет для перерисовки без подсветки
+            # Используем update() для безопасной перерисовки (repaint() может быть небезопасным)
+            self.viewport().update()
+            self.update()
+    
+    def _auto_scroll_on_drag(self, position):
+        """Автоматическая прокрутка дерева при drag & drop, если курсор близко к краю"""
+        viewport = self.viewport()
+        viewport_rect = viewport.rect()
+        
+        # Порог для начала автоскролла (в пикселях от края)
+        scroll_threshold = 30
+        
+        # Проверяем верхний край
+        if position.y() < scroll_threshold:
+            scrollbar = self.verticalScrollBar()
+            if scrollbar and scrollbar.value() > scrollbar.minimum():
+                # Запускаем плавную прокрутку вверх
+                if self._scroll_direction != -1:
+                    self._scroll_direction = -1
+                    if not self._scroll_timer.isActive():
+                        self._scroll_timer.start(16)  # ~60 FPS для плавности
+            else:
+                # Достигли верха, останавливаем прокрутку
+                self._scroll_timer.stop()
+                self._scroll_direction = 0
+        
+        # Проверяем нижний край
+        elif position.y() > viewport_rect.height() - scroll_threshold:
+            scrollbar = self.verticalScrollBar()
+            if scrollbar and scrollbar.value() < scrollbar.maximum():
+                # Запускаем плавную прокрутку вниз
+                if self._scroll_direction != 1:
+                    self._scroll_direction = 1
+                    if not self._scroll_timer.isActive():
+                        self._scroll_timer.start(16)  # ~60 FPS для плавности
+            else:
+                # Достигли низа, останавливаем прокрутку
+                self._scroll_timer.stop()
+                self._scroll_direction = 0
         else:
-            event.ignore()
-
+            # Курсор вне зоны автоскролла, останавливаем прокрутку
+            self._scroll_timer.stop()
+            self._scroll_direction = 0
+    
+    def _perform_smooth_scroll(self):
+        """Выполнить один шаг плавной прокрутки"""
+        if self._scroll_direction == 0:
+            self._scroll_timer.stop()
+            return
+        
+        scrollbar = self.verticalScrollBar()
+        if not scrollbar:
+            self._scroll_timer.stop()
+            self._scroll_direction = 0
+            return
+        
+        # Попиксельная прокрутка для максимальной плавности
+        scroll_speed = 1  # 1 пиксель за тик
+        current_value = scrollbar.value()
+        
+        if self._scroll_direction == -1:  # Прокрутка вверх
+            if current_value > scrollbar.minimum():
+                new_value = max(scrollbar.minimum(), current_value - scroll_speed)
+                scrollbar.setValue(new_value)
+            else:
+                # Достигли верха, останавливаем
+                self._scroll_timer.stop()
+                self._scroll_direction = 0
+        elif self._scroll_direction == 1:  # Прокрутка вниз
+            if current_value < scrollbar.maximum():
+                new_value = min(scrollbar.maximum(), current_value + scroll_speed)
+                scrollbar.setValue(new_value)
+            else:
+                # Достигли низа, останавливаем
+                self._scroll_timer.stop()
+                self._scroll_direction = 0
+    
+    def _auto_expand_folder(self):
+        """Автоматически развернуть папку после задержки при drag & drop"""
+        if self._expand_target_item and not self._expand_target_item.isExpanded():
+            # Проверяем, что элемент все еще является папкой
+            data = self._expand_target_item.data(0, Qt.UserRole)
+            if data and data.get("type") == "folder":
+                self._expand_target_item.setExpanded(True)
+                # Обновляем позицию drag over item, так как дерево изменилось
+                if self._drag_over_item == self._expand_target_item:
+                    self.viewport().update()
+                    self.update()
+    
     def _resolve_drop_target(self, position):
         item = self.itemAt(position)
         if not item:
@@ -1721,16 +2363,42 @@ class TestCaseTreeWidget(QTreeWidget):
             if test_case:
                 return getattr(test_case, "_filepath", None)
         return None
+    
+    def capture_scroll_position(self) -> int:
+        """Сохранить текущую позицию скролла."""
+        scrollbar = self.verticalScrollBar()
+        if scrollbar:
+            return scrollbar.value()
+        return 0
+    
+    def restore_scroll_position(self, position: int):
+        """Восстановить позицию скролла."""
+        scrollbar = self.verticalScrollBar()
+        if scrollbar:
+            # Устанавливаем позицию скролла с задержкой, чтобы дерево успело обновиться
+            # Используем несколько попыток для надежности
+            def set_scroll():
+                if scrollbar:
+                    scrollbar.setValue(position)
+            QTimer.singleShot(50, set_scroll)
+            # Дополнительная попытка на случай, если первая не сработала
+            QTimer.singleShot(100, set_scroll)
 
-    def restore_selected_item(self, filepath: Optional[Path]):
-        """Восстановить выбранный элемент по пути к файлу."""
+    def restore_selected_item(self, filepath: Optional[Path], restore_scroll: bool = False):
+        """Восстановить выбранный элемент по пути к файлу.
+        
+        Args:
+            filepath: Путь к файлу тест-кейса
+            restore_scroll: Если True, прокручивает дерево к элементу. Если False, только выделяет элемент.
+        """
         if not filepath:
             return
         
         item = self._find_item_by_filepath(self.invisibleRootItem(), filepath)
         if item:
             self.setCurrentItem(item)
-            self.scrollToItem(item)
+            if restore_scroll:
+                self.scrollToItem(item)
             # Не вызываем test_case_selected.emit, чтобы не перезагружать форму
 
     def _find_item_by_filepath(self, parent: QTreeWidgetItem, filepath: Path) -> Optional[QTreeWidgetItem]:

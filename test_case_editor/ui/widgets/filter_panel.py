@@ -200,7 +200,7 @@ class FilterPanel(QWidget):
         
         # Создаем виджеты для всех полей (но не добавляем их в UI)
         for field_key in self._all_fields.keys():
-            widget = self._create_list_widget()
+            widget = self._create_list_widget(field_key)
             self._field_widgets[field_key] = widget
         
         # Показываем только поля по умолчанию
@@ -408,9 +408,11 @@ class FilterPanel(QWidget):
         except Exception:
             return None
     
-    def _create_list_widget(self) -> CheckboxComboBox:
+    def _create_list_widget(self, field_key: str) -> CheckboxComboBox:
         """Создать выпадающий список с чекбоксами"""
-        combo = CheckboxComboBox()
+        # Для test_case_id включаем поиск
+        enable_search = (field_key == "test_case_id")
+        combo = CheckboxComboBox(enable_search=enable_search)
         return combo
     
     def _populate_all_lists(self):

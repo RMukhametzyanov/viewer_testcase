@@ -56,7 +56,6 @@ from .widgets.placeholder_widget import PlaceholderWidget
 from .widgets.tree_widget import TestCaseTreeWidget
 from .widgets.form_widget import TestCaseFormWidget
 from .widgets.auxiliary_panel import AuxiliaryPanel
-from .widgets.toggle_switch import ToggleSwitch
 from .widgets.filter_panel import FilterPanel
 from ..utils import llm
 from ..utils.prompt_builder import build_review_prompt, build_creation_prompt
@@ -147,17 +146,24 @@ class SettingsDialog(QDialog):
             ("Общие", "general"),
             ("LLM", "llm"),
             ("Промпты", "prompts"),
-            ("Панели", "panels"),
+            ("Панели", "panels"),  # Скрыт, но функционал сохранен
             ("Внешний вид", "appearance"),
             ("Панель Информация", "information_panel"),
+            ("Тест кейс", "test_case"),
             ("Импорт", "import"),
         ]
         
         self.section_widgets = {}
+        self.panels_item = None  # Сохраняем ссылку на элемент "Панели" для скрытия
         for name, key in sections:
             # Добавляем в список навигации
             item = QListWidgetItem(name)
             self.nav_list.addItem(item)
+            
+            # Скрываем пункт "Панели"
+            if key == "panels":
+                self.panels_item = item
+                item.setHidden(True)
             
             # Создаем и добавляем контент
             if key == "general":
@@ -172,6 +178,8 @@ class SettingsDialog(QDialog):
                 widget = self._create_appearance_tab()
             elif key == "information_panel":
                 widget = self._create_information_panel_tab()
+            elif key == "test_case":
+                widget = self._create_test_case_tab()
             elif key == "import":
                 widget = self._create_import_tab()
             else:
@@ -439,6 +447,42 @@ class SettingsDialog(QDialog):
         
         return widget
 
+    def _create_test_case_tab(self) -> QWidget:
+        """Создать вкладку настроек тест-кейса"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        layout.setSpacing(UI_METRICS.base_spacing)
+        
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.NoFrame)
+        
+        content = QWidget()
+        content_layout = QVBoxLayout(content)
+        content_layout.setSpacing(UI_METRICS.section_spacing)
+        
+        # Причины пропуска теста
+        skip_reasons_group = QGroupBox("Причины пропуска теста")
+        skip_reasons_layout = QVBoxLayout()
+        skip_reasons_layout.setSpacing(UI_METRICS.base_spacing)
+        
+        # Многострочное поле для причин (кроме "Другое")
+        reasons_label = QLabel("Список причин пропуска (каждая причина с новой строки):")
+        skip_reasons_layout.addWidget(reasons_label)
+        
+        self.skip_reasons_edit = QTextEdit()
+        self.skip_reasons_edit.setPlaceholderText("Автотесты\nНагрузочное тестирование\nTest-first")
+        skip_reasons_layout.addWidget(self.skip_reasons_edit)
+        
+        skip_reasons_group.setLayout(skip_reasons_layout)
+        content_layout.addWidget(skip_reasons_group)
+        
+        content_layout.addStretch()
+        scroll.setWidget(content)
+        layout.addWidget(scroll)
+        
+        return widget
+
     def _create_appearance_tab(self) -> QWidget:
         """Создать вкладку настроек внешнего вида"""
         widget = QWidget()
@@ -556,6 +600,15 @@ class SettingsDialog(QDialog):
         
         padding_group.setLayout(padding_layout)
         content_layout.addWidget(padding_group)
+        
+        # Счетчики в дереве
+        tree_group = QGroupBox("Дерево элементов")
+        tree_layout = QVBoxLayout()
+        self.show_folder_counters_check = QCheckBox("Показывать счетчики JSON файлов в папках")
+        self.show_folder_counters_check.setToolTip("Отображать количество JSON файлов в каждой папке дерева (например: Кандидаты (6))")
+        tree_layout.addWidget(self.show_folder_counters_check)
+        tree_group.setLayout(tree_layout)
+        content_layout.addWidget(tree_group)
         
         content_layout.addStretch()
         scroll.setWidget(content)
@@ -738,6 +791,13 @@ class SettingsDialog(QDialog):
         self.form_area_spin.setValue(panel_sizes.get('form_area', 900))
         self.review_panel_spin.setValue(panel_sizes.get('review', 360))
         
+        # Тест кейс - причины пропуска (кроме "Другое")
+        if hasattr(self, 'skip_reasons_edit'):
+            skip_reasons = self.settings.get('skip_reasons', [])
+            # Фильтруем "Другое" и формируем текст
+            reasons_text = '\n'.join([r for r in skip_reasons if r != "Другое"])
+            self.skip_reasons_edit.setPlainText(reasons_text)
+        
         # Внешний вид
         self.theme_combo.setCurrentText(self.settings.get('theme', 'dark'))
         font_family = self.settings.get('font_family', 'Segoe UI')
@@ -758,6 +818,9 @@ class SettingsDialog(QDialog):
         self.container_padding_spin.setValue(self.settings.get('container_padding', 12))
         self.text_padding_spin.setValue(self.settings.get('text_input_vertical_padding', 2))
         self.group_title_spacing_spin.setValue(self.settings.get('group_title_spacing', 1))
+        # Счетчики в дереве
+        if hasattr(self, 'show_folder_counters_check'):
+            self.show_folder_counters_check.setChecked(self.settings.get('show_folder_counters', False))
         
         # Панель Информация - видимость элементов (отдельно для каждого элемента)
         info_visibility = self.settings.get('information_panel_visibility', {})
@@ -888,6 +951,17 @@ class SettingsDialog(QDialog):
         self.settings['panel_sizes']['form_area'] = self.form_area_spin.value()
         self.settings['panel_sizes']['review'] = self.review_panel_spin.value()
         
+        # Тест кейс - причины пропуска
+        if hasattr(self, 'skip_reasons_edit'):
+            # Получаем текст из многострочного поля
+            reasons_text = self.skip_reasons_edit.toPlainText().strip()
+            # Разбиваем на строки и фильтруем пустые
+            skip_reasons = [r.strip() for r in reasons_text.split('\n') if r.strip()]
+            # Добавляем "Другое" если его нет
+            if "Другое" not in skip_reasons:
+                skip_reasons.append("Другое")
+            self.settings['skip_reasons'] = skip_reasons
+        
         # Внешний вид
         self.settings['theme'] = self.theme_combo.currentText().strip()
         self.settings['font_family'] = self.font_family_combo.currentText()
@@ -897,6 +971,9 @@ class SettingsDialog(QDialog):
         self.settings['container_padding'] = self.container_padding_spin.value()
         self.settings['text_input_vertical_padding'] = self.text_padding_spin.value()
         self.settings['group_title_spacing'] = self.group_title_spacing_spin.value()
+        # Счетчики в дереве
+        if hasattr(self, 'show_folder_counters_check'):
+            self.settings['show_folder_counters'] = self.show_folder_counters_check.isChecked()
         
         # Панель Информация - видимость элементов (отдельно для каждого элемента)
         if 'information_panel_visibility' not in self.settings:
@@ -1337,7 +1414,7 @@ class MainWindow(QMainWindow):
         search_layout.setSpacing(UI_METRICS.base_spacing // 2)
         
         self.search_input = QLineEdit()
-        self.search_input.setPlaceholderText("🔍 Поиск...")
+        self.search_input.setPlaceholderText("Название или идентификатор")
         self.search_input.textChanged.connect(self._filter_tree)
         search_layout.addWidget(self.search_input, 1)
         
@@ -1384,6 +1461,9 @@ class MainWindow(QMainWindow):
         # Передаем настройки для списка причин пропуска
         skip_reasons = self.settings.get('skip_reasons', ['Автотесты', 'Нагрузочное тестирование', 'Другое'])
         self.tree_widget.set_skip_reasons(skip_reasons)
+        # Передаем настройку для отображения счетчиков
+        show_counters = self.settings.get('show_folder_counters', False)
+        self.tree_widget.set_show_folder_counters(show_counters)
         self.tree_widget.test_case_selected.connect(self._on_test_case_selected)
         self.tree_widget.tree_updated.connect(self._on_tree_updated)
         self.tree_widget.review_requested.connect(self._on_review_requested)
@@ -1462,6 +1542,10 @@ class MainWindow(QMainWindow):
         self.aux_panel.manual_review_notes_changed.connect(self._on_manual_review_notes_changed)
         self.detail_splitter.addWidget(self.aux_panel)
         
+        # Устанавливаем test_cases_dir для панели отчетности
+        if hasattr(self.aux_panel, 'reports_panel') and self.test_cases_dir:
+            self.aux_panel.reports_panel.set_test_cases_dir(self.test_cases_dir)
+        
         # Создаем кнопки панелей в toolbar после создания aux_panel
         self._create_panel_buttons()
         
@@ -1497,11 +1581,13 @@ class MainWindow(QMainWindow):
         self.view_menu = menubar.addMenu('Вид')
         width_action = self.view_menu.addAction('Настроить ширины панелей…')
         width_action.triggered.connect(self._configure_panel_widths)
+        width_action.setVisible(False)  # Скрываем, управление через панель инструментов
         statistics_action = self.view_menu.addAction('Показать статистику')
         statistics_action.triggered.connect(self._show_statistics_panel)
         
-        # Подменю "Режим" в меню "Вид"
+        # Подменю "Режим" в меню "Вид" (скрыто, управление через панель инструментов)
         mode_menu = self.view_menu.addMenu('Режим')
+        mode_menu.setVisible(False)  # Скрываем, управление через панель инструментов
         self._mode_action_group = QActionGroup(self)
         self._mode_action_group.setExclusive(True)
         self._mode_actions = {}
@@ -1533,17 +1619,7 @@ class MainWindow(QMainWindow):
         generate_report_action.triggered.connect(self._generate_html_report)
         settings_action.setShortcut('Ctrl+,')
 
-        # Меню "Git" - создаем через QAction чтобы иконка отображалась рядом с текстом
-        self.git_menu_action = QAction('Git', self)
-        self.git_menu = QMenu(self)
-        self.git_menu_action.setMenu(self.git_menu)
-        menubar.addAction(self.git_menu_action)
-        self.git_commit_action = self.git_menu.addAction('Commit…')
-        self.git_commit_action.triggered.connect(self._open_git_commit_dialog)
-        self.git_push_action = self.git_menu.addAction('Push')
-        self.git_push_action.triggered.connect(self._perform_git_push)
-        
-        # Обновляем индикаторы статуса Git
+        # Обновляем индикаторы статуса Git (для кнопки синхронизации)
         self._update_git_status_indicators()
     
     def _create_toolbar(self):
@@ -1552,19 +1628,32 @@ class MainWindow(QMainWindow):
         self.toolbar.setMovable(False)  # Не позволяем перемещать панель
         self.addToolBar(self.toolbar)
         
-        # Переключатель режима
-        self.mode_edit_label = QLabel("Редактирование")
-        self.toolbar.addWidget(self.mode_edit_label)
+        # Кнопка синхронизации Git (слева)
+        self._create_git_sync_button()
         
-        self.mode_switch = ToggleSwitch()
-        self.mode_switch.toggled.connect(self._on_mode_switch_changed)
-        self.toolbar.addWidget(self.mode_switch)
+        # Отступ перед разделителем
+        spacer_before = QWidget()
+        spacer_before.setFixedWidth(2)
+        self.toolbar.addWidget(spacer_before)
         
-        self.mode_run_label = QLabel("Запуск тестов")
-        self.toolbar.addWidget(self.mode_run_label)
+        # Вертикальный разделитель
+        separator = QFrame()
+        separator.setFrameShape(QFrame.VLine)
+        separator.setFrameShadow(QFrame.Sunken)
+        separator.setStyleSheet("color: rgba(255, 255, 255, 0.3);")
+        separator.setFixedWidth(1)
+        separator.setFixedHeight(24)
+        self.toolbar.addWidget(separator)
+        
+        # Отступ после разделителя
+        spacer_after = QWidget()
+        spacer_after.setFixedWidth(2)
+        self.toolbar.addWidget(spacer_after)
+        
+        # Кнопки режимов с иконками (слева, после разделителя)
+        self._create_mode_buttons()
         
         # Добавляем растягивающийся разделитель, чтобы кнопки панелей были справа
-        self.toolbar.addSeparator()
         spacer = QWidget()
         spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         self.toolbar.addWidget(spacer)
@@ -1600,20 +1689,24 @@ class MainWindow(QMainWindow):
             try:
                 with open(mapping_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
-                    if isinstance(data, dict) and 'panels' in data:
-                        return data.get('panels', {})
-                    else:
+                    # Возвращаем весь словарь, чтобы иметь доступ ко всем секциям
+                    if isinstance(data, dict):
                         return data
+                    else:
+                        return {}
             except (json.JSONDecodeError, IOError) as e:
                 print(f"Ошибка загрузки маппинга иконок: {e}")
         
+        # Возвращаем словарь с секцией panels для обратной совместимости
         return {
-            "information": "info.svg",
-            "review": "eye.svg",
-            "creation": "file-plus.svg",
-            "json": "code.svg",
-            "files": "file.svg",
-            "reports": "book.svg"
+            "panels": {
+                "information": "info.svg",
+                "review": "eye.svg",
+                "creation": "file-plus.svg",
+                "json": "code.svg",
+                "files": "file.svg",
+                "reports": "book.svg"
+            }
         }
     
     def _load_svg_icon(self, icon_name: str, size: int = 24, color: Optional[str] = None) -> Optional[QIcon]:
@@ -1658,8 +1751,14 @@ class MainWindow(QMainWindow):
         if not hasattr(self, 'toolbar') or not self.toolbar:
             return
         
+        # Добавляем разделитель перед кнопками панелей
+        self.toolbar.addSeparator()
+        
         # Загружаем маппинг иконок
         icon_mapping = self._load_icon_mapping()
+        
+        # Получаем секцию panels из маппинга
+        panels_mapping = icon_mapping.get('panels', icon_mapping)  # Для обратной совместимости
         
         # Порядок панелей
         tabs_order = ["information", "review", "creation", "json", "files", "reports", "manual_review"]
@@ -1679,7 +1778,7 @@ class MainWindow(QMainWindow):
             button = QToolButton()
             
             # Загружаем иконку из SVG файла
-            icon_name = icon_mapping.get(tab_id)
+            icon_name = panels_mapping.get(tab_id)
             if icon_name:
                 icon = self._load_svg_icon(icon_name, size=20, color="#ffffff")
                 if icon and not icon.isNull():
@@ -1727,6 +1826,114 @@ class MainWindow(QMainWindow):
             if hasattr(self, 'aux_panel'):
                 self.aux_panel.setVisible(True)
                 self.aux_panel.select_tab("information")
+    
+    def _create_mode_buttons(self):
+        """Создать кнопки режимов редактирования и запуска тестов с иконками."""
+        # Загружаем маппинг иконок
+        icon_mapping = self._load_icon_mapping()
+        toolbar_mapping = icon_mapping.get('toolbar', {})
+        
+        # Кнопка режима редактирования
+        self.mode_edit_button = QToolButton()
+        edit_icon_name = toolbar_mapping.get('edit_mode', 'edit.svg')
+        edit_icon = self._load_svg_icon(edit_icon_name, size=20, color="#ffffff")
+        if edit_icon and not edit_icon.isNull():
+            self.mode_edit_button.setIcon(edit_icon)
+            self.mode_edit_button.setIconSize(QSize(20, 20))
+        else:
+            print(f"Предупреждение: не удалось загрузить иконку {edit_icon_name} для режима редактирования")
+            self.mode_edit_button.setText("E")
+        self.mode_edit_button.setToolTip("Редактирование")
+        self.mode_edit_button.setCursor(Qt.PointingHandCursor)
+        self.mode_edit_button.setAutoRaise(True)
+        self.mode_edit_button.setFixedSize(32, 32)
+        self.mode_edit_button.setCheckable(False)
+        self.mode_edit_button.setStyleSheet(self._get_panel_button_style(False))
+        # При клике переключаем на режим редактирования
+        self.mode_edit_button.clicked.connect(lambda: self._set_mode("edit"))
+        self.toolbar.addWidget(self.mode_edit_button)
+        
+        # Кнопка режима запуска тестов
+        self.mode_run_button = QToolButton()
+        run_icon_name = toolbar_mapping.get('run_mode', 'check-square.svg')
+        run_icon = self._load_svg_icon(run_icon_name, size=20, color="#ffffff")
+        if run_icon and not run_icon.isNull():
+            self.mode_run_button.setIcon(run_icon)
+            self.mode_run_button.setIconSize(QSize(20, 20))
+        else:
+            print(f"Предупреждение: не удалось загрузить иконку {run_icon_name} для режима запуска тестов")
+            self.mode_run_button.setText("R")
+        self.mode_run_button.setToolTip("Запуск тестов")
+        self.mode_run_button.setCursor(Qt.PointingHandCursor)
+        self.mode_run_button.setAutoRaise(True)
+        self.mode_run_button.setFixedSize(32, 32)
+        self.mode_run_button.setCheckable(False)
+        self.mode_run_button.setStyleSheet(self._get_panel_button_style(False))
+        # При клике переключаем на режим запуска
+        self.mode_run_button.clicked.connect(lambda: self._set_mode("run"))
+        self.toolbar.addWidget(self.mode_run_button)
+    
+    def _create_git_sync_button(self):
+        """Создать кнопку синхронизации git в toolbar."""
+        # Проверяем, что toolbar существует
+        if not hasattr(self, 'toolbar') or not self.toolbar:
+            return
+        
+        # Загружаем маппинг иконок
+        icon_mapping = self._load_icon_mapping()
+        
+        # Создаем кнопку
+        git_sync_button = QToolButton()
+        
+        # Загружаем иконку из SVG файла
+        toolbar_mapping = icon_mapping.get('toolbar', {})
+        icon_name = toolbar_mapping.get('git_sync', 'gitlab.svg')
+        icon = self._load_svg_icon(icon_name, size=20, color="#ffffff")
+        if icon and not icon.isNull():
+            git_sync_button.setIcon(icon)
+            git_sync_button.setIconSize(QSize(20, 20))
+        else:
+            print(f"Предупреждение: не удалось загрузить иконку {icon_name} для синхронизации git")
+            git_sync_button.setText("Git")
+        
+        git_sync_button.setToolTip("Синхронизация с репозиторием (Pull, Commit, Push)")
+        git_sync_button.setCursor(Qt.PointingHandCursor)
+        git_sync_button.setAutoRaise(True)
+        git_sync_button.setFixedSize(32, 32)
+        
+        # Стиль кнопки (похожий на кнопки панелей, но не checkable)
+        git_sync_button.setStyleSheet(self._get_panel_button_style(False))
+        
+        # Подключаем обработчик клика
+        git_sync_button.clicked.connect(self._perform_git_sync)
+        
+        self.toolbar.addWidget(git_sync_button)
+        self.git_sync_button = git_sync_button
+        
+        # Обновляем стиль кнопки при создании
+        has_uncommitted, has_unpushed, has_conflicts = self._check_git_status()
+        self._update_git_sync_button_style(has_conflicts, has_uncommitted)
+    
+    def _update_git_sync_button_style(self, has_conflicts: bool, has_uncommitted: bool):
+        """Обновить цвет иконки синхронизации Git в зависимости от состояния."""
+        if not hasattr(self, 'git_sync_button'):
+            return
+        
+        # Определяем цвет иконки
+        icon_color = "#ffffff"  # По умолчанию - белый
+        if has_conflicts:
+            icon_color = "#e74c3c"  # Красный для конфликтов
+        elif has_uncommitted:
+            icon_color = "#f39c12"  # Желтый для незакоммиченных изменений
+        
+        # Загружаем иконку с нужным цветом
+        icon_mapping = self._load_icon_mapping()
+        toolbar_mapping = icon_mapping.get('toolbar', {})
+        icon_name = toolbar_mapping.get('git_sync', 'gitlab.svg')
+        icon = self._load_svg_icon(icon_name, size=20, color=icon_color)
+        if icon and not icon.isNull():
+            self.git_sync_button.setIcon(icon)
+            self.git_sync_button.setIconSize(QSize(20, 20))
     
     def _on_panel_button_clicked(self, tab_id: str, checked: bool):
         """Обработчик клика на кнопку панели."""
@@ -1885,8 +2092,22 @@ class MainWindow(QMainWindow):
             """)
     
     def _create_save_shortcut(self):
-        """Создать горячую клавишу Ctrl+S для сохранения"""
-        save_shortcut = QShortcut(QKeySequence("Ctrl+S"), self)
+        """Создать горячую клавишу для сохранения (Ctrl+S на Windows/Linux, Cmd+S на macOS)
+        
+        Использует явную комбинацию клавиш с кодами клавиш, которая работает независимо от раскладки клавиатуры.
+        На macOS используется Meta (Cmd), на Windows/Linux - Control.
+        """
+        # На macOS используем Meta (Cmd), на Windows/Linux - Control
+        # Используем коды клавиш напрямую для работы независимо от раскладки
+        if sys.platform == "darwin":
+            # macOS: Cmd+S (MetaModifier = Cmd)
+            # Используем конструктор QKeySequence с модификатором и кодом клавиши
+            key_sequence = QKeySequence(Qt.MetaModifier + Qt.Key_S)
+        else:
+            # Windows/Linux: Ctrl+S
+            key_sequence = QKeySequence(Qt.ControlModifier + Qt.Key_S)
+        
+        save_shortcut = QShortcut(key_sequence, self)
         save_shortcut.activated.connect(self._on_save_button_clicked)
         self.save_shortcut = save_shortcut  # Сохраняем ссылку, чтобы не удалился
     
@@ -2446,17 +2667,123 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("Git: ошибка выполнения")
             return
     
-    def _check_git_status(self):
-        """Проверить статус Git: есть ли незакоммиченные изменения и незапушенные коммиты."""
+    def _perform_git_pull(self):
+        """Выполнить git pull для получения изменений из удалённого репозитория."""
         repo_root, git_path = self._get_git_repo_info()
         if repo_root is None or git_path is None:
-            return False, False
-        
-        has_uncommitted = False
-        has_unpushed = False
+            return
         
         try:
-            # Проверяем наличие незакоммиченных изменений
+            self.statusBar().showMessage("Git: получаю изменения из удалённого репозитория…")
+            pull_result = subprocess.run(
+                ["git", "pull"],
+                cwd=str(repo_root),
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='replace',
+                timeout=60,  # Таймаут 60 секунд для pull
+            )
+            
+            if pull_result.returncode != 0:
+                stderr = (pull_result.stderr or "").strip()
+                stdout = (pull_result.stdout or "").strip()
+                combined_output = stderr or stdout or "Неизвестная ошибка."
+                
+                # Определяем тип ошибки для более понятного сообщения
+                error_lower = combined_output.lower()
+                if any(keyword in error_lower for keyword in ["could not resolve", "failed to connect", "connection refused", "network", "unreachable", "timeout"]):
+                    error_message = (
+                        "Не удалось получить изменения из удалённого репозитория.\n\n"
+                        "Возможные причины:\n"
+                        "• GitLab недоступен или перегружен\n"
+                        "• Проблемы с сетевым подключением\n"
+                        "• Неверный URL удалённого репозитория\n\n"
+                        f"Детали ошибки:\n{combined_output}"
+                    )
+                elif "authentication" in error_lower or "permission" in error_lower or "denied" in error_lower:
+                    error_message = (
+                        "Не удалось получить изменения: проблема с аутентификацией.\n\n"
+                        "Проверьте:\n"
+                        "• Настройки доступа к репозиторию\n"
+                        "• Учётные данные Git\n\n"
+                        f"Детали ошибки:\n{combined_output}"
+                    )
+                elif "merge conflict" in error_lower or "conflict" in error_lower:
+                    # Сообщаем пользователю о конфликтах
+                    QMessageBox.warning(
+                        self,
+                        "Git Pull - Конфликты",
+                        "Обнаружены конфликты при слиянии. Пожалуйста, разрешите их вручную с помощью Git."
+                    )
+                    self.statusBar().showMessage("Git: обнаружены конфликты")
+                    return False
+                else:
+                    error_message = (
+                        "Не удалось получить изменения из удалённого репозитория.\n\n"
+                        f"Детали ошибки:\n{combined_output}"
+                    )
+                
+                QMessageBox.warning(
+                    self,
+                    "Git Pull - Ошибка",
+                    error_message,
+                )
+                self.statusBar().showMessage("Git: не удалось получить изменения")
+                return False
+            else:
+                # Pull успешно выполнен
+                output = (pull_result.stdout or "").strip()
+                if output and "already up to date" not in output.lower():
+                    QMessageBox.information(
+                        self,
+                        "Git",
+                        "Изменения успешно получены из удалённого репозитория.",
+                    )
+                self.statusBar().showMessage("Git: изменения успешно получены")
+                # Обновляем индикаторы статуса Git
+                self._update_git_status_indicators()
+                return True
+                
+        except subprocess.TimeoutExpired:
+            QMessageBox.warning(
+                self,
+                "Git Pull - Таймаут",
+                (
+                    "Превышено время ожидания при получении изменений.\n\n"
+                    "Возможные причины:\n"
+                    "• GitLab недоступен или перегружен\n"
+                    "• Медленное сетевое подключение\n"
+                    "• Слишком большой объём данных для получения\n\n"
+                    "Попробуйте выполнить pull позже или проверьте подключение к сети."
+                ),
+            )
+            self.statusBar().showMessage("Git: таймаут при получении изменений")
+            return False
+        except FileNotFoundError:
+            QMessageBox.critical(
+                self,
+                "Git",
+                "Команда git не найдена. Установите Git и убедитесь, что он доступен в PATH.",
+            )
+            self.statusBar().showMessage("Git: ошибка выполнения")
+            return False
+    
+    def _perform_git_sync(self):
+        """Выполнить синхронизацию с репозиторием: pull, commit (если есть изменения), push."""
+        repo_root, git_path = self._get_git_repo_info()
+        if repo_root is None or git_path is None:
+            return
+        
+        # Шаг 1: Pull - получаем изменения из удалённого репозитория
+        self.statusBar().showMessage("Git: синхронизация с репозиторием…")
+        pull_success = self._perform_git_pull()
+        if not pull_success:
+            # Если pull не удался, не продолжаем синхронизацию
+            return
+        
+        # Шаг 2: Проверяем, есть ли локальные изменения для коммита
+        try:
             status_proc = subprocess.run(
                 ["git", "status", "--porcelain", git_path],
                 cwd=str(repo_root),
@@ -2466,7 +2793,65 @@ class MainWindow(QMainWindow):
                 errors='replace',
                 check=True,
             )
-            has_uncommitted = bool(status_proc.stdout.strip())
+            has_changes = bool(status_proc.stdout.strip())
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            has_changes = False
+        
+        # Шаг 3: Если есть изменения, делаем commit
+        if has_changes:
+            # Открываем диалог для ввода комментария коммита
+            dialog = GitCommitDialog(self)
+            if dialog.exec_() == QDialog.Accepted:
+                comment = dialog.get_comment().strip()
+                if comment:
+                    self._perform_git_commit(comment)
+                else:
+                    # Пользователь отменил коммит, но продолжаем push если есть что отправлять
+                    pass
+            else:
+                # Пользователь отменил коммит, но продолжаем push если есть что отправлять
+                pass
+        
+        # Шаг 4: Push - отправляем изменения в удалённый репозиторий
+        self._perform_git_push()
+    
+    def _check_git_status(self):
+        """Проверить статус Git: есть ли незакоммиченные изменения, незапушенные коммиты и конфликты."""
+        repo_root, git_path = self._get_git_repo_info()
+        if repo_root is None or git_path is None:
+            return False, False, False
+        
+        has_uncommitted = False
+        has_unpushed = False
+        has_conflicts = False
+        
+        try:
+            # Проверяем наличие незакоммиченных изменений и конфликтов
+            status_proc = subprocess.run(
+                ["git", "status", "--porcelain", git_path],
+                cwd=str(repo_root),
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='replace',
+                check=True,
+            )
+            status_output = status_proc.stdout.strip()
+            has_uncommitted = bool(status_output)
+            
+            # Проверяем наличие конфликтов слияния
+            # Конфликты обозначаются как "UU", "AA", "DD", "AU", "UA", "DU", "UD" в первой колонке
+            if status_output:
+                for line in status_output.split('\n'):
+                    if line:
+                        # Первые два символа - статус файла
+                        status_code = line[:2]
+                        # Конфликты: UU (оба изменены), AA (оба добавлены), DD (оба удалены),
+                        # AU (добавлен нами, обновлен ими), UA (обновлен нами, добавлен ими),
+                        # DU (удален нами, обновлен ими), UD (обновлен нами, удален ими)
+                        if status_code in ['UU', 'AA', 'DD', 'AU', 'UA', 'DU', 'UD']:
+                            has_conflicts = True
+                            break
         except (subprocess.CalledProcessError, FileNotFoundError):
             # Если не удалось проверить, считаем что изменений нет
             pass
@@ -2512,50 +2897,14 @@ class MainWindow(QMainWindow):
             # Если не удалось проверить, считаем что коммитов для push нет
             pass
         
-        return has_uncommitted, has_unpushed
+        return has_uncommitted, has_unpushed, has_conflicts
     
     def _update_git_status_indicators(self):
-        """Обновить визуальные индикаторы статуса Git в меню."""
-        if not hasattr(self, 'git_commit_action') or not hasattr(self, 'git_push_action'):
-            return
+        """Обновить визуальные индикаторы статуса Git (для кнопки синхронизации)."""
+        has_uncommitted, has_unpushed, has_conflicts = self._check_git_status()
         
-        has_uncommitted, has_unpushed = self._check_git_status()
-        
-        # Обновляем индикатор для Commit
-        if has_uncommitted:
-            # Есть незакоммиченные изменения - добавляем индикатор
-            self.git_commit_action.setText('● Commit…')
-        else:
-            # Нет незакоммиченных изменений - обычный текст
-            self.git_commit_action.setText('Commit…')
-        
-        # Обновляем индикатор для Push
-        if has_unpushed:
-            # Есть незапушенные коммиты - добавляем индикатор
-            self.git_push_action.setText('● Push')
-        else:
-            # Нет незапушенных коммитов - обычный текст
-            self.git_push_action.setText('Push')
-        
-        # Обновляем иконку меню Git (используем git_menu_action чтобы иконка отображалась рядом с текстом)
-        if hasattr(self, 'git_menu_action'):
-            if has_uncommitted:
-                # Приоритет: незакоммиченные изменения - желтая иконка
-                icon = self._load_svg_icon('arrow-up-right.svg', size=16, color='#f39c12')
-                if icon:
-                    self.git_menu_action.setIcon(icon)
-                else:
-                    self.git_menu_action.setIcon(QIcon())
-            elif has_unpushed:
-                # Есть незапушенные коммиты - синяя иконка
-                icon = self._load_svg_icon('arrow-up-right.svg', size=16, color='#3498db')
-                if icon:
-                    self.git_menu_action.setIcon(icon)
-                else:
-                    self.git_menu_action.setIcon(QIcon())
-            else:
-                # Нет изменений - убираем иконку
-                self.git_menu_action.setIcon(QIcon())
+        # Обновляем стиль кнопки синхронизации Git
+        self._update_git_sync_button_style(has_conflicts, has_uncommitted)
     
     def select_test_cases_folder(self):
         """Обработчик выбора папки с тест-кейсами"""
@@ -2585,6 +2934,7 @@ class MainWindow(QMainWindow):
             'LLM_METHODIC_PATH': str(self._default_methodic_path()),
             'panel_sizes': {'left': 350, 'form_area': 900, 'review': 0},
             'skip_reasons': ['Автотесты', 'Нагрузочное тестирование', 'Другое'],
+            'show_folder_counters': False,
         }
         
         if self.settings_file.exists():
@@ -2628,6 +2978,9 @@ class MainWindow(QMainWindow):
             selected_path = Path(folder)
             self.settings['test_cases_dir'] = str(selected_path)
             self.save_settings(self.settings)
+            # Обновляем панель отчетности
+            if hasattr(self, 'aux_panel') and hasattr(self.aux_panel, 'reports_panel'):
+                self.aux_panel.reports_panel.set_test_cases_dir(selected_path)
             return selected_path
         
         # Если пользователь отменил выбор, сохраняем пустое значение
@@ -2664,10 +3017,13 @@ class MainWindow(QMainWindow):
         if hasattr(self, "detail_splitter"):
             saved_detail_sizes = self.detail_splitter.sizes()
         
+        scroll_position = 0
         if hasattr(self, "tree_widget"):
             expanded_state = self.tree_widget.capture_expanded_state()
             # Сохраняем путь к выбранному элементу для восстановления фокуса
             selected_filepath = self.tree_widget.capture_selected_item()
+            # Сохраняем позицию скролла для восстановления после перезагрузки
+            scroll_position = self.tree_widget.capture_scroll_position()
 
         self.test_cases = self.service.load_all_test_cases(self.test_cases_dir)
         
@@ -2675,15 +3031,27 @@ class MainWindow(QMainWindow):
         if hasattr(self, 'filter_panel'):
             self.filter_panel.update_test_cases(self.test_cases)
         
-        # Обновляем дерево
-        self.tree_widget.load_tree(self.test_cases_dir, self.test_cases)
-        self.tree_widget.restore_expanded_state(expanded_state)
-        # Восстанавливаем выбранный элемент
+        # Обновляем дерево с передачей состояния для восстановления (предотвращает прыгание)
+        self.tree_widget.load_tree(self.test_cases_dir, self.test_cases, expanded_state=expanded_state)
+        # Восстанавливаем выбранный элемент (без прокрутки, чтобы сохранить позицию скролла)
         if selected_filepath:
-            self.tree_widget.restore_selected_item(selected_filepath)
+            self.tree_widget.restore_selected_item(selected_filepath, restore_scroll=False)
         # Обновляем индикаторы статусов в дереве (в режиме запуска тестов)
         if not self.tree_widget._edit_mode:
             self.tree_widget._update_tree_icons(self.tree_widget.invisibleRootItem())
+        
+        # Восстанавливаем фильтры ПОСЛЕ всех операций с деревом (включая обновление иконок)
+        # Это гарантирует, что фильтры применяются к полностью сформированному дереву
+        if hasattr(self, 'search_input') and hasattr(self, 'tree_widget'):
+            query = self.search_input.text()
+            filters = getattr(self, '_current_filters', {})
+            if query or filters:
+                self.tree_widget.filter_items(query, filters)
+        
+        # Восстанавливаем позицию скролла ПОСЛЕ применения фильтров
+        # Фильтры могут изменить высоту дерева, поэтому позицию нужно восстанавливать после них
+        if hasattr(self, "tree_widget"):
+            self.tree_widget.restore_scroll_position(scroll_position)
         
         # Восстанавливаем размеры панелей после обновления
         if saved_detail_sizes and hasattr(self, "detail_splitter"):
@@ -2802,6 +3170,7 @@ class MainWindow(QMainWindow):
     
     def _on_tree_updated(self):
         """Обработка обновления дерева"""
+        # load_all_test_cases() уже применяет фильтры внутри себя
         self.load_all_test_cases()
         self.statusBar().showMessage("Дерево тест-кейсов обновлено.")
     
@@ -2811,6 +3180,7 @@ class MainWindow(QMainWindow):
             # Сохраняем состояние дерева
             expanded_state = self.tree_widget.capture_expanded_state()
             selected_filepath = self.tree_widget.capture_selected_item()
+            scroll_position = self.tree_widget.capture_scroll_position()
             
             # Перезагружаем тест-кейсы
             self.load_all_test_cases()
@@ -2818,7 +3188,19 @@ class MainWindow(QMainWindow):
             # Восстанавливаем состояние дерева
             self.tree_widget.restore_expanded_state(expanded_state)
             if selected_filepath:
-                self.tree_widget.restore_selected_item(selected_filepath)
+                self.tree_widget.restore_selected_item(selected_filepath, restore_scroll=False)
+            
+            # load_all_test_cases() уже применяет фильтры внутри себя, но нужно применить их после восстановления состояния
+            # чтобы фильтры работали с правильным состоянием развернутых папок
+            if hasattr(self, 'search_input') and hasattr(self, 'tree_widget'):
+                query = self.search_input.text()
+                filters = getattr(self, '_current_filters', {})
+                if query or filters:
+                    self.tree_widget.filter_items(query, filters)
+            
+            # Восстанавливаем позицию скролла ПОСЛЕ применения фильтров
+            # Фильтры могут изменить высоту дерева, поэтому позицию нужно восстанавливать после них
+            self.tree_widget.restore_scroll_position(scroll_position)
             
             # Обновляем индикаторы статусов в дереве (в режиме запуска тестов)
             if not self.tree_widget._edit_mode:
@@ -2939,6 +3321,14 @@ class MainWindow(QMainWindow):
         filters = getattr(self, '_current_filters', {})
         self.tree_widget.filter_items(query, filters)
     
+    def _apply_current_filters(self):
+        """Применить текущие фильтры к дереву после перезагрузки."""
+        if hasattr(self, 'search_input') and hasattr(self, 'tree_widget'):
+            query = self.search_input.text()
+            filters = getattr(self, '_current_filters', {})
+            if query or filters:
+                self.tree_widget.filter_items(query, filters)
+    
     def _on_filter_button_clicked(self):
         """Обработчик клика на кнопку фильтра."""
         if not hasattr(self, 'filter_panel'):
@@ -2957,6 +3347,9 @@ class MainWindow(QMainWindow):
     
     def _on_filters_applied(self, filters: dict):
         """Обработчик применения фильтров."""
+        # Сохраняем фильтры для последующего восстановления после перезагрузки дерева
+        self._current_filters = filters.copy() if filters else {}
+        
         # Обновляем цвет иконки фильтра на зеленый
         if hasattr(self, 'filter_button'):
             filter_icon_name = "filter.svg"
@@ -3672,17 +4065,14 @@ class MainWindow(QMainWindow):
 
     def _update_mode_indicator(self):
         is_run = self._current_mode == "run"
-        if hasattr(self, "mode_switch"):
-            self.mode_switch.blockSignals(True)
-            self.mode_switch.setChecked(is_run)
-            self.mode_switch.blockSignals(False)
-        if hasattr(self, "mode_edit_label"):
-            self.mode_edit_label.setStyleSheet(
-                "color: #ffffff;" if not is_run else "color: #777777;"
+        # Обновляем стиль кнопок режимов (активная - яркая, неактивная - тусклая)
+        if hasattr(self, "mode_edit_button"):
+            self.mode_edit_button.setStyleSheet(
+                self._get_panel_button_style(not is_run)  # Активна когда не в режиме запуска
             )
-        if hasattr(self, "mode_run_label"):
-            self.mode_run_label.setStyleSheet(
-                "color: #ffffff;" if is_run else "color: #777777;"
+        if hasattr(self, "mode_run_button"):
+            self.mode_run_button.setStyleSheet(
+                self._get_panel_button_style(is_run)  # Активна когда в режиме запуска
             )
 
     def _apply_mode_state(self):
@@ -4042,6 +4432,9 @@ class MainWindow(QMainWindow):
             if old_dir != self.test_cases_dir:
                 # Перезагружаем дерево тест-кейсов, если изменилась папка
                 self.load_all_test_cases()
+                # Обновляем панель отчетности
+                if hasattr(self, 'aux_panel') and hasattr(self.aux_panel, 'reports_panel'):
+                    self.aux_panel.reports_panel.set_test_cases_dir(self.test_cases_dir)
         
         # Обновляем LLM настройки
         llm_host_changed = False
@@ -4077,6 +4470,12 @@ class MainWindow(QMainWindow):
                 testers_list = [t.strip() for t in testers_list.split('\n') if t.strip()]
                 if hasattr(self, 'aux_panel'):
                     self.aux_panel.set_information_testers(testers_list)
+        
+        # Обновляем настройку счетчиков в дереве
+        if 'show_folder_counters' in new_settings:
+            show_counters = new_settings.get('show_folder_counters', False)
+            if hasattr(self, 'tree_widget'):
+                self.tree_widget.set_show_folder_counters(show_counters)
         
         # Обновляем промпты
         if 'DEFAULT_PROMT' in new_settings:
@@ -4157,6 +4556,52 @@ class MainWindow(QMainWindow):
                 layout.setContentsMargins(margins[0], UI_METRICS.group_title_spacing, margins[2], margins[3])
     
     def closeEvent(self, event):
+        # Проверяем наличие незакоммиченных изменений
+        has_uncommitted, has_unpushed, has_conflicts = self._check_git_status()
+        
+        if has_uncommitted or has_unpushed:
+            # Формируем сообщение
+            message_parts = []
+            if has_uncommitted:
+                message_parts.append("• Есть незакоммиченные изменения")
+            if has_unpushed:
+                message_parts.append("• Есть незапушенные коммиты")
+            
+            message = "Обнаружены незавершенные изменения в Git:\n\n" + "\n".join(message_parts)
+            message += "\n\nХотите сделать коммит и пуш перед закрытием?"
+            
+            reply = QMessageBox.question(
+                self,
+                "Незавершенные изменения Git",
+                message,
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.Yes
+            )
+            
+            if reply == QMessageBox.Yes:
+                # Если есть незакоммиченные изменения, делаем коммит
+                if has_uncommitted:
+                    dialog = GitCommitDialog(self)
+                    if dialog.exec_() == QDialog.Accepted:
+                        comment = dialog.get_comment().strip()
+                        if comment:
+                            # Выполняем коммит синхронно (блокируем UI)
+                            self._perform_git_commit(comment)
+                            # Проверяем статус после коммита
+                            has_uncommitted, has_unpushed, has_conflicts = self._check_git_status()
+                        else:
+                            # Пользователь отменил коммит, отменяем закрытие
+                            event.ignore()
+                            return
+                    else:
+                        # Пользователь отменил диалог коммита, отменяем закрытие
+                        event.ignore()
+                        return
+                
+                # Если есть незапушенные коммиты, делаем пуш
+                if has_unpushed:
+                    self._perform_git_push()
+        
         # Останавливаем таймер проверки LLM
         if hasattr(self, '_llm_check_timer'):
             self._llm_check_timer.stop()
@@ -4304,8 +4749,6 @@ class MainWindow(QMainWindow):
         if 'group_title_spacing' in self.settings:
             UI_METRICS.group_title_spacing = self.settings['group_title_spacing']
 
-    def _on_mode_switch_changed(self, checked: bool):
-        self._set_mode("run" if checked else "edit")
 
     def _generate_allure_report(self):
         """Генерация Allure отчета из JSON файлов тест-кейсов"""
@@ -4341,8 +4784,8 @@ class MainWindow(QMainWindow):
             # Определяем папку приложения
             app_dir = Path(__file__).resolve().parent.parent.parent
             
-            # Проверяем и создаем папку Reports, если её нет
-            reports_dir = app_dir / "Reports"
+            # Проверяем и создаем папку Reports_by_viewer в родительской директории test_cases_dir
+            reports_dir = self.test_cases_dir.parent / "Reports_by_viewer"
             if not reports_dir.exists():
                 try:
                     reports_dir.mkdir(parents=True, exist_ok=True)
@@ -4350,9 +4793,9 @@ class MainWindow(QMainWindow):
                     QMessageBox.warning(
                         self,
                         "Ошибка создания папки",
-                        f"Не удалось создать папку Reports:\n{e}"
+                        f"Не удалось создать папку Reports_by_viewer:\n{e}"
                     )
-                    self.statusBar().showMessage(f"Ошибка создания папки Reports: {e}")
+                    self.statusBar().showMessage(f"Ошибка создания папки Reports_by_viewer: {e}")
                     return
             
             # Получаем название проекта из настроек
@@ -4389,22 +4832,22 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage(f"Ошибка: {e}")
 
     def _generate_summary_report(self):
-        """Генерация суммарного HTML отчета на основе всех отчетов в папке Reports"""
+        """Генерация суммарного HTML отчета на основе всех отчетов в папке Reports_by_viewer"""
         try:
             # Определяем папку приложения
             current_file = Path(__file__).resolve()
             app_dir = current_file.parent.parent.parent
             
-            # Определяем папку Reports
-            reports_dir = app_dir / "Reports"
+            # Определяем папку Reports_by_viewer в родительской директории test_cases_dir
+            reports_dir = self.test_cases_dir.parent / "Reports_by_viewer"
             
             if not reports_dir.exists():
                 QMessageBox.warning(
                     self,
-                    "Папка Reports не найдена",
-                    f"Папка Reports не существует:\n{reports_dir}",
+                    "Папка Reports_by_viewer не найдена",
+                    f"Папка Reports_by_viewer не существует:\n{reports_dir}",
                 )
-                self.statusBar().showMessage("Папка Reports не найдена")
+                self.statusBar().showMessage("Папка Reports_by_viewer не найдена")
                 return
             
             # Генерируем суммарный отчет
@@ -4437,7 +4880,7 @@ class MainWindow(QMainWindow):
                     self,
                     "Ошибка генерации суммарного отчета",
                     "Не удалось сгенерировать суммарный отчет.\n"
-                    "Убедитесь, что в папке Reports есть HTML отчеты.",
+                    "Убедитесь, что в папке Reports_by_viewer есть HTML отчеты.",
                 )
                 self.statusBar().showMessage("Ошибка при генерации суммарного отчета")
         except Exception as e:

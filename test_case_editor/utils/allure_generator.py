@@ -37,9 +37,10 @@ def generate_allure_report(
             # utils -> test_case_editor -> (корень проекта)
             app_dir = current_file.parent.parent.parent
         
-        # Создаем папку Reports
-        reports_dir = app_dir / "Reports"
-        reports_dir.mkdir(exist_ok=True)
+        # Создаем папку Reports_by_viewer в родительской директории test_cases_dir
+        # Если test_cases_dir = "/path/to/test_suites", то reports_dir = "/path/to/Reports_by_viewer"
+        reports_dir = test_cases_dir.parent / "Reports_by_viewer"
+        reports_dir.mkdir(exist_ok=True, parents=True)
         
         # Создаем подпапку с датой и временем
         dt = datetime.now()
