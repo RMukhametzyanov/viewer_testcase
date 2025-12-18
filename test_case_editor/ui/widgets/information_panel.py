@@ -45,6 +45,7 @@ class InformationPanel(QWidget):
         self.current_test_case: Optional[TestCase] = None
         self._is_loading = False
         self._testers_list: List[str] = []  # Список тестировщиков из настроек
+        self._features_list: List[str] = []  # Список фичей из настроек
         # Видимость элементов (по умолчанию все видимы)
         self._visibility_settings = {
             # Метаданные
@@ -272,8 +273,13 @@ class InformationPanel(QWidget):
         self.epic_input.setPlaceholderText("Epic")
         self.epic_container = self._add_labeled_widget(layout, "Epic:", self.epic_input)
 
-        self.feature_input = self._create_line_edit()
-        self.feature_input.setPlaceholderText("Feature")
+        self.feature_input = _NoWheelComboBox()
+        self.feature_input.setEditable(True)
+        self.feature_input.addItem("")  # Пустой элемент по умолчанию
+        line_edit = self.feature_input.lineEdit()
+        if line_edit:
+            line_edit.setPlaceholderText("Feature")
+        self.feature_input.currentTextChanged.connect(self._on_changed)
         self.feature_container = self._add_labeled_widget(layout, "Feature:", self.feature_input)
 
         self.story_input = self._create_line_edit()
@@ -342,6 +348,24 @@ class InformationPanel(QWidget):
             self._update_tester_combo(self.owner_input)
         if hasattr(self, 'reviewer_input'):
             self._update_tester_combo(self.reviewer_input)
+    
+    def set_features(self, features: List[str]):
+        """Установить список фичей из настроек"""
+        self._features_list = features if features else []
+        # Обновляем ComboBox фичей
+        if hasattr(self, 'feature_input'):
+            current_text = self.feature_input.currentText()
+            self.feature_input.clear()
+            self.feature_input.addItem("")  # Пустой элемент
+            for feature in sorted(self._features_list, key=str.lower):
+                self.feature_input.addItem(feature)
+            # Восстанавливаем текущий текст, если он был
+            if current_text:
+                index = self.feature_input.findText(current_text, Qt.MatchFixedString)
+                if index >= 0:
+                    self.feature_input.setCurrentIndex(index)
+                else:
+                    self.feature_input.setEditText(current_text)
 
     def _add_labeled_widget(self, parent_layout: QHBoxLayout, label_text: str, widget):
         """Добавить виджет с подписью и вернуть контейнер для управления видимостью"""
@@ -496,7 +520,14 @@ class InformationPanel(QWidget):
             self.epic_input.blockSignals(False)
 
             self.feature_input.blockSignals(True)
-            self.feature_input.setText(test_case.feature or "")
+            feature_text = test_case.feature or ""
+            # Пытаемся найти в списке
+            index = self.feature_input.findText(feature_text, Qt.MatchFixedString)
+            if index >= 0:
+                self.feature_input.setCurrentIndex(index)
+            else:
+                # Если не найдено, устанавливаем как редактируемый текст
+                self.feature_input.setEditText(feature_text)
             self.feature_input.blockSignals(False)
 
             self.story_input.blockSignals(True)
@@ -528,7 +559,7 @@ class InformationPanel(QWidget):
             self.issue_links_input.clear()
             self.test_case_links_input.clear()
             self.epic_input.clear()
-            self.feature_input.clear()
+            self.feature_input.setCurrentIndex(0)  # Устанавливаем пустой элемент
             self.story_input.clear()
             self.component_input.clear()
 
@@ -555,7 +586,7 @@ class InformationPanel(QWidget):
         test_case.issue_links = self.issue_links_input.text()
         test_case.test_case_links = self.test_case_links_input.text()
         test_case.epic = self.epic_input.text()
-        test_case.feature = self.feature_input.text()
+        test_case.feature = self.feature_input.currentText()
         test_case.story = self.story_input.text()
         test_case.component = self.component_input.text()
 

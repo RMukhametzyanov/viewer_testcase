@@ -124,15 +124,15 @@ class _StepsTableWidget(QTableWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        # Включаем попиксельный скролл ДО других настроек
+        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
+        # QTableWidget по умолчанию поддерживает разные высоты строк (uniformRowHeights = False)
+        
         self.setAcceptDrops(True)
         self.setDragDropMode(QAbstractItemView.DropOnly)
         self.setDefaultDropAction(Qt.CopyAction)
         self._drag_over_row = -1  # Текущая строка, над которой происходит drag
-        
-        # Настройка плавной прокрутки по пикселям
-        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
-        self.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
-        
         # Применяем стиль для обводки строки при drag & drop
         self.setStyleSheet("""
             QTableWidget::item {
@@ -201,38 +201,6 @@ class _StepsTableWidget(QTableWidget):
                         item.setBackground(QColor())
             self._drag_over_row = -1
     
-    def wheelEvent(self, event: QWheelEvent):
-        """Переопределяем wheelEvent для плавной пиксельной прокрутки."""
-        # Получаем вертикальный скроллбар
-        v_scrollbar = self.verticalScrollBar()
-        if v_scrollbar and v_scrollbar.isVisible():
-            # Получаем дельту прокрутки
-            delta = event.angleDelta().y()
-            
-            # Проверяем, есть ли пиксельная дельта (новые версии Qt)
-            pixel_delta = event.pixelDelta().y() if not event.pixelDelta().isNull() else None
-            
-            if pixel_delta is not None:
-                # Если есть пиксельная дельта, используем её напрямую
-                current_value = v_scrollbar.value()
-                new_value = current_value - pixel_delta
-                v_scrollbar.setValue(new_value)
-            else:
-                # Если delta в градусах (обычно 120 градусов за клик), конвертируем в пиксели
-                # Используем более плавный коэффициент для пиксельной прокрутки
-                # Стандартный шаг - 15 пикселей на 120 градусов (1 клик)
-                pixel_delta = (delta / 120.0) * 15
-                
-                # Прокручиваем на вычисленное количество пикселей
-                current_value = v_scrollbar.value()
-                new_value = current_value - int(pixel_delta)
-                v_scrollbar.setValue(new_value)
-            
-            event.accept()
-        else:
-            # Если вертикальный скроллбар не виден, используем стандартное поведение
-            super().wheelEvent(event)
-    
     def dropEvent(self, event: QDropEvent):
         """Обработка drop файлов."""
         # Убираем выделение
@@ -259,6 +227,20 @@ class _StepsTableWidget(QTableWidget):
         # Эмитируем сигнал с номером строки и списком файлов
         self.files_dropped_on_row.emit(row, file_paths)
         event.acceptProposedAction()
+    
+    def wheelEvent(self, event: QWheelEvent):
+        """Переопределяем wheelEvent для попиксельной прокрутки"""
+        # Получаем скроллбар и прокручиваем его напрямую для попиксельной прокрутки
+        scroll_bar = self.verticalScrollBar()
+        if scroll_bar and scroll_bar.isVisible():
+            # Используем delta() для получения точного значения прокрутки
+            delta = event.angleDelta().y()
+            # Прокручиваем на точное количество пикселей
+            scroll_bar.setValue(scroll_bar.value() - delta)
+            event.accept()
+        else:
+            # Если скроллбар не виден, используем стандартную обработку
+            super().wheelEvent(event)
 
 
 class TestCaseFormWidget(QWidget):
@@ -1379,6 +1361,11 @@ class TestCaseFormWidget(QWidget):
         # Убираем чередующиеся цвета строк - единый стиль для всей таблицы
         self.steps_table.setAlternatingRowColors(False)
         
+        # Убеждаемся, что попиксельный скролл установлен (уже установлен в __init__, но на всякий случай)
+        self.steps_table.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.steps_table.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
+        # QTableWidget по умолчанию поддерживает разные высоты строк
+        
         # Подключение сигналов
         self.steps_table.itemSelectionChanged.connect(self._update_step_controls_state)
         self.steps_table.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -1859,8 +1846,6 @@ class TestCaseFormWidget(QWidget):
         self.steps_table.setColumnHidden(4, not enabled)  # Показать действия в режиме редактирования
         
         self._update_step_controls_state()
-        # Обновляем высоту строк после изменения видимости колонок
-        QTimer.singleShot(0, self._update_table_row_heights)
 
     def set_run_mode(self, enabled: bool):
         self._run_mode_enabled = enabled
@@ -1883,9 +1868,6 @@ class TestCaseFormWidget(QWidget):
                 if buttons:
                     for btn in buttons:
                         btn.setEnabled(enabled)
-        
-        # Обновляем высоту строк после изменения видимости колонок
-        QTimer.singleShot(0, self._update_table_row_heights)
 
     def _refresh_step_indices(self):
         """Обновить номера шагов в колонке №."""

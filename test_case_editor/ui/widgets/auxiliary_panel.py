@@ -175,6 +175,11 @@ class AuxiliaryPanel(QWidget):
         """Установить список тестировщиков для панели информации"""
         if hasattr(self, "information_panel"):
             self.information_panel.set_testers(testers)
+    
+    def set_information_features(self, features: List[str]):
+        """Установить список фичей для панели информации"""
+        if hasattr(self, "information_panel"):
+            self.information_panel.set_features(features)
 
     # ------------------------------------------------------------------ files
 

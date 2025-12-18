@@ -1,20 +1,20 @@
 {
-    "test_cases_dir": "C:\\spektr-autotest\\manual_tests",
-    "DEFAULT_PROMT": "Сделай ревью тест-кейса. Поверхностное описание шагов не приемлемо. Необходимы детальные шаги.",
+    "test_cases_dir": "C:\\spektr-manual-tests\\manual_tests",
+    "DEFAULT_PROMT": "Сделай ревью",
     "panel_sizes": {
-        "left": 364,
-        "form_area": 1710,
-        "review": 559
+        "left": 461,
+        "form_area": 2061,
+        "review": 922
     },
     "LLM_MODEL": "qwen2.5:32b-instruct",
     "LLM_HOST": "http://spb99-vkc-dhwgpu07.devzone.local:11434",
     "LLM_METHODIC_PATH": "C:\\viewer_testcase\\test_case_editor\\docs\\test-cases-guidelines.md",
     "window_geometry": {
-        "x": 137,
-        "y": 55,
-        "width": 2101,
-        "height": 977,
-        "is_fullscreen": false
+        "x": 326,
+        "y": 57,
+        "width": 1281,
+        "height": 952,
+        "is_fullscreen": true
     },
     "DEFAULT_PROMT_CREATE_TC": "Создай тест-кейсы с акцентом на аспекты указанные в методике и ЧТЗ. Поверхностное описание шагов не приемлемо. Необходимы детальные шаги.",
     "theme": "dark",
@@ -24,7 +24,7 @@
     "base_spacing": 10,
     "section_spacing": 4,
     "container_padding": 4,
-    "group_title_spacing": 11,
+    "group_title_spacing": 10,
     "information_panel_visibility": {
         "id": true,
         "created": true,
@@ -40,13 +40,13 @@
         "environment": false,
         "browser": false,
         "test_case_id": true,
-        "issue_links": false,
+        "issue_links": true,
         "test_case_links": false,
         "tags": true,
         "epic": true,
         "feature": true,
         "story": true,
-        "component": true,
+        "component": false,
         "description": true,
         "expected_result": false
     },
@@ -54,12 +54,16 @@
         "Автотесты",
         "Нагрузочное тестирование",
         "Test-first",
+        "123",
         "Другое"
     ],
     "project_name": "СПЕКТР",
     "testers": [
-        "Руст",
-        "Сергей",
-        "Анна"
-    ]
+        "Lobanov.SI",
+        "Mukhametzyanov.RI",
+        "Bagautdinova.AV"
+    ],
+    "show_folder_counters": true,
+    "git_fetch_check_interval_minutes": 1,
+    "git_fetch_check_interval_seconds": 10
 }

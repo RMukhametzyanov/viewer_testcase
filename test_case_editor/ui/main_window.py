@@ -64,6 +64,21 @@ from ..utils.settings_path import get_settings_path
 from ..utils.allure_generator import generate_allure_report
 from ..utils.html_report_generator import generate_html_report
 from ..utils.resource_path import get_icon_path, get_icons_dir
+from ..utils.features_manager import (
+    load_features,
+    save_features,
+    update_feature_name_in_test_cases,
+    remove_feature_from_test_cases,
+    get_features_file_path,
+)
+# Условный импорт для git_conflict_resolver (может отсутствовать)
+try:
+    from ..git_conflict_resolver import GitConflictDetector, GitConflictResolverDialog
+    GIT_CONFLICT_RESOLVER_AVAILABLE = True
+except ImportError:
+    GitConflictDetector = None
+    GitConflictResolverDialog = None
+    GIT_CONFLICT_RESOLVER_AVAILABLE = False
 from .styles.ui_metrics import UI_METRICS
 from .styles.app_theme import build_app_style_sheet
 from .styles.theme_provider import THEME_PROVIDER, ThemeProvider
@@ -150,6 +165,7 @@ class SettingsDialog(QDialog):
             ("Внешний вид", "appearance"),
             ("Панель Информация", "information_panel"),
             ("Тест кейс", "test_case"),
+            ("Управление списком feature", "features"),
             ("Импорт", "import"),
         ]
         
@@ -180,6 +196,8 @@ class SettingsDialog(QDialog):
                 widget = self._create_information_panel_tab()
             elif key == "test_case":
                 widget = self._create_test_case_tab()
+            elif key == "features":
+                widget = self._create_features_tab()
             elif key == "import":
                 widget = self._create_import_tab()
             else:
@@ -476,6 +494,62 @@ class SettingsDialog(QDialog):
         
         skip_reasons_group.setLayout(skip_reasons_layout)
         content_layout.addWidget(skip_reasons_group)
+        
+        content_layout.addStretch()
+        scroll.setWidget(content)
+        layout.addWidget(scroll)
+        
+        return widget
+
+    def _create_features_tab(self) -> QWidget:
+        """Создать вкладку управления списком feature"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        layout.setSpacing(UI_METRICS.base_spacing)
+        
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.NoFrame)
+        
+        content = QWidget()
+        content_layout = QVBoxLayout(content)
+        content_layout.setSpacing(UI_METRICS.section_spacing)
+        
+        # Описание
+        info_label = QLabel("Управление списком feature. Список хранится в файле features.json в директории с тест-кейсами.")
+        info_label.setWordWrap(True)
+        content_layout.addWidget(info_label)
+        
+        # Список фичей
+        features_group = QGroupBox("Список feature")
+        features_layout = QVBoxLayout()
+        features_layout.setSpacing(UI_METRICS.base_spacing)
+        
+        # Список фичей
+        self.features_list = QListWidget()
+        self.features_list.setMinimumHeight(200)
+        features_layout.addWidget(self.features_list)
+        
+        # Кнопки управления
+        buttons_layout = QHBoxLayout()
+        
+        add_btn = QPushButton("Добавить")
+        add_btn.clicked.connect(self._add_feature)
+        buttons_layout.addWidget(add_btn)
+        
+        edit_btn = QPushButton("Редактировать")
+        edit_btn.clicked.connect(self._edit_feature)
+        buttons_layout.addWidget(edit_btn)
+        
+        delete_btn = QPushButton("Удалить")
+        delete_btn.clicked.connect(self._delete_feature)
+        buttons_layout.addWidget(delete_btn)
+        
+        buttons_layout.addStretch()
+        features_layout.addLayout(buttons_layout)
+        
+        features_group.setLayout(features_layout)
+        content_layout.addWidget(features_group)
         
         content_layout.addStretch()
         scroll.setWidget(content)
@@ -879,6 +953,18 @@ class SettingsDialog(QDialog):
             self.info_description_check.setChecked(info_visibility.get('description', True))
         if hasattr(self, 'info_expected_result_check'):
             self.info_expected_result_check.setChecked(info_visibility.get('expected_result', True))
+        
+        # Загружаем список фичей
+        if hasattr(self, 'features_list'):
+            features = load_features(self.settings)
+            self.features_list.clear()
+            # Загружаем фичи из файла
+            for feature in sorted(features, key=str.lower):
+                if feature and feature.strip():  # Пропускаем пустые значения
+                    self.features_list.addItem(feature.strip())
+            # Инициализируем словари для отслеживания изменений
+            self._feature_rename_map = {}
+            self._features_to_delete = []
 
     def _create_import_tab(self) -> QWidget:
         """Создать вкладку настроек импорта"""
@@ -924,6 +1010,137 @@ class SettingsDialog(QDialog):
             self.accept()
             # Вызываем метод импорта из главного окна
             self.parent_window.convert_from_azure()
+
+    def _add_feature(self):
+        """Добавить новую фичу"""
+        text, ok = QInputDialog.getText(
+            self,
+            "Добавить feature",
+            "Введите название feature:",
+            QLineEdit.Normal,
+            ""
+        )
+        if ok and text.strip():
+            # Проверяем на дубликаты (регистронезависимо)
+            existing_items = [
+                self.features_list.item(i).text()
+                for i in range(self.features_list.count())
+            ]
+            if text.strip().lower() in [item.lower() for item in existing_items]:
+                QMessageBox.warning(
+                    self,
+                    "Ошибка",
+                    f"Feature '{text.strip()}' уже существует в списке."
+                )
+                return
+            
+            self.features_list.addItem(text.strip())
+            # Сортируем список
+            self._sort_features_list()
+
+    def _edit_feature(self):
+        """Редактировать выбранную фичу"""
+        current_item = self.features_list.currentItem()
+        if not current_item:
+            QMessageBox.warning(
+                self,
+                "Ошибка",
+                "Выберите feature для редактирования."
+            )
+            return
+        
+        old_name = current_item.text()
+        text, ok = QInputDialog.getText(
+            self,
+            "Редактировать feature",
+            "Введите новое название feature:",
+            QLineEdit.Normal,
+            old_name
+        )
+        if ok and text.strip() and text.strip() != old_name:
+            # Проверяем на дубликаты (регистронезависимо)
+            existing_items = [
+                self.features_list.item(i).text()
+                for i in range(self.features_list.count())
+                if self.features_list.item(i) != current_item
+            ]
+            if text.strip().lower() in [item.lower() for item in existing_items]:
+                QMessageBox.warning(
+                    self,
+                    "Ошибка",
+                    f"Feature '{text.strip()}' уже существует в списке."
+                )
+                return
+            
+            # Сохраняем старое имя для обновления в тест-кейсах
+            self._feature_rename_map = getattr(self, '_feature_rename_map', {})
+            self._feature_rename_map[old_name] = text.strip()
+            
+            current_item.setText(text.strip())
+            # Сортируем список
+            self._sort_features_list()
+
+    def _delete_feature(self):
+        """Удалить выбранную фичу"""
+        current_item = self.features_list.currentItem()
+        if not current_item:
+            QMessageBox.warning(
+                self,
+                "Ошибка",
+                "Выберите feature для удаления."
+            )
+            return
+        
+        feature_name = current_item.text()
+        reply = QMessageBox.question(
+            self,
+            "Подтверждение удаления",
+            f"Вы уверены, что хотите удалить feature '{feature_name}'?\n\n"
+            f"Это также удалит эту feature из всех тест-кейсов.",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+        
+        if reply == QMessageBox.Yes:
+            # Сохраняем имя для удаления из тест-кейсов
+            self._features_to_delete = getattr(self, '_features_to_delete', [])
+            self._features_to_delete.append(feature_name)
+            
+            # Удаляем из списка
+            row = self.features_list.row(current_item)
+            self.features_list.takeItem(row)
+
+    def _sort_features_list(self):
+        """Отсортировать список фичей"""
+        if not hasattr(self, 'features_list'):
+            return
+        
+        items = []
+        for i in range(self.features_list.count()):
+            item = self.features_list.item(i)
+            if item:  # Проверяем, что элемент существует
+                text = item.text().strip()
+                if text:  # Пропускаем пустые значения
+                    items.append(text)
+        
+        if not items:
+            return
+        
+        items.sort(key=str.lower)
+        
+        # Сохраняем текущий выбранный элемент
+        current_item = self.features_list.currentItem()
+        current_text = current_item.text() if current_item else None
+        
+        self.features_list.clear()
+        for item_text in items:
+            self.features_list.addItem(item_text)
+        
+        # Восстанавливаем выбор, если возможно
+        if current_text:
+            index = self.features_list.findItems(current_text, Qt.MatchExactly)
+            if index:
+                self.features_list.setCurrentItem(index[0])
 
     def _save_and_accept(self):
         """Сохранить настройки и закрыть диалог"""
@@ -1034,6 +1251,58 @@ class SettingsDialog(QDialog):
         if hasattr(self, 'info_expected_result_check'):
             info_visibility['expected_result'] = self.info_expected_result_check.isChecked()
         self.settings['information_panel_visibility'] = info_visibility
+        
+        # Сохраняем список фичей
+        if hasattr(self, 'features_list'):
+            features = []
+            for i in range(self.features_list.count()):
+                item = self.features_list.item(i)
+                if item:
+                    text = item.text().strip()
+                    if text:  # Пропускаем пустые значения
+                        features.append(text)
+            # Всегда сохраняем список фичей (даже если он пустой)
+            success = save_features(self.settings, features)
+            if not success:
+                QMessageBox.warning(
+                    self,
+                    "Ошибка сохранения",
+                    "Не удалось сохранить список фичей. Проверьте права доступа к файлу."
+                )
+            
+            # Синхронизируем изменения в тест-кейсах
+            test_cases_dir_str = self.settings.get('test_cases_dir', '').strip()
+            if test_cases_dir_str:
+                test_cases_dir = Path(test_cases_dir_str)
+                
+                # Обновляем переименованные фичи
+                rename_map = getattr(self, '_feature_rename_map', {})
+                for old_name, new_name in rename_map.items():
+                    updated_count = update_feature_name_in_test_cases(
+                        test_cases_dir,
+                        old_name,
+                        new_name
+                    )
+                    if updated_count > 0:
+                        QMessageBox.information(
+                            self,
+                            "Обновление завершено",
+                            f"Обновлено {updated_count} тест-кейс(ов) при переименовании '{old_name}' в '{new_name}'."
+                        )
+                
+                # Удаляем фичи из тест-кейсов
+                features_to_delete = getattr(self, '_features_to_delete', [])
+                for feature_name in features_to_delete:
+                    updated_count = remove_feature_from_test_cases(
+                        test_cases_dir,
+                        feature_name
+                    )
+                    if updated_count > 0:
+                        QMessageBox.information(
+                            self,
+                            "Обновление завершено",
+                            f"Удалена feature '{feature_name}' из {updated_count} тест-кейс(ов)."
+                        )
         
         self.accept()
 
@@ -1527,6 +1796,10 @@ class MainWindow(QMainWindow):
             # Если сохранено как строка, разбиваем по переносам строк
             testers_list = [t.strip() for t in testers_list.split('\n') if t.strip()]
             self.aux_panel.set_information_testers(testers_list)
+        
+        # Загружаем и устанавливаем список фичей
+        features_list = load_features(self.settings)
+        self.aux_panel.set_information_features(features_list)
         # Устанавливаем минимальную и максимальную ширину для aux_panel
         # чтобы предотвратить автоматическое расширение
         self.aux_panel.setMinimumWidth(220)
@@ -1581,13 +1854,11 @@ class MainWindow(QMainWindow):
         self.view_menu = menubar.addMenu('Вид')
         width_action = self.view_menu.addAction('Настроить ширины панелей…')
         width_action.triggered.connect(self._configure_panel_widths)
-        width_action.setVisible(False)  # Скрываем, управление через панель инструментов
         statistics_action = self.view_menu.addAction('Показать статистику')
         statistics_action.triggered.connect(self._show_statistics_panel)
         
-        # Подменю "Режим" в меню "Вид" (скрыто, управление через панель инструментов)
+        # Подменю "Режим" в меню "Вид"
         mode_menu = self.view_menu.addMenu('Режим')
-        mode_menu.setVisible(False)  # Скрываем, управление через панель инструментов
         self._mode_action_group = QActionGroup(self)
         self._mode_action_group.setExclusive(True)
         self._mode_actions = {}
@@ -2710,13 +2981,8 @@ class MainWindow(QMainWindow):
                         f"Детали ошибки:\n{combined_output}"
                     )
                 elif "merge conflict" in error_lower or "conflict" in error_lower:
-                    # Сообщаем пользователю о конфликтах
-                    QMessageBox.warning(
-                        self,
-                        "Git Pull - Конфликты",
-                        "Обнаружены конфликты при слиянии. Пожалуйста, разрешите их вручную с помощью Git."
-                    )
-                    self.statusBar().showMessage("Git: обнаружены конфликты")
+                    # Открываем решатель конфликтов
+                    self._open_conflict_resolver()
                     return False
                 else:
                     error_message = (
@@ -2905,6 +3171,50 @@ class MainWindow(QMainWindow):
         
         # Обновляем стиль кнопки синхронизации Git
         self._update_git_sync_button_style(has_conflicts, has_uncommitted)
+    
+    def _open_conflict_resolver(self):
+        """Открыть диалог для решения конфликтов Git."""
+        if not GIT_CONFLICT_RESOLVER_AVAILABLE:
+            QMessageBox.warning(
+                self,
+                "Функция недоступна",
+                "Модуль разрешения Git-конфликтов не установлен."
+            )
+            return
+        
+        repo_root, git_path = self._get_git_repo_info()
+        if repo_root is None or git_path is None:
+            return
+        
+        # Обнаруживаем файлы с конфликтами
+        detector = GitConflictDetector(repo_root)
+        conflicted_files = detector.find_conflicted_files(git_path)
+        
+        if not conflicted_files:
+            QMessageBox.information(
+                self,
+                "Нет конфликтов",
+                "Конфликты не обнаружены."
+            )
+            return
+        
+        # Открываем диалог решения конфликтов
+        dialog = GitConflictResolverDialog(repo_root, conflicted_files, self)
+        dialog.conflicts_resolved.connect(self._on_conflicts_resolved)
+        dialog.exec_()
+    
+    def _on_conflicts_resolved(self, all_resolved: bool):
+        """Обработчик разрешения конфликтов."""
+        if all_resolved:
+            # Обновляем статус Git
+            self._update_git_status_indicators()
+            QMessageBox.information(
+                self,
+                "Конфликты разрешены",
+                "Все конфликты успешно разрешены. Вы можете продолжить синхронизацию."
+            )
+        else:
+            self._update_git_status_indicators()
     
     def select_test_cases_folder(self):
         """Обработчик выбора папки с тест-кейсами"""
@@ -4470,6 +4780,11 @@ class MainWindow(QMainWindow):
                 testers_list = [t.strip() for t in testers_list.split('\n') if t.strip()]
                 if hasattr(self, 'aux_panel'):
                     self.aux_panel.set_information_testers(testers_list)
+            
+            # Обновляем список фичей
+            if hasattr(self, 'aux_panel'):
+                features_list = load_features(new_settings)
+                self.aux_panel.set_information_features(features_list)
         
         # Обновляем настройку счетчиков в дереве
         if 'show_folder_counters' in new_settings:

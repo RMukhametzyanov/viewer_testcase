@@ -38,21 +38,6 @@ class FileItemWidget(QWidget):
         self.file_path = file_path
         self.attached_to_steps = attached_to_steps or []
         self._setup_ui()
-    
-    @staticmethod
-    def _extract_real_filename(filename: str) -> str:
-        """Извлечь реальное имя файла, отсекая префикс testCaseId-stepId_.
-        
-        Формат файла: {testCaseId}-{stepId}_{realName}.{extension}
-        Возвращает: {realName}.{extension}
-        """
-        # Ищем последнее подчеркивание, после которого идет реальное имя файла
-        last_underscore_idx = filename.rfind('_')
-        if last_underscore_idx != -1:
-            # Берем все после последнего подчеркивания
-            return filename[last_underscore_idx + 1:]
-        # Если подчеркивания нет, возвращаем имя как есть
-        return filename
 
     def _setup_ui(self):
         layout = QVBoxLayout(self)
@@ -65,10 +50,7 @@ class FileItemWidget(QWidget):
         file_row.setContentsMargins(0, 0, 0, 0)
         file_row.setSpacing(5)
 
-        # Извлекаем реальное имя файла, отсекая префикс testCaseId-stepId_
-        display_name = self._extract_real_filename(self.file_path.name)
-        
-        file_label = QLabel(display_name)
+        file_label = QLabel(self.file_path.name)
         file_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         file_label.setWordWrap(False)  # Не переносим текст на новую строку
         file_label.setToolTip(str(self.file_path))  # Полный путь в подсказке
@@ -543,22 +525,19 @@ class FilesPanel(QWidget):
 
     def _remove_file(self, file_path: Path):
         """Удалить файл из списка, из attachments шагов и с диска."""
-        # Извлекаем реальное имя файла для отображения
-        real_filename = FileItemWidget._extract_real_filename(file_path.name)
-        
         # Проверяем, к каким шагам прикреплен файл
         attached_to_steps = self._file_to_steps.get(file_path, [])
         
         if attached_to_steps:
             steps_text = ", ".join([f"Шаг {idx + 1}" for idx in attached_to_steps])
             message = (
-                f"Вы уверены, что хотите удалить файл '{real_filename}'?\n\n"
+                f"Вы уверены, что хотите удалить файл '{file_path.name}'?\n\n"
                 f"Файл прикреплен к: {steps_text}\n"
                 f"Файл будет удален с диска и убран из всех шагов."
             )
         else:
             message = (
-                f"Вы уверены, что хотите удалить файл '{real_filename}'?\n\n"
+                f"Вы уверены, что хотите удалить файл '{file_path.name}'?\n\n"
                 f"Файл будет удален с диска."
             )
 
@@ -618,11 +597,10 @@ class FilesPanel(QWidget):
             # Эмитируем сигнал об изменении attachments
             self.attachment_changed.emit()
         except Exception as e:
-            real_filename = FileItemWidget._extract_real_filename(file_path.name)
             QMessageBox.critical(
                 self,
                 "Ошибка удаления",
-                f"Не удалось удалить файл '{real_filename}':\n{str(e)}"
+                f"Не удалось удалить файл '{file_path.name}':\n{str(e)}"
             )
 
     def _update_files_height(self):
