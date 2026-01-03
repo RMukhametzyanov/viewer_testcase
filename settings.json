@@ -2,15 +2,15 @@
     "test_cases_dir": "C:\\spektr-manual-tests\\manual_tests",
     "DEFAULT_PROMT": "Сделай ревью",
     "panel_sizes": {
-        "left": 461,
-        "form_area": 2061,
-        "review": 922
+        "left": 503,
+        "form_area": 1379,
+        "review": 751
     },
     "LLM_MODEL": "qwen2.5:32b-instruct",
     "LLM_HOST": "http://spb99-vkc-dhwgpu07.devzone.local:11434",
     "LLM_METHODIC_PATH": "C:\\viewer_testcase\\test_case_editor\\docs\\test-cases-guidelines.md",
     "window_geometry": {
-        "x": 326,
+        "x": -1755,
         "y": 57,
         "width": 1281,
         "height": 952,
@@ -20,7 +20,7 @@
     "theme": "dark",
     "font_family": "Segoe UI",
     "font_size": 13,
-    "text_input_vertical_padding": 3,
+    "text_input_vertical_padding": 0,
     "base_spacing": 10,
     "section_spacing": 4,
     "container_padding": 4,
